@@ -1,0 +1,1 @@
+<img src="{{ asset('images/Samarent.png') }}" alt="" class="h-10">
