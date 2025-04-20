@@ -14,7 +14,6 @@ class Complete extends Model
         'no_telp_bengkel',
         'nominal_estimasi',
         'kode',
-        'no_pengajuan',
         'tanggal_masuk_finance',
         'tanggal_tf_finance',
         'nominal_tf_finance',

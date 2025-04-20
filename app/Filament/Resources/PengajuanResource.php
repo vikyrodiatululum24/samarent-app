@@ -27,7 +27,7 @@ class PengajuanResource extends Resource
 
     protected static ?string $slug = 'pengajuan';
 
-    protected static ?string $recordTitleAttribute = 'title';
+    protected static ?string $recordTitleAttribute = 'no_pengajuan';
 
     protected static ?string $navigationLabel = 'Pengajuan';
 
@@ -52,7 +52,7 @@ class PengajuanResource extends Resource
                                     ->required() // Ensure the field is required
                                     ->default(fn() => 'SPK/' . str_pad(\App\Models\Pengajuan::max('id') + 1, 4, '0', STR_PAD_LEFT) . '/' . now()->format('m') . '/' . now()->format('Y'))
                                     ->readOnly()
-                                    ->unique(), // Ensure the field value is unique
+                                    ->unique(ignoreRecord: true), // Ensure the field value is unique, but ignore the current record when editing
                                 Forms\Components\TextInput::make('nama')
                                     ->required()
                                     ->maxLength(255),
@@ -220,31 +220,23 @@ class PengajuanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            // ->query(function (Builder $query) {
-            //     $user = auth()->user();
-            //     if ($user->role === 'user') {
-            //         return $query->where('user_id', $user->id);
-            //     }
-
-            //     return $query; // admin melihat semua
-            // })
             ->columns([
                 Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('nama')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('no_wa')->sortable()->searchable(),
+                // Tables\Columns\TextColumn::make('no_wa')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('jenis')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('type')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('nopol')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('odometer')->sortable()->searchable(),
+                // Tables\Columns\TextColumn::make('nopol')->sortable()->searchable(),
+                // Tables\Columns\TextColumn::make('odometer')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('service')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('project')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('provinsi')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('kota')->sortable()->searchable(),
+                // Tables\Columns\TextColumn::make('provinsi')->sortable()->searchable(),
+                // Tables\Columns\TextColumn::make('kota')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('payment_1')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('bank_1')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('norek_1')->sortable()->searchable(),
+                // Tables\Columns\TextColumn::make('payment_1')->sortable()->searchable(),
+                // Tables\Columns\TextColumn::make('bank_1')->sortable()->searchable(),
+                // Tables\Columns\TextColumn::make('norek_1')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
                     ->sortable()
@@ -264,24 +256,22 @@ class PengajuanResource extends Resource
                         'Selesai' => 'success',
                         default => 'gray',
                     }),
-                Tables\Columns\ImageColumn::make('foto_unit')
-                    ->label('Foto Unit')
-                    ->getStateUsing(fn($record) => asset('storage/' . $record->foto_unit))
-                    ->height(50),
-                Tables\Columns\ImageColumn::make('foto_odometer')
-                    ->label('Foto Odometer')
-                    ->getStateUsing(fn($record) => asset('storage/' . $record->foto_odometer))
-                    ->height(50),
-                Tables\Columns\TextColumn::make('foto_kondisi')
-                    ->label('Semua Foto Kondisi')
-                    ->html()
-                    ->getStateUsing(function ($record) {
-                        return '<div style="display:flex; gap:6px;">' . collect($record->foto_kondisi)
-                            ->map(fn($file) => '<img src="' . asset('storage/' . $file) . '" width="50"/>')
-                            ->implode('') . '</div>';
-                    }),
-
-
+                // Tables\Columns\ImageColumn::make('foto_unit')
+                //     ->label('Foto Unit')
+                //     ->getStateUsing(fn($record) => asset('storage/' . $record->foto_unit))
+                //     ->height(50),
+                // Tables\Columns\ImageColumn::make('foto_odometer')
+                //     ->label('Foto Odometer')
+                //     ->getStateUsing(fn($record) => asset('storage/' . $record->foto_odometer))
+                //     ->height(50),
+                // Tables\Columns\TextColumn::make('foto_kondisi')
+                //     ->label('Semua Foto Kondisi')
+                //     ->html()
+                //     ->getStateUsing(function ($record) {
+                //         return '<div style="display:flex; gap:6px;">' . collect($record->foto_kondisi)
+                //             ->map(fn($file) => '<img src="' . asset('storage/' . $file) . '" width="50"/>')
+                //             ->implode('') . '</div>';
+                //     }),
             ])
             ->filters([
                 SelectFilter::make('keterangan_proses')
@@ -290,7 +280,7 @@ class PengajuanResource extends Resource
                         'cs' => 'Customer Service',
                         'finance' => 'Finance',
                         'done' => 'Selesai',
-                    ])                  
+                    ])
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
@@ -311,6 +301,8 @@ class PengajuanResource extends Resource
                     ->form([
                         Forms\Components\Fieldset::make('Informasi Bengkel')
                             ->schema([
+                                Hidden::make('user_id')
+                                    ->default(\Illuminate\Support\Facades\Auth::user()->id),
                                 Forms\Components\TextInput::make('bengkel_estimasi')
                                     ->label('Bengkel Estimasi')
                                     ->required()
@@ -372,8 +364,8 @@ class PengajuanResource extends Resource
                                         'paid' => 'Paid',
                                         'unpaid' => 'Unpaid',
                                     ])
+                                    ->required()
                                     ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid'),
-                                    // ->required(),
                             ])
                             ->columns(2),
                         Forms\Components\Fieldset::make('Transfer Bengkel')
@@ -427,8 +419,8 @@ class PengajuanResource extends Resource
                                             $set('foto_tambahan', array_slice($state, 0, 3));
                                         }
                                         $record = $livewire->record ?? null;
-                                        if ($record && is_array($record->foto_tambahan)) {
-                                            $lama = collect($record->foto_tambahan);
+                                        if ($record && is_array($record->complete->foto_tambahan)) {
+                                            $lama = collect($record->complete->foto_tambahan);
                                             $baru = collect($state);
                                             $yangDihapus = $lama->diff($baru);
                                             foreach ($yangDihapus as $path) {
@@ -506,7 +498,10 @@ class PengajuanResource extends Resource
                                     Components\TextEntry::make('nopol'),
                                     Components\TextEntry::make('odometer'),
                                     Components\TextEntry::make('service'),
+                                ]),
+                                Components\Group::make([
                                     Components\TextEntry::make('project'),
+                                    Components\TextEntry::make('keterangan'),
                                     Components\TextEntry::make('up'),
                                     Components\TextEntry::make('provinsi'),
                                     Components\TextEntry::make('kota'),
@@ -516,14 +511,11 @@ class PengajuanResource extends Resource
 
                 Components\Section::make('Pembayaran')
                     ->schema([
-                        Components\Grid::make(2)
+                        Components\Grid::make(3)
                             ->schema([
-                                Components\Group::make([
-                                    Components\TextEntry::make('keterangan'),
-                                    Components\TextEntry::make('payment_1'),
-                                    Components\TextEntry::make('bank_1'),
-                                    Components\TextEntry::make('norek_1'),
-                                ]),
+                                Components\TextEntry::make('payment_1'),
+                                Components\TextEntry::make('bank_1'),
+                                Components\TextEntry::make('norek_1'),
                             ]),
                     ]),
                 Components\Section::make('Dokumentasi')
@@ -558,54 +550,65 @@ class PengajuanResource extends Resource
                     ]),
                 Components\Section::make('Informasi Admin')
                     ->schema([
-                        Components\Grid::make(2)
+                        Components\Grid::make(1)
                             ->schema([
                                 Components\Group::make([
-                                    Components\TextEntry::make('admin.bengkel_estimasi')
-                                        ->label('Bengkel Estimasi'),
-                                    Components\TextEntry::make('admin.no_telp_bengkel')
-                                        ->label('No. Telp Bengkel'),
-                                    Components\TextEntry::make('admin.nominal_estimasi')
-                                        ->label('Nominal Estimasi'),
                                     Components\TextEntry::make('admin.kode')
                                         ->label('Kode'),
                                 ]),
+                            ]),
+                        Components\Grid::make(3)
+                            ->schema([
+                                Components\TextEntry::make('admin.bengkel_estimasi')
+                                    ->label('Bengkel Estimasi'),
+                                Components\TextEntry::make('admin.no_telp_bengkel')
+                                    ->label('No. Telp Bengkel'),
+                                Components\TextEntry::make('admin.nominal_estimasi')
+                                    ->label('Nominal Estimasi'),
+                            ])
+                            ->label('Informasi Bengkel'),
+                        Components\Grid::make(3)
+                            ->schema([
+                                Components\TextEntry::make('admin.tanggal_masuk_finance')
+                                    ->label('Tanggal Masuk Finance')
+                                    ->dateTime(),
+                                Components\TextEntry::make('admin.tanggal_tf_finance')
+                                    ->label('Tanggal Transfer Finance')
+                                    ->dateTime(),
+                                Components\TextEntry::make('admin.nominal_tf_finance')
+                                    ->label('Nominal Transfer Finance'),
+                            ]),
+                        Components\Grid::make(1)
+                            ->schema([
                                 Components\Group::make([
-                                    Components\TextEntry::make('admin.tanggal_masuk_finance')
-                                        ->label('Tanggal Masuk Finance')
-                                        ->dateTime(),
-                                    Components\TextEntry::make('admin.tanggal_tf_finance')
-                                        ->label('Tanggal Transfer Finance')
-                                        ->dateTime(),
-                                    Components\TextEntry::make('admin.nominal_tf_finance')
-                                        ->label('Nominal Transfer Finance'),
                                     Components\TextEntry::make('admin.payment_2')
                                         ->label('Metode Pembayaran'),
-                                    Components\TextEntry::make('admin.bank_2')
-                                        ->label('Bank'),
-                                    Components\TextEntry::make('admin.norek_2')
-                                        ->label('No. Rekening'),
-                                    Components\TextEntry::make('admin.status_finance')
-                                        ->label('Status Finance'),
                                 ]),
+                            ]),
+                        Components\Grid::make(3)
+                            ->schema([
+                                Components\TextEntry::make('admin.bank_2')
+                                    ->label('Bank'),
+                                Components\TextEntry::make('admin.norek_2')
+                                    ->label('No. Rekening'),
+                                Components\TextEntry::make('admin.status_finance')
+                                    ->label('Status Finance'),
                             ]),
                         Components\Grid::make(2)
                             ->schema([
-                                Components\Group::make([
-                                    Components\TextEntry::make('admin.nominal_tf_bengkel')
-                                        ->label('Nominal Transfer Bengkel'),
-                                    Components\TextEntry::make('admin.selisih_tf')
-                                        ->label('Selisih Transfer'),
-                                    Components\TextEntry::make('admin.tanggal_tf_bengkel')
-                                        ->label('Tanggal Transfer Bengkel')
-                                        ->dateTime(),
-                                    Components\TextEntry::make('admin.tanggal_pengerjaan')
-                                        ->label('Tanggal Pengerjaan')
-                                        ->dateTime(),
-                                ]),
+                                Components\TextEntry::make('admin.nominal_tf_bengkel')
+                                    ->label('Nominal Transfer Bengkel'),
+                                Components\TextEntry::make('admin.selisih_tf')
+                                    ->label('Selisih Transfer'),
+                                Components\TextEntry::make('admin.tanggal_tf_bengkel')
+                                    ->label('Tanggal Transfer Bengkel')
+                                    ->dateTime(),
+                                Components\TextEntry::make('admin.tanggal_pengerjaan')
+                                    ->label('Tanggal Pengerjaan')
+                                    ->dateTime(),
                             ]),
-
-                    ]),
+                    ])
+                    ->visible(fn($record) => !empty($record->admin)), // Only show when admin data is filled
                 Components\Section::make('Dokumentasi Admin')
                     ->schema([
                         ViewEntry::make('admin.foto_nota')
@@ -633,7 +636,8 @@ class PengajuanResource extends Resource
                     ->columns([
                         'default' => 4,
                         'md' => 5,
-                    ]),
+                    ])
+                    ->visible(fn($record)=> !empty($record->admin)),
             ]);
     }
 

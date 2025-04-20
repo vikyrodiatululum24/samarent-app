@@ -17,6 +17,8 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Facades\Filament;
+// use Illuminate\Support\Facades\Route;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -44,7 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
+                // Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
@@ -61,6 +63,14 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 \App\Http\Middleware\EnsureAdminRole::class,
             ]);
-            // ->logoutRedirectUrl(route('admin.logout'));
+        // ->logoutRedirectUrl(route('admin.logout'));
+    }
+
+    public function boot(): void
+    {
+        Filament::registerRenderHook(
+            'panels::body.end',
+            fn() => view('components.footer'),
+        );        
     }
 }

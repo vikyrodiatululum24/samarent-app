@@ -29,6 +29,7 @@ class Pengajuan extends Model
         'foto_unit',
         'foto_odometer',
         'foto_kondisi',
+        'keterangan_proses'
     ];
 
     protected $casts = [

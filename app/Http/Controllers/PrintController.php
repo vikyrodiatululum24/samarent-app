@@ -3,17 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengajuan;
+use PDF;
 use Illuminate\Http\Request;
-use Mpdf\Mpdf;
 
 class PrintController extends Controller
 {
-    public function printSpk($id)
+    public function viewSpk($id)
     {
-        $mpdf = new Mpdf();
         $pengajuan = Pengajuan::with('complete')->findOrFail($id);
-        $mpdf->WriteHTML(view('prints.spk', compact('pengajuan')));
-        $mpdf->Output('spk.pdf', 'I');
+        return view('prints.spk', compact('pengajuan'));
+    }
+    public function printSpk($id)
+    {   
+        // $data = ['title' => 'domPDF in Laravel 10'];
+        $pengajuan = Pengajuan::with('complete')->findOrFail($id);
+        $pdf = PDF::loadView('prints.spk', ['pengajuan' => $pengajuan]);
+        return $pdf->stream('spk.pdf');
     }
 
     public function printSjp($id)

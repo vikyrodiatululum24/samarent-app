@@ -126,14 +126,17 @@ class PengajuanResource extends Resource
                             ->reactive(),
                         Forms\Components\TextInput::make('payment_1')
                             ->nullable()
+                            ->required(fn(callable $get) => $get('keterangan') === 'Reimburse')
                             ->maxLength(255)
                             ->disabled(fn(callable $get) => $get('keterangan') !== 'Reimburse'),
                         Forms\Components\TextInput::make('bank_1')
                             ->nullable()
+                            ->required(fn(callable $get) => $get('keterangan') === 'Reimburse')
                             ->maxLength(255)
                             ->disabled(fn(callable $get) => $get('keterangan') !== 'Reimburse'),
                         Forms\Components\TextInput::make('norek_1')
                             ->nullable()
+                            ->required(fn(callable $get) => $get('keterangan') === 'Reimburse')
                             ->numeric()
                             ->maxLength(255)
                             ->disabled(fn(callable $get) => $get('keterangan') !== 'Reimburse'),
