@@ -62,7 +62,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 \App\Http\Middleware\EnsureAdminRole::class,
-            ]);
+            ])
+            ->databaseNotifications();
         // ->logoutRedirectUrl(route('admin.logout'));
     }
 

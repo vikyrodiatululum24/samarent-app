@@ -13,6 +13,8 @@ use Filament\Tables\Table;
 use Filament\Forms\Components\Hidden;
 use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ExportAction;
+use App\Filament\Exports\PengajuanExporter; // Ensure the PengajuanExporter class is imported
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
 use Filament\Pages\SubNavigationPosition;
@@ -347,7 +349,7 @@ class PengajuanResource extends Resource
                                     // ->required()
                                     ->default(fn($record) => $record->complete?->nominal_tf_finance),
                                 Forms\Components\TextInput::make('payment_2')
-                                    ->label('Metode Pembayaran')
+                                    ->label('Rekening Atas Nama')
                                     // ->required()
                                     ->default(fn($record) => $record->complete?->payment_2),
                                 Forms\Components\TextInput::make('bank_2')
@@ -444,7 +446,11 @@ class PengajuanResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportAction::make()->exporter(PengajuanExporter::class)
                 ]),
+            ])
+            ->headerActions([
+                ExportAction::make()->exporter(PengajuanExporter::class)
             ])
             ->defaultSort('id', 'desc') // Optional: Add default sorting
             ->recordUrl(null); // Disable row hover linking
@@ -548,84 +554,84 @@ class PengajuanResource extends Resource
                         'default' => 4,
                         'md' => 5,
                     ]),
-                Components\Section::make('Informasi Admin')
+                Components\Section::make('Informasi Complete')
                     ->schema([
                         Components\Grid::make(1)
                             ->schema([
                                 Components\Group::make([
-                                    Components\TextEntry::make('admin.kode')
+                                    Components\TextEntry::make('complete.kode')
                                         ->label('Kode'),
                                 ]),
                             ]),
                         Components\Grid::make(3)
                             ->schema([
-                                Components\TextEntry::make('admin.bengkel_estimasi')
+                                Components\TextEntry::make('complete.bengkel_estimasi')
                                     ->label('Bengkel Estimasi'),
-                                Components\TextEntry::make('admin.no_telp_bengkel')
+                                Components\TextEntry::make('complete.no_telp_bengkel')
                                     ->label('No. Telp Bengkel'),
-                                Components\TextEntry::make('admin.nominal_estimasi')
+                                Components\TextEntry::make('complete.nominal_estimasi')
                                     ->label('Nominal Estimasi'),
                             ])
                             ->label('Informasi Bengkel'),
                         Components\Grid::make(3)
                             ->schema([
-                                Components\TextEntry::make('admin.tanggal_masuk_finance')
+                                Components\TextEntry::make('complete.tanggal_masuk_finance')
                                     ->label('Tanggal Masuk Finance')
                                     ->dateTime(),
-                                Components\TextEntry::make('admin.tanggal_tf_finance')
+                                Components\TextEntry::make('complete.tanggal_tf_finance')
                                     ->label('Tanggal Transfer Finance')
                                     ->dateTime(),
-                                Components\TextEntry::make('admin.nominal_tf_finance')
+                                Components\TextEntry::make('complete.nominal_tf_finance')
                                     ->label('Nominal Transfer Finance'),
                             ]),
                         Components\Grid::make(1)
                             ->schema([
                                 Components\Group::make([
-                                    Components\TextEntry::make('admin.payment_2')
-                                        ->label('Metode Pembayaran'),
+                                    Components\TextEntry::make('complete.payment_2')
+                                        ->label('Nama Rekening'),
                                 ]),
                             ]),
                         Components\Grid::make(3)
                             ->schema([
-                                Components\TextEntry::make('admin.bank_2')
+                                Components\TextEntry::make('complete.bank_2')
                                     ->label('Bank'),
-                                Components\TextEntry::make('admin.norek_2')
+                                Components\TextEntry::make('complete.norek_2')
                                     ->label('No. Rekening'),
-                                Components\TextEntry::make('admin.status_finance')
+                                Components\TextEntry::make('complete.status_finance')
                                     ->label('Status Finance'),
                             ]),
                         Components\Grid::make(2)
                             ->schema([
-                                Components\TextEntry::make('admin.nominal_tf_bengkel')
+                                Components\TextEntry::make('complete.nominal_tf_bengkel')
                                     ->label('Nominal Transfer Bengkel'),
-                                Components\TextEntry::make('admin.selisih_tf')
+                                Components\TextEntry::make('complete.selisih_tf')
                                     ->label('Selisih Transfer'),
-                                Components\TextEntry::make('admin.tanggal_tf_bengkel')
+                                Components\TextEntry::make('complete.tanggal_tf_bengkel')
                                     ->label('Tanggal Transfer Bengkel')
                                     ->dateTime(),
-                                Components\TextEntry::make('admin.tanggal_pengerjaan')
+                                Components\TextEntry::make('complete.tanggal_pengerjaan')
                                     ->label('Tanggal Pengerjaan')
                                     ->dateTime(),
                             ]),
                     ])
-                    ->visible(fn($record) => !empty($record->admin)), // Only show when admin data is filled
-                Components\Section::make('Dokumentasi Admin')
+                    ->visible(fn($record) => !empty($record->complete)), // Only show when complete data is filled
+                Components\Section::make('Dokumentasi Complete')
                     ->schema([
-                        ViewEntry::make('admin.foto_nota')
+                        ViewEntry::make('complete.foto_nota')
                             ->label('Foto Nota')
                             ->view('filament.components.foto-nota')
                             ->columnSpan([
                                 'default' => 2,
                                 'md' => 1,
                             ]),
-                        ViewEntry::make('admin.foto_pengerjaan_bengkel')
+                        ViewEntry::make('complete.foto_pengerjaan_bengkel')
                             ->label('Foto Pengerjaan Bengkel')
                             ->view('filament.components.foto-pengerjaan-bengkel')
                             ->columnSpan([
                                 'default' => 2,
                                 'md' => 1,
                             ]),
-                        ViewEntry::make('admin.foto_tambahan')
+                        ViewEntry::make('complete.foto_tambahan')
                             ->label('Foto Tambahan')
                             ->view('filament.components.foto-tambahan')
                             ->columnSpan([
@@ -637,7 +643,7 @@ class PengajuanResource extends Resource
                         'default' => 4,
                         'md' => 5,
                     ])
-                    ->visible(fn($record)=> !empty($record->admin)),
+                    ->visible(fn($record)=> !empty($record->complete)),
             ]);
     }
 

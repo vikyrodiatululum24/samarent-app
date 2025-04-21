@@ -10,11 +10,12 @@
 <body>
     {{-- spk --}}
     <div>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; margin-top: 50mm;">
+        <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr style="height : 20mm;">
                 <td style="width: 20%; text-align: center; border: 2px solid black;">
                     <p style="margin: 2px 0;">KM AWAL</p>
-                    <h2 style="margin: 2px 0; font-weight: bold;">{{--  --}}</h2>
+                    <h2 style="margin: 2px 0; font-weight: bold;">&nbsp;</h2>
                 </td>
                 <th>
                     <h1>Surat Perintah Kerja</h1>
@@ -37,8 +38,8 @@
                 <td style="width: 30%;">
                     <p style="margin: 2px 0;">: {{ $pengajuan->complete->bengkel_estimasi }}</p>
                     <p style="margin: 2px 0;">: {{ $pengajuan->complete->no_telp_bengkel }}</p>
-                    <p style="margin: 2px 0;">: {{ $pengajuan->complete->estimasi }}</p>
-                    <p style="margin: 2px 0;">: {{ $pengajuan->complete->no_rek_bengkel }}</p>
+                    <p style="margin: 2px 0;">: {{ $pengajuan->complete->nominal_estimasi }}</p>
+                    <p style="margin: 2px 0;">: </p>
                 </td>
                 <th style="width: 20%; text-align: left;">
                     <p style="margin: 2px 0;">No WO</p>
@@ -63,7 +64,6 @@
                     <th style="border: 1px solid black; padding: 0.5rem">KM</th>
                     <th style="border: 1px solid black; padding: 0.5rem">Type Unit</th>
                     <th style="border: 1px solid black; padding: 0.5rem">Permintaan / Part</th>
-                    {{-- <th style="border: 1px solid black; padding: 0.5rem">Jumlah</th> --}}
                     <th style="border: 1px solid black; padding: 0.5rem">Keterangan</th>
                 </tr>
             </thead>
@@ -73,8 +73,8 @@
                     <td style="border: 1px solid black; padding: 0.5rem;">{{ $pengajuan->odometer }}</td>
                     <td style="border: 1px solid black; padding: 0.5rem;">{{ $pengajuan->type }}</td>
                     <td style="border: 1px solid black; padding: 0.5rem;">{{ $pengajuan->service }}</td>
-                    {{-- <td style="border: 1px solid black; padding: 0.5rem;">{{ $pengajuan->jumlah_part }}</td> --}}
-                    <td style="border: 1px solid black; padding: 0.5rem;">{{ $pengajuan->complete->kode }}</td>
+                    <td style="border: 1px solid black; padding: 0.5rem; text-transform:uppercase;">
+                        {{ $pengajuan->complete->kode }}</td>
                 </tr>
             </tbody>
         </table>
@@ -136,7 +136,7 @@
                     <p style="margin: 2px;">: {{ $pengajuan->complete->bengkel_estimasi }}</p>
                     <p style="margin: 2px;">: {{ $pengajuan->complete->cabang }}</p>
                     <p style="margin: 2px;">: {{ $pengajuan->complete->no_telp_bengkel }}</p>
-                    <p style="margin: 2px;">: {{ $pengajuan->complete->estimasi }}</p>
+                    <p style="margin: 2px;">: {{ $pengajuan->complete->nominal_estimasi }}</p>
                     <p style="margin: 2px;">: {{ $pengajuan->complete->no_rek_bengkel }}</p>
                 </td>
                 <th style="width: 20%; padding: 10px; text-align: left;">
@@ -174,7 +174,8 @@
                         <p style="margin: 2px;">tidak ada gambar</p>
                     @endif
                 </td>
-                <td style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
+                <td
+                    style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
                     @if ($pengajuan->foto_odometer)
                         <img src="{{ public_path('storage/' . $pengajuan->foto_odometer) }}" alt="Foto Odometer"
                             width="300">
@@ -192,15 +193,15 @@
                 </th>
             </tr>
             <tr>
-                <td style="width: 50%; padding: 10px; text-align: center; min-height: 300px; border: 1px solid black; vertical-align: top;">
-                @if ($pengajuan->foto_kondisi)
-                    @foreach ($pengajuan->foto_kondisi as $kondisi)
-                    <img src="{{ public_path('storage/' . $kondisi) }}" alt="Foto Odometer"
-                    width="300">
-                    @endforeach
-                @else
-                    <p style="margin: 2px;">tidak ada gambar</p>
-                @endif
+                <td
+                    style="width: 50%; padding: 10px; text-align: center; min-height: 300px; border: 1px solid black; vertical-align: top;">
+                    @if ($pengajuan->foto_kondisi)
+                        @foreach ($pengajuan->foto_kondisi as $kondisi)
+                            <img src="{{ public_path('storage/' . $kondisi) }}" alt="Foto Odometer" width="300">
+                        @endforeach
+                    @else
+                        <p style="margin: 2px;">tidak ada gambar</p>
+                    @endif
                     {{-- @php
                         $foto = $pengajuan->foto_kondisi ?? [];
                         $jumlah = count($foto);
@@ -217,7 +218,7 @@
                             @else
                             <div>
                                 {{-- Dua gambar pertama --}}
-                                {{-- <div style="margin: 0; padding: 0;">
+                    {{-- <div style="margin: 0; padding: 0;">
                                     <img src="{{ public_path('storage/' . $foto[0]) }}" alt="Foto Unit" width="150" style="margin: 2px;">
                                     <img src="{{ public_path('storage/' . $foto[1]) }}" alt="Foto Unit" width="150" style="margin: 2px;">
                                 </div>
@@ -235,11 +236,12 @@
                         <p style="margin: 2px;">tidak ada gambar</p>
                     @endif --}}
                 </td>
-                
-                <td style="width: 50%; padding: 10px; text-align: center; min-height: 300px; border: 1px solid black; vertical-align: top;">
-                    @if ($pengajuan->foto_nota)
-                        <img src="{{ public_path('storage/' . $pengajuan->foto_nota) }}" alt="Foto Odometer"
-                            width="300">
+
+                <td
+                    style="width: 50%; padding: 10px; text-align: center; min-height: 300px; border: 1px solid black; vertical-align: top;">
+                    @if ($pengajuan->complete->foto_nota)
+                        <img src="{{ public_path('storage/' . $pengajuan->complete->foto_nota) }}"
+                            alt="Foto Odometer" width="300">
                     @else
                         <p style="margin: 2px;">tidak ada gambar</p>
                     @endif
@@ -315,7 +317,8 @@
                     $fotoTambahan = $pengajuan->complete->foto_tambahan;
                     $fotoArray = is_string($fotoTambahan) ? json_decode($fotoTambahan, true) : $fotoTambahan;
                 @endphp
-                <td style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
+                <td
+                    style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
                     @if (!empty($fotoArray) && isset($fotoArray[0]))
                         <img src="{{ public_path('storage/' . $fotoArray[0]) }}" alt="Foto Tambahan" width="300">
                     @else
@@ -332,14 +335,16 @@
                 </th>
             </tr>
             <tr>
-                <td style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
+                <td
+                    style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
                     @if (!empty($fotoArray) && isset($fotoArray[1]))
                         <img src="{{ public_path('storage/' . $fotoArray[1]) }}" alt="Foto Tambahan" width="300">
                     @else
                         <p style="margin: 2px;">tidak ada gambar</p>
                     @endif
                 </td>
-                <td style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
+                <td
+                    style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
                     @if (!empty($fotoArray) && isset($fotoArray[2]))
                         <img src="{{ public_path('storage/' . $fotoArray[2]) }}" alt="Foto Tambahan" width="300">
                     @else
@@ -355,31 +360,72 @@
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr>
                 <th style="width: 20%; text-align: center; border: 1px solid black;">
-                    <img src="{{ public_path('images/logo_samarent.png') }}" alt="logo samarent" width="150">
+                    <img src="{{ public_path('images/logo_spj_samarent.jpg') }}" alt="logo samarent" width="150">
                 </th>
-                <th style="width: 80%; text-align: center; border: 1px solid black;">
-                    <h1 style="text-transform: uppercase; margin: 2px;">FORM</br> PERMOHONAN DANA SJP</h1>
+                <th style="width: 80%; text-align: center; border: 1px solid black; position: relative;">
+                    <div style="position: relative; text-align: center;">
+                        <h2 style="text-transform: uppercase; margin: 0;">
+                            FORM<br>PERMOHONAN DANA SJP
+                        </h2>
+                        <p style="position: absolute; top: 0; right: 10px; margin: 0; font-weight: normal;">
+                            {{ $pengajuan->no_pengajuan }}
+                        </p>
+                    </div>
                 </th>
             </tr>
         </table>
-    </br>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr style="vertical-align: top;">
-                <th style="width: 10%; padding: 10px; text-align: left;">
-                    <p style="margin: 2px;">Tanggal</p>
-                    <p style="margin: 2px;">Jumlah</p>
-                    <p style="margin: 2px;">Terbilang</p>
-                    <p style="margin: 2px;">Untuk Keperluan</p>
-                    <p style="margin: 2px;">Dibayarkan Oleh</p>
-                    <p style="margin: 2px;">Dibayarkan Kepada</p>
+                <th style="width: 10%; padding: 5px; text-align: left;">
+                    <p style="margin: 0;">Tanggal</p>
                 </th>
-                <td style="width: 30%; padding: 10px;">
-                    <p style="margin: 2px;">: ................................................... </p>
-                    <p style="margin: 2px;">: ................................................... </p>
-                    <p style="margin: 2px;">: ................................................... </p>
-                    <p style="margin: 2px;">: ................................................... </p>
-                    <p style="margin: 2px;">: ................................................... </p>
-                    <p style="margin: 2px;">: ................................................... </p>
+                <td style="width: 30%; padding: 5px;">
+                    <p style="margin: 0;">:
+                        {{ \Carbon\Carbon::parse($pengajuan->complete->tanggal_masuk_finance)->format('d F Y') }} </p>
+                </td>
+            </tr>
+            <tr style="vertical-align: top;">
+                <th style="width: 10%; padding: 5px; text-align: left;">
+                    <p style="margin: 0;">Jumlah</p>
+                </th>
+                <td style="width: 30%; padding: 5px;">
+                    <p style="margin: 0;">: Rp. {{ $pengajuan->complete->nominal_estimasi }} </p>
+                </td>
+            </tr>
+            <tr style="vertical-align: top;">
+                <th style="width: 10%; padding: 5px; text-align: left;">
+                    <p style="margin: 0;">Terbilang</p>
+                </th>
+                <td style="width: 30%; padding: 5px;">
+                    <p style="margin: 0;">: ({{ ucwords(terbilang($pengajuan->complete->nominal_estimasi)) }}
+                        rupiah) </p>
+                </td>
+            </tr>
+            <tr style="vertical-align: top;">
+                <th style="width: 10%; padding: 5px; text-align: left;">
+                    <p style="margin: 0;">Untuk Keperluan</p>
+                </th>
+                <td style="width: 30%; padding: 5px;">
+                    <p style="margin: 0;">: {{ $pengajuan->service.' '. $pengajuan->nopol. ' KM '.
+                        $pengajuan->odometer .' '. $pengajuan->service .' '. $pengajuan->type . ' ' . ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) . ' ' . $pengajuan->provinsi . '-' . $pengajuan->kota }}</p>
+                </td>
+            </tr>
+            <tr style="vertical-align: top;">
+                <th style="width: 10%; padding: 5px; text-align: left;">
+                    <p style="margin: 0;">Dibayarkan Oleh</p>
+                </th>
+                <td style="width: 30%; padding: 5px;">
+                    <p style="margin: 0;">: PT. Samana Jaya Propertindo </p>
+                </td>
+            </tr>
+            <tr style="vertical-align: top;">
+                <th style="width: 10%; padding: 5px; text-align: left;">
+                    <p style="margin: 0;">Dibayarkan Kepada</p>
+                </th>
+                <td style="width: 30%; padding: 5px;">
+                    <p style="margin: 0;">: {{ $pengajuan->complete->payment_2 }}
+                        {{ $pengajuan->complete->bank_2 }} {{ $pengajuan->complete->norek_2 }} <span
+                            style="font-weight: bold">{{ $pengajuan->keterangan }}</span></p>
                 </td>
             </tr>
         </table>
@@ -399,7 +445,8 @@
                 <td style="height: 113px; border: 1px solid black;">&nbsp;</td>
             </tr>
             <tr>
-                <td style="height: 38px; border: 1px solid black;">Tgl :</td>
+                <td style="height: 38px; border: 1px solid black;">Tgl : {{ $pengajuan->created_at->format('d F Y') }}
+                </td>
                 <td style="height: 38px; border: 1px solid black;">Tgl :</td>
                 <td style="height: 38px; border: 1px solid black;">Tgl :</td>
                 <td style="height: 38px; border: 1px solid black;">Tgl :</td>

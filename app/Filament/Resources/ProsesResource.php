@@ -75,7 +75,7 @@ class ProsesResource extends Resource
                             // ->required()
                             ->default(fn($record) => $record->complete?->nominal_tf_finance),
                         Forms\Components\TextInput::make('payment_2')
-                            ->label('Metode Pembayaran')
+                            ->label('Nama Rekening')
                             // ->required()
                             ->default(fn($record) => $record->complete?->payment_2),
                         Forms\Components\TextInput::make('bank_2')
