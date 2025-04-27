@@ -16,7 +16,6 @@ class PengajuanExporter extends Exporter
         return [
             ExportColumn::make('id')->label('ID'),
             ExportColumn::make('created_at')->label('Tanggal Pengajuan'),
-            ExportColumn::make('no_pengajuan')->label('No Pengajuan'),
             ExportColumn::make('nama')->label('Nama PIC'),
             ExportColumn::make('no_wa')->label('No WA'),
             ExportColumn::make('jenis'),
@@ -33,6 +32,7 @@ class PengajuanExporter extends Exporter
             ExportColumn::make('provinsi')->label('Provinsi'),
             ExportColumn::make('kota')->label('Kota'),
             ExportColumn::make('complete.kode')->label('Kode'),
+            ExportColumn::make('no_pengajuan')->label('No Pengajuan'),
             ExportColumn::make('complete.tanggal_masuk_finance')->label('Tanggal Masuk Finance'),
             ExportColumn::make('complete.tanggal_tf_finance')->label('Tanggal Transfer Finance'),
             ExportColumn::make('keterangan')->label('Jenis Pengajuan'),

@@ -20,11 +20,7 @@ class StatsOverview extends BaseWidget
             Stat::make('Customer Service', $csCount)
                 ->description('Jumlah pengajuan di tahap CS')
                 ->descriptionIcon('heroicon-m-user-group', IconPosition::Before)
-                ->color('primary')
-                ->extraAttributes([
-                    'class' => 'cursor-pointer',
-                    'wire:click' => "\$dispatch('setStatusFilter', { filter: 'cs' })",
-                ]),
+                ->color('primary'),
             Stat::make('Finance', $financeCount)
                 ->description('Jumlah pengajuan di tahap Finance')
                 ->descriptionIcon('heroicon-m-currency-dollar', IconPosition::Before)

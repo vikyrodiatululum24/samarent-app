@@ -32,6 +32,10 @@ class AuthenticatedSessionController extends Controller
             return Filament::getPanel('user')->getUrl();
         }
 
+        if ($user->role === 'finance') {
+            return Filament::getPanel('finance')->getUrl();
+        }
+
         return '/';
     }
 

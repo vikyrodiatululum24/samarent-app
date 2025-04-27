@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreatePengajuan extends CreateRecord
 {
     protected static string $resource = PengajuanResource::class;
+
+    public function getTitle(): string
+    {
+        return 'Buat Pengajuan Baru';
+    }
 }

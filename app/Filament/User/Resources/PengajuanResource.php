@@ -37,17 +37,13 @@ class PengajuanResource extends Resource
                             ->schema([
                                 Hidden::make('user_id')
                                     ->default(\Illuminate\Support\Facades\Auth::user()->id),
-                                Forms\Components\TextInput::make('no_pengajuan')
-                                    ->label('No. Pengajuan')
-                                    ->required() // Ensure the field is required
-                                    ->default(fn() => 'SPK/' . str_pad(\App\Models\Pengajuan::max('id') + 1, 4, '0', STR_PAD_LEFT) . '/' . now()->format('m') . '/' . now()->format('Y'))
-                                    ->readOnly()
-                                    ->unique(ignoreRecord: true), // Ensure the field value is unique only on create
                                 Forms\Components\TextInput::make('nama')
                                     ->required()
+                                    ->label('Nama PIC')
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('no_wa')
                                     ->required()
+                                    ->label('No. WhatsApp')
                                     ->numeric()
                                     ->maxLength(255),
                             ]),
@@ -55,12 +51,16 @@ class PengajuanResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('jenis')
                                     ->required()
+                                    ->label('Jenis Kendaraan')
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('type')
                                     ->required()
+                                    ->label('Tipe Unit')
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('nopol')
                                     ->required()
+                                    ->label('Nomor Polisi')
+                                    ->placeholder('Tanpa Spasi')
                                     ->maxLength(255),
                             ])
                     ])
@@ -78,15 +78,16 @@ class PengajuanResource extends Resource
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('service')
                                     ->required()
+                                    ->label('Jenis Permintaan Service')
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('project')
                                     ->required()
                                     ->maxLength(255),
                             ]),
                         Forms\Components\Group::make([
-
                             Forms\Components\Select::make('up')
                                 ->required()
+                                ->label('Unit Pelaksana')
                                 ->options([
                                     'UP 1' => 'UP 1',
                                     'UP 2' => 'UP 2',
@@ -98,7 +99,7 @@ class PengajuanResource extends Resource
                                 ->reactive()
                                 ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
                             Forms\Components\TextInput::make('up_lainnya')
-                                ->label('UP Lainnya')
+                                ->label('Unit Pelaksana Lainnya')
                                 ->required(fn(callable $get) => $get('up') === 'manual')
                                 ->visible(fn(callable $get) => $get('up') === 'manual'),
                             Forms\Components\TextInput::make('provinsi')
@@ -117,6 +118,7 @@ class PengajuanResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('keterangan')
                             ->required()
+                            ->label('Jenis Pengajuan')
                             ->options([
                                 'Reimburse' => 'Reimburse',
                                 'cash advance' => 'Cash Advance',
@@ -126,16 +128,19 @@ class PengajuanResource extends Resource
                             ->reactive(),
                         Forms\Components\TextInput::make('payment_1')
                             ->nullable()
+                            ->label('Nama Rekening')
                             ->required(fn(callable $get) => $get('keterangan') === 'Reimburse')
                             ->maxLength(255)
                             ->disabled(fn(callable $get) => $get('keterangan') !== 'Reimburse'),
                         Forms\Components\TextInput::make('bank_1')
                             ->nullable()
+                            ->label('Bank')
                             ->required(fn(callable $get) => $get('keterangan') === 'Reimburse')
                             ->maxLength(255)
                             ->disabled(fn(callable $get) => $get('keterangan') !== 'Reimburse'),
                         Forms\Components\TextInput::make('norek_1')
                             ->nullable()
+                            ->label('No. Rekening')
                             ->required(fn(callable $get) => $get('keterangan') === 'Reimburse')
                             ->numeric()
                             ->maxLength(255)
@@ -203,21 +208,16 @@ class PengajuanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            // ->query(fn(Builder $query) => $query->where('user_id', auth()->id()))
             ->columns([
-                Tables\Columns\TextColumn::make('nama')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('no_wa')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('jenis')->sortable(),
-                Tables\Columns\TextColumn::make('type')->sortable(),
-                Tables\Columns\TextColumn::make('nopol')->sortable(),
-                Tables\Columns\TextColumn::make('odometer')->sortable(),
-                Tables\Columns\TextColumn::make('service')->sortable(),
-                Tables\Columns\TextColumn::make('project')->sortable(),
-                Tables\Columns\TextColumn::make('provinsi')->sortable(),
-                Tables\Columns\TextColumn::make('kota')->sortable(),
-                Tables\Columns\TextColumn::make('payment_1')->sortable(),
-                Tables\Columns\TextColumn::make('bank_1')->sortable(),
-                Tables\Columns\TextColumn::make('norek_1')->sortable(),
+                Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('jenis')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('type')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
                     ->sortable()
@@ -226,20 +226,21 @@ class PengajuanResource extends Resource
                     ->getStateUsing(function ($record) {
                         return match ($record->keterangan_proses) {
                             'cs' => 'Customer Service',
-                            'finance' => 'Finance',
+                            'pengajuan finance' => 'Pengajuan Finance',
+                            'finance' => 'Input Finance',
+                            'otorisasi' => 'Otorisasi',
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
                     })
-                    ->color(fn(string $state) => match ($state) {
-                        'Customer Service' => 'gray',
-                        'Finance' => 'warning',
-                        'Selesai' => 'success',
+                    ->color(fn(string $state) => match (true) {
+                        str_contains($state, 'Customer Service') => 'gray',
+                        str_contains($state, 'Pengajuan Finance') => 'primary',
+                        str_contains($state, 'Input Finance') => 'warning',
+                        str_contains($state, 'Otorisasi') => 'warning',
+                        str_contains($state, 'Selesai') => 'success',
                         default => 'gray',
                     }),
-                Tables\Columns\ImageColumn::make('foto_unit'),
-                Tables\Columns\ImageColumn::make('foto_odometer'),
-                Tables\Columns\ImageColumn::make('foto_kondisi')->label('Foto Kondisi')->getStateUsing(fn($record) => $record->getFotoKondisiThumbnailAttribute()),
             ])
             ->filters([
                 SelectFilter::make('user_id')
@@ -274,14 +275,14 @@ class PengajuanResource extends Resource
         ];
     }
 
-    public static function getNavigationGroup(): ?string
+    public static function getModelLabel(): string
     {
-        return 'Pengajuan';
+        return 'Pengajuan'; // singular
     }
 
-    public static function getNavigationLabel(): string
+    public static function getPluralModelLabel(): string
     {
-        return 'Pengajuan';
+        return 'Pengajuan'; // tetap singular
     }
 
     public static function getNavigationBadge(): ?string

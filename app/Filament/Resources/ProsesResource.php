@@ -228,6 +228,16 @@ class ProsesResource extends Resource
         ];
     }
 
+    public static function getModelLabel(): string
+    {
+        return 'Customer Service'; // singular
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Customer Service'; // tetap singular
+    }
+
     public static function canCreate(): bool
     {
         return false; // Menghilangkan tombol create (newPengajuan)

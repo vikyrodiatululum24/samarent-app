@@ -57,6 +57,15 @@ class Pengajuan extends Model
         });
     }
 
+    protected static function booted()
+    {
+        static::creating(function ($pengajuan) {
+            $nextId = static::max('id') + 1;
+            $pengajuan->no_pengajuan = 'SPK/' . str_pad($nextId, 4, '0', STR_PAD_LEFT) . '/' . now()->format('m') . '/' . now()->format('Y');
+        });
+    }
+
+
     public function getFotoKondisiThumbnailAttribute()
     {
         return $this->foto_kondisi[0] ?? null;
@@ -71,4 +80,10 @@ class Pengajuan extends Model
     {
         return $this->hasone(Complete::class, 'pengajuan_id');
     }
+
+    public function finance()
+    {
+        return $this->hasone(Finance::class, 'pengajuan_id');
+    }
+    
 }

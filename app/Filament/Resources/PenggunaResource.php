@@ -30,16 +30,17 @@ class PenggunaResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
-                    ->label('Password')
-                    ->password()
+                ->password()
+                ->revealable()
+                ->label('Password')
                     ->maxLength(255)
                     ->required(fn($context) => $context === 'create') // Wajib hanya saat create
                     ->dehydrateStateUsing(function ($state) {
                         return filled($state) ? bcrypt($state) : null; // Enkripsi jika ada input
                     })
-                    ->afterStateHydrated(function ($component) {
-                        $component->state(''); // Kosongkan field saat edit agar tidak tampil hash
-                    })
+                    // ->afterStateHydrated(function ($component) {
+                    //     $component->state(''); // Kosongkan field saat edit agar tidak tampil hash
+                    // })
                     ->dehydrated(fn($state) => filled($state)) // Hanya simpan ke DB jika diisi
                     ->disableAutocomplete(),
 
@@ -91,6 +92,16 @@ class PenggunaResource extends Resource
         return [
             // Define relations if needed
         ];
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Pengguna'; // singular
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Pengguna'; // tetap singular
     }
 
     public static function getPages(): array

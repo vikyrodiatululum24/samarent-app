@@ -8,16 +8,21 @@ use App\Http\Controllers\PrintController;
 
 
 Route::get('/', function () {
-    if (Auth::hasUser()) {
-        if (Auth::user()->role === 'admin') {
+    $user = Auth::user();
+
+    if ($user) {
+        if ($user->role === 'admin') {
             return redirect('/admin');
-        } elseif (Auth::user()->role === 'user') {
+        } else if ($user->role === 'user') {
             return redirect('/user');
+        } else if ($user->role === 'finance') {
+            return redirect('/finance');
         }
-    } else {
-        return redirect('/login');
     }
+
+    return redirect('/login');
 })->name('dashboard');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

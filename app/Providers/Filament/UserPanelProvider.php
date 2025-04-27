@@ -26,6 +26,7 @@ class UserPanelProvider extends PanelProvider
             ->id('user')
             ->path('user')
             ->brandName('SAMARENT')
+            ->favicon(asset('images/icon.png'))
             ->brandLogo(asset('images/Samarent.png')) // ganti logo
             ->brandLogoHeight('50px')
             ->colors([

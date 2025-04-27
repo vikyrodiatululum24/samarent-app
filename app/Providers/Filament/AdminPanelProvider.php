@@ -28,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->favicon(asset('images/icon.png'))
             ->brandName('SAMARENT')
             ->brandLogo(asset('images/Samarent.png')) // ganti logo
             ->brandLogoHeight('50px')
