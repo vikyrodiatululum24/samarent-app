@@ -54,45 +54,52 @@ class ProsesResource extends Resource
                                 'op' => 'OP',
                                 'sc' => 'SC',
                                 'sp' => 'SP',
+                                'stnk' => 'STNK',
                             ])
                             ->required()
                             ->default(fn($record) => $record->complete?->kode),
-                    ])
-                    ->columns(1),
-                Forms\Components\Fieldset::make('Informasi Finance')
-                    ->schema([
                         Forms\Components\DatePicker::make('tanggal_masuk_finance')
                             ->label('Tanggal Masuk Finance')
                             ->required()
                             ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
+                    ])
+                    ->columns(1),
+                Forms\Components\Fieldset::make('Informasi Finance')
+                    ->schema([
                         Forms\Components\DatePicker::make('tanggal_tf_finance')
                             ->label('Tanggal Transfer Finance')
                             // ->required()
+                            ->readOnly()
                             ->default(fn($record) => $record->complete?->tanggal_tf_finance),
                         Forms\Components\TextInput::make('nominal_tf_finance')
                             ->label('Nominal Transfer Finance')
                             ->numeric()
                             // ->required()
+                            ->readOnly()
                             ->default(fn($record) => $record->complete?->nominal_tf_finance),
                         Forms\Components\TextInput::make('payment_2')
-                            ->label('Nama Rekening')
+                            ->label('Rekening Atas Nama')
                             // ->required()
+                            ->readOnly()
                             ->default(fn($record) => $record->complete?->payment_2),
                         Forms\Components\TextInput::make('bank_2')
                             ->label('Bank')
                             // ->required()
+                            ->readOnly()
                             ->default(fn($record) => $record->complete?->bank_2),
                         Forms\Components\TextInput::make('norek_2')
                             ->label('No. Rekening')
                             // ->required()
+                            ->readOnly()
                             ->default(fn($record) => $record->complete?->norek_2),
-                        Forms\Components\Select::make('status_finance')
+                        Forms\Components\TextInput::make('status_finance')
                             ->label('Status Finance')
-                            ->options([
-                                'paid' => 'Paid',
-                                'unpaid' => 'Unpaid',
-                            ])
+                            // ->options([
+                            //     'paid' => 'Paid',
+                            //     'unpaid' => 'Unpaid',
+                            // ])
                             ->required()
+                            ->readOnly()
                             ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid'),
                     ])
                     ->columns(2),

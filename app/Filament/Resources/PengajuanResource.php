@@ -349,7 +349,7 @@ class PengajuanResource extends Resource
                                     //     'unpaid' => 'Unpaid',
                                     // ])
                                     ->required()
-                                    ->readonly()
+                                    ->readOnly()
                                     ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid'),
                             ])
                             ->columns(2),
