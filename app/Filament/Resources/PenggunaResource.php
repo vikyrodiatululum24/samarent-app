@@ -16,7 +16,7 @@ class PenggunaResource extends Resource
 
     protected static ?string $navigationLabel = 'Pengguna';
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    // protected static ?string $navigationIcon = 'heroicon-o-users';
 
     public static function form(Form $form): Form
     {
@@ -30,9 +30,9 @@ class PenggunaResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
-                ->password()
-                ->revealable()
-                ->label('Password')
+                    ->password()
+                    ->revealable()
+                    ->label('Password')
                     ->maxLength(255)
                     ->required(fn($context) => $context === 'create') // Wajib hanya saat create
                     ->dehydrateStateUsing(function ($state) {
@@ -48,6 +48,8 @@ class PenggunaResource extends Resource
                     ->options([
                         'admin' => 'Admin',
                         'user' => 'User',
+                        'finance' => 'Finance',
+                        'manager' => 'Manager',
                     ])
                     ->required(),
             ]);

@@ -29,75 +29,6 @@ class PengajuanResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    // public static function form(Form $form): Form
-    // {
-    //     // Pastikan relasi dimuat
-    //     // $record = $form->getRecord();
-    //     // $record->load('complete', 'finance');
-    //     // dd($record->complete->payment_2, $record->finance);
-    
-    //     // return $form
-    //         // ->schema([
-    //         //     Forms\Components\Fieldset::make('Informasi Finance')
-    //         //         ->schema([
-    //         //             Forms\Components\Grid::make(3)
-    //         //                 ->schema([
-    //         //                     Forms\Components\TextInput::make('complete.payment_2')
-    //         //                         ->label('Rekening Atas Nama')
-    //         //                         ->required()
-    //         //                         ->default(fn($record) => $record->complete?->payment_2 ?? ''),
-    //         //                     Forms\Components\TextInput::make('complete.bank_2')
-    //         //                         ->label('Bank')
-    //         //                         ->required()
-    //         //                         ->default(fn($record) => $record->complete?->bank_2 ?? ''),
-    //         //                     Forms\Components\TextInput::make('complete.norek_2')
-    //         //                         ->label('No. Rekening')
-    //         //                         ->numeric()
-    //         //                         ->required()
-    //         //                         ->default(fn($record) => $record->complete?->norek_2 ?? ''),
-    //         //                 ]),
-    //         //             Forms\Components\Grid::make(3)
-    //         //                 ->schema([
-    //         //                     Forms\Components\DatePicker::make('complete.tanggal_tf_finance')
-    //         //                         ->label('Tanggal Transfer')
-    //         //                         ->required(fn($get) => $get('complete.status_finance') === 'paid')
-    //         //                         ->default(fn($record) => $record->complete?->tanggal_tf_finance),
-    //         //                     Forms\Components\TextInput::make('complete.nominal_tf_finance')
-    //         //                         ->label('Nominal Transfer')
-    //         //                         ->numeric()
-    //         //                         ->required(fn($get) => $get('complete.status_finance') === 'paid')
-    //         //                         ->default(fn($record) => $record->complete?->nominal_tf_finance),
-    //         //                     Forms\Components\Select::make('complete.status_finance')
-    //         //                         ->label('Status')
-    //         //                         ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid')
-    //         //                         ->options([
-    //         //                             'paid' => 'Paid',
-    //         //                             'unpaid' => 'Unpaid',
-    //         //                         ]),
-    //         //                 ]),
-    //         //             Forms\Components\FileUpload::make('finance.bukti_transaksi')
-    //         //                 ->image()
-    //         //                 ->required(fn($get) => $get('complete.status_finance') === 'paid')
-    //         //                 ->label('Bukti Transaksi')
-    //         //                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp'])
-    //         //                 ->disk('public')
-    //         //                 ->directory('bukti_transaksi')
-    //         //                 ->visibility('public')
-    //         //                 ->afterStateUpdated(function ($state, callable $get, callable $set, $livewire) {
-    //         //                     $record = $livewire->record ?? null;
-    //         //                     if ($record && $record->finance?->bukti_transaksi) {
-    //         //                         Storage::disk('public')->delete($record->finance->bukti_transaksi);
-    //         //                     }
-    //         //                     if ($state) {
-    //         //                         $set('finance.bukti_transaksi', $state);
-    //         //                     }
-    //         //                 }),
-    //         //         ])
-    //         //         ->columns(1),
-    //         // ]);
-    // }
-    
-
     public static function table(Table $table): Table
     {
         return $table
@@ -146,64 +77,64 @@ class PengajuanResource extends Resource
                         'done' => 'Selesai',
                     ]),
             ])
-                ->actions([
-                    Tables\Actions\Action::make('Proses')
+            ->actions([
+                Tables\Actions\Action::make('Proses')
                     ->label('Proses')
                     ->icon('heroicon-o-pencil')
                     ->form([
-                            Forms\Components\Fieldset::make('Informasi Finance')
-                                ->schema([
-                                    Hidden::make('finance.user_id')
+                        Forms\Components\Fieldset::make('Informasi Finance')
+                            ->schema([
+                                Hidden::make('finance.user_id')
                                     ->default(\Illuminate\Support\Facades\Auth::user()->id),
-                                    Forms\Components\Grid::make(3)
-                                        ->schema([
-                                            Forms\Components\TextInput::make('complete.payment_2')
-                                                ->label('Rekening Atas Nama')
-                                                ->required()
-                                                ->default(fn($record) => $record->complete?->payment_2 ?? ''),
-                                            Forms\Components\TextInput::make('complete.bank_2')
-                                                ->label('Bank')
-                                                ->required()
-                                                ->default(fn($record) => $record->complete?->bank_2 ?? ''),
-                                            Forms\Components\TextInput::make('complete.norek_2')
-                                                ->label('No. Rekening')
-                                                ->numeric()
-                                                ->required()
-                                                ->default(fn($record) => $record->complete?->norek_2 ?? ''),
-                                        ]),
-                                        Forms\Components\Grid::make(3)
-                                        ->schema([
-                                            Forms\Components\DatePicker::make('complete.tanggal_tf_finance')
-                                                ->label('Tanggal Transfer')
-                                                ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
-                                                ->default(fn($record) => $record->complete?->tanggal_tf_finance),
-                                    
-                                            Forms\Components\TextInput::make('complete.nominal_tf_finance')
-                                                ->label('Nominal Transfer')
-                                                ->numeric()
-                                                ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
-                                                ->default(fn($record) => $record->complete?->nominal_tf_finance),
-                                    
-                                            Forms\Components\Select::make('complete.status_finance')
-                                                ->label('Status')
-                                                ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid')
-                                                ->options([
-                                                    'paid' => 'Paid',
-                                                    'unpaid' => 'Unpaid',
-                                                ]),
-                                    
-                                        ]),
-                                    
-                                    Forms\Components\FileUpload::make('finance.bukti_transaksi')
-                                        ->label('Bukti Transaksi')
-                                        ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
-                                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp'])
-                                        ->disk('public')
-                                        ->directory('bukti_transaksi')
-                                        ->default(fn($record) => $record->finance?->bukti_transaksi),
-                                ])
-                                ->columns(1),
-                        ])
+                                Forms\Components\Grid::make(3)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('complete.payment_2')
+                                            ->label('Rekening Atas Nama')
+                                            ->required()
+                                            ->default(fn($record) => $record->complete?->payment_2 ?? ''),
+                                        Forms\Components\TextInput::make('complete.bank_2')
+                                            ->label('Bank')
+                                            ->required()
+                                            ->default(fn($record) => $record->complete?->bank_2 ?? ''),
+                                        Forms\Components\TextInput::make('complete.norek_2')
+                                            ->label('No. Rekening')
+                                            ->numeric()
+                                            ->required()
+                                            ->default(fn($record) => $record->complete?->norek_2 ?? ''),
+                                    ]),
+                                Forms\Components\Grid::make(3)
+                                    ->schema([
+                                        Forms\Components\DatePicker::make('complete.tanggal_tf_finance')
+                                            ->label('Tanggal Transfer')
+                                            ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
+                                            ->default(fn($record) => $record->complete?->tanggal_tf_finance),
+
+                                        Forms\Components\TextInput::make('complete.nominal_tf_finance')
+                                            ->label('Nominal Transfer')
+                                            ->numeric()
+                                            ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
+                                            ->default(fn($record) => $record->complete?->nominal_tf_finance),
+
+                                        Forms\Components\Select::make('complete.status_finance')
+                                            ->label('Status')
+                                            ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid')
+                                            ->options([
+                                                'paid' => 'Paid',
+                                                'unpaid' => 'Unpaid',
+                                            ]),
+
+                                    ]),
+
+                                Forms\Components\FileUpload::make('finance.bukti_transaksi')
+                                    ->label('Bukti Transaksi')
+                                    ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp'])
+                                    ->disk('public')
+                                    ->directory('bukti_transaksi')
+                                    ->default(fn($record) => $record->finance?->bukti_transaksi),
+                            ])
+                            ->columns(1),
+                    ])
                     ->action(function (array $data, Pengajuan $record) {
                         $data['finance']['user_id'] = \Illuminate\Support\Facades\Auth::user()->id;
                         $record->complete()->updateOrCreate([], $data['complete']); // Update or create related data
@@ -215,12 +146,12 @@ class PengajuanResource extends Resource
                             ->success()
                             ->send();
                     }),
-                ])
-                ->bulkActions([
+            ])
+            ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]); 
+            ]);
     }
 
     public static function infolist(Infolist $infolist): Infolist
@@ -409,12 +340,19 @@ class PengajuanResource extends Resource
                                 'default' => 4,
                                 'md' => 3,
                             ]),
+                        ViewEntry::make('finance.bukti_transaksi')
+                            ->label('Bukti Transaksi')
+                            ->view('filament.components.bukti_transaksi')
+                            ->columnSpan([
+                                'default' => 4,
+                                'md' => 3,
+                            ]),
                     ])
                     ->columns([
                         'default' => 4,
                         'md' => 5,
                     ])
-                    ->visible(fn($record)=> !empty($record->complete)),
+                    ->visible(fn($record) => !empty($record->complete)),
             ]);
     }
 

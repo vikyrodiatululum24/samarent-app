@@ -19,7 +19,7 @@ class ProsesResource extends Resource
 {
     protected static ?string $model = Complete::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-adjustments-horizontal';
+    // protected static ?string $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
     protected static ?string $navigationLabel = 'Customer Service';
 
@@ -189,7 +189,7 @@ class ProsesResource extends Resource
                     ->getStateUsing(function ($record) {
                         return match ($record->status_finance) {
                             'unpaid' => 'Unpaid',
-                            'padi' => 'Paid',
+                            'paid' => 'Paid',
                             default => 'Tidak Diketahui',
                         };
                     })

@@ -22,22 +22,4 @@ class PrintController extends Controller
         $pdf = PDF::loadView('prints.spk', ['pengajuan' => $pengajuan]);
         return $pdf->stream("$namaFile.pdf");
     }
-
-    public function printSjp($id)
-    {
-        $pengajuan = Pengajuan::findOrFail($id);
-        return view('prints.sjp', compact('pengajuan'));
-    }
-
-    public function printLampiran($id)
-    {
-        $pengajuan = Pengajuan::findOrFail($id);
-        return view('prints.lampiran', compact('pengajuan'));
-    }
-
-    public function printLampiran2($id)
-    {
-        $pengajuan = Pengajuan::findOrFail($id);
-        return view('prints.lampiran2', compact('pengajuan'));
-    }
 }

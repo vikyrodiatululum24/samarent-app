@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PengajuanResource\Pages;
-use App\Filament\Resources\PengajuanResource\RelationManagers;
 use App\Models\Pengajuan;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -21,9 +20,7 @@ use Filament\Infolists\Infolist;
 use Filament\Pages\SubNavigationPosition;
 use Filament\Resources\Pages\Page;
 use Filament\Infolists\Components\ViewEntry;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Actions\CreateAction;
 
 class PengajuanResource extends Resource
 {
@@ -37,7 +34,7 @@ class PengajuanResource extends Resource
 
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    // protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
@@ -106,6 +103,7 @@ class PengajuanResource extends Resource
                                     'UP 3' => 'UP 3',
                                     'UP 5' => 'UP 5',
                                     'UP 7' => 'UP 7',
+                                    'PT Jepang' => 'PT Jepang',
                                     'manual' => 'Lainnya',
                                 ])
                                 ->reactive()
@@ -223,14 +221,21 @@ class PengajuanResource extends Resource
     {
         return $table
             ->columns([
-            Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('jenis')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('type')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->sortable()
+                    ->searchable()
+                    ->label('Tanggal Pengajuan')
+                    ->date('d M Y')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('User'),
+                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Nama PIC'),
+                Tables\Columns\TextColumn::make('nopol')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('No. Polisi'),
+                Tables\Columns\TextColumn::make('jenis')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Jenis Kendaraan'),
+                Tables\Columns\TextColumn::make('type')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Type Unit'),
+                Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Permintaan Service'),
+                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project'),
+                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana'),
                 Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
@@ -299,15 +304,16 @@ class PengajuanResource extends Resource
                                         'op' => 'OP',
                                         'sc' => 'SC',
                                         'sp' => 'SP',
+                                        'stnk' => 'STNK',
                                     ])
                                     ->required()
                                     ->default(fn($record) => $record->complete?->kode),
-                                    Forms\Components\DatePicker::make('tanggal_masuk_finance')
-                                        ->label('Tanggal Masuk Finance')
-                                        ->required()
-                                        ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
-                                ])
-                                ->columns(1),
+                                Forms\Components\DatePicker::make('tanggal_masuk_finance')
+                                    ->label('Tanggal Masuk Finance')
+                                    ->required()
+                                    ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
+                            ])
+                            ->columns(1),
                         Forms\Components\Fieldset::make('Informasi Finance')
                             ->schema([
                                 Forms\Components\DatePicker::make('tanggal_tf_finance')
@@ -362,7 +368,8 @@ class PengajuanResource extends Resource
                                     ->required(fn($record) => $record->complete?->status_finance === 'paid')
                                     ->default(fn($record) => $record->complete?->selisih_tf)
                                     ->reactive()
-                                    ->afterStateUpdated(fn(callable $set, $state, callable $get) => $set('selisih_tf', 
+                                    ->afterStateUpdated(fn(callable $set, $state, callable $get) => $set(
+                                        'selisih_tf',
                                         // Ambil nilai nominal_tf_finance dari database berdasarkan record
                                         $get('nominal_tf_finance') - $get('nominal_tf_bengkel')
                                     )),
@@ -385,41 +392,13 @@ class PengajuanResource extends Resource
                                     ->disk('public')
                                     ->directory('foto_nota')
                                     ->nullable()
-                                    ->default(fn($record) => $record->complete?->foto_nota)
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $get, callable $set, $livewire) {
-                                        $record = $livewire->record ?? null;
-                                        if ($record && $record->complete?->foto_nota && $record->complete->foto_nota !== $state) {
-                                            Storage::disk('public')->delete($record->complete->foto_nota);
-                                        }
-                                    })
-                                    ->dehydrated(false)
-                                    ->deleteUploadedFileUsing(function ($file, $livewire) {
-                                        $record = $livewire->record ?? null;
-                                        if ($record && $record->complete?->foto_nota === $file) {
-                                            Storage::disk('public')->delete($file);
-                                        }
-                                    }),
+                                    ->default(fn($record) => $record->complete?->foto_nota),
                                 Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
                                     ->label('Foto Pengerjaan Bengkel')
                                     ->disk('public')
                                     ->directory('foto_pengerjaan_bengkel')
                                     ->nullable()
-                                    ->default(fn($record) => $record->complete?->foto_pengerjaan_bengkel)
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $get, callable $set, $livewire) {
-                                        $record = $livewire->record ?? null;
-                                        if ($record && $record->complete?->foto_pengerjaan_bengkel && $record->complete->foto_pengerjaan_bengkel !== $state) {
-                                            Storage::disk('public')->delete($record->complete->foto_pengerjaan_bengkel);
-                                        }
-                                    })
-                                    ->dehydrated(false)
-                                    ->deleteUploadedFileUsing(function ($file, $livewire) {
-                                        $record = $livewire->record ?? null;
-                                        if ($record && $record->complete?->foto_pengerjaan_bengkel === $file) {
-                                            Storage::disk('public')->delete($file);
-                                        }
-                                    }),
+                                    ->default(fn($record) => $record->complete?->foto_pengerjaan_bengkel),
                                 Forms\Components\FileUpload::make('foto_tambahan')
                                     ->label('Foto Tambahan')
                                     ->disk('public')
@@ -434,20 +413,13 @@ class PengajuanResource extends Resource
                                             $set('foto_tambahan', array_slice($state, 0, 3));
                                         }
                                         $record = $livewire->record ?? null;
-                                        if ($record && is_array($record->complete?->foto_tambahan)) {
+                                        if ($record && is_array($record->complete->foto_tambahan)) {
                                             $lama = collect($record->complete->foto_tambahan);
                                             $baru = collect($state);
                                             $yangDihapus = $lama->diff($baru);
                                             foreach ($yangDihapus as $path) {
                                                 Storage::disk('public')->delete($path);
                                             }
-                                        }
-                                    })
-                                    ->dehydrated(false)
-                                    ->deleteUploadedFileUsing(function ($file, $livewire) {
-                                        $record = $livewire->record ?? null;
-                                        if ($record && is_array($record->complete?->foto_tambahan) && in_array($file, $record->complete->foto_tambahan)) {
-                                            Storage::disk('public')->delete($file);
                                         }
                                     }),
                             ])
@@ -457,10 +429,10 @@ class PengajuanResource extends Resource
                         $record->complete()->updateOrCreate([], $data); // Update or create related data
                         $statusFinance = $data['status_finance'] ?? 'unpaid';
                         $record->update(['keterangan_proses' => $statusFinance === 'paid' ? 'done' : 'pengajuan finance']);
-                        // Notification::make()
-                        //     ->title('Data pengajuan berhasil diproses.')
-                        //     ->success()
-                        //     ->send();
+                        Notification::make()
+                            ->title('Data pengajuan berhasil diproses.')
+                            ->success()
+                            ->send();
                     }),
             ])
             ->bulkActions([
@@ -661,12 +633,19 @@ class PengajuanResource extends Resource
                                 'default' => 4,
                                 'md' => 3,
                             ]),
+                        ViewEntry::make('finance.bukti_transaksi')
+                            ->label('Bukti Transaksi')
+                            ->view('filament.components.bukti_transaksi')
+                            ->columnSpan([
+                                'default' => 4,
+                                'md' => 3,
+                            ]),
                     ])
                     ->columns([
                         'default' => 4,
                         'md' => 5,
                     ])
-                    ->visible(fn($record)=> !empty($record->complete)),
+                    ->visible(fn($record) => !empty($record->complete)),
             ]);
     }
 

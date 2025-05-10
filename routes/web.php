@@ -17,7 +17,10 @@ Route::get('/', function () {
             return redirect('/user');
         } else if ($user->role === 'finance') {
             return redirect('/finance');
+        } else if ($user->role === 'manager') {
+            return redirect('/manager');
         }
+
     }
 
     return redirect('/login');

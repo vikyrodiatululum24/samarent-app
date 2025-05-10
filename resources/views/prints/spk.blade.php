@@ -72,7 +72,7 @@
                     <td style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">{{ $pengajuan->nopol }}</td>
                     <td style="border: 1px solid black; padding: 0.5rem; text-align: center;">{{ number_format($pengajuan->odometer, 0, ',', '.') }}</td>
                     <td style="border: 1px solid black; padding: 0.5rem; text-align: center;">{{ $pengajuan->type }}</td>
-                    <td style="border: 1px solid black; padding: 0.5rem; text-align: center;">{{ $pengajuan->service }}</td>
+                    <td style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : capitalize">{{ $pengajuan->service }}</td>
                     <td style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
                         {{ $pengajuan->complete->kode }}
                     </td>
@@ -288,32 +288,6 @@
                     @endif
                 </td>
             </tr>
-            {{-- <tr>
-                <th style="width: 50%; padding: 10px; text-align: center; border: 1px solid black;">
-                    <p style="margin: 2px;">FOTO TAMBAHAN</p>
-                </th>
-                <th style="width: 50%; padding: 10px; text-align: center; border: 1px solid black">
-                    <p style="margin: 2px;">FOTO TAMBAHAN</p>
-                </th>
-            </tr>
-            <tr>
-                <td
-                    style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
-                    @if (!empty($fotoArray) && isset($fotoArray[1]))
-                        <img src="{{ public_path('storage/' . $fotoArray[1]) }}" alt="Foto Tambahan" style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                    @else
-                        <p style="margin: 2px;">tidak ada gambar</p>
-                    @endif
-                </td>
-                <td
-                    style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
-                    @if (!empty($fotoArray) && isset($fotoArray[2]))
-                        <img src="{{ public_path('storage/' . $fotoArray[2]) }}" alt="Foto Tambahan" style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                    @else
-                        <p style="margin: 2px;">tidak ada gambar</p>
-                    @endif
-                </td>
-            </tr> --}}
         </table>
     </div>
     @endif
@@ -492,7 +466,7 @@
                 </th>
                 <td style="width: 30%; padding: 2px; font-size: 12px">
                     <p style="margin: 0; text-transform: uppercase">: {{ $pengajuan->payment_1 }}
-                        {{ $pengajuan->bank_1 .' '. $pengajuan->norek_1 .' '. $pengajuan->complete->norek_2 }} <span
+                        {{ $pengajuan->bank_1 .' '. $pengajuan->norek_1 }} <span
                             style="font-weight: bold">{{ $pengajuan->keterangan }}</span></p>
                 </td>
             </tr>

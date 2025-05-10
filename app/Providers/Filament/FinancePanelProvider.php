@@ -10,6 +10,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -61,6 +62,8 @@ class FinancePanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 \App\Http\Middleware\EnsureFinanceRole::class,
-            ]);
+            ])
+            ->maxContentWidth(MaxWidth::Full)
+            ->topNavigation();
     }
 }

@@ -11,19 +11,17 @@ class StatsOverview extends BaseWidget
 {
     protected function getStats(): array
     {
-        $csCount = Pengajuan::where('keterangan_proses', 'cs')->count();
-        $financeCount = Pengajuan::where('keterangan_proses', 'finance')->count();
+        $csCount = Pengajuan::whereIn('keterangan_proses', ['cs', 'otorisasi'])->count();
+
+        $financeCount = Pengajuan::whereIn('keterangan_proses', ['pengajuan finance', 'finance'])->count();
+
         $doneCount = Pengajuan::where('keterangan_proses', 'done')->count();
 
         return [
             Stat::make('Customer Service', $csCount)
                 ->description('Jumlah pengajuan di tahap CS')
                 ->descriptionIcon('heroicon-m-user-group', IconPosition::Before)
-                ->color('primary')
-                ->extraAttributes([
-                    'class' => 'cursor-pointer',
-                    'wire:click' => "\$dispatch('setStatusFilter', { filter: 'cs' })",
-                ]),
+                ->color('primary'),
             Stat::make('Finance', $financeCount)
                 ->description('Jumlah pengajuan di tahap Finance')
                 ->descriptionIcon('heroicon-m-currency-dollar', IconPosition::Before)
