@@ -93,7 +93,7 @@ class PengajuanResource extends Resource
                                     'UP 3' => 'UP 3',
                                     'UP 5' => 'UP 5',
                                     'UP 7' => 'UP 7',
-                                    'PT Jepang' => 'PT Jepang',
+                                    'CUST JEPANG' => 'CUST JEPANG',
                                     'manual' => 'Lainnya',
                                 ])
                                 ->reactive()
@@ -224,6 +224,12 @@ class PengajuanResource extends Resource
                 Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Permintaan Service'),
                 Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project'),
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana'),
+                Tables\Columns\TextColumn::make('complete.nominal_estimasi')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Nominal Estimasi')
+                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
                 Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
@@ -280,6 +286,11 @@ class PengajuanResource extends Resource
             'edit' => Pages\EditPengajuan::route('/{record}/edit'),
             'view' => Pages\ViewPengajuan::route('/{record}'),
         ];
+    }
+
+    public static function getGlobalSearchResultUrl(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return PengajuanResource::getUrl('view', ['record' => $record]);
     }
 
     public static function getModelLabel(): string

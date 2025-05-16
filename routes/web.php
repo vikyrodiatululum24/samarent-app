@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     // Route::get('/pengajuan/{id}/view-spk', [PrintController::class, 'viewSpk'])->name('view.spk');
     Route::get('/pengajuan/{id}/print-spk', [PrintController::class, 'printSpk'])->name('print.spk');
-    Route::get('/pengajuan/{id}/print-sjp', [PrintController::class, 'printSjp'])->name('print.sjp');
+    Route::get('/pengajuan/{id}/preview', [PrintController::class, 'preview'])->name('preview');
     Route::get('/pengajuan/{id}/print-lampiran', [PrintController::class, 'printLampiran'])->name('print.lampiran');
     Route::get('/pengajuan/{id}/print-lampiran2', [PrintController::class, 'printLampiran2'])->name('print.lampiran2');
 });

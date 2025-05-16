@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cetak;
 use App\Models\Pengajuan;
 use PDF;
-use Illuminate\Http\Request;
 
 class PrintController extends Controller
 {
-    public function viewSpk($id)
+    public function preview($id)
     {
         $pengajuan = Pengajuan::with('complete')->findOrFail($id);
-        return view('prints.spk', compact('pengajuan'));
+        return view('prints.preview', compact('pengajuan'));
     }
     public function printSpk($id)
     {   
@@ -20,6 +20,7 @@ class PrintController extends Controller
         $namaFile = $pengajuan->nopol. '-' . $pengajuan->no_pengajuan;
         $namaFile = str_replace(['/', '\\'], '-' , $namaFile);
         $pdf = PDF::loadView('prints.spk', ['pengajuan' => $pengajuan]);
+        Cetak::create(['pengajuan_id' => $pengajuan->no_pengajuan]);
         return $pdf->stream("$namaFile.pdf");
     }
 }

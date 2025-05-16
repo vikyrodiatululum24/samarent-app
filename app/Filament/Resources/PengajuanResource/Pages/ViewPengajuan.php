@@ -15,10 +15,16 @@ class ViewPengajuan extends ViewRecord
         return [
             Actions\ActionGroup::make([
                 Actions\Action::make('print_spk')
+                    ->label('Preview')
+                    ->icon('heroicon-o-printer')
+                    ->url(fn ($record) => route('preview', $record->id))
+                    ->openUrlInNewTab(),
+                Actions\Action::make('print_spk')
                     ->label('Print SPK')
                     ->icon('heroicon-o-printer')
                     ->url(fn ($record) => route('print.spk', $record->id))
-                    ->openUrlInNewTab(),
+                    ->openUrlInNewTab()
+                    ->badge(fn ($record) => \App\Models\Cetak::where('pengajuan_id', $record->no_pengajuan)->exists() ? 'Sudah di-print' : null)
                 // Actions\Action::make('print_sjp')
                 //     ->label('Print SJP')
                 //     ->icon('heroicon-o-printer')

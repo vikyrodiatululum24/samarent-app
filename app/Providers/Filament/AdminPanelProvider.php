@@ -74,6 +74,6 @@ class AdminPanelProvider extends PanelProvider
         Filament::registerRenderHook(
             'panels::body.end',
             fn() => view('components.footer'),
-        );        
+        );
     }
 }
