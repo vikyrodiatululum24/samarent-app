@@ -40,26 +40,13 @@ class PengajuanResource extends Resource
                                     ->required()
                                     ->label('Nama PIC')
                                     ->maxLength(255),
+                            ]),
+                        Forms\Components\Group::make()
+                            ->schema([
                                 Forms\Components\TextInput::make('no_wa')
                                     ->required()
                                     ->label('No. WhatsApp')
                                     ->numeric()
-                                    ->maxLength(255),
-                            ]),
-                        Forms\Components\Group::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('jenis')
-                                    ->required()
-                                    ->label('Jenis Kendaraan')
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('type')
-                                    ->required()
-                                    ->label('Tipe Unit')
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('nopol')
-                                    ->required()
-                                    ->label('Nomor Polisi')
-                                    ->placeholder('Tanpa Spasi')
                                     ->maxLength(255),
                             ])
                     ])

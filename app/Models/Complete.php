@@ -26,13 +26,12 @@ class Complete extends Model
         'tanggal_pengerjaan',
         'status_finance',
         'foto_nota',
-        'foto_pengerjaan_bengkel',
         'foto_tambahan',
     ];
 
     protected $casts = [
         'foto_nota' => 'string',
-        'foto_pengerjaan_bengkel' => 'string',
+
         'foto_tambahan' => 'array',
     ];
 

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\PrintController;
+use App\Filament\Pages\DetailHistori;
 
 
 Route::get('/', function () {
@@ -40,6 +41,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengajuan/{id}/print-lampiran', [PrintController::class, 'printLampiran'])->name('print.lampiran');
     Route::get('/pengajuan/{id}/print-lampiran2', [PrintController::class, 'printLampiran2'])->name('print.lampiran2');
 });
+
+Route::get('/detail-histori', DetailHistori::class)->name('filament.admin.pages.detail-histori');
+
 
 // Route::get('/logout', function () {
 //     Auth::logout();

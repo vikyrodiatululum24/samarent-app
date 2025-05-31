@@ -2,25 +2,26 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PengajuanResource\Pages;
-use App\Models\Pengajuan;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
+use App\Models\Pengajuan;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use Filament\Infolists\Components;
+use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\Hidden;
 use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\ExportAction;
-use Filament\Tables\Actions\ExportBulkAction;
-use App\Filament\Exports\PengajuanExporter; // Ensure the PengajuanExporter class is imported
-use Filament\Infolists\Components;
-use Filament\Infolists\Infolist;
 use Filament\Pages\SubNavigationPosition;
-use Filament\Resources\Pages\Page;
-use Filament\Infolists\Components\ViewEntry;
+use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Infolists\Components\ViewEntry;
+use Filament\Tables\Actions\ExportBulkAction;
+use App\Filament\Resources\PengajuanResource\Pages;
+use App\Filament\Resources\PengajuanResource\RelationManagers\ServiceUnitRelationManager;
+use App\Filament\Exports\PengajuanExporter; // Ensure the PengajuanExporter class is imported
 
 class PengajuanResource extends Resource
 {
@@ -54,44 +55,10 @@ class PengajuanResource extends Resource
                                     ->numeric()
                                     ->maxLength(255),
                             ]),
-                        Forms\Components\Group::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('jenis')
-                                    ->required()
-                                    ->label('Jenis Kendaraan')
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('type')
-                                    ->required()
-                                    ->label('Tipe Unit')
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('nopol')
-                                    ->required()
-                                    ->placeholder('Tanpa Spasi')
-                                    ->label('Nomor Polisi')
-                                    ->maxLength(255),
-                            ])
-                    ])
-                    ->columns(2)
-                    ->columnSpan('full')
-                    ->extraAttributes(['class' => 'mb-4']),
-
-                Forms\Components\Fieldset::make('Detail Kendaraan')
-                    ->schema([
-                        Forms\Components\Group::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('odometer')
-                                    ->required()
-                                    ->numeric()
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('service')
-                                    ->required()
-                                    ->label('Jenis Permintaan Service')
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('project')
-                                    ->required()
-                                    ->maxLength(255),
-                            ]),
                         Forms\Components\Group::make([
+                            Forms\Components\TextInput::make('project')
+                                ->required()
+                                ->maxLength(255),
                             Forms\Components\Select::make('up')
                                 ->required()
                                 ->label('Unit Pelaksana')
@@ -121,7 +88,6 @@ class PengajuanResource extends Resource
                     ->columns(2)
                     ->columnSpan('full')
                     ->extraAttributes(['class' => 'mb-4']),
-
                 Forms\Components\Fieldset::make('Pembayaran')
                     ->schema([
                         Forms\Components\Select::make('keterangan')
@@ -156,62 +122,6 @@ class PengajuanResource extends Resource
                     ->columns(2)
                     ->columnSpan('full')
                     ->extraAttributes(['class' => 'mb-4']),
-
-                Forms\Components\Fieldset::make('Dokumentasi')
-                    ->schema([
-                        Forms\Components\FileUpload::make('foto_unit')
-                            ->image()
-                            ->required()
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp'])
-                            ->disk('public')
-                            ->directory('foto_unit')
-                            ->visibility('public')
-                            ->afterStateUpdated(function ($state, callable $get, callable $set, $livewire) {
-                                $record = $livewire->record ?? null;
-                                if ($record && $record->foto_unit && $record->foto_unit !== $state) {
-                                    Storage::disk('public')->delete($record->foto_unit);
-                                }
-                            }),
-                        Forms\Components\FileUpload::make('foto_odometer')
-                            ->image()
-                            ->required()
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp'])
-                            ->disk('public')
-                            ->directory('foto_odometer')
-                            ->visibility('public')
-                            ->afterStateUpdated(function ($state, callable $get, callable $set, $livewire) {
-                                $record = $livewire->record ?? null;
-                                if ($record && $record->foto_odometer && $record->foto_odometer !== $state) {
-                                    Storage::disk('public')->delete($record->foto_odometer);
-                                }
-                            }),
-                        Forms\Components\FileUpload::make('foto_kondisi')
-                            ->required()
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp'])
-                            ->disk('public')
-                            ->directory('foto_kondisi')
-                            ->image()
-                            ->multiple()
-                            ->maxFiles(3)
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
-                                if (count($state) > 3) {
-                                    $set('foto_kondisi', array_slice($state, 0, 3));
-                                }
-                                $record = $livewire->record ?? null;
-                                if ($record && is_array($record->foto_kondisi)) {
-                                    $lama = collect($record->foto_kondisi);
-                                    $baru = collect($state);
-                                    $yangDihapus = $lama->diff($baru);
-                                    foreach ($yangDihapus as $path) {
-                                        Storage::disk('public')->delete($path);
-                                    }
-                                }
-                            }),
-                    ])
-                    ->columns(3)
-                    ->columnSpan('full')
-                    ->extraAttributes(['class' => 'mb-4']),
             ]);
     }
 
@@ -234,7 +144,7 @@ class PengajuanResource extends Resource
                 Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Permintaan Service'),
                 Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project'),
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana'),
-                Tables\Columns\TextColumn::make('complete.estimasi_bengkel')
+                Tables\Columns\TextColumn::make('complete.bengkel_estimasi')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -654,20 +564,6 @@ class PengajuanResource extends Resource
                                         ->dateTime()
                                         ->getStateUsing(fn($record) => $record->created_at->format('d M Y H:i:s')),
                                 ]),
-                            ]),
-                    ]),
-
-                Components\Section::make('Detail Kendaraan')
-                    ->schema([
-                        Components\Grid::make(2)
-                            ->schema([
-                                Components\Group::make([
-                                    Components\TextEntry::make('jenis'),
-                                    Components\TextEntry::make('type'),
-                                    Components\TextEntry::make('nopol'),
-                                    Components\TextEntry::make('odometer'),
-                                    Components\TextEntry::make('service'),
-                                ]),
                                 Components\Group::make([
                                     Components\TextEntry::make('project'),
                                     Components\TextEntry::make('keterangan'),
@@ -675,9 +571,8 @@ class PengajuanResource extends Resource
                                     Components\TextEntry::make('provinsi'),
                                     Components\TextEntry::make('kota'),
                                 ]),
-                            ]),
+                            ])
                     ]),
-
                 Components\Section::make('Pembayaran')
                     ->schema([
                         Components\Grid::make(3)
@@ -687,35 +582,12 @@ class PengajuanResource extends Resource
                                 Components\TextEntry::make('norek_1'),
                             ]),
                     ]),
-                Components\Section::make('Dokumentasi')
+                Components\Section::make('Detail Kendaraan')
                     ->schema([
-                        ViewEntry::make('foto_unit')
-                            ->label('Foto Unit')
-                            ->view('filament.components.foto-unit')
-                            ->columnSpan([
-                                'default' => 2,
-                                'md' => 1,
-                            ]),
-
-                        ViewEntry::make('foto_odometer')
-                            ->label('Foto Odometer')
-                            ->view('filament.components.foto-odometer')
-                            ->columnSpan([
-                                'default' => 2,
-                                'md' => 1,
-                            ]),
-
-                        ViewEntry::make('foto_kondisi')
-                            ->label('Foto Kondisi')
-                            ->view('filament.components.foto-kondisi')
-                            ->columnSpan([
-                                'default' => 4,
-                                'md' => 3,
-                            ]),
-                    ])
-                    ->columns([
-                        'default' => 4,
-                        'md' => 5,
+                        ViewEntry::make('service_unit.pengajuan_id')
+                            ->label('Detail Kendaraan')
+                            ->view('filament.resources.pages.pengajuan.detail-kendaraan')
+                            ->columnSpanFull(),
                     ]),
                 Components\Section::make('Informasi Complete')
                     ->schema([
@@ -829,7 +701,7 @@ class PengajuanResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ServiceUnitRelationManager::class,
         ];
     }
 

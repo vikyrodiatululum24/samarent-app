@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Pengajuan extends Model
 {
@@ -12,11 +11,6 @@ class Pengajuan extends Model
         'no_pengajuan',
         'nama',
         'no_wa',
-        'jenis',
-        'type',
-        'nopol',
-        'odometer',
-        'service',
         'project',
         'up',
         'up_lainnya',
@@ -26,36 +20,8 @@ class Pengajuan extends Model
         'payment_1',
         'bank_1',
         'norek_1',
-        'foto_unit',
-        'foto_odometer',
-        'foto_kondisi',
         'keterangan_proses'
     ];
-
-    protected $casts = [
-        'foto_unit' => 'string',
-        'foto_odometer' => 'string',
-        'foto_kondisi' => 'array',
-    ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($pengajuan) {
-            if ($pengajuan->foto_unit) {
-                Storage::disk('public')->delete($pengajuan->foto_unit);
-            }
-            if ($pengajuan->foto_odometer) {
-                Storage::disk('public')->delete($pengajuan->foto_odometer);
-            }
-            if (is_array($pengajuan->foto_kondisi)) {
-                foreach ($pengajuan->foto_kondisi as $path) {
-                    Storage::disk('public')->delete($path);
-                }
-            }
-        });
-    }
 
     protected static function booted()
     {
@@ -85,5 +51,9 @@ class Pengajuan extends Model
     {
         return $this->hasone(Finance::class, 'pengajuan_id');
     }
-    
+
+    public function service_unit()
+    {
+        return $this->hasMany(ServiceUnit::class, 'pengajuan_id');
+    }
 }

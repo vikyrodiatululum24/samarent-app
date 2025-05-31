@@ -21,8 +21,6 @@ class PengajuanResource extends Resource
 {
     protected static ?string $model = Pengajuan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
     public static function form(Form $form): Form
     {
         return $form
@@ -42,7 +40,7 @@ class PengajuanResource extends Resource
                     ->label('Tanggal Pengajuan')
                     ->date('d M Y'),
                 Tables\Columns\TextColumn::make('nama')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('nopol')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('unit.nopol')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('type')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('service')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable(),
@@ -318,10 +316,10 @@ class PengajuanResource extends Resource
         return false; // Menghilangkan tombol create (newPengajuan)
     }
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
+    // public static function shouldRegisterNavigation(): bool
+    // {
+    //     return false;
+    // }
 
     public static function getEloquentQuery(): Builder
     {

@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cetaks', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('pengajuan_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
+        Schema::table('service_units', function (Blueprint $table) {
+            $table->string('foto_pengerjaan_bengkel')->nullable()->after('foto_kondisi');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cetaks');
+        Schema::table('service_units', function (Blueprint $table) {
+            $table->dropColumn('foto_pengerjaan_bengkel');
+        });
     }
 };

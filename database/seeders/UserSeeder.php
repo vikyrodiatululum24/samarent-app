@@ -14,11 +14,13 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $users = [
-            ['name' => 'User One', 'email' => 'user1@example.com', 'password' => Hash::make('password1'), 'role' => 'admin'],
-            ['name' => 'User Two', 'email' => 'user2@example.com', 'password' => Hash::make('password2'), 'role' => 'admin'],
-            ['name' => 'User Three', 'email' => 'user3@example.com', 'password' => Hash::make('password3'), 'role' => 'user'],
-            ['name' => 'User Four', 'email' => 'user4@example.com', 'password' => Hash::make('password4'), 'role' => 'user'],
-            ['name' => 'User Five', 'email' => 'user5@example.com', 'password' => Hash::make('password5'), 'role' => 'user'],
+            ['name' => 'Admin One', 'email' => 'admin1@example.com', 'password' => Hash::make('password'), 'role' => 'admin'],
+            ['name' => 'Admin Two', 'email' => 'admin2@example.com', 'password' => Hash::make('password'), 'role' => 'admin'],
+            ['name' => 'User One', 'email' => 'user1@example.com', 'password' => Hash::make('password'), 'role' => 'user'],
+            ['name' => 'User Two', 'email' => 'user2@example.com', 'password' => Hash::make('password'), 'role' => 'user'],
+            ['name' => 'User Three', 'email' => 'user3@example.com', 'password' => Hash::make('password'), 'role' => 'user'],
+            ['name' => 'Finance', 'email' => 'finance@example.com', 'password' => Hash::make('password'), 'role' => 'finance'],
+            ['name' => 'Manager', 'email' => 'manager@example.com', 'password' => Hash::make('password'), 'role' => 'manager'],
         ];
 
         DB::table('users')->insert($users);

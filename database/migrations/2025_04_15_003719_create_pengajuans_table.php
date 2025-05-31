@@ -16,25 +16,17 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('no_pengajuan')->unique();
             $table->string('nama');
-            $table->string('no_wa');
-            $table->string('jenis');
-            $table->string('type');
-            $table->string('nopol');
-            $table->string('odometer');
-            $table->string('service');
+            $table->string('no_wa');           
             $table->string('project');
             $table->string('up');
             $table->string('up_lainnya')->nullable();
             $table->string('provinsi');
             $table->string('kota');
-            $table->enum('keterangan', ['Reimburse', 'cash advance', 'invoice', 'free']);
+            $table->enum('keterangan', ['reimburse', 'cash advance', 'invoice', 'free']);
             $table->string('payment_1')->nullable();
             $table->string('bank_1')->nullable();
             $table->string('norek_1')->nullable();
             $table->string('keterangan_proses')->default('cs');
-            $table->string('foto_unit');
-            $table->string('foto_odometer');
-            $table->json('foto_kondisi');
             $table->timestamps();
         });
     }

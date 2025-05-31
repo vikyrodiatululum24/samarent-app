@@ -11,11 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('units', function (Blueprint $table) {
+        Schema::create('data_units', function (Blueprint $table) {
             $table->id();
+            $table->string('no_rks')->nullable();
+            $table->string('penyerahan_unit')->nullable();
             $table->string('jenis');
+            $table->string('merk');
             $table->string('type');
-            $table->string('nopol');
+            $table->string('nopol')->unique();
+            $table->string('no_rangka')->nullable();
+            $table->string('no_mesin')->nullable();
+            $table->string('tgl_pajak')->nullable();
+            $table->string('regional')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('units');
+        Schema::dropIfExists('data_units');
     }
 };
