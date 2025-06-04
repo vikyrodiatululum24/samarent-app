@@ -2,14 +2,14 @@
 
 namespace App\Filament\Exports;
 
-use App\Models\Pengajuan;
-use Filament\Actions\Exports\ExportColumn;
+use App\Models\ServiceUnit;
 use Filament\Actions\Exports\Exporter;
+use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Models\Export;
 
 class PengajuanExporter extends Exporter
 {
-    protected static ?string $model = Pengajuan::class;
+    protected static ?string $model = ServiceUnit::class;
 
     public static function getColumns(): array
     {

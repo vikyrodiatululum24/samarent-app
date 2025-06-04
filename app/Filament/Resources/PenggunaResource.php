@@ -106,6 +106,31 @@ class PenggunaResource extends Resource
         return 'Pengguna'; // tetap singular
     }
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->name === 'admin';
+    }
+
+    public static function canView($record): bool
+    {
+        return auth()->user()?->name === 'admin';
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->name === 'admin';
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->name === 'admin';
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->name === 'admin';
+    }
+
     public static function getPages(): array
     {
         return [

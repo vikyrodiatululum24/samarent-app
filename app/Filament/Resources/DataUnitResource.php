@@ -20,7 +20,7 @@ class DataUnitResource extends Resource
     protected static ?string $model = Unit::class;
 
     // protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
-    // protected static ?string $navigationGroup = 'Unit';
+    protected static ?string $navigationGroup = 'Unit';
     protected static ?string $navigationLabel = 'Data Unit';
 
     public static function form(Form $form): Form
@@ -46,11 +46,23 @@ class DataUnitResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no_rks')
+                    ->label('No. RKS')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('penyerahan_unit')
+                    ->label('Penyerahan Unit')
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->formatStateUsing(fn ($state) => \Carbon\Carbon::parse($state)->format('d-m-Y'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('jenis')
                     ->label('Jenis Kendaraan')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('merk')
                     ->label('Merk Kendaraan')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type Kendaraan')
@@ -58,29 +70,24 @@ class DataUnitResource extends Resource
                 Tables\Columns\TextColumn::make('nopol')
                     ->label('No. Polisi')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('no_rangka')
+                    ->label('No. Rangka')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('no_mesin')
+                    ->label('No. Mesin')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('tgl_pajak')
+                    ->label('Tanggal Pajak')
+                    ->dateTime()
+                    ->formatStateUsing(fn ($state) => \Carbon\Carbon::parse($state)->format('d-m-Y'))
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('regional')
+                    ->label('Regional')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
 
-                Tables\Columns\TextColumn::make('total_pengajuan')
-                    ->label('Total Pengajuan')
-                    ->getStateUsing(function ($record) {
-                        return $record->serviceUnit
-                            ->filter(fn($su) => $su->pengajuan !== null)
-                            ->count();
-                    }),
-
-                Tables\Columns\IconColumn::make('pengajuan_bulan_ini')
-                    ->label('Pengajuan Bulan Ini')
-                    ->getStateUsing(function ($record) {
-                        $startOfMonth = request()->get('start_date') ? Carbon::parse(request()->get('start_date'))->startOfDay() : Carbon::now()->startOfMonth();
-                        $endOfMonth = request()->get('end_date') ? Carbon::parse(request()->get('end_date'))->endOfDay() : Carbon::now()->endOfMonth();
-
-                        return $record->serviceUnit
-                            ->filter(function ($su) use ($startOfMonth, $endOfMonth) {
-                                return $su->pengajuan &&
-                                    $su->pengajuan->created_at->between($startOfMonth, $endOfMonth);
-                            })
-                            ->count() > 0;
-                    })
-                    ->boolean(),
             ])
             ->filters([
                 //

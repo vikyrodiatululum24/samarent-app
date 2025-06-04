@@ -30,8 +30,7 @@ class Complete extends Model
     ];
 
     protected $casts = [
-        'foto_nota' => 'string',
-
+        'foto_nota' => 'array',
         'foto_tambahan' => 'array',
     ];
 

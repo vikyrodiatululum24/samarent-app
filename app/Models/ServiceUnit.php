@@ -16,6 +16,7 @@ class ServiceUnit extends Model
         'foto_odometer',
         'foto_kondisi',
         'foto_pengerjaan_bengkel',
+        'foto_tambahan',
     ];
 
     protected $casts = [
@@ -23,6 +24,7 @@ class ServiceUnit extends Model
         'foto_odometer' => 'string',
         'foto_kondisi' => 'array',
         'foto_pengerjaan_bengkel' => 'string',
+        'foto_tambahan' => 'array',
     ];
 
     protected static function boot()

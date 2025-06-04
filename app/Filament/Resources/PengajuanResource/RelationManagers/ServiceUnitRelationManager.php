@@ -55,12 +55,6 @@ class ServiceUnitRelationManager extends RelationManager
                     ->disk('public')
                     ->directory('foto_kondisi')
                     ->nullable(),
-                Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
-                    ->label('Foto Pengerjaan Bengkel')
-                    ->image()
-                    ->disk('public')
-                    ->directory('foto_pengerjaan_bengkel')
-                    ->nullable(),
             ]);
     }
 

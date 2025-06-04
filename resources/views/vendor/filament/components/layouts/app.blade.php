@@ -4,7 +4,7 @@
         x-show="showSidebar" 
         class="w-64 bg-white border-r shadow-md transition-all"
     >
-        <x-filament::layouts.app.sidebar />
+        {{-- <x-filament::layouts.app.sidebar /> --}}
     </aside>
 
     {{-- Main Content --}}

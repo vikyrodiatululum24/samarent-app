@@ -3,9 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use App\Http\Controllers\PrintController;
-use App\Filament\Pages\DetailHistori;
 
 
 Route::get('/', function () {
@@ -35,38 +33,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    // Route::get('/pengajuan/{id}/view-spk', [PrintController::class, 'viewSpk'])->name('view.spk');
     Route::get('/pengajuan/{id}/print-spk', [PrintController::class, 'printSpk'])->name('print.spk');
     Route::get('/pengajuan/{id}/preview', [PrintController::class, 'preview'])->name('preview');
-    Route::get('/pengajuan/{id}/print-lampiran', [PrintController::class, 'printLampiran'])->name('print.lampiran');
-    Route::get('/pengajuan/{id}/print-lampiran2', [PrintController::class, 'printLampiran2'])->name('print.lampiran2');
 });
-
-Route::get('/detail-histori', DetailHistori::class)->name('filament.admin.pages.detail-histori');
-
-
-// Route::get('/logout', function () {
-//     Auth::logout();
-//     // session()->invalidate();
-//     // session()->regenerateToken();
-//     return redirect('/login');
-// })->name('logout.get');
-
-// Admin logout
-// Route::post('/admin/logout', function (Request $request) {
-//     Auth::logout();
-//     $request->session()->invalidate();
-//     $request->session()->regenerateToken();
-//     return redirect('/login'); // arahkan ke halaman login utama (Breeze)
-// })->name('filament.user.auth.logout');
-
-// // User logout
-// Route::post('/user/logout', function (Request $request) {
-//     Auth::logout();
-//     $request->session()->invalidate();
-//     $request->session()->regenerateToken();
-//     return redirect('/login'); // arahkan juga ke login utama
-// })->name('filament.user.auth.logout');
 
 
 require __DIR__.'/auth.php';
