@@ -2,18 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProsesResource\Pages;
-use App\Filament\Resources\ProsesResource\RelationManagers;
-use App\Models\Complete;
-use App\Models\Proses;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Proses;
+use App\Models\Complete;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Storage;
+use Filament\Tables\Actions\ExportAction;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\ServiceUnitExporter;
+use App\Filament\Resources\ProsesResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ProsesResource\RelationManagers;
 
 class ProsesResource extends Resource
 {
@@ -211,6 +213,9 @@ class ProsesResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+            ])
+            ->headerActions([
+                ExportAction::make()->exporter(ServiceUnitExporter::class),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

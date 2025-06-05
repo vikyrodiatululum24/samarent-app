@@ -144,7 +144,7 @@ class PengajuanResource extends Resource
                                 Forms\Components\FileUpload::make('finance.bukti_transaksi')
                                     ->label('Bukti Transaksi')
                                     ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
-                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp'])
+                                    
                                     ->disk('public')
                                     ->directory('bukti_transaksi')
                                     ->default(fn($record) => $record->finance?->bukti_transaksi),

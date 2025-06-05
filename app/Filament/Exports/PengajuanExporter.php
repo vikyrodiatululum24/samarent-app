@@ -18,7 +18,7 @@ class PengajuanExporter extends Exporter
             ExportColumn::make('created_at')->label('Tanggal Pengajuan'),
             ExportColumn::make('nama')->label('Nama PIC'),
             ExportColumn::make('no_wa')->label('No WA'),
-            ExportColumn::make('jenis'),
+            ExportColumn::make('service_unit.jenis'),
             ExportColumn::make('type'),
             ExportColumn::make('nopol')->label('Nomor Polisi'),
             ExportColumn::make('odometer'),

@@ -108,27 +108,27 @@ class PenggunaResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->name === 'admin';
+        return auth()->user()?->email === 'centralakun@samarent.com';
     }
 
     public static function canView($record): bool
     {
-        return auth()->user()?->name === 'admin';
+        return auth()->user()?->email === 'centralakun@samarent.com';
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->name === 'admin';
+        return auth()->user()?->email === 'centralakun@samarent.com';
     }
 
     public static function canEdit($record): bool
     {
-        return auth()->user()?->name === 'admin';
+        return auth()->user()?->email === 'centralakun@samarent.com';
     }
 
     public static function canDelete($record): bool
     {
-        return auth()->user()?->name === 'admin';
+        return auth()->user()?->email === 'centralakun@samarent.com';
     }
 
     public static function getPages(): array

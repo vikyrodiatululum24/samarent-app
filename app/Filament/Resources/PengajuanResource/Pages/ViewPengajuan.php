@@ -21,7 +21,7 @@ class ViewPengajuan extends ViewRecord
                     ->url(fn($record) => route('preview', $record->id))
                     ->openUrlInNewTab(),
                 Actions\Action::make('print_spk')
-                    ->label('Print SPK')
+                    ->label('Download SPK')
                     ->icon('heroicon-o-printer')
                     ->url(fn($record) => route('print.spk', $record->id))
                     ->openUrlInNewTab()

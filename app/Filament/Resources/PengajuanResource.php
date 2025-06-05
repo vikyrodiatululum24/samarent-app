@@ -20,6 +20,7 @@ use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Imports\PengajuanImporter;
 use Filament\Infolists\Components\ViewEntry;
+use App\Filament\Exports\ServiceUnitExporter;
 use Filament\Tables\Actions\ExportBulkAction;
 use App\Filament\Resources\PengajuanResource\Pages;
 use App\Filament\Resources\PengajuanResource\RelationManagers\ServiceUnitRelationManager;
@@ -614,7 +615,7 @@ class PengajuanResource extends Resource
                 ]),
             ])
             ->headerActions([
-                ExportAction::make()->exporter(PengajuanExporter::class),
+                ExportAction::make()->exporter(ServiceUnitExporter::class),
                 ImportAction::make()->importer(PengajuanImporter::class)
             ])
             ->defaultSort('id', 'desc'); // Optional: Add default sorting
