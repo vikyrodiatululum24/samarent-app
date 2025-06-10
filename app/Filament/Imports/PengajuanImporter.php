@@ -12,12 +12,8 @@ class PengajuanImporter extends Importer
     protected static ?string $model = Pengajuan::class;
 
     public static function getColumns(): array
-    {   
+    {
         return [
-            ImportColumn::make('user_id')
-                ->requiredMapping()
-                ->numeric()
-                ->rules(['required', 'integer']),
             ImportColumn::make('no_pengajuan')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),

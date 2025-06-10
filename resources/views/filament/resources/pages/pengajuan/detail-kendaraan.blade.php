@@ -50,14 +50,14 @@
             @endphp
             @include('filament.components.foto-unit', ['getState' => fn() => $fotoUnit])
         </div>
-        <div class="mt-6">
+        {{-- <div class="mt-6">
             @php
                 $fotoPengerjaan = $serviceUnit->foto_pengerjaan_bengkel ?? null;
             @endphp
             @include('filament.components.foto-pengerjaan-bengkel', [
                 'getState' => fn() => $fotoPengerjaan,
             ])
-        </div>
+        </div> --}}
     </div>
     <div class="mt-6">
         @php

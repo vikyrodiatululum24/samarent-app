@@ -11,5 +11,5 @@
         @endforeach
     </div>
 @else
-    <p class="text-gray-500">Tidak ada foto tambahan.</p>
+    <p class="text-gray-500">Tidak ada foto nota.</p>
 @endif

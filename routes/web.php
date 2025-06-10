@@ -19,7 +19,6 @@ Route::get('/', function () {
         } else if ($user->role === 'manager') {
             return redirect('/manager');
         }
-
     }
 
     return redirect('/login');
@@ -38,4 +37,4 @@ Route::middleware('auth')->group(function () {
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

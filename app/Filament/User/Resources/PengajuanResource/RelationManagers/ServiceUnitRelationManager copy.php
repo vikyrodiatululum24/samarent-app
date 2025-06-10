@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\PengajuanResource\RelationManagers;
+namespace App\Filament\Resources\User\PengajuanResource\RelationManagers;
 
 use Filament\Forms;
 use App\Models\Unit;
@@ -66,9 +66,6 @@ class ServiceUnitRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('unit_nopol')
                     ->label('Unit')
                     ->getStateUsing(function ($record) {
-                        if (!$record->unit) {
-                            return 'Unit tidak ditemukan';
-                        }
                         return "{$record->unit->type} - {$record->unit->nopol}";
                     }),
                 Tables\Columns\TextColumn::make('odometer'),

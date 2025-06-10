@@ -101,10 +101,10 @@ class PengajuanResource extends Resource
                         Forms\Components\Select::make('keterangan')
                             ->required()
                             ->options([
-                                'REIMBURSE' => 'REIMBURSE',
-                                'CASH ADVANCE' => 'CASH ADVANCE',
-                                'INVOICE' => 'INVOICE',
-                                'FREE' => 'FREE',
+                                'reimburse' => 'REIMBURSE',
+                                'cash advance' => 'CASH ADVANCE',
+                                'invoice' => 'INVOICE',
+                                'free' => 'FREE',
                             ])
                             ->reactive(),
                         Forms\Components\TextInput::make('payment_1')
@@ -181,11 +181,11 @@ class PengajuanResource extends Resource
                     })
                     ->getStateUsing(function ($record) {
                         return match ($record->keterangan_proses) {
-                            'CS' => 'Customer Service',
-                            'PENGAJUAN FINANCE' => 'Pengajuan Finance',
-                            'FINANCE' => 'Input Finance',
-                            'OTORISASI' => 'Otorisasi',
-                            'DONE' => 'Selesai',
+                            'cs' => 'Customer Service',
+                            'pengajuan finance' => 'Pengajuan Finance',
+                            'finance' => 'Input Finance',
+                            'otorisasi' => 'Otorisasi',
+                            'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
                     }),
@@ -194,11 +194,11 @@ class PengajuanResource extends Resource
                 SelectFilter::make('keterangan_proses')
                     ->label('Status Proses')
                     ->options([
-                        'CS' => 'Customer Service',
-                        'PENGAJUAN FINANCE' => 'Pengajuan Finance',
-                        'FINANCE' => 'Input Finance',
-                        'OTORISASI' => 'Otorisasi',
-                        'DONE' => 'Selesai',
+                        'cs' => 'Customer Service',
+                        'pengajuan finance' => 'Pengajuan Finance',
+                        'finance' => 'Input Finance',
+                        'otorisasi' => 'Otorisasi',
+                        'done' => 'Selesai',
                     ]),
             ])
             ->actions([
@@ -551,6 +551,7 @@ class PengajuanResource extends Resource
 
                         Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
                             ->label('Foto Pengerjaan Bengkel')
+                            ->image()
                             ->disk('public')
                             ->directory('foto_pengerjaan_bengkel')
                             ->nullable()
@@ -560,6 +561,7 @@ class PengajuanResource extends Resource
 
                         Forms\Components\FileUpload::make('foto_tambahan')
                             ->label('Foto Tambahan')
+                            ->image()
                             ->disk('public')
                             ->directory('foto_tambahan')
                             ->multiple()
@@ -639,11 +641,11 @@ class PengajuanResource extends Resource
                                         ->badge()
                                         ->getStateUsing(function ($record) {
                                             return match ($record->keterangan_proses) {
-                                                'CS' => 'Customer Service',
-                                                'PENGAJUAN FINANCE' => 'Pengajuan Finance',
-                                                'FINANCE' => 'Input Finance',
-                                                'OTORISASI' => 'Otorisasi',
-                                                'DONE' => 'Selesai',
+                                                'cs' => 'Customer Service',
+                                                'pengajuan finance' => 'Pengajuan Finance',
+                                                'finance' => 'Input Finance',
+                                                'otorisasi' => 'Otorisasi',
+                                                'done' => 'Selesai',
                                                 default => 'Tidak Diketahui',
                                             };
                                         })
@@ -801,6 +803,11 @@ class PengajuanResource extends Resource
         ];
     }
 
+    public static function getGlobalSearchResultUrl(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return PengajuanResource::getUrl('view', ['record' => $record]);
+    }
+
     public static function getPages(): array
     {
         return [
@@ -811,10 +818,6 @@ class PengajuanResource extends Resource
         ];
     }
 
-    public static function getGlobalSearchResultUrl(\Illuminate\Database\Eloquent\Model $record): string
-    {
-        return PengajuanResource::getUrl('view', ['record' => $record]);
-    }
 
     public static function getModelLabel(): string
     {

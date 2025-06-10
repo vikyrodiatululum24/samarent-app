@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('foto_unit');
             $table->string('foto_odometer');
             $table->json('foto_kondisi');
+            $table->string('foto_pengerjaan_bengkel')->nullable();
+            $table->json('foto_tambahan')->nullable();
             $table->timestamps();
         });
     }

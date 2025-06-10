@@ -28,9 +28,6 @@ class pengajuanTable extends BaseWidget
                     ->label('Tanggal Pengajuan')
                     ->date('d M Y'),
                 Tables\Columns\TextColumn::make('nama')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('nopol')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('type')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('service')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan_proses')
@@ -40,11 +37,11 @@ class pengajuanTable extends BaseWidget
                         ->badge()
                         ->getStateUsing(function ($record) {
                             return match ($record->keterangan_proses) {
-                                'cs' => 'Customer Service',
-                                'pengajuan finance' => 'Pengajuan Finance',
-                                'finance' => 'Input Finance',
-                                'otorisasi' => 'Otorisasi',
-                                'done' => 'Selesai',
+                                'CS' => 'Customer Service',
+                                'PENGAJUAN FINANCE' => 'Pengajuan Finance',
+                                'FINANCE' => 'Input Finance',
+                                'OTORISASI' => 'Otorisasi',
+                                'DONE' => 'Selesai',
                                 default => 'Tidak Diketahui',
                             };
                         })

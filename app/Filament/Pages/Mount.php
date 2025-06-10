@@ -23,16 +23,31 @@ class Mount extends Page implements HasTable
 
     public function getTableQuery()
     {
-        // Ambil semua unit, tidak perlu eager load count di sini
-        return Unit::query();
+        // Hitung jumlah service unit untuk setiap bulan (12 bulan terakhir)
+        $query = Unit::query();
+        $startDate = !empty($this->data['startDate']) ? $this->data['startDate'] : now()->subMonths(11)->startOfMonth()->toDateString();
+        $endDate = !empty($this->data['endDate']) ? $this->data['endDate'] : now()->endOfMonth()->toDateString();
+        $period = \Carbon\CarbonPeriod::create($startDate, '1 month', $endDate);
+
+        foreach ($period as $month) {
+            $monthStart = $month->copy()->startOfMonth()->toDateString();
+            $monthEnd = $month->copy()->endOfMonth()->toDateString();
+            $alias = 'service_count_' . $month->format('Ym');
+            $query->withCount([
+                'serviceUnit as ' . $alias => function ($q) use ($monthStart, $monthEnd) {
+                    $q->whereDate('created_at', '>=', $monthStart)
+                        ->whereDate('created_at', '<=', $monthEnd);
+                }
+            ]);
+        }
+
+        return $query;
     }
 
     public function getTableColumns(): array
     {
-        // Ambil range bulan dari filter atau default 12 bulan terakhir
         $startDate = !empty($this->data['startDate']) ? $this->data['startDate'] : now()->subMonths(11)->startOfMonth()->toDateString();
         $endDate = !empty($this->data['endDate']) ? $this->data['endDate'] : now()->endOfMonth()->toDateString();
-
         $period = \Carbon\CarbonPeriod::create($startDate, '1 month', $endDate);
 
         $columns = [
@@ -44,33 +59,15 @@ class Mount extends Page implements HasTable
 
         foreach ($period as $month) {
             $monthLabel = $month->format('M Y');
-            $monthStart = $month->copy()->startOfMonth()->toDateString();
-            $monthEnd = $month->copy()->endOfMonth()->toDateString();
-
-            $columns[] = TextColumn::make('service_count_' . $month->format('Ym'))
+            $alias = 'service_count_' . $month->format('Ym');
+            $columns[] = TextColumn::make($alias)
                 ->label($monthLabel)
                 ->alignCenter()
-                ->getStateUsing(function ($record) use ($monthStart, $monthEnd) {
-                    return $record->serviceUnit()
-                        ->whereDate('created_at', '>=', $monthStart)
-                        ->whereDate('created_at', '<=', $monthEnd)
-                        ->count();
-                });
+                ->formatStateUsing(fn($state) => $state ?? 0); // tampilkan 0 jika null
         }
 
         return $columns;
     }
-
-    // public function getTableActions(): array
-    // {
-    //     return [
-
-    //         Action::make('detail')
-    //             ->label('Detail')
-    //             ->url(fn($record) => DetailHistori::getUrl(['unit' => $record->id]))
-    //             ->icon('heroicon-o-eye'),
-    //     ];
-    // }
 
     public function getTableDefaultSort(): ?array
     {

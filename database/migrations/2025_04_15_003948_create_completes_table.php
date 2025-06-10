@@ -31,8 +31,6 @@ return new class extends Migration
             $table->date('tanggal_pengerjaan')->nullable();
             $table->enum('status_finance', ['paid', 'unpaid'])->default('unpaid');
             $table->json('foto_nota')->nullable();
-            $table->string('foto_pengerjaan_bengkel')->nullable();
-            $table->json('foto_tambahan')->nullable();
             $table->timestamps();
         });
     }

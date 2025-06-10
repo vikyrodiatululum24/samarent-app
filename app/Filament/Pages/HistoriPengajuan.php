@@ -82,8 +82,6 @@ class HistoriPengajuan extends Page implements HasTable, HasForms
                 ->label('Jumlah Pengajuan')
                 ->sortable()
                 ->alignCenter()
-
-
         ];
     }
 
