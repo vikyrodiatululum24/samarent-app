@@ -757,20 +757,6 @@ class PengajuanResource extends Resource
                                 'default' => 4,
                                 'md' => 3,
                             ]),
-                        ViewEntry::make('complete.foto_pengerjaan_bengkel')
-                            ->label('Foto Pengerjaan Bengkel')
-                            ->view('filament.components.foto-pengerjaan-bengkel')
-                            ->columnSpan([
-                                'default' => 2,
-                                'md' => 1,
-                            ]),
-                        ViewEntry::make('complete.foto_tambahan')
-                            ->label('Foto Tambahan')
-                            ->view('filament.components.foto-tambahan')
-                            ->columnSpan([
-                                'default' => 4,
-                                'md' => 3,
-                            ]),
                         ViewEntry::make('finance.bukti_transaksi')
                             ->label('Bukti Transaksi')
                             ->view('filament.components.bukti_transaksi')

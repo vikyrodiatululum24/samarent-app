@@ -49,11 +49,11 @@ class PengajuanResource extends Resource
                     ->badge()
                     ->getStateUsing(function ($record) {
                         return match ($record->keterangan_proses) {
-                                'CS' => 'Customer Service',
-                                'PENGAJUAN FINANCE' => 'Pengajuan Finance',
-                                'FINANCE' => 'Input Finance',
-                                'OTORISASI' => 'Otorisasi',
-                                'DONE' => 'Selesai',
+                            'cs' => 'Customer Service',
+                            'pengajuan finance' => 'Pengajuan Finance',
+                            'finance' => 'Input Finance',
+                            'otorisasi' => 'Otorisasi',
+                            'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
                     })

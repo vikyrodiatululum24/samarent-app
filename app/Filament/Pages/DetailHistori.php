@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Unit;
 use Filament\Pages\Page;
+use App\Models\ServiceUnit;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -25,35 +26,39 @@ class DetailHistori extends Page implements HasTable
         $this->unit = Unit::findOrFail($unitId);
     }
 
+
     public function getTableQuery()
     {
-        return Unit::query()
-            ->with(['serviceUnit', 'serviceUnit.pengajuan'])
-            ->where('id', $this->unit->id);
-        // ->orderByDesc('serviceUnit.created_at');
+        return ServiceUnit::query()
+            ->with(['pengajuan'])
+            ->where('unit_id', $this->unit->id);
     }
 
     public function getTableColumns(): array
     {
         return [
-            TextColumn::make('serviceUnit.created_at')
+            TextColumn::make('created_at')
                 ->label('Tanggal Pengajuan')
-                ->dateTime('d/m/Y'),
-            textColumn::make('serviceUnit.pengajuan.no_pengajuan')
+                ->dateTime('d/m/Y')
+                ->sortable(),
+
+            TextColumn::make('pengajuan.no_pengajuan')
                 ->label('No Pengajuan')
                 ->searchable(),
-            TextColumn::make('serviceUnit.odometer')
+
+            TextColumn::make('odometer')
                 ->label('Odometer')
                 ->sortable(),
-            TextColumn::make('serviceUnit.service')
+
+            TextColumn::make('service')
                 ->label('Jenis Service')
                 ->sortable(),
         ];
     }
 
+
     public function getTableDefaultSort(): ?array
     {
         return ['id' => 'desc']; // atau 'total_pengajuan' => 'desc'
     }
-
 }
