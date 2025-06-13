@@ -182,7 +182,7 @@
                     style="width: 50%; padding: 10px; text-align: center; min-height: 300px; border: 1px solid black; vertical-align: top;">
                     @if (!empty($pengajuan->finance->bukti_transaksi))
                         <img src="{{ public_path('storage/' . $pengajuan->finance->bukti_transaksi) }}"
-                            alt="Foto Odometer" style="max-width: 100%; max-height: 300px; object-fit: contain;">
+                            alt="extension tidak support" style="max-width: 100%; max-height: 300px; object-fit: contain;">
                     @else
                         <p style="margin: 2px;">tidak ada gambar</p>
                     @endif
@@ -587,11 +587,26 @@
                     <p style="margin: 0;">Untuk Keperluan</p>
                 </th>
                 <td style="width: 30%; padding: 2px; font-size: 12px">
-                    <p style="margin: 0;">: {{ $pengajuan->service_unit->count() . ' Unit, ' .
-                            ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) . ', ' }}
-                        <span
-                            style="text-transform: uppercase;">{{ $pengajuan->provinsi . ' - ' . $pengajuan->kota . ', ' . $pengajuan->complete->kode  }}</span>
-                    </p>
+                    @if ($pengajuan->service_unit->count() === 1)
+                        @foreach ($pengajuan->service_unit as $serviceUnit)
+                            <p style="margin: 0; text-transform: capitalize">
+                                : {{ $serviceUnit->service }}
+                                <span style="text-transform: uppercase;">{{ $serviceUnit->unit->nopol }}</span>
+                                {{ ' KM ' . $serviceUnit->odometer . ' ' . $serviceUnit->unit->type . ' ' . ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) }}
+                                <span
+                                    style="text-transform: uppercase;">{{ $pengajuan->provinsi . ' - ' . $pengajuan->kota }}</span>
+                            </p>
+                        @endforeach
+                    @else
+                        <p style="margin: 0;">:
+                            {{ $pengajuan->service_unit->count() .
+                                ' Unit, ' .
+                                ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) .
+                                ', ' }}
+                            <span
+                                style="text-transform: uppercase;">{{ $pengajuan->provinsi . ' - ' . $pengajuan->kota . ', ' . $pengajuan->complete->kode }}</span>
+                        </p>
+                    @endif
                 </td>
             </tr>
             <tr style="vertical-align: top; font-size: 12px">
@@ -608,13 +623,13 @@
                 </th>
                 <td style="width: 30%; padding: 2px; font-size: 12px">
                     <p style="margin: 0; text-transform: uppercase">: {{ $pengajuan->payment_1 }}
-                        {{ $pengajuan->bank_1 . ' ' . $pengajuan->norek_1 }} <span 
-                            @if ($pengajuan->keterangan == 'reimburse') style="color: red; font-weight: bold;"
-                            @elseif($pengajuan->keterangan == 'cash advance')
+                        {{ $pengajuan->bank_1 . ' ' . $pengajuan->norek_1 }} <span
+                            @if ($pengajuan->keterangan == 'REIMBURSE') style="color: red; font-weight: bold;"
+                            @elseif(strtoupper($pengajuan->keterangan) == 'CASH ADVANCE')
                                 style="color: blue; font-weight: bold;"
-                            @elseif($pengajuan->keterangan == 'invoice')
+                            @elseif($pengajuan->keterangan == 'INVOICE')
                                 style="color: green; font-weight: bold;"
-                            @elseif($pengajuan->keterangan == 'free')
+                            @elseif($pengajuan->keterangan == 'FREE')
                                 style="color: black; font-weight: bold;" @endif>{{ $pengajuan->keterangan }}</span>
                     </p>
                 </td>

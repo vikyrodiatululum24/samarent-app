@@ -110,22 +110,28 @@ class PengajuanResource extends Resource
                         Forms\Components\TextInput::make('payment_1')
                             ->nullable()
                             ->label('Nama Rekening')
-                            ->required(fn(callable $get) => $get('keterangan') === 'REIMBURSE')
+                            ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
                             ->maxLength(255)
-                            ->disabled(fn(callable $get) => $get('keterangan') !== 'REIMBURSE'),
-                        Forms\Components\TextInput::make('bank_1')
+                            ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
+                        Forms\Components\Select::make('bank_1')
                             ->nullable()
                             ->label('Bank')
-                            ->required(fn(callable $get) => $get('keterangan') === 'REIMBURSE')
-                            ->maxLength(255)
-                            ->disabled(fn(callable $get) => $get('keterangan') !== 'REIMBURSE'),
+                            ->options([
+                                'BCA' => 'BCA',
+                                'MANDIRI' => 'MANDIRI',
+                                'BRI' => 'BRI',
+                                'BNI' => 'BNI',
+                                'PERMATA' => 'PERMATA',
+                            ])
+                            ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
+                            ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
                         Forms\Components\TextInput::make('norek_1')
                             ->nullable()
                             ->label('No. Rekening')
-                            ->required(fn(callable $get) => $get('keterangan') === 'REIMBURSE')
+                            ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
                             ->numeric()
                             ->maxLength(255)
-                            ->disabled(fn(callable $get) => $get('keterangan') !== 'REIMBURSE'),
+                            ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
                     ])
                     ->columns(2)
                     ->columnSpan('full')

@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('payment_1')->nullable();
             $table->string('bank_1')->nullable();
             $table->string('norek_1')->nullable();
-            $table->string('keterangan_proses')->default('CS');
+            $table->string('keterangan_proses')->default('cs');
             $table->timestamps();
         });
     }

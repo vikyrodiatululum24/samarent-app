@@ -27,18 +27,16 @@ class DataUnitResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('jenis')
-                    ->label('Jenis Kendaraan')
-                    ->required(),
-                Forms\Components\TextInput::make('merk')
-                    ->label('Merk Kendaraan')
-                    ->required(),
-                Forms\Components\TextInput::make('type')
-                    ->label('Type Kendaraan')
-                    ->required(),
-                Forms\Components\TextInput::make('nopol')
-                    ->label('No. Polisi')
-                    ->rules('required', 'unique:data_units,nopol', 'max:10'),
+                Forms\Components\TextInput::make('no_rks')->label('No. RKS'),
+                Forms\Components\TextInput::make('penyerahan_unit')->label('Penyerahan Unit'),
+                Forms\Components\TextInput::make('jenis')->label('Jenis Kendaraan')->required(),
+                Forms\Components\TextInput::make('merk')->label('Merk Kendaraan')->required(),
+                Forms\Components\TextInput::make('type')->label('Type Kendaraan')->required(),
+                Forms\Components\TextInput::make('nopol')->label('No. Polisi')->rules('required', 'unique:data_units,nopol', 'max:10')->required(),
+                Forms\Components\TextInput::make('no_rangka')->label('No. Rangka'),
+                Forms\Components\TextInput::make('no_mesin')->label('No. Mesin'),
+                Forms\Components\TextInput::make('tgl_pajak')->label('Tanggal Pajak'),
+                Forms\Components\TextInput::make('regional')->label('Regional'),
             ]);
     }
 
@@ -54,7 +52,7 @@ class DataUnitResource extends Resource
                     ->label('Penyerahan Unit')
                     ->dateTime()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(fn ($state) => \Carbon\Carbon::parse($state)->format('d-m-Y'))
+                    ->formatStateUsing(fn($state) => \Carbon\Carbon::parse($state)->format('d-m-Y'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('jenis')
                     ->label('Jenis Kendaraan')
@@ -81,7 +79,7 @@ class DataUnitResource extends Resource
                 Tables\Columns\TextColumn::make('tgl_pajak')
                     ->label('Tanggal Pajak')
                     ->dateTime()
-                    ->formatStateUsing(fn ($state) => \Carbon\Carbon::parse($state)->format('d-m-Y'))
+                    ->formatStateUsing(fn($state) => \Carbon\Carbon::parse($state)->format('d-m-Y'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('regional')
                     ->label('Regional')
@@ -107,6 +105,16 @@ class DataUnitResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Unit'; // singular
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Unit'; // tetap singular
     }
 
     public static function getPages(): array

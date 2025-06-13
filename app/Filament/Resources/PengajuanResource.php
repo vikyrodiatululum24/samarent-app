@@ -3,27 +3,32 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use App\Models\Unit;
+use Illuminate\Support\Facades\Storage;
 use Filament\Tables;
 use Filament\Forms\Form;
 use App\Models\Pengajuan;
 use Filament\Tables\Table;
+use App\Models\ServiceUnit;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Infolists\Components;
 use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\Hidden;
-use Illuminate\Support\Facades\Storage;
+use Filament\Forms\Components\Wizard;
 use Filament\Notifications\Notification;
 use Filament\Pages\SubNavigationPosition;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Wizard\Step;
 use App\Filament\Imports\PengajuanImporter;
 use Filament\Infolists\Components\ViewEntry;
 use App\Filament\Exports\ServiceUnitExporter;
 use Filament\Tables\Actions\ExportBulkAction;
 use App\Filament\Resources\PengajuanResource\Pages;
-use App\Filament\Resources\PengajuanResource\RelationManagers\ServiceUnitRelationManager;
+// use App\Filament\Resources\PengajuanResource\RelationManagers\ServiceUnitRelationManager;
 use App\Filament\Exports\PengajuanExporter; // Ensure the PengajuanExporter class is imported
 
 class PengajuanResource extends Resource
@@ -42,96 +47,131 @@ class PengajuanResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Fieldset::make('Informasi Umum')
-                    ->schema([
-                        Forms\Components\Group::make()
-                            ->schema([
-                                Hidden::make('user_id')
-                                    ->default(\Illuminate\Support\Facades\Auth::user()->id),
-                                Forms\Components\TextInput::make('nama')
-                                    ->label('Nama PIC')
-                                    ->required()
-                                    ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('no_wa')
-                                    ->label('No. WhatsApp')
-                                    ->required()
-                                    ->numeric()
-                                    ->maxLength(255),
-                            ]),
-                        Forms\Components\Group::make([
-                            Forms\Components\TextInput::make('project')
-                                ->required()
-                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                                ->maxLength(255),
-                            Forms\Components\Select::make('up')
-                                ->required()
-                                ->label('Unit Pelaksana')
-                                ->options([
-                                    'UP 1' => 'UP 1',
-                                    'UP 2' => 'UP 2',
-                                    'UP 3' => 'UP 3',
-                                    'UP 5' => 'UP 5',
-                                    'UP 7' => 'UP 7',
-                                    'CUST JEPANG' => 'CUST JEPANG',
-                                    'manual' => 'Lainnya',
+                Wizard::make([
+                    Step::make('Pengajuan')
+                        ->schema([
+                            Forms\Components\Fieldset::make('Informasi Umum')
+                                ->schema([
+                                    Forms\Components\Group::make()
+                                        ->schema([
+                                            Hidden::make('user_id')
+                                                ->default(\Illuminate\Support\Facades\Auth::user()->id),
+                                            Forms\Components\TextInput::make('nama')
+                                                ->label('Nama PIC')
+                                                ->required()
+                                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                                ->maxLength(255),
+                                            Forms\Components\TextInput::make('no_wa')
+                                                ->label('No. WhatsApp')
+                                                ->required()
+                                                ->numeric()
+                                                ->maxLength(255),
+                                        ]),
+                                    Forms\Components\Group::make()
+                                        ->schema([
+                                            Forms\Components\TextInput::make('project')
+                                                ->required()
+                                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                                ->maxLength(255),
+                                            Forms\Components\Select::make('up')
+                                                ->required()
+                                                ->label('Unit Pelaksana')
+                                                ->options([
+                                                    'UP 1' => 'UP 1',
+                                                    'UP 2' => 'UP 2',
+                                                    'UP 3' => 'UP 3',
+                                                    'UP 5' => 'UP 5',
+                                                    'UP 7' => 'UP 7',
+                                                    'CUST JEPANG' => 'CUST JEPANG',
+                                                    'manual' => 'Lainnya',
+                                                ])
+                                                ->reactive()
+                                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
+                                            Forms\Components\TextInput::make('up_lainnya')
+                                                ->label('Unit Pelaksana Lainnya')
+                                                ->required(fn(callable $get) => $get('up') === 'manual')
+                                                ->visible(fn(callable $get) => $get('up') === 'manual')
+                                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
+                                        ]),
+                                    Forms\Components\TextInput::make('provinsi')
+                                        ->required()
+                                        ->label('Provinsi')
+                                        ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('kota')
+                                        ->required()
+                                        ->label('Kota/Kab')
+                                        ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                        ->maxLength(255),
+
+
                                 ])
-                                ->reactive()
-                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
-                            Forms\Components\TextInput::make('up_lainnya')
-                                ->label('Unit Pelaksana Lainnya')
-                                ->required(fn(callable $get) => $get('up') === 'manual')
-                                ->visible(fn(callable $get) => $get('up') === 'manual')
-                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
-                            Forms\Components\TextInput::make('provinsi')
-                                ->required()
-                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                                ->maxLength(255),
-                            Forms\Components\TextInput::make('kota')
-                                ->required()
-                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                                ->maxLength(255),
+                                ->columns(2)
+                                ->columnSpan('full')
+                                ->extraAttributes(['class' => 'mb-4']),
+                            Forms\Components\Fieldset::make('Pembayaran')
+                                ->schema([
+                                    Forms\Components\Select::make('keterangan')
+                                        ->required()
+                                        ->options([
+                                            'reimburse' => 'REIMBURSE',
+                                            'cash advance' => 'CASH ADVANCE',
+                                            'invoice' => 'INVOICE',
+                                            'free' => 'FREE',
+                                        ])
+                                        ->reactive(),
+                                    Forms\Components\TextInput::make('payment_1')
+                                        ->nullable()
+                                        ->label('Nama Rekening')
+                                        ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                        ->maxLength(255),
+                                    Forms\Components\Select::make('bank_1')
+                                        ->nullable()
+                                        ->label('Bank')
+                                        ->options([
+                                            'BCA' => 'BCA',
+                                            'MANDIRI' => 'MANDIRI',
+                                            'BRI' => 'BRI',
+                                            'BNI' => 'BNI',
+                                            'PERMATA' => 'PERMATA',
+                                        ]),
+                                    Forms\Components\TextInput::make('norek_1')
+                                        ->nullable()
+                                        ->label('No. Rekening')
+                                        ->numeric()
+                                        ->maxLength(255),
+                                ])
+                                ->columns(2)
+                                ->columnSpan('full')
+                                ->extraAttributes(['class' => 'mb-4']),
+                        ]),
+                    Step::make('Data Service')
+                        ->schema([
+                            Forms\Components\Repeater::make('service_unit')
+                                ->relationship() // penting: ini untuk relasi hasMany
+                                ->schema([
+                                    Forms\Components\Select::make('unit_id')
+                                        ->label('Unit')
+                                        ->relationship('unit', 'nopol') // Relasi dari model ini ke model Unit
+                                        ->getOptionLabelFromRecordUsing(function (Unit $unit) {
+                                            return "{$unit->type} - {$unit->nopol}";
+                                        })
+                                        ->searchable()
+                                        ->preload() // Optional, preload semua data untuk menghindari query saat ketik
+                                        ->required(),
+                                    Forms\Components\TextInput::make('odometer')
+                                        ->numeric()
+                                        ->required(),
+                                    Forms\Components\TextInput::make('service')
+                                        ->label('Jenis Permintaan Service')
+                                        ->required(),
+                                ])
                         ])
-                    ])
-                    ->columns(2)
-                    ->columnSpan('full')
-                    ->extraAttributes(['class' => 'mb-4']),
-                Forms\Components\Fieldset::make('Pembayaran')
-                    ->schema([
-                        Forms\Components\Select::make('keterangan')
-                            ->required()
-                            ->options([
-                                'reimburse' => 'REIMBURSE',
-                                'cash advance' => 'CASH ADVANCE',
-                                'invoice' => 'INVOICE',
-                                'free' => 'FREE',
-                            ])
-                            ->reactive(),
-                        Forms\Components\TextInput::make('payment_1')
-                            ->nullable()
-                            ->label('Nama Rekening')
-                            ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                            ->maxLength(255),
-                        Forms\Components\Select::make('bank_1')
-                            ->nullable()
-                            ->label('Bank')
-                            ->options([
-                                'BCA' => 'BCA',
-                                'MANDIRI' => 'MANDIRI',
-                                'BRI' => 'BRI',
-                                'BNI' => 'BNI',
-                                'PERMATA' => 'PERMATA',
-                            ]),
-                        Forms\Components\TextInput::make('norek_1')
-                            ->nullable()
-                            ->label('No. Rekening')
-                            ->numeric()
-                            ->maxLength(255),
-                    ])
-                    ->columns(2)
-                    ->columnSpan('full')
-                    ->extraAttributes(['class' => 'mb-4']),
-            ]);
+
+                ])
+                    ->columnSpan('full') // Membuat wizard full width
+            ])
+            ->columns(1); // Pastikan form satu kolom agar full width
     }
 
     public static function table(Table $table): Table
@@ -147,6 +187,25 @@ class PengajuanResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('User'),
                 Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Nama PIC'),
+                Tables\Columns\TextColumn::make('service_unit')
+                    ->label('Service - Nopol')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            $nopol = $service->unit?->nopol ?? '-';
+                            return "{$service->service} - {$nopol}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('service', 'like', "%{$search}%")
+                                ->orWhere('nopol', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project'),
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana'),
                 Tables\Columns\TextColumn::make('complete.bengkel_estimasi')
@@ -173,6 +232,7 @@ class PengajuanResource extends Resource
                     ->badge()
                     ->color(fn(string $state) => match (true) {
                         str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'gray',
+                        str_contains(strtoupper($state), 'CHECKER') => 'success',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
                         str_contains(strtoupper($state), 'INPUT FINANCE') => 'warning',
                         str_contains(strtoupper($state), 'OTORISASI') => 'warning',
@@ -182,6 +242,7 @@ class PengajuanResource extends Resource
                     ->getStateUsing(function ($record) {
                         return match ($record->keterangan_proses) {
                             'cs' => 'Customer Service',
+                            'checker' => 'Checker',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
@@ -329,35 +390,6 @@ class PengajuanResource extends Resource
                                         $record = $livewire->record ?? null;
                                         if ($record && is_array($record->complete->foto_nota)) {
                                             $lama = collect($record->complete->foto_nota);
-                                            $baru = collect($state);
-                                            $yangDihapus = $lama->diff($baru);
-                                            foreach ($yangDihapus as $path) {
-                                                Storage::disk('public')->delete($path);
-                                            }
-                                        }
-                                    }),
-                                Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
-                                    ->label('Foto Pengerjaan Bengkel')
-                                    ->disk('public')
-                                    ->directory('foto_pengerjaan_bengkel')
-                                    ->nullable()
-                                    ->default(fn($record) => $record->complete?->foto_pengerjaan_bengkel),
-                                Forms\Components\FileUpload::make('foto_tambahan')
-                                    ->label('Foto Tambahan')
-                                    ->disk('public')
-                                    ->directory('foto_tambahan')
-                                    ->multiple()
-                                    ->maxFiles(3)
-                                    ->nullable()
-                                    ->default(fn($record) => $record->complete?->foto_tambahan)
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
-                                        if (count($state) > 3) {
-                                            $set('foto_tambahan', array_slice($state, 0, 3));
-                                        }
-                                        $record = $livewire->record ?? null;
-                                        if ($record && is_array($record->complete->foto_tambahan)) {
-                                            $lama = collect($record->complete->foto_tambahan);
                                             $baru = collect($state);
                                             $yangDihapus = $lama->diff($baru);
                                             foreach ($yangDihapus as $path) {
@@ -515,7 +547,7 @@ class PengajuanResource extends Resource
                         $record->complete()->updateOrCreate([], $data);
                         $nominalTfBengkel = $data['nominal_tf_bengkel'] ?? null;
                         $record->update([
-                            'keterangan_proses' => !empty($nominalTfBengkel) ? 'DONE' : 'PENGAJUAN FINANCE'
+                            'keterangan_proses' => !empty($nominalTfBengkel) ? 'done' : 'checker'
                         ]);
                         Notification::make()
                             ->title('Data pengajuan berhasil diproses.')
@@ -539,14 +571,22 @@ class PengajuanResource extends Resource
                             })
                             ->required()
                             ->afterStateUpdated(function ($state, callable $set) {
+                                // dd($state);
                                 if (!$state) return;
 
-                                // dd($state);
+                                $unit = ServiceUnit::find($state);
 
-                                $unit = \App\Models\ServiceUnit::find($state);
                                 $set('foto_pengerjaan_bengkel', $unit?->foto_pengerjaan_bengkel);
                                 $set('foto_tambahan', $unit?->foto_tambahan ?? []);
-                                // dd($unit?->foto_tambahan, $unit?->foto_pengerjaan_bengkel);
+                                $set('foto_unit', $unit?->foto_unit);
+                                $set('foto_odometer', $unit?->foto_odometer);
+                                $set('foto_kondisi', $unit?->foto_kondisi ?? []);
+                            })
+                            ->default(function ($record) {
+                                if ($record && $record->service_unit && $record->service_unit->count() > 0) {
+                                    return $record->service_unit->first()->id;
+                                }
+                                return null;
                             }),
 
                         Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
@@ -556,8 +596,8 @@ class PengajuanResource extends Resource
                             ->directory('foto_pengerjaan_bengkel')
                             ->nullable()
                             ->reactive()
-                            ->dehydrated(), // agar data ini dikirim saat submit
-                        // default tidak perlu karena akan diset di afterStateUpdated di atas
+                            ->dehydrated()
+                            ->default(fn($get) => ServiceUnit::find($get('unit'))?->foto_pengerjaan_bengkel ?? null),
 
                         Forms\Components\FileUpload::make('foto_tambahan')
                             ->label('Foto Tambahan')
@@ -569,9 +609,13 @@ class PengajuanResource extends Resource
                             ->nullable()
                             ->reactive()
                             ->dehydrated()
-                            // default juga tidak perlu karena diset oleh afterStateUpdated
-                            ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
-                                // 🔒 Pastikan $state selalu array
+                            ->default(function ($get) {
+                                $unitId = $get('unit');
+                                ($unit = ServiceUnit::find($unitId));
+                                $foto = $unit?->foto_tambahan ?? [];
+                                return is_array($foto) ? $foto : json_decode($foto, true);
+                            })
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $state = is_array($state) ? $state : (is_null($state) ? [] : [$state]);
 
                                 if (count($state) > 3) {
@@ -579,18 +623,49 @@ class PengajuanResource extends Resource
                                 }
 
                                 $unitId = $get('unit');
-                                $unit = \App\Models\ServiceUnit::find($unitId);
+                                $unit = ServiceUnit::find($unitId);
+                                $lama = $unit?->foto_tambahan ?? [];
 
-                                // Pastikan ini juga array
-                                $lama = $unit->foto_tambahan ?? [];
-                                $lama = is_array($lama) ? $lama : [$lama];
+                                $lama = is_array($lama) ? $lama : json_decode($lama ?? '[]', true);
 
                                 $yangDihapus = collect($lama)->diff($state);
                                 foreach ($yangDihapus as $path) {
                                     Storage::disk('public')->delete($path);
                                 }
                             }),
+
+                        Forms\Components\FileUpload::make('foto_unit')
+                            ->label('Foto Unit')
+                            ->image()
+                            ->disk('public')
+                            ->directory('foto_unit')
+                            ->nullable()
+                            ->default(fn($get) => optional(ServiceUnit::find($get('unit')))->foto_unit),
+
+                        Forms\Components\FileUpload::make('foto_odometer')
+                            ->label('Foto Odometer')
+                            ->image()
+                            ->disk('public')
+                            ->directory('foto_odometer')
+                            ->nullable()
+                            ->default(fn($get) => optional(ServiceUnit::find($get('unit')))->foto_odometer),
+
+                        Forms\Components\FileUpload::make('foto_kondisi')
+                            ->label('Foto Kondisi')
+                            ->image()
+                            ->multiple()
+                            ->maxFiles(3)
+                            ->disk('public')
+                            ->directory('foto_kondisi')
+                            ->nullable()
+                            ->default(function ($get) {
+                                $unitId = $get('unit');
+                                $unit = ServiceUnit::find($unitId);
+                                $foto = $unit?->foto_kondisi ?? [];
+                                return is_array($foto) ? $foto : json_decode($foto, true);
+                            }),
                     ])
+
 
                     ->action(function (array $data, Pengajuan $record) {
                         $unitId = $data['unit'] ?? null;
@@ -600,6 +675,9 @@ class PengajuanResource extends Resource
                                 $serviceUnit->update([
                                     'foto_pengerjaan_bengkel' => $data['foto_pengerjaan_bengkel'] ?? null,
                                     'foto_tambahan' => $data['foto_tambahan'] ?? [],
+                                    'foto_kondisi' => $data['foto_kondisi'] ?? [],
+                                    'foto_unit' => $data['foto_unit'] ?? null,
+                                    'foto_odometer' => $data['foto_odometer'] ?? null,
                                 ]);
                                 Notification::make()
                                     ->title('Dokumentasi berhasil diperbarui.')
@@ -613,7 +691,25 @@ class PengajuanResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    ExportBulkAction::make()->exporter(PengajuanExporter::class)
+                    ExportBulkAction::make()->exporter(PengajuanExporter::class),
+                    Tables\Actions\BulkAction::make('check')
+                        ->label('Checked')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                $record->update(['keterangan_proses' => 'pengajuan finance']);
+                            }
+                            Notification::make()
+                                ->title('Status pengajuan diubah menjadi Pengajuan Finance.')
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion()
+                        ->modalHeading('Konfirmasi Pengajuan Finance')
+                        ->modalSubheading('Apakah Anda yakin ingin mengubah status semua pengajuan yang dipilih menjadi "Pengajuan Finance"?')
+                        ->modalButton('Ya, Ubah Status')
                 ]),
             ])
             ->headerActions([
@@ -642,6 +738,7 @@ class PengajuanResource extends Resource
                                         ->getStateUsing(function ($record) {
                                             return match ($record->keterangan_proses) {
                                                 'cs' => 'Customer Service',
+                                                'checker' => 'Checker',
                                                 'pengajuan finance' => 'Pengajuan Finance',
                                                 'finance' => 'Input Finance',
                                                 'otorisasi' => 'Otorisasi',
@@ -651,6 +748,7 @@ class PengajuanResource extends Resource
                                         })
                                         ->color(fn(string $state) => match ($state) {
                                             'Customer Service' => 'gray',
+                                            'Checker' => 'success',
                                             'Pengajuan Finance' => 'primary',
                                             'Finance' => 'warning',
                                             'Otorisasi' => 'warning',
@@ -785,7 +883,7 @@ class PengajuanResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ServiceUnitRelationManager::class,
+            // ServiceUnitRelationManager::class,
         ];
     }
 

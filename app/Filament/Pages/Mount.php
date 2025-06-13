@@ -63,7 +63,8 @@ class Mount extends Page implements HasTable
             $columns[] = TextColumn::make($alias)
                 ->label($monthLabel)
                 ->alignCenter()
-                ->formatStateUsing(fn($state) => $state ?? 0); // tampilkan 0 jika null
+                ->icon(fn($state) => $state > 0 ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                ->color(fn($state) => $state > 0 ? 'success' : 'danger');
         }
 
         return $columns;

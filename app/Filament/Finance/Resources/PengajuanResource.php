@@ -34,13 +34,35 @@ class PengajuanResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('jenis')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('type')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->sortable()
+                    ->searchable()
+                    ->label('Tanggal Pengajuan')
+                    ->date('d M Y')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('User'),
+                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Nama PIC'),
+                Tables\Columns\TextColumn::make('service_unit')
+                    ->label('Service - Nopol')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            $nopol = $service->unit?->nopol ?? '-';
+                            return "{$service->service} - {$nopol}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('service', 'like', "%{$search}%")
+                                ->orWhere('nopol', 'like', "%{$search}%");
+                        });
+                    }),
+                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project'),
+                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana'),
                 Tables\Columns\TextColumn::make('complete.bengkel_estimasi')
                     ->sortable()
                     ->searchable()
@@ -63,6 +85,14 @@ class PengajuanResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->badge()
+                    ->color(fn(string $state) => match (true) {
+                        str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'gray',
+                        str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
+                        str_contains(strtoupper($state), 'INPUT FINANCE') => 'warning',
+                        str_contains(strtoupper($state), 'OTORISASI') => 'warning',
+                        str_contains(strtoupper($state), 'SELESAI') => 'success',
+                        default => 'gray',
+                    })
                     ->getStateUsing(function ($record) {
                         return match ($record->keterangan_proses) {
                             'cs' => 'Customer Service',
@@ -72,14 +102,6 @@ class PengajuanResource extends Resource
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
-                    })
-                    ->color(fn(string $state) => match (true) {
-                        str_contains($state, 'Customer Service') => 'gray',
-                        str_contains($state, 'Pengajuan Finance') => 'primary',
-                        str_contains($state, 'Input Finance') => 'warning',
-                        str_contains($state, 'Otorisasi') => 'warning',
-                        str_contains($state, 'Selesai') => 'success',
-                        default => 'gray',
                     }),
             ])
             ->filters([
@@ -138,13 +160,12 @@ class PengajuanResource extends Resource
                                                 'paid' => 'Paid',
                                                 'unpaid' => 'Unpaid',
                                             ]),
-
                                     ]),
-
                                 Forms\Components\FileUpload::make('finance.bukti_transaksi')
                                     ->label('Bukti Transaksi')
+                                    ->helperText('Hanya dapat mengunggah file dengan tipe PDF atau gambar (image).')
                                     ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
-                                    
+                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
                                     ->disk('public')
                                     ->directory('bukti_transaksi')
                                     ->default(fn($record) => $record->finance?->bukti_transaksi),
