@@ -23,40 +23,42 @@ class newFinance extends BaseWidget
             ->columns([
                 Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('jenis')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('type')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
-                    Tables\Columns\TextColumn::make('keterangan_proses')
-                        ->label('Status Proses')
-                        ->sortable()
-                        ->searchable()
-                        ->badge()
-                        ->getStateUsing(function ($record) {
-                            return match ($record->keterangan_proses) {
-                                'cs' => 'Customer Service',
-                                'pengajuan finance' => 'Pengajuan Finance',
-                                'finance' => 'Input Finance',
-                                'otorisasi' => 'Otorisasi',
-                                'done' => 'Selesai',
-                                default => 'Tidak Diketahui',
-                            };
-                        })
-                        ->color(fn(string $state) => match (true) {
-                            str_contains($state, 'Customer Service') => 'gray',
-                            str_contains($state, 'Pengajuan Finance') => 'primary',
-                            str_contains($state, 'Input Finance') => 'warning',
-                            str_contains($state, 'Otorisasi') => 'warning',
-                            str_contains($state, 'Selesai') => 'success',
-                            default => 'gray',
-                        }),
-                ])
+                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('jenis')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('type')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('keterangan_proses')
+                    ->label('Status Proses')
+                    ->sortable()
+                    ->searchable()
+                    ->badge()
+                    ->color(fn(string $state) => match (true) {
+                        str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'gray',
+                        str_contains(strtoupper($state), 'CHECKER') => 'success',
+                        str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
+                        str_contains(strtoupper($state), 'INPUT FINANCE') => 'warning',
+                        str_contains(strtoupper($state), 'OTORISASI') => 'warning',
+                        str_contains(strtoupper($state), 'SELESAI') => 'success',
+                        default => 'gray',
+                    })
+                    ->getStateUsing(function ($record) {
+                        return match ($record->keterangan_proses) {
+                            'cs' => 'Customer Service',
+                            'checker' => 'Checker',
+                            'pengajuan finance' => 'Pengajuan Finance',
+                            'finance' => 'Input Finance',
+                            'otorisasi' => 'Otorisasi',
+                            'done' => 'Selesai',
+                            default => 'Tidak Diketahui',
+                        };
+                    }),
+            ])
             ->actions([
                 Tables\Actions\Action::make('open')
-                    ->url(fn (Pengajuan $record): string => PengajuanResource::getUrl('view', ['record' => $record])),
+                    ->url(fn(Pengajuan $record): string => PengajuanResource::getUrl('view', ['record' => $record])),
             ]);
     }
 }

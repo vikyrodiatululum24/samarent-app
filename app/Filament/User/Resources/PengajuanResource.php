@@ -3,6 +3,7 @@
 namespace App\Filament\User\Resources;
 
 use Filament\Forms;
+use App\Models\Unit;
 use Filament\Tables;
 use Filament\Forms\Form;
 use App\Models\Pengajuan;
@@ -12,18 +13,17 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Wizard;
 use Filament\Infolists\Components\Grid;
-use Illuminate\Support\Facades\Storage;
 use Filament\Infolists\Components\Group;
 use Filament\Pages\SubNavigationPosition;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use App\Filament\User\Resources\PengajuanResource\Pages;
-use App\Filament\User\Resources\PengajuanResource\RelationManagers;
-use App\Filament\Resources\PengajuanResource\RelationManagers\ServiceUnitRelationManager;
 
 class PengajuanResource extends Resource
 {
@@ -41,102 +41,167 @@ class PengajuanResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Fieldset::make('Informasi Umum')
-                    ->schema([
-                        Forms\Components\Group::make()
-                            ->schema([
-                                Hidden::make('user_id')
-                                    ->default(\Illuminate\Support\Facades\Auth::user()->id),
-                                Forms\Components\TextInput::make('nama')
-                                    ->label('Nama PIC')
-                                    ->required()
-                                    ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('no_wa')
-                                    ->label('No. WhatsApp')
-                                    ->required()
-                                    ->numeric()
-                                    ->maxLength(255),
-                            ]),
-                        Forms\Components\Group::make([
-                            Forms\Components\TextInput::make('project')
-                                ->required()
-                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                                ->maxLength(255),
-                            Forms\Components\Select::make('up')
-                                ->required()
-                                ->label('Unit Pelaksana')
-                                ->options([
-                                    'UP 1' => 'UP 1',
-                                    'UP 2' => 'UP 2',
-                                    'UP 3' => 'UP 3',
-                                    'UP 5' => 'UP 5',
-                                    'UP 7' => 'UP 7',
-                                    'CUST JEPANG' => 'CUST JEPANG',
-                                    'manual' => 'Lainnya',
+                Wizard::make([
+                    Step::make('Pengajuan')
+                        ->schema([
+                            Forms\Components\Fieldset::make('Informasi Umum')
+                                ->schema([
+                                    Forms\Components\Group::make()
+                                        ->schema([
+                                            Hidden::make('user_id')
+                                                ->default(\Illuminate\Support\Facades\Auth::user()->id),
+                                            Forms\Components\TextInput::make('nama')
+                                                ->label('Nama PIC')
+                                                ->required()
+                                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                                ->maxLength(255),
+                                            Forms\Components\TextInput::make('no_wa')
+                                                ->label('No. WhatsApp')
+                                                ->required()
+                                                ->numeric()
+                                                ->maxLength(255),
+                                        ]),
+                                    Forms\Components\Group::make()
+                                        ->schema([
+                                            Forms\Components\TextInput::make('project')
+                                                ->required()
+                                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                                ->maxLength(255),
+                                            Forms\Components\Select::make('up')
+                                                ->required()
+                                                ->label('Unit Pelaksana')
+                                                ->options([
+                                                    'UP 1' => 'UP 1',
+                                                    'UP 2' => 'UP 2',
+                                                    'UP 3' => 'UP 3',
+                                                    'UP 5' => 'UP 5',
+                                                    'UP 7' => 'UP 7',
+                                                    'CUST JEPANG' => 'CUST JEPANG',
+                                                    'manual' => 'Lainnya',
+                                                ])
+                                                ->reactive()
+                                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
+                                            Forms\Components\TextInput::make('up_lainnya')
+                                                ->label('Unit Pelaksana Lainnya')
+                                                ->required(fn(callable $get) => $get('up') === 'manual')
+                                                ->visible(fn(callable $get) => $get('up') === 'manual')
+                                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
+                                        ]),
+                                    Forms\Components\TextInput::make('provinsi')
+                                        ->required()
+                                        ->label('Provinsi')
+                                        ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('kota')
+                                        ->required()
+                                        ->label('Kota/Kab')
+                                        ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                        ->maxLength(255),
+
+
                                 ])
-                                ->reactive()
-                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
-                            Forms\Components\TextInput::make('up_lainnya')
-                                ->label('Unit Pelaksana Lainnya')
-                                ->required(fn(callable $get) => $get('up') === 'manual')
-                                ->visible(fn(callable $get) => $get('up') === 'manual')
-                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
-                            Forms\Components\TextInput::make('provinsi')
-                                ->required()
-                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                                ->maxLength(255),
-                            Forms\Components\TextInput::make('kota')
-                                ->required()
-                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                                ->maxLength(255),
+                                ->columns(2)
+                                ->columnSpan('full')
+                                ->extraAttributes(['class' => 'mb-4']),
+                            Forms\Components\Fieldset::make('Pembayaran')
+                                ->schema([
+                                    Forms\Components\Select::make('keterangan')
+                                        ->required()
+                                        ->label('Jenis Pengajuan')
+                                        ->options([
+                                            'reimburse' => 'REIMBURSE',
+                                            'cash advance' => 'CASH ADVANCE',
+                                            'invoice' => 'INVOICE',
+                                            'free' => 'FREE',
+                                        ])
+                                        ->reactive(),
+                                    Forms\Components\TextInput::make('payment_1')
+                                        ->nullable()
+                                        ->label('Nama Rekening')
+                                        ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
+                                        ->maxLength(255)
+                                        ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
+                                    Forms\Components\Select::make('bank_1')
+                                        ->nullable()
+                                        ->label('Bank')
+                                        ->options([
+                                            'BCA' => 'BCA',
+                                            'MANDIRI' => 'MANDIRI',
+                                            'BRI' => 'BRI',
+                                            'BNI' => 'BNI',
+                                            'PERMATA' => 'PERMATA',
+                                        ])
+                                        ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
+                                        ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
+                                    Forms\Components\TextInput::make('norek_1')
+                                        ->nullable()
+                                        ->label('No. Rekening')
+                                        ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
+                                        ->numeric()
+                                        ->maxLength(255)
+                                        ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
+                                ])
+                                ->columns(2)
+                                ->columnSpan('full')
+                                ->extraAttributes(['class' => 'mb-4']),
+                        ]),
+                    Step::make('Data Service')
+                        ->schema([
+                            Forms\Components\Repeater::make('service_unit')
+                                ->relationship() // penting: ini untuk relasi hasMany
+                                ->schema([
+                                    Forms\Components\Grid::make(2)
+                                        ->schema([
+                                            Forms\Components\Select::make('unit_id')
+                                                ->label('Unit')
+                                                ->relationship('unit', 'nopol')
+                                                ->getOptionLabelFromRecordUsing(function (Unit $unit) {
+                                                    return "{$unit->type} - {$unit->nopol}";
+                                                })
+                                                ->searchable()
+                                                ->preload()
+                                                ->required(),
+                                            Forms\Components\TextInput::make('odometer')
+                                                ->numeric()
+                                                ->required(),
+                                        ]),
+                                    Forms\Components\TextInput::make('service')
+                                        ->label('Jenis Permintaan Service')
+                                        ->required(),
+                                    Forms\Components\Grid::make(2)
+                                        ->schema([
+
+                                            Forms\Components\FileUpload::make('foto_unit')
+                                                ->label('Foto Unit')
+                                                ->image()
+                                                ->disk('public')
+                                                ->directory('foto_unit')
+                                                ->nullable(),
+
+                                            Forms\Components\FileUpload::make('foto_odometer')
+                                                ->label('Foto Odometer')
+                                                ->image()
+                                                ->disk('public')
+                                                ->directory('foto_odometer')
+                                                ->nullable(),
+
+
+                                            Forms\Components\FileUpload::make('foto_kondisi')
+                                                ->label('Foto Kondisi')
+                                                ->image()
+                                                ->multiple()
+                                                ->maxFiles(3)
+                                                ->disk('public')
+                                                ->directory('foto_kondisi')
+                                                ->nullable(),
+                                        ])
+                                ])
                         ])
-                    ])
-                    ->columns(2)
-                    ->columnSpan('full')
-                    ->extraAttributes(['class' => 'mb-4']),
-                Forms\Components\Fieldset::make('Pembayaran')
-                    ->schema([
-                        Forms\Components\Select::make('keterangan')
-                            ->required()
-                            ->label('Jenis Pengajuan')
-                            ->options([
-                                'reimburse' => 'REIMBURSE',
-                                'cash advance' => 'CASH ADVANCE',
-                                'invoice' => 'INVOICE',
-                                'free' => 'FREE',
-                            ])
-                            ->reactive(),
-                        Forms\Components\TextInput::make('payment_1')
-                            ->nullable()
-                            ->label('Nama Rekening')
-                            ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
-                            ->maxLength(255)
-                            ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
-                        Forms\Components\Select::make('bank_1')
-                            ->nullable()
-                            ->label('Bank')
-                            ->options([
-                                'BCA' => 'BCA',
-                                'MANDIRI' => 'MANDIRI',
-                                'BRI' => 'BRI',
-                                'BNI' => 'BNI',
-                                'PERMATA' => 'PERMATA',
-                            ])
-                            ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
-                            ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
-                        Forms\Components\TextInput::make('norek_1')
-                            ->nullable()
-                            ->label('No. Rekening')
-                            ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
-                            ->numeric()
-                            ->maxLength(255)
-                            ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
-                    ])
-                    ->columns(2)
-                    ->columnSpan('full')
-                    ->extraAttributes(['class' => 'mb-4']),
-            ]);
+
+                ])
+                    ->columnSpan('full') // Membuat wizard full width
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -170,23 +235,25 @@ class PengajuanResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->badge()
+                    ->color(fn(string $state) => match (true) {
+                        str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'gray',
+                        str_contains(strtoupper($state), 'CHECKER') => 'success',
+                        str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
+                        str_contains(strtoupper($state), 'INPUT FINANCE') => 'warning',
+                        str_contains(strtoupper($state), 'OTORISASI') => 'warning',
+                        str_contains(strtoupper($state), 'SELESAI') => 'success',
+                        default => 'gray',
+                    })
                     ->getStateUsing(function ($record) {
                         return match ($record->keterangan_proses) {
                             'cs' => 'Customer Service',
+                            'checker' => 'Checker',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
-                    })
-                    ->color(fn(string $state) => match (true) {
-                        str_contains($state, 'Customer Service') => 'gray',
-                        str_contains($state, 'Pengajuan Finance') => 'primary',
-                        str_contains($state, 'Input Finance') => 'warning',
-                        str_contains($state, 'Otorisasi') => 'warning',
-                        str_contains($state, 'Selesai') => 'success',
-                        default => 'gray',
                     }),
             ])
             ->filters([
@@ -224,6 +291,7 @@ class PengajuanResource extends Resource
                                         ->getStateUsing(function ($record) {
                                             return match ($record->keterangan_proses) {
                                                 'cs' => 'Customer Service',
+                                                'checker' => 'Checker',
                                                 'pengajuan finance' => 'Pengajuan Finance',
                                                 'finance' => 'Input Finance',
                                                 'otorisasi' => 'Otorisasi',
@@ -233,6 +301,7 @@ class PengajuanResource extends Resource
                                         })
                                         ->color(fn(string $state) => match ($state) {
                                             'Customer Service' => 'gray',
+                                            'Checker' => 'success',
                                             'Pengajuan Finance' => 'primary',
                                             'Finance' => 'warning',
                                             'Otorisasi' => 'warning',
@@ -284,7 +353,7 @@ class PengajuanResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ServiceUnitRelationManager::class,
+            //
         ];
     }
 

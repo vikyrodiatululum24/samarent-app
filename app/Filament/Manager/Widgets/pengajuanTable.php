@@ -31,33 +31,35 @@ class pengajuanTable extends BaseWidget
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan_proses')
-                        ->label('Status Proses')
-                        ->sortable()
-                        ->searchable()
-                        ->badge()
-                        ->getStateUsing(function ($record) {
-                            return match ($record->keterangan_proses) {
-                                'CS' => 'Customer Service',
-                                'PENGAJUAN FINANCE' => 'Pengajuan Finance',
-                                'FINANCE' => 'Input Finance',
-                                'OTORISASI' => 'Otorisasi',
-                                'DONE' => 'Selesai',
-                                default => 'Tidak Diketahui',
-                            };
-                        })
-                        ->color(fn(string $state) => match (true) {
-                            str_contains($state, 'Customer Service') => 'gray',
-                            str_contains($state, 'Pengajuan Finance') => 'primary',
-                            str_contains($state, 'Input Finance') => 'warning',
-                            str_contains($state, 'Otorisasi') => 'warning',
-                            str_contains($state, 'Selesai') => 'success',
-                            default => 'gray',
-                        }),
-                ])
+                    ->label('Status Proses')
+                    ->sortable()
+                    ->searchable()
+                    ->badge()
+                    ->color(fn(string $state) => match (true) {
+                        str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'gray',
+                        str_contains(strtoupper($state), 'CHECKER') => 'success',
+                        str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
+                        str_contains(strtoupper($state), 'INPUT FINANCE') => 'warning',
+                        str_contains(strtoupper($state), 'OTORISASI') => 'warning',
+                        str_contains(strtoupper($state), 'SELESAI') => 'success',
+                        default => 'gray',
+                    })
+                    ->getStateUsing(function ($record) {
+                        return match ($record->keterangan_proses) {
+                            'cs' => 'Customer Service',
+                            'checker' => 'Checker',
+                            'pengajuan finance' => 'Pengajuan Finance',
+                            'finance' => 'Input Finance',
+                            'otorisasi' => 'Otorisasi',
+                            'done' => 'Selesai',
+                            default => 'Tidak Diketahui',
+                        };
+                    }),
+
+            ])
             ->actions([
                 // Tables\Actions\Action::make('open')
                 //     ->url(fn (Pengajuan $record): string => PengajuanResource::getUrl('view', ['record' => $record])),
             ]);
     }
-
 }

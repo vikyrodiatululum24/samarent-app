@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DataUnitResource\Pages;
 
+use App\Filament\Exports\UnitExporter;
 use App\Filament\Resources\DataUnitResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -18,6 +19,9 @@ class ListDataUnits extends ListRecords
             Actions\ImportAction::make()
             ->label('Import Unit')
             ->importer(DataUnitImporter::class),
+            Actions\ExportAction::make()
+            ->label('Export Unit')
+            ->exporter(UnitExporter::class),
             Actions\CreateAction::make()
             ->label('Tambah Unit'),
         ];

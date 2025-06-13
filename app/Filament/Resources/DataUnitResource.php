@@ -10,8 +10,11 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Carbon;
 use Filament\Resources\Resource;
+use Filament\Actions\ExportAction;
+use App\Filament\Exports\UnitExporter;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\ExportBulkAction;
 use App\Filament\Resources\DataUnitResource\Pages;
 use App\Filament\Resources\DataUnitResource\RelationManagers;
 
@@ -96,7 +99,12 @@ class DataUnitResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make('export_units')
+                        ->label('Export Unit')
+                        ->exporter(UnitExporter::class),
                 ]),
+
+                // Removed headerActions ExportAction because it is not supported for tables
             ]);
     }
 

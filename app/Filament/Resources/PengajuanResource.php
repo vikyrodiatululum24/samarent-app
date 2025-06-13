@@ -150,21 +150,70 @@ class PengajuanResource extends Resource
                             Forms\Components\Repeater::make('service_unit')
                                 ->relationship() // penting: ini untuk relasi hasMany
                                 ->schema([
-                                    Forms\Components\Select::make('unit_id')
-                                        ->label('Unit')
-                                        ->relationship('unit', 'nopol') // Relasi dari model ini ke model Unit
-                                        ->getOptionLabelFromRecordUsing(function (Unit $unit) {
-                                            return "{$unit->type} - {$unit->nopol}";
-                                        })
-                                        ->searchable()
-                                        ->preload() // Optional, preload semua data untuk menghindari query saat ketik
-                                        ->required(),
-                                    Forms\Components\TextInput::make('odometer')
-                                        ->numeric()
-                                        ->required(),
+                                    Forms\Components\Grid::make(2)
+                                        ->schema([
+                                            Forms\Components\Select::make('unit_id')
+                                                ->label('Unit')
+                                                ->relationship('unit', 'nopol')
+                                                ->getOptionLabelFromRecordUsing(function (Unit $unit) {
+                                                    return "{$unit->type} - {$unit->nopol}";
+                                                })
+                                                ->searchable()
+                                                ->preload()
+                                                ->required(),
+                                            Forms\Components\TextInput::make('odometer')
+                                                ->numeric()
+                                                ->required(),
+                                        ]),
                                     Forms\Components\TextInput::make('service')
                                         ->label('Jenis Permintaan Service')
                                         ->required(),
+                                    Forms\Components\Grid::make(2)
+                                        ->schema([
+                                            Forms\Components\Grid::make(3)
+                                                ->schema([
+                                                    Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
+                                                        ->label('Foto Pengerjaan Bengkel')
+                                                        ->image()
+                                                        ->disk('public')
+                                                        ->directory('foto_pengerjaan_bengkel')
+                                                        ->nullable()
+                                                        ->reactive()
+                                                        ->dehydrated(),
+
+                                                    Forms\Components\FileUpload::make('foto_unit')
+                                                        ->label('Foto Unit')
+                                                        ->image()
+                                                        ->disk('public')
+                                                        ->directory('foto_unit')
+                                                        ->nullable(),
+
+                                                    Forms\Components\FileUpload::make('foto_odometer')
+                                                        ->label('Foto Odometer')
+                                                        ->image()
+                                                        ->disk('public')
+                                                        ->directory('foto_odometer')
+                                                        ->nullable(),
+                                                ]),
+
+                                            Forms\Components\FileUpload::make('foto_kondisi')
+                                                ->label('Foto Kondisi')
+                                                ->image()
+                                                ->multiple()
+                                                ->maxFiles(3)
+                                                ->disk('public')
+                                                ->directory('foto_kondisi')
+                                                ->nullable(),
+
+                                            Forms\Components\FileUpload::make('foto_tambahan')
+                                                ->label('Foto Tambahan')
+                                                ->image()
+                                                ->disk('public')
+                                                ->directory('foto_tambahan')
+                                                ->multiple()
+                                                ->maxFiles(3)
+                                                ->nullable(),
+                                        ])
                                 ])
                         ])
 
@@ -554,138 +603,138 @@ class PengajuanResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\Action::make('Documentasi')
-                    ->label('Dokumentasi')
-                    ->icon('heroicon-o-photo')
-                    ->form([
-                        Forms\Components\Select::make('unit')
-                            ->label('Unit')
-                            ->reactive()
-                            ->options(function ($record) {
-                                if (!$record || !$record->service_unit) return [];
+                // Tables\Actions\Action::make('Documentasi')
+                //     ->label('Dokumentasi')
+                //     ->icon('heroicon-o-photo')
+                //     ->form([
+                //         Forms\Components\Select::make('unit')
+                //             ->label('Unit')
+                //             ->reactive()
+                //             ->options(function ($record) {
+                //                 if (!$record || !$record->service_unit) return [];
 
-                                return $record->service_unit
-                                    ->filter(fn($unit) => $unit->unit && !is_null($unit->unit->type))
-                                    ->mapWithKeys(fn($unit) => [$unit->id => $unit->unit->type])
-                                    ->toArray();
-                            })
-                            ->required()
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                // dd($state);
-                                if (!$state) return;
+                //                 return $record->service_unit
+                //                     ->filter(fn($unit) => $unit->unit && !is_null($unit->unit->type))
+                //                     ->mapWithKeys(fn($unit) => [$unit->id => $unit->unit->type])
+                //                     ->toArray();
+                //             })
+                //             ->required()
+                //             ->afterStateUpdated(function ($state, callable $set) {
+                //                 // dd($state);
+                //                 if (!$state) return;
 
-                                $unit = ServiceUnit::find($state);
+                //                 $unit = ServiceUnit::find($state);
 
-                                $set('foto_pengerjaan_bengkel', $unit?->foto_pengerjaan_bengkel);
-                                $set('foto_tambahan', $unit?->foto_tambahan ?? []);
-                                $set('foto_unit', $unit?->foto_unit);
-                                $set('foto_odometer', $unit?->foto_odometer);
-                                $set('foto_kondisi', $unit?->foto_kondisi ?? []);
-                            })
-                            ->default(function ($record) {
-                                if ($record && $record->service_unit && $record->service_unit->count() > 0) {
-                                    return $record->service_unit->first()->id;
-                                }
-                                return null;
-                            }),
+                //                 $set('foto_pengerjaan_bengkel', $unit?->foto_pengerjaan_bengkel);
+                //                 $set('foto_tambahan', $unit?->foto_tambahan ?? []);
+                //                 $set('foto_unit', $unit?->foto_unit);
+                //                 $set('foto_odometer', $unit?->foto_odometer);
+                //                 $set('foto_kondisi', $unit?->foto_kondisi ?? []);
+                //             })
+                //             ->default(function ($record) {
+                //                 if ($record && $record->service_unit && $record->service_unit->count() > 0) {
+                //                     return $record->service_unit->first()->id;
+                //                 }
+                //                 return null;
+                //             }),
 
-                        Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
-                            ->label('Foto Pengerjaan Bengkel')
-                            ->image()
-                            ->disk('public')
-                            ->directory('foto_pengerjaan_bengkel')
-                            ->nullable()
-                            ->reactive()
-                            ->dehydrated()
-                            ->default(fn($get) => ServiceUnit::find($get('unit'))?->foto_pengerjaan_bengkel ?? null),
+                //         Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
+                //             ->label('Foto Pengerjaan Bengkel')
+                //             ->image()
+                //             ->disk('public')
+                //             ->directory('foto_pengerjaan_bengkel')
+                //             ->nullable()
+                //             ->reactive()
+                //             ->dehydrated()
+                //             ->default(fn($get) => ServiceUnit::find($get('unit'))?->foto_pengerjaan_bengkel ?? null),
 
-                        Forms\Components\FileUpload::make('foto_tambahan')
-                            ->label('Foto Tambahan')
-                            ->image()
-                            ->disk('public')
-                            ->directory('foto_tambahan')
-                            ->multiple()
-                            ->maxFiles(3)
-                            ->nullable()
-                            ->reactive()
-                            ->dehydrated()
-                            ->default(function ($get) {
-                                $unitId = $get('unit');
-                                ($unit = ServiceUnit::find($unitId));
-                                $foto = $unit?->foto_tambahan ?? [];
-                                return is_array($foto) ? $foto : json_decode($foto, true);
-                            })
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $state = is_array($state) ? $state : (is_null($state) ? [] : [$state]);
+                //         Forms\Components\FileUpload::make('foto_tambahan')
+                //             ->label('Foto Tambahan')
+                //             ->image()
+                //             ->disk('public')
+                //             ->directory('foto_tambahan')
+                //             ->multiple()
+                //             ->maxFiles(3)
+                //             ->nullable()
+                //             ->reactive()
+                //             ->dehydrated()
+                //             ->default(function ($get) {
+                //                 $unitId = $get('unit');
+                //                 ($unit = ServiceUnit::find($unitId));
+                //                 $foto = $unit?->foto_tambahan ?? [];
+                //                 return is_array($foto) ? $foto : json_decode($foto, true);
+                //             })
+                //             ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                //                 $state = is_array($state) ? $state : (is_null($state) ? [] : [$state]);
 
-                                if (count($state) > 3) {
-                                    $set('foto_tambahan', array_slice($state, 0, 3));
-                                }
+                //                 if (count($state) > 3) {
+                //                     $set('foto_tambahan', array_slice($state, 0, 3));
+                //                 }
 
-                                $unitId = $get('unit');
-                                $unit = ServiceUnit::find($unitId);
-                                $lama = $unit?->foto_tambahan ?? [];
+                //                 $unitId = $get('unit');
+                //                 $unit = ServiceUnit::find($unitId);
+                //                 $lama = $unit?->foto_tambahan ?? [];
 
-                                $lama = is_array($lama) ? $lama : json_decode($lama ?? '[]', true);
+                //                 $lama = is_array($lama) ? $lama : json_decode($lama ?? '[]', true);
 
-                                $yangDihapus = collect($lama)->diff($state);
-                                foreach ($yangDihapus as $path) {
-                                    Storage::disk('public')->delete($path);
-                                }
-                            }),
+                //                 $yangDihapus = collect($lama)->diff($state);
+                //                 foreach ($yangDihapus as $path) {
+                //                     Storage::disk('public')->delete($path);
+                //                 }
+                //             }),
 
-                        Forms\Components\FileUpload::make('foto_unit')
-                            ->label('Foto Unit')
-                            ->image()
-                            ->disk('public')
-                            ->directory('foto_unit')
-                            ->nullable()
-                            ->default(fn($get) => optional(ServiceUnit::find($get('unit')))->foto_unit),
+                //         Forms\Components\FileUpload::make('foto_unit')
+                //             ->label('Foto Unit')
+                //             ->image()
+                //             ->disk('public')
+                //             ->directory('foto_unit')
+                //             ->nullable()
+                //             ->default(fn($get) => optional(ServiceUnit::find($get('unit')))->foto_unit),
 
-                        Forms\Components\FileUpload::make('foto_odometer')
-                            ->label('Foto Odometer')
-                            ->image()
-                            ->disk('public')
-                            ->directory('foto_odometer')
-                            ->nullable()
-                            ->default(fn($get) => optional(ServiceUnit::find($get('unit')))->foto_odometer),
+                //         Forms\Components\FileUpload::make('foto_odometer')
+                //             ->label('Foto Odometer')
+                //             ->image()
+                //             ->disk('public')
+                //             ->directory('foto_odometer')
+                //             ->nullable()
+                //             ->default(fn($get) => optional(ServiceUnit::find($get('unit')))->foto_odometer),
 
-                        Forms\Components\FileUpload::make('foto_kondisi')
-                            ->label('Foto Kondisi')
-                            ->image()
-                            ->multiple()
-                            ->maxFiles(3)
-                            ->disk('public')
-                            ->directory('foto_kondisi')
-                            ->nullable()
-                            ->default(function ($get) {
-                                $unitId = $get('unit');
-                                $unit = ServiceUnit::find($unitId);
-                                $foto = $unit?->foto_kondisi ?? [];
-                                return is_array($foto) ? $foto : json_decode($foto, true);
-                            }),
-                    ])
+                //         Forms\Components\FileUpload::make('foto_kondisi')
+                //             ->label('Foto Kondisi')
+                //             ->image()
+                //             ->multiple()
+                //             ->maxFiles(3)
+                //             ->disk('public')
+                //             ->directory('foto_kondisi')
+                //             ->nullable()
+                //             ->default(function ($get) {
+                //                 $unitId = $get('unit');
+                //                 $unit = ServiceUnit::find($unitId);
+                //                 $foto = $unit?->foto_kondisi ?? [];
+                //                 return is_array($foto) ? $foto : json_decode($foto, true);
+                //             }),
+                //     ])
 
 
-                    ->action(function (array $data, Pengajuan $record) {
-                        $unitId = $data['unit'] ?? null;
-                        if ($unitId) {
-                            $serviceUnit = \App\Models\ServiceUnit::find($unitId);
-                            if ($serviceUnit) {
-                                $serviceUnit->update([
-                                    'foto_pengerjaan_bengkel' => $data['foto_pengerjaan_bengkel'] ?? null,
-                                    'foto_tambahan' => $data['foto_tambahan'] ?? [],
-                                    'foto_kondisi' => $data['foto_kondisi'] ?? [],
-                                    'foto_unit' => $data['foto_unit'] ?? null,
-                                    'foto_odometer' => $data['foto_odometer'] ?? null,
-                                ]);
-                                Notification::make()
-                                    ->title('Dokumentasi berhasil diperbarui.')
-                                    ->success()
-                                    ->send();
-                            }
-                        }
-                    }),
+                //     ->action(function (array $data, Pengajuan $record) {
+                //         $unitId = $data['unit'] ?? null;
+                //         if ($unitId) {
+                //             $serviceUnit = \App\Models\ServiceUnit::find($unitId);
+                //             if ($serviceUnit) {
+                //                 $serviceUnit->update([
+                //                     'foto_pengerjaan_bengkel' => $data['foto_pengerjaan_bengkel'] ?? null,
+                //                     'foto_tambahan' => $data['foto_tambahan'] ?? [],
+                //                     'foto_kondisi' => $data['foto_kondisi'] ?? [],
+                //                     'foto_unit' => $data['foto_unit'] ?? null,
+                //                     'foto_odometer' => $data['foto_odometer'] ?? null,
+                //                 ]);
+                //                 Notification::make()
+                //                     ->title('Dokumentasi berhasil diperbarui.')
+                //                     ->success()
+                //                     ->send();
+                //             }
+                //         }
+                //     }),
 
             ])
             ->bulkActions([

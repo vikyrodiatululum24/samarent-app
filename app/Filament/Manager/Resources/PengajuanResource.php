@@ -28,7 +28,7 @@ class PengajuanResource extends Resource
                 //
             ]);
     }
-    
+
 
     public static function table(Table $table): Table
     {
@@ -57,7 +57,7 @@ class PengajuanResource extends Resource
                         // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
                         $query->whereHas('service_unit.unit', function ($q) use ($search) {
                             $q->where('service', 'like', "%{$search}%")
-                              ->orWhere('nopol', 'like', "%{$search}%");
+                                ->orWhere('nopol', 'like', "%{$search}%");
                         });
                     }),
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable(),
@@ -67,23 +67,25 @@ class PengajuanResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->badge()
+                    ->color(fn(string $state) => match (true) {
+                        str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'gray',
+                        str_contains(strtoupper($state), 'CHECKER') => 'success',
+                        str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
+                        str_contains(strtoupper($state), 'INPUT FINANCE') => 'warning',
+                        str_contains(strtoupper($state), 'OTORISASI') => 'warning',
+                        str_contains(strtoupper($state), 'SELESAI') => 'success',
+                        default => 'gray',
+                    })
                     ->getStateUsing(function ($record) {
                         return match ($record->keterangan_proses) {
                             'cs' => 'Customer Service',
+                            'checker' => 'Checker',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
-                    })
-                    ->color(fn(string $state) => match (true) {
-                        str_contains($state, 'Customer Service') => 'gray',
-                        str_contains($state, 'Pengajuan Finance') => 'primary',
-                        str_contains($state, 'Input Finance') => 'warning',
-                        str_contains($state, 'Otorisasi') => 'warning',
-                        str_contains($state, 'Selesai') => 'success',
-                        default => 'gray',
                     }),
             ])
             ->filters([
@@ -340,7 +342,38 @@ class PengajuanResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->where('up', 'UP 5');
+        $user = auth()->user();
+
+        // Ambil data manager terkait user
+        $manager = $user->manager;
+        // Jika user adalah centralakun@samarent.com, tampilkan semua data
+        if ($user->email === 'centralakun@samarent.com') {
+            return parent::getEloquentQuery();
+        }
+
+        // Jika tidak ada manager, kembalikan query kosong
+        if (!$manager) {
+            return parent::getEloquentQuery()->whereRaw('1 = 0');
+        }
+
+        // Ambil UP dan project yang dimiliki user (manager)
+        $ups = array_filter([$manager->up]);
+        $projects = array_filter([$manager->perusahaan]);
+
+        $query = parent::getEloquentQuery();
+
+        if (!empty($ups) && !empty($projects)) {
+            // Jika user punya keduanya, filter berdasarkan up dan project
+            $query->whereIn('up', $ups)
+                ->whereIn('project', $projects);
+        } elseif (!empty($ups)) {
+            // Jika hanya punya up
+            $query->whereIn('up', $ups);
+        } else {
+            // Tidak punya keduanya, kembalikan query kosong
+            $query->whereRaw('1 = 0');
+        }
+
+        return $query;
     }
 }

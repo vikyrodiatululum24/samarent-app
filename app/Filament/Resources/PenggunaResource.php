@@ -83,6 +83,62 @@ class PenggunaResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('manager')
+                    ->icon('heroicon-o-cog')
+                    ->label('')
+                    ->visible(fn($record) => $record->role === 'manager')
+                    ->modalHeading('Isi Form Manager')
+                    ->modalSubmitActionLabel('Simpan')
+                    ->form(function ($record) {
+                        $manager = $record->manager; // sekarang hasOne, bukan collection lagi
+
+                        return [
+                            Forms\Components\Select::make('up')
+                                ->required()
+                                ->label('Unit Pelaksana')
+                                ->options([
+                                    'UP 1' => 'UP 1',
+                                    'UP 2' => 'UP 2',
+                                    'UP 3' => 'UP 3',
+                                    'UP 5' => 'UP 5',
+                                    'UP 7' => 'UP 7',
+                                    'CUST JEPANG' => 'CUST JEPANG',
+                                    'manual' => 'Lainnya',
+                                ])
+                                ->reactive()
+                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null))
+                                ->default($manager?->up),
+
+                            Forms\Components\Textarea::make('perusahaan')
+                                ->label('Perusahaan')
+                                ->default($manager?->perusahaan),
+                        ];
+                    })
+                    ->action(function (array $data, $record, $action) {
+                        $record->manager()->updateOrCreate(
+                            ['user_id' => $record->id], // kondisi untuk update jika sudah ada
+                            [
+                                'up' => $data['up'],
+                                'perusahaan' => $data['perusahaan'],
+                            ]
+                        );
+
+                        $action->success('Data manager berhasil disimpan.');
+                    }),
+                Tables\Actions\Action::make('delete-manager') // tombol hapus
+                    ->color('danger')
+                    ->label('')
+                    ->icon('heroicon-o-trash')
+                    ->visible(fn($record) => $record->role === 'manager' && $record->manager !== null)
+                    ->requiresConfirmation()
+                    ->deselectRecordsAfterCompletion()
+                    ->modalHeading('Unmanage')
+                    ->modalSubheading('Apakah Anda yakin ingin Unmanage? Tindakan ini tidak dapat dibatalkan.')
+                    ->modalButton('Ya, Hapus Data')
+                    ->action(function ($record, $action) {
+                        $record->manager?->delete();
+                        $action->success('Data manager berhasil dihapus.');
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
