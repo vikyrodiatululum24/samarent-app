@@ -23,6 +23,6 @@ class PrintController extends Controller
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
         $pdf = PDF::loadView('prints.spk', ['pengajuan' => $pengajuan]);
         Cetak::create(['pengajuan_id' => $pengajuan->id]);
-        return $pdf->download("$namaFile.pdf");
+        return $pdf->stream("$namaFile.pdf");
     }
 }

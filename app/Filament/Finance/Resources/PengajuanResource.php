@@ -212,6 +212,7 @@ class PengajuanResource extends Resource
                                         ->getStateUsing(function ($record) {
                                             return match ($record->keterangan_proses) {
                                                 'cs' => 'Customer Service',
+                                                'checker' => 'Checker',
                                                 'pengajuan finance' => 'Pengajuan Finance',
                                                 'finance' => 'Input Finance',
                                                 'otorisasi' => 'Otorisasi',
@@ -221,8 +222,9 @@ class PengajuanResource extends Resource
                                         })
                                         ->color(fn(string $state) => match ($state) {
                                             'Customer Service' => 'gray',
+                                            'Checker' => 'success',
                                             'Pengajuan Finance' => 'primary',
-                                            'Input Finance' => 'warning',
+                                            'Finance' => 'warning',
                                             'Otorisasi' => 'warning',
                                             'Selesai' => 'success',
                                             default => 'gray',
@@ -232,20 +234,6 @@ class PengajuanResource extends Resource
                                         ->dateTime()
                                         ->getStateUsing(fn($record) => $record->created_at->format('d M Y H:i:s')),
                                 ]),
-                            ]),
-                    ]),
-
-                Components\Section::make('Detail Kendaraan')
-                    ->schema([
-                        Components\Grid::make(2)
-                            ->schema([
-                                Components\Group::make([
-                                    Components\TextEntry::make('jenis'),
-                                    Components\TextEntry::make('type'),
-                                    Components\TextEntry::make('nopol'),
-                                    Components\TextEntry::make('odometer'),
-                                    Components\TextEntry::make('service'),
-                                ]),
                                 Components\Group::make([
                                     Components\TextEntry::make('project'),
                                     Components\TextEntry::make('keterangan'),
@@ -253,9 +241,8 @@ class PengajuanResource extends Resource
                                     Components\TextEntry::make('provinsi'),
                                     Components\TextEntry::make('kota'),
                                 ]),
-                            ]),
+                            ])
                     ]),
-
                 Components\Section::make('Pembayaran')
                     ->schema([
                         Components\Grid::make(3)
@@ -265,37 +252,14 @@ class PengajuanResource extends Resource
                                 Components\TextEntry::make('norek_1'),
                             ]),
                     ]),
-                Components\Section::make('Dokumentasi')
+                Components\Section::make('Detail Kendaraan')
                     ->schema([
-                        ViewEntry::make('foto_unit')
-                            ->label('Foto Unit')
-                            ->view('filament.components.foto-unit')
-                            ->columnSpan([
-                                'default' => 2,
-                                'md' => 1,
-                            ]),
-
-                        ViewEntry::make('foto_odometer')
-                            ->label('Foto Odometer')
-                            ->view('filament.components.foto-odometer')
-                            ->columnSpan([
-                                'default' => 2,
-                                'md' => 1,
-                            ]),
-
-                        ViewEntry::make('foto_kondisi')
-                            ->label('Foto Kondisi')
-                            ->view('filament.components.foto-kondisi')
-                            ->columnSpan([
-                                'default' => 4,
-                                'md' => 3,
-                            ]),
-                    ])
-                    ->columns([
-                        'default' => 4,
-                        'md' => 5,
+                        ViewEntry::make('service_unit.pengajuan_id')
+                            ->label('Detail Kendaraan')
+                            ->view('filament.resources.pages.pengajuan.detail-kendaraan')
+                            ->columnSpanFull(),
                     ]),
-                Components\Section::make('Informasi Proses')
+                Components\Section::make('Informasi Complete')
                     ->schema([
                         Components\Grid::make(1)
                             ->schema([
@@ -356,25 +320,11 @@ class PengajuanResource extends Resource
                             ]),
                     ])
                     ->visible(fn($record) => !empty($record->complete)), // Only show when complete data is filled
-                Components\Section::make('Dokumentasi Proses')
+                Components\Section::make('Dokumentasi Complete')
                     ->schema([
                         ViewEntry::make('complete.foto_nota')
                             ->label('Foto Nota')
                             ->view('filament.components.foto-nota')
-                            ->columnSpan([
-                                'default' => 2,
-                                'md' => 1,
-                            ]),
-                        ViewEntry::make('complete.foto_pengerjaan_bengkel')
-                            ->label('Foto Pengerjaan Bengkel')
-                            ->view('filament.components.foto-pengerjaan-bengkel')
-                            ->columnSpan([
-                                'default' => 2,
-                                'md' => 1,
-                            ]),
-                        ViewEntry::make('complete.foto_tambahan')
-                            ->label('Foto Tambahan')
-                            ->view('filament.components.foto-tambahan')
                             ->columnSpan([
                                 'default' => 4,
                                 'md' => 3,
@@ -389,7 +339,7 @@ class PengajuanResource extends Resource
                     ])
                     ->columns([
                         'default' => 4,
-                        'md' => 5,
+                        'md' => 3,
                     ])
                     ->visible(fn($record) => !empty($record->complete)),
             ]);

@@ -2,11 +2,12 @@
 
 namespace App\Filament\User\Widgets;
 
-use App\Filament\User\Resources\PengajuanResource;
-use App\Models\Pengajuan;
 use Filament\Tables;
+use App\Models\Pengajuan;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Widgets\TableWidget as BaseWidget;
+use App\Filament\User\Resources\PengajuanResource;
 
 class newPengajuan extends BaseWidget
 {
@@ -30,12 +31,43 @@ class newPengajuan extends BaseWidget
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('User'),
                 Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Nama PIC'),
-                Tables\Columns\TextColumn::make('nopol')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('No. Polisi'),
-                Tables\Columns\TextColumn::make('jenis')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Jenis Kendaraan'),
-                Tables\Columns\TextColumn::make('type')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Type Unit'),
-                Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Permintaan Service'),
+                Tables\Columns\TextColumn::make('service_unit')
+                    ->label('Service - Nopol')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            $nopol = $service->unit?->nopol ?? '-';
+                            return "{$service->service} - {$nopol}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('service', 'like', "%{$search}%")
+                                ->orWhere('nopol', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project'),
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana'),
+                Tables\Columns\TextColumn::make('complete.bengkel_estimasi')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Bengkel'),
+                Tables\Columns\TextColumn::make('complete.nominal_tf_bengkel')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Nominal Transfer'),
+                Tables\Columns\TextColumn::make('complete.nominal_estimasi')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Nominal Estimasi')
+                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
                 Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
