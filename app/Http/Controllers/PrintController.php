@@ -21,8 +21,11 @@ class PrintController extends Controller
         $pengajuan = Pengajuan::with('complete')->findOrFail($id);
         $namaFile = $pengajuan->no_pengajuan;
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
-        $pdf = PDF::loadView('prints.spk', ['pengajuan' => $pengajuan]);
         Cetak::create(['pengajuan_id' => $pengajuan->id]);
+        $pdf = PDF::loadView('prints.spk', [
+            'pengajuan' => $pengajuan,
+            'autoPrint' => true // kirim flag ke view
+        ]);
         return $pdf->stream("$namaFile.pdf");
     }
 }
