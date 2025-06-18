@@ -3,8 +3,9 @@
 namespace App\Filament\Exports;
 
 use App\Models\ServiceUnit;
-use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
+use Illuminate\Database\Query\Builder;
+use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Models\Export;
 
 class ServiceUnitExporter extends Exporter
@@ -50,6 +51,16 @@ class ServiceUnitExporter extends Exporter
             ExportColumn::make('pengajuan.keterangan_proses')->label('Keterangan Proses Pengajuan'),
             ExportColumn::make('pengajuan.complete.status_finance')->label('Status Finance'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with([
+                'pengajuan',
+                'pengajuan.complete',
+                'unit'
+            ]);
     }
 
     public static function getCompletedNotificationBody(Export $export): string

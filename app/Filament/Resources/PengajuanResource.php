@@ -236,25 +236,62 @@ class PengajuanResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('User'),
                 Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Nama PIC'),
-                Tables\Columns\TextColumn::make('service_unit')
-                    ->label('Service - Nopol')
+                Tables\Columns\TextColumn::make('jenis')
+                    ->label('Jenis Kendaraan')
                     ->getStateUsing(function ($record) {
                         // Ambil semua service yang berelasi dengan pengajuan ini
                         $services = $record->service_unit()->with('unit')->get();
                         // Format: [nama_service (nopol)], dipisah baris baru
                         return $services->map(function ($service) {
-                            $nopol = $service->unit?->nopol ?? '-';
-                            return "{$service->service} - {$nopol}";
+                            $jenis = $service->unit?->jenis ?? '-';
+                            return "{$jenis}";
                         })->implode('<br>');
                     })
                     ->html()
                     ->searchable(query: function (Builder $query, string $search) {
                         // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
                         $query->whereHas('service_unit.unit', function ($q) use ($search) {
-                            $q->where('service', 'like', "%{$search}%")
-                                ->orWhere('nopol', 'like', "%{$search}%");
+                            $q->where('jenis', 'like', "%{$search}%");
                         });
-                    }),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('service_unit')
+                    ->label('Service')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            return "{$service->service}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('service', 'like', "%{$search}%");
+                        });
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('nopol')
+                    ->label('No. Polisi')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            $nopol = $service->unit?->nopol ?? '-';
+                            return "{$nopol}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('nopol', 'like', "%{$search}%");
+                        });
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project'),
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana'),
                 Tables\Columns\TextColumn::make('complete.bengkel_estimasi')
@@ -740,7 +777,7 @@ class PengajuanResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    ExportBulkAction::make()->exporter(PengajuanExporter::class),
+                    // ExportBulkAction::make()->exporter(ServiceUnitExporter::class),
                     Tables\Actions\BulkAction::make('check')
                         ->label('Checked')
                         ->icon('heroicon-o-check-circle')
@@ -762,8 +799,9 @@ class PengajuanResource extends Resource
                 ]),
             ])
             ->headerActions([
-                ExportAction::make()->exporter(ServiceUnitExporter::class),
+                // ExportAction::make()->exporter(ServiceUnitExporter::class),
                 ImportAction::make()->importer(PengajuanImporter::class)
+
             ])
             ->defaultSort('id', 'desc'); // Optional: Add default sorting
     }

@@ -2,8 +2,12 @@
 
 namespace App\Filament\Resources\PengajuanResource\Pages;
 
-use Filament\Actions;
+use Filament\Actions\CreateAction;
+use App\Exports\ServiceUnitExport;
+use Filament\Actions\Action;
+use Maatwebsite\Excel\Facades\Excel;
 use Filament\Resources\Components\Tab;
+use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\PengajuanResource;
 
@@ -14,7 +18,24 @@ class ListPengajuans extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
+            Action::make('exportFiltered')
+            ->label('Export Filter Tanggal')
+            ->form([
+                DatePicker::make('from_date')->label('Dari Tanggal')->required(),
+                DatePicker::make('to_date')->label('Sampai Tanggal')->required(),
+            ])
+            ->action(function (array $data) {
+                $from = $data['from_date'];
+                $to = $data['to_date'];
+                $filename = 'service_units_' . now()->format('Ymd_His') . '.xlsx';
+
+                return response()->streamDownload(function () use ($from, $to) {
+                    echo Excel::raw(new \App\Exports\ServiceUnitExport($from, $to), \Maatwebsite\Excel\Excel::XLSX);
+                }, $filename);
+            })
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('success'),
         ];
     }
 
@@ -22,10 +43,10 @@ class ListPengajuans extends ListRecords
     {
         return [
             null => Tab::make('All'),
-            'OP' => Tab::make()->query(fn ($query) => $query->whereHas('complete', fn ($q) => $q->where('kode', 'op'))),
-            'SC' => Tab::make()->query(fn ($query) => $query->whereHas('complete', fn ($q) => $q->where('kode', 'sc'))),
-            'SP' => Tab::make()->query(fn ($query) => $query->whereHas('complete', fn ($q) => $q->where('kode', 'sp'))),
-            'STNK' => Tab::make()->query(fn ($query) => $query->whereHas('complete', fn ($q) => $q->where('kode', 'stnk'))),
+            'OP' => Tab::make()->query(fn($query) => $query->whereHas('complete', fn($q) => $q->where('kode', 'op'))),
+            'SC' => Tab::make()->query(fn($query) => $query->whereHas('complete', fn($q) => $q->where('kode', 'sc'))),
+            'SP' => Tab::make()->query(fn($query) => $query->whereHas('complete', fn($q) => $q->where('kode', 'sp'))),
+            'STNK' => Tab::make()->query(fn($query) => $query->whereHas('complete', fn($q) => $q->where('kode', 'stnk'))),
         ];
     }
 }
