@@ -42,26 +42,44 @@ class PengajuanResource extends Resource
                 Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('nama')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('service_unit')
-                    ->label('Service - Nopol')
+                    ->label('Service')
                     ->getStateUsing(function ($record) {
                         // Ambil semua service yang berelasi dengan pengajuan ini
                         $services = $record->service_unit()->with('unit')->get();
                         // Format: [nama_service (nopol)], dipisah baris baru
                         return $services->map(function ($service) {
-                            $nopol = $service->unit?->nopol ?? '-';
-                            return "{$service->service} - {$nopol}";
+                            return "{$service->service}";
                         })->implode('<br>');
                     })
                     ->html()
                     ->searchable(query: function (Builder $query, string $search) {
                         // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
                         $query->whereHas('service_unit.unit', function ($q) use ($search) {
-                            $q->where('service', 'like', "%{$search}%")
-                                ->orWhere('nopol', 'like', "%{$search}%");
+                            $q->where('service', 'like', "%{$search}%");
                         });
-                    }),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('nopol')
+                    ->label('No. Polisi')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            $nopol = $service->unit?->nopol ?? '-';
+                            return "{$nopol}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('nopol', 'like', "%{$search}%");
+                        });
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
                     ->sortable()
