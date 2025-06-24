@@ -254,4 +254,9 @@ class ProsesResource extends Resource
     {
         return false; // Menghilangkan tombol create (newPengajuan)
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 }

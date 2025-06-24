@@ -57,8 +57,7 @@ class PengajuanResource extends Resource
                         $query->whereHas('service_unit.unit', function ($q) use ($search) {
                             $q->where('service', 'like', "%{$search}%");
                         });
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    }),
                 Tables\Columns\TextColumn::make('nopol')
                     ->label('No. Polisi')
                     ->getStateUsing(function ($record) {
@@ -76,8 +75,7 @@ class PengajuanResource extends Resource
                         $query->whereHas('service_unit.unit', function ($q) use ($search) {
                             $q->where('nopol', 'like', "%{$search}%");
                         });
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    }),
 
                 Tables\Columns\TextColumn::make('up')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan_proses')
