@@ -136,6 +136,7 @@ class PengajuanResource extends Resource
                                         ->getStateUsing(function ($record) {
                                             return match ($record->keterangan_proses) {
                                                 'cs' => 'Customer Service',
+                                                'checker' => 'Checker',
                                                 'pengajuan finance' => 'Pengajuan Finance',
                                                 'finance' => 'Finance',
                                                 'otorisasi' => 'Otorisasi',
@@ -144,10 +145,11 @@ class PengajuanResource extends Resource
                                             };
                                         })
                                         ->color(fn(string $state) => match ($state) {
-                                            'Customer Service' => 'gray',
-                                            'Pengajuan Finance' => 'primary',
+                                            'Customer Service' => 'primary',
+                                            'Checker' => 'danger',
+                                            'Pengajuan Finance' => 'info',
                                             'Finance' => 'warning',
-                                            'Otorisasi' => 'warning',
+                                            'Otorisasi' => 'danger',
                                             'Selesai' => 'success',
                                             default => 'gray',
                                         }),

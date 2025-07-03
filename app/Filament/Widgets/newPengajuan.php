@@ -75,11 +75,11 @@ class newPengajuan extends BaseWidget
                     ->searchable()
                     ->badge()
                     ->color(fn(string $state) => match (true) {
-                        str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'gray',
-                        str_contains(strtoupper($state), 'CHECKER') => 'success',
+                        str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'black',
+                        str_contains(strtoupper($state), 'CHECKER') => 'danger',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
-                        str_contains(strtoupper($state), 'INPUT FINANCE') => 'warning',
-                        str_contains(strtoupper($state), 'OTORISASI') => 'warning',
+                        str_contains(strtoupper($state), 'INPUT FINANCE') => 'brown',
+                        str_contains(strtoupper($state), 'OTORISASI') => 'yellow',
                         str_contains(strtoupper($state), 'SELESAI') => 'success',
                         default => 'gray',
                     })
