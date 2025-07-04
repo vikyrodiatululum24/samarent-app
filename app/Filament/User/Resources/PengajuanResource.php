@@ -346,9 +346,16 @@ class PengajuanResource extends Resource
                     }),
             ])
             ->filters([
-                SelectFilter::make('user_id')
-                    ->relationship('user', 'name')
-                    ->label('User'),
+                SelectFilter::make('keterangan_proses')
+                    ->label('Status Proses')
+                    ->options([
+                        'cs' => 'Customer Service',
+                        'checker' => 'Checker',
+                        'pengajuan finance' => 'Pengajuan Finance',
+                        'finance' => 'Input Finance',
+                        'otorisasi' => 'Otorisasi',
+                        'done' => 'Selesai',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

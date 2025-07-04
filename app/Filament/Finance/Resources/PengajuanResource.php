@@ -113,6 +113,7 @@ class PengajuanResource extends Resource
                     ->label('Status Proses')
                     ->options([
                         'cs' => 'Customer Service',
+                        'checker' => 'Checker',
                         'pengajuan finance' => 'Pengajuan Finance',
                         'finance' => 'Input Finance',
                         'otorisasi' => 'Otorisasi',
