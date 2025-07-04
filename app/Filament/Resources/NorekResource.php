@@ -30,10 +30,18 @@ class NorekResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->label('Nama Rekening')
+                    ->unique(ignoreRecord: true)
+                    ->validationMessages([
+                        'unique' => 'Nama rekening sudah terdaftar.',
+                    ])
                     ->maxLength(255),
                 Forms\Components\TextInput::make('norek')
                     ->required()
                     ->label('Nomor Rekening')
+                    ->unique(ignoreRecord: true)
+                    ->validationMessages([
+                        'unique' => 'Nomor rekening sudah terdaftar.',
+                    ])
                     ->maxLength(255),
                 Forms\Components\Select::make('bank')
                     ->label('Bank')
