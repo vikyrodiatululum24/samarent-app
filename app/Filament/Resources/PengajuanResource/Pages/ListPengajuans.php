@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\PengajuanResource\Pages;
 
 use Filament\Actions\CreateAction;
-use App\Exports\ServiceUnitExport;
 use Filament\Actions\Action;
 use Maatwebsite\Excel\Facades\Excel;
 use Filament\Resources\Components\Tab;
@@ -20,7 +19,7 @@ class ListPengajuans extends ListRecords
         return [
             CreateAction::make(),
             Action::make('exportFiltered')
-            ->label('Export Filter Tanggal')
+            ->label('Export Data Pengajuan')
             ->form([
                 DatePicker::make('from_date')->label('Dari Tanggal')->required(),
                 DatePicker::make('to_date')->label('Sampai Tanggal')->required(),

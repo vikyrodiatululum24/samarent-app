@@ -27,8 +27,10 @@ class PengajuanResource extends Resource
 {
     protected static ?string $model = Pengajuan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Pengajuan Finance';
 
+    protected static ?string $label = 'Pengajuan Finance';
+    protected static ?string $pluralLabel = 'Pengajuan Finance';
     public static function table(Table $table): Table
     {
         return $table
@@ -128,19 +130,106 @@ class PengajuanResource extends Resource
                                     ->default(\Illuminate\Support\Facades\Auth::user()->id),
                                 Forms\Components\Grid::make(3)
                                     ->schema([
-                                        Forms\Components\TextInput::make('complete.payment_2')
-                                            ->label('Rekening Atas Nama')
-                                            ->required()
-                                            ->default(fn($record) => $record->complete?->payment_2 ?? ''),
+                                        Forms\Components\Select::make('complete.payment_2')
+                                            ->label('Nama Rekening')
+                                            ->options(
+                                                \App\Models\Norek::pluck('name', 'name')->toArray()
+                                            )
+                                            ->searchable()
+                                            ->nullable()
+                                            ->reactive()
+                                            ->default(fn($record) => $record->complete?->payment_2)
+                                            ->afterStateUpdated(function ($component, $state, callable $set) {
+                                                $component->state(strtoupper($state));
+                                                $norek = \App\Models\Norek::where('name', $state)->first();
+                                                $set('complete.norek_2', $norek?->norek);
+                                                $set('complete.bank_2', $norek?->bank);
+                                                $set('complete.payment_2', $norek?->name);
+                                            })
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('name')
+                                                    ->label('Nama Rekening')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('norek')
+                                                    ->label('No. Rekening')
+                                                    ->required()
+                                                    ->numeric()
+                                                    ->maxLength(255),
+                                                Forms\Components\Select::make('bank')
+                                                    ->label('Bank')
+                                                    ->required()
+                                                    ->options([
+                                                        'BCA' => 'BCA',
+                                                        'MANDIRI' => 'MANDIRI',
+                                                        'BRI' => 'BRI',
+                                                        'BNI' => 'BNI',
+                                                        'PERMATA' => 'PERMATA',
+                                                        'BTN' => 'BTN',
+                                                    ]),
+                                            ])
+                                            ->createOptionUsing(function (array $data) {
+                                                // Cek duplikat berdasarkan name atau norek
+                                                $exists = \App\Models\Norek::where('name', $data['name'])
+                                                    ->orWhere('norek', $data['norek'])
+                                                    ->exists();
+                                                if ($exists) {
+                                                    \Filament\Notifications\Notification::make()
+                                                        ->title('Gagal Menambah Rekening')
+                                                        ->body('Nama rekening atau nomor rekening sudah terdaftar.')
+                                                        ->danger()
+                                                        ->send();
+                                                    return $data['name'];
+                                                }
+                                                \App\Models\Norek::create(['name' => $data['name'], 'norek' => $data['norek'], 'bank' => $data['bank']]);
+                                                \Filament\Notifications\Notification::make()
+                                                    ->title('Berhasil Menambah Rekening')
+                                                    ->body('Nama rekening dan nomor rekening berhasil ditambahkan.')
+                                                    ->success()
+                                                    ->send();
+                                                return $data['name'];
+                                            })
+                                            ->createOptionAction(function ($action) {
+                                                $action->modalHeading('Tambah Nama Rekening Baru');
+                                            }),
                                         Forms\Components\TextInput::make('complete.bank_2')
+                                            ->nullable()
                                             ->label('Bank')
-                                            ->required()
-                                            ->default(fn($record) => $record->complete?->bank_2 ?? ''),
+                                            ->readOnly()
+                                            ->default(function (callable $get) {
+                                                $nama = $get('complete.payment_2');
+                                                if (!$nama) return null;
+                                                $norek = \App\Models\Norek::where('name', $nama)->first();
+                                                return $norek?->bank;
+                                            })
+                                            ->reactive()
+                                            ->afterStateHydrated(function ($component, $state, callable $get) {
+                                                $nama = $get('complete.payment_2');
+                                                if ($nama) {
+                                                    $norek = \App\Models\Norek::where('name', $nama)->first();
+                                                    $component->state($norek?->bank);
+                                                }
+                                            }),
                                         Forms\Components\TextInput::make('complete.norek_2')
+                                            ->nullable()
                                             ->label('No. Rekening')
                                             ->numeric()
-                                            ->required()
-                                            ->default(fn($record) => $record->complete?->norek_2 ?? ''),
+                                            ->maxLength(255)
+                                            ->readOnly()
+                                            ->default(function (callable $get) {
+                                                $nama = $get('complete.payment_2');
+                                                if (!$nama) return null;
+                                                $norek = \App\Models\Norek::where('name', $nama)->first();
+                                                return $norek?->norek;
+                                            })
+                                            ->reactive()
+                                            ->afterStateHydrated(function ($component, $state, callable $get) {
+                                                $nama = $get('complete.payment_2');
+                                                if ($nama) {
+                                                    $norek = \App\Models\Norek::where('name', $nama)->first();
+                                                    $component->state($norek?->norek);
+                                                }
+                                            }),
                                     ]),
                                 Forms\Components\Grid::make(3)
                                     ->schema([

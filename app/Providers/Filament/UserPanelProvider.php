@@ -34,8 +34,9 @@ class UserPanelProvider extends PanelProvider
                 'primary' => '#4F46E5', // ganti warna utama
                 'secondary' => '#b5b4cc', // ganti warna sekunder
                 'danger' => '#EF4444', // ganti warna bahaya
+                'brown' => '#A16207', // ganti warna coklat
                 'success' => '#22C55E', // ganti warna sukses
-                'warning' => '#FBBF24', // ganti warna peringatan
+                'yellow' => '#FBBF24', // ganti warna peringatan
             ])
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')

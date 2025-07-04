@@ -5,6 +5,7 @@ namespace App\Filament\User\Resources;
 use Filament\Forms;
 use App\Models\Unit;
 use Filament\Tables;
+use App\Models\Project;
 use Filament\Forms\Form;
 use App\Models\Pengajuan;
 use Filament\Tables\Table;
@@ -63,10 +64,24 @@ class PengajuanResource extends Resource
                                         ]),
                                     Forms\Components\Group::make()
                                         ->schema([
-                                            Forms\Components\TextInput::make('project')
+                                            Forms\Components\Select::make('project')
+                                                ->label('Project')
                                                 ->required()
-                                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
-                                                ->maxLength(255),
+                                                ->options(Project::pluck('name', 'name')->toArray()) // key dan value = name
+                                                ->searchable()
+                                                ->createOptionForm([
+                                                    Forms\Components\TextInput::make('name')
+                                                        ->label('Nama Project')
+                                                        ->required()
+                                                        ->maxLength(255),
+                                                ])
+                                                ->createOptionUsing(function (array $data) {
+                                                    Project::create(['name' => $data['name']]);
+                                                    return $data['name']; // ini yang akan dipakai sebagai value dari select
+                                                })
+                                                ->createOptionAction(function ($action) {
+                                                    $action->modalHeading('Tambah Project Baru');
+                                                }),
                                             Forms\Components\Select::make('up')
                                                 ->required()
                                                 ->label('Unit Pelaksana')
@@ -115,31 +130,105 @@ class PengajuanResource extends Resource
                                             'free' => 'FREE',
                                         ])
                                         ->reactive(),
-                                    Forms\Components\TextInput::make('payment_1')
-                                        ->nullable()
+                                    Forms\Components\Select::make('payment_1')
                                         ->label('Nama Rekening')
-                                        ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
-                                        ->maxLength(255)
-                                        ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
-                                    Forms\Components\Select::make('bank_1')
+                                        ->options(
+                                            \App\Models\Norek::pluck('name', 'name')->toArray()
+                                        )
+                                        ->searchable()
+                                        ->nullable()
+                                        ->reactive()
+                                        ->afterStateUpdated(function ($component, $state, callable $set) {
+                                            $component->state(strtoupper($state));
+                                            $norek = \App\Models\Norek::where('name', $state)->first();
+                                            $set('norek_1', $norek?->norek);
+                                            $set('bank_1', $norek?->bank);
+                                        })
+                                        ->createOptionForm([
+                                            Forms\Components\TextInput::make('name')
+                                                ->label('Nama Rekening')
+                                                ->required()
+                                                ->maxLength(255),
+                                            Forms\Components\TextInput::make('norek')
+                                                ->label('No. Rekening')
+                                                ->required()
+                                                ->numeric()
+                                                ->maxLength(255),
+                                            Forms\Components\Select::make('bank')
+                                                ->label('Bank')
+                                                ->required()
+                                                ->options([
+                                                    'BCA' => 'BCA',
+                                                    'MANDIRI' => 'MANDIRI',
+                                                    'BRI' => 'BRI',
+                                                    'BNI' => 'BNI',
+                                                    'PERMATA' => 'PERMATA',
+                                                    'BTN' => 'BTN',
+                                                ]),
+                                        ])
+                                        ->createOptionUsing(function (array $data) {
+                                            // Cek duplikat berdasarkan name atau norek
+                                            $exists = \App\Models\Norek::where('name', $data['name'])
+                                                ->orWhere('norek', $data['norek'])
+                                                ->exists();
+                                            if ($exists) {
+                                                \Filament\Notifications\Notification::make()
+                                                    ->title('Gagal Menambah Rekening')
+                                                    ->body('Nama rekening atau nomor rekening sudah terdaftar.')
+                                                    ->danger()
+                                                    ->send();
+                                                return $data['name'];
+                                            }
+                                            \App\Models\Norek::create(['name' => $data['name'], 'norek' => $data['norek'], 'bank' => $data['bank']]);
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('Berhasil Menambah Rekening')
+                                                ->body('Nama rekening dan nomor rekening berhasil ditambahkan.')
+                                                ->success()
+                                                ->send();
+                                            return $data['name'];
+                                        })
+                                        ->createOptionAction(function ($action) {
+                                            $action->modalHeading('Tambah Nama Rekening Baru');
+                                        }),
+                                    Forms\Components\TextInput::make('bank_1')
                                         ->nullable()
                                         ->label('Bank')
-                                        ->options([
-                                            'BCA' => 'BCA',
-                                            'MANDIRI' => 'MANDIRI',
-                                            'BRI' => 'BRI',
-                                            'BNI' => 'BNI',
-                                            'PERMATA' => 'PERMATA',
-                                        ])
-                                        ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
-                                        ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
+                                        ->readOnly()
+                                        ->default(function (callable $get) {
+                                            $nama = $get('payment_1');
+                                            if (!$nama) return null;
+                                            $norek = \App\Models\Norek::where('name', $nama)->first();
+                                            return $norek?->bank;
+                                        })
+                                        ->reactive()
+                                        ->afterStateHydrated(function ($component, $state, callable $get) {
+                                            $nama = $get('payment_1');
+                                            if ($nama) {
+                                                $norek = \App\Models\Norek::where('name', $nama)->first();
+                                                $component->state($norek?->bank);
+                                            }
+                                        }),
+
                                     Forms\Components\TextInput::make('norek_1')
                                         ->nullable()
                                         ->label('No. Rekening')
-                                        ->required(fn(callable $get) => $get('keterangan') === 'reimburse')
                                         ->numeric()
                                         ->maxLength(255)
-                                        ->disabled(fn(callable $get) => $get('keterangan') !== 'reimburse'),
+                                        ->readOnly()
+                                        ->default(function (callable $get) {
+                                            $nama = $get('payment_1');
+                                            if (!$nama) return null;
+                                            $norek = \App\Models\Norek::where('name', $nama)->first();
+                                            return $norek?->norek;
+                                        })
+                                        ->reactive()
+                                        ->afterStateHydrated(function ($component, $state, callable $get) {
+                                            $nama = $get('payment_1');
+                                            if ($nama) {
+                                                $norek = \App\Models\Norek::where('name', $nama)->first();
+                                                $component->state($norek?->norek);
+                                            }
+                                        }),
                                 ])
                                 ->columns(2)
                                 ->columnSpan('full')
@@ -300,11 +389,11 @@ class PengajuanResource extends Resource
                                             };
                                         })
                                         ->color(fn(string $state) => match ($state) {
-                                            'Customer Service' => 'gray',
-                                            'Checker' => 'success',
+                                            'Customer Service' => 'black',
+                                            'Checker' => 'danger',
                                             'Pengajuan Finance' => 'primary',
                                             'Finance' => 'warning',
-                                            'Otorisasi' => 'warning',
+                                            'Otorisasi' => 'yellow',
                                             'Selesai' => 'success',
                                             default => 'gray',
                                         }),
