@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Print SPK</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
     <style>
         .page {
             width: 195mm;
@@ -12,7 +13,7 @@
             margin: 10mm;
             border: 1px solid #000;
             background: #fff;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding: 15mm;
         }
 
@@ -197,7 +198,8 @@
                     <p style="margin: 2px;">: {{ $pengajuan->no_pengajuan }}</p>
                     <p style="margin: 2px; text-transform: capitalize;">: {{ $pengajuan->keterangan }}</p>
                     <p style="margin: 2px;">: {{ $pengajuan->created_at->format('d F Y') }}</p>
-                    <p style="margin: 2px; text-transform: uppercase;">: {{ $pengajuan->up_lainnya ?? $pengajuan->up }}
+                    <p style="margin: 2px; text-transform: uppercase;">:
+                        {{ $pengajuan->up_lainnya ?? $pengajuan->up }}
                         - {{ $pengajuan->provinsi }}</p>
                     <p style="margin: 2px;">: {{ $pengajuan->no_wa }}</p>
                 </td>

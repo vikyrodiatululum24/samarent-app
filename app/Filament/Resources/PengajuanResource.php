@@ -485,7 +485,7 @@ class PengajuanResource extends Resource
                                     ->required()
                                     ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
                             ])
-                            ->columns(1),
+                            ->columns(2),
                         Forms\Components\Fieldset::make('Informasi Finance')
                             ->schema([
                                 Forms\Components\DatePicker::make('tanggal_tf_finance')
@@ -628,7 +628,7 @@ class PengajuanResource extends Resource
                                     ->required()
                                     ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
                             ])
-                            ->columns(1),
+                            ->columns(2),
                         Forms\Components\Fieldset::make('Informasi Finance')
                             ->schema([
                                 Forms\Components\DatePicker::make('tanggal_tf_finance')

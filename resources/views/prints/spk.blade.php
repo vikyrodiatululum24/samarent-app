@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Print SPK</title>
+
+    <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
 </head>
 
 <body>
@@ -182,7 +184,8 @@
                     style="width: 50%; padding: 10px; text-align: center; min-height: 300px; border: 1px solid black; vertical-align: top;">
                     @if (!empty($pengajuan->finance->bukti_transaksi))
                         <img src="{{ public_path('storage/' . $pengajuan->finance->bukti_transaksi) }}"
-                            alt="extension tidak support" style="max-width: 100%; max-height: 300px; object-fit: contain;">
+                            alt="extension tidak support"
+                            style="max-width: 100%; max-height: 300px; object-fit: contain;">
                     @else
                         <p style="margin: 2px;">tidak ada gambar</p>
                     @endif
