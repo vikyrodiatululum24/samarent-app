@@ -435,6 +435,11 @@ class PengajuanResource extends Resource
                             default => 'Tidak Diketahui',
                         };
                     }),
+                Tables\Columns\TextColumn::make('complete.bengkel_invoice')
+                    ->label('Bengkel Invoice')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('keterangan_proses')
