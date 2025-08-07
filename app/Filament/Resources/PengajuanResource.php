@@ -269,6 +269,7 @@ class PengajuanResource extends Resource
                                                     Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
                                                         ->label('Foto Pengerjaan Bengkel')
                                                         ->image()
+                                                        ->maxSize(2048) // Maksimal 2MB
                                                         ->disk('public')
                                                         ->directory('foto_pengerjaan_bengkel')
                                                         ->nullable()
@@ -278,6 +279,7 @@ class PengajuanResource extends Resource
                                                     Forms\Components\FileUpload::make('foto_unit')
                                                         ->label('Foto Unit')
                                                         ->image()
+                                                        ->maxSize(2048) // Maksimal 2MB
                                                         ->disk('public')
                                                         ->directory('foto_unit')
                                                         ->nullable(),
@@ -285,6 +287,7 @@ class PengajuanResource extends Resource
                                                     Forms\Components\FileUpload::make('foto_odometer')
                                                         ->label('Foto Odometer')
                                                         ->image()
+                                                        ->maxSize(2048) // Maksimal 2MB
                                                         ->disk('public')
                                                         ->directory('foto_odometer')
                                                         ->nullable(),
@@ -293,6 +296,7 @@ class PengajuanResource extends Resource
                                             Forms\Components\FileUpload::make('foto_kondisi')
                                                 ->label('Foto Kondisi')
                                                 ->image()
+                                                ->maxSize(2048) // Maksimal 2MB
                                                 ->multiple()
                                                 ->maxFiles(3)
                                                 ->disk('public')
@@ -302,6 +306,7 @@ class PengajuanResource extends Resource
                                             Forms\Components\FileUpload::make('foto_tambahan')
                                                 ->label('Foto Tambahan')
                                                 ->image()
+                                                ->maxSize(2048) // Maksimal 2MB
                                                 ->disk('public')
                                                 ->directory('foto_tambahan')
                                                 ->multiple()
@@ -555,8 +560,14 @@ class PengajuanResource extends Resource
                             ->columns(2),
                         Forms\Components\Fieldset::make('Dokumentasi')
                             ->schema([
+                                Forms\Components\TextInput::make('bengkel_invoice')
+                                    ->label('Bengkel Invoice')
+                                    ->required()
+                                    ->default(fn($record) => $record->complete?->bengkel_invoice),
                                 Forms\Components\FileUpload::make('foto_nota')
                                     ->label('Foto Nota')
+                                    ->image()
+                                    ->maxSize(2048) // Maksimal 2MB
                                     ->disk('public')
                                     ->directory('foto_nota')
                                     ->multiple()
@@ -698,8 +709,14 @@ class PengajuanResource extends Resource
                             ->columns(2),
                         Forms\Components\Fieldset::make('Dokumentasi')
                             ->schema([
+                                Forms\Components\TextInput::make('bengkel_invoice')
+                                    ->label('Bengkel Invoice')
+                                    ->required()
+                                    ->default(fn($record) => $record->complete?->bengkel_invoice),
                                 Forms\Components\FileUpload::make('foto_nota')
                                     ->label('Foto Nota')
+                                    ->image()
+                                    ->maxSize(2048) // Maksimal 2MB
                                     ->disk('public')
                                     ->directory('foto_nota')
                                     ->multiple()
@@ -836,12 +853,17 @@ class PengajuanResource extends Resource
                     ]),
                 Components\Section::make('Informasi Complete')
                     ->schema([
-                        Components\Grid::make(1)
+                        Components\Grid::make(3)
                             ->schema([
                                 Components\Group::make([
                                     Components\TextEntry::make('complete.kode')
                                         ->label('Kode'),
                                 ]),
+                                Components\TextEntry::make('complete.bengkel_invoice')
+                                    ->label('Bengkel Invoice')
+                                    ->visible(fn($record) => !empty($record->complete?->bengkel_invoice))
+                                    ->columnSpan(2),
+
                             ]),
                         Components\Grid::make(3)
                             ->schema([

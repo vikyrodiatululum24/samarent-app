@@ -2,33 +2,34 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use App\Filament\Asuransi\Resources\AsuransiResource;
 use Filament\Pages;
 use Filament\Panel;
+use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
-use Filament\Widgets;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
+use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Filament\Http\Middleware\AuthenticateSession;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-// use App\Filament\Finance\Resources\Widgets\StatsOverview;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
-class FinancePanelProvider extends PanelProvider
+class AsuransiPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('finance')
-            ->path('finance')
-            ->brandName('SAMARENT')
+            // ->home(AsuransiResource::class)
+            ->id('asuransi')
+            ->path('asuransi')
             ->favicon(asset('images/icon.png'))
+            ->brandName('SAMARENT')
             ->brandLogo(asset('images/Samarent.png')) // ganti logo
             ->brandLogoHeight('50px')
             ->login(false)
@@ -40,16 +41,18 @@ class FinancePanelProvider extends PanelProvider
                 'success' => '#22C55E', // ganti warna sukses
                 'yellow' => '#FBBF24', // ganti warna peringatan
             ])
-            ->discoverResources(in: app_path('Filament/Finance/Resources'), for: 'App\\Filament\\Finance\\Resources')
-            ->discoverPages(in: app_path('Filament/Finance/Pages'), for: 'App\\Filament\\Finance\\Pages')
+            ->discoverResources(in: app_path('Filament/Asuransi/Resources'), for: 'App\\Filament\\Asuransi\\Resources')
+            ->discoverPages(in: app_path('Filament/Asuransi/Pages'), for: 'App\\Filament\\Asuransi\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                // Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Finance/Widgets'), for: 'App\\Filament\\Finance\\Widgets')
+            ->resources([
+                AsuransiResource::class,
+            ])
+            ->discoverWidgets(in: app_path('Filament/Asuransi/Widgets'), for: 'App\\Filament\\Asuransi\\Widgets')
             ->widgets([
-                // Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
-                // Widgets\StatsOverview::class,
+                Widgets\AccountWidget::class,
+                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -62,10 +65,11 @@ class FinancePanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->authMiddleware([
-                \App\Http\Middleware\EnsureFinanceRole::class,
-            ])
+            ->databaseNotifications()
             ->maxContentWidth(MaxWidth::Full)
-            ->topNavigation();
+            ->topNavigation()
+            ->authMiddleware([
+                \App\Http\Middleware\EnsureAsuransiRole::class,
+            ]);
     }
 }

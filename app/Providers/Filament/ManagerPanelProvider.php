@@ -27,6 +27,7 @@ class ManagerPanelProvider extends PanelProvider
             ->favicon(asset('images/icon.png'))
             ->brandLogo(asset('images/Samarent.png')) // ganti logo
             ->brandLogoHeight('50px')
+            ->login(false)
             ->colors([
                 'primary' => '#4F46E5', // ganti warna utama
                 'secondary' => '#b5b4cc', // ganti warna sekunder

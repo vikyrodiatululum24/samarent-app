@@ -24,4 +24,9 @@ class Unit extends Model
     {
         return $this->hasMany(ServiceUnit::class, 'unit_id', 'id');
     }
+
+    public function asuransi()
+    {
+        return $this->hasMany(Asuransi::class, 'unit_id', 'id');
+    }
 }

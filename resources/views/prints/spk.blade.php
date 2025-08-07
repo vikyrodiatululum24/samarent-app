@@ -316,7 +316,7 @@
                     <td
                         style="width: 50%; padding: 10px; text-align: center; min-height: 300px; border: 1px solid black; vertical-align: top;">
                         @if (!empty($fotoKondisi) && isset($fotoKondisi[0]))
-                            <img src="{{ public_path('storage/' . $fotoKondisi[0]) }}" alt="Foto Tambahan"
+                            <img src="{{ public_path('storage/' . $fotoKondisi[0]) }}" alt="foto kondisi"
                                 style="max-width: 100%; max-height: 300px; object-fit: contain;">
                         @else
                             <p style="margin: 2px;">tidak ada gambar</p>
@@ -325,7 +325,7 @@
                     <td
                         style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align:top; align-items: left;">
                         @if (!empty($fotoKondisi) && isset($fotoKondisi[1]))
-                            <img src="{{ public_path('storage/' . $fotoKondisi[1]) }}" alt="Foto Tambahan"
+                            <img src="{{ public_path('storage/' . $fotoKondisi[1]) }}" alt="foto kondisi"
                                 style="max-width: 100%; max-height: 300px; object-fit: contain;">
                         @else
                             <p style="margin: 2px;">tidak ada gambar</p>

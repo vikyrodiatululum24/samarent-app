@@ -24,6 +24,7 @@ class Complete extends Model
         'selisih_tf',
         'tanggal_tf_bengkel',
         'tanggal_pengerjaan',
+        'bengkel_invoice',
         'status_finance',
         'foto_nota',
         'foto_tambahan',

@@ -18,7 +18,10 @@ Route::get('/', function () {
             return redirect('/finance');
         } else if ($user->role === 'manager') {
             return redirect('/manager');
+        } else if ($user->role === 'asuransi') {
+            return redirect('/asuransi');
         }
+        
     }
 
     return redirect('/login');
@@ -34,6 +37,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/pengajuan/{id}/print-spk', [PrintController::class, 'printSpk'])->name('print.spk');
     Route::get('/pengajuan/{id}/preview', [PrintController::class, 'preview'])->name('preview');
+    Route::get('/pengajuan/{id}/print-asuransi', [PrintController::class, 'printAsuransi'])->name('print.asuransi');
 });
 
 

@@ -263,6 +263,7 @@ class PengajuanResource extends Resource
                                             Forms\Components\FileUpload::make('foto_unit')
                                                 ->label('Foto Unit')
                                                 ->image()
+                                                ->maxSize(2048) // Maksimal 2MB
                                                 ->disk('public')
                                                 ->directory('foto_unit')
                                                 ->nullable(),
@@ -270,14 +271,15 @@ class PengajuanResource extends Resource
                                             Forms\Components\FileUpload::make('foto_odometer')
                                                 ->label('Foto Odometer')
                                                 ->image()
+                                                ->maxSize(2048) // Maksimal 2MB
                                                 ->disk('public')
                                                 ->directory('foto_odometer')
                                                 ->nullable(),
 
-
                                             Forms\Components\FileUpload::make('foto_kondisi')
                                                 ->label('Foto Kondisi')
                                                 ->image()
+                                                ->maxSize(2048) // Maksimal 2MB
                                                 ->multiple()
                                                 ->maxFiles(3)
                                                 ->disk('public')
