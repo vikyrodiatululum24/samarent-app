@@ -57,11 +57,14 @@ class AsuransiResource extends Resource
                             ]),
                         Forms\Components\Textarea::make('lokasi')
                             ->label('Lokasi')
-                            ->columnSpan(2)
+                            ->columnSpan([
+                                'sm' => 2,
+                            ])
                             ->maxLength(255),
                     ])
-                    ->columns(2),
-
+                    ->columns([
+                        'sm' => 2,
+                    ]),
                 Forms\Components\Section::make('Detail Asuransi')
                     ->schema([
                         Forms\Components\TextInput::make('nama')
@@ -88,9 +91,13 @@ class AsuransiResource extends Resource
                             ->label('Kategori'),
                         Forms\Components\Textarea::make('status')
                             ->label('Status')
-                            ->columnSpan(2)
+                            ->columnSpan([
+                                'sm' => 2,
+                            ])
                     ])
-                    ->columns(2),
+                    ->columns([
+                        'sm' => 2,
+                    ]),
 
                 Forms\Components\Section::make('Keterangan')
                     ->schema([
@@ -260,6 +267,12 @@ class AsuransiResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('tanggal_pengajuan')
+                    ->label('Tanggal Pengajuan')
+                    ->date('d M Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('unit.nopol')
                     ->label('No. Polisi')
                     ->searchable()
@@ -268,11 +281,6 @@ class AsuransiResource extends Resource
                 Tables\Columns\TextColumn::make('nama_pic')
                     ->label('Nama PIC')
                     ->searchable()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('tanggal_pengajuan')
-                    ->label('Tanggal Pengajuan')
-                    ->date('d M Y')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('nama')
@@ -285,20 +293,18 @@ class AsuransiResource extends Resource
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'TLO' => 'warning',
-                        'Comprehensive' => 'success',
-                        'Third Party' => 'info',
+                        'All Risk' => 'primary',
                         default => 'gray',
-                    }),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('kategori')
                     ->label('Kategori')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'Baru' => 'success',
-                        'Perpanjangan' => 'warning',
-                        'Klaim' => 'danger',
-                        default => 'gray',
-                    }),
+                    ->toggleable(isToggledHiddenByDefault: true),
+                
+                Tables\Columns\TextColumn::make('keterangan')
+                    ->label('Keterangan')
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
@@ -309,12 +315,26 @@ class AsuransiResource extends Resource
                         'Selesai' => 'success',
                         'Ditolak' => 'danger',
                         default => 'gray',
-                    }),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('nominal')
                     ->label('Nominal')
                     ->money('IDR')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('periode_mulai')
+                    ->label('Periode Mulai')
+                    ->date('d M Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('periode_selesai')
+                    ->label('Periode Selesai')
+                    ->date('d M Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('up')
                     ->label('UP')
@@ -322,6 +342,10 @@ class AsuransiResource extends Resource
 
                 Tables\Columns\TextColumn::make('lokasi')
                     ->label('Lokasi')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('tujuan_pengajuan')
+                    ->label('Tujuan Pengajuan')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -433,8 +457,7 @@ class AsuransiResource extends Resource
                                     ->badge()
                                     ->color(fn(string $state): string => match ($state) {
                                         'TLO' => 'warning',
-                                        'Comprehensive' => 'success',
-                                        'Third Party' => 'info',
+                                        'All Risk' => 'primary',
                                         default => 'gray',
                                     }),
 
@@ -447,8 +470,8 @@ class AsuransiResource extends Resource
                                         ->label('Periode Selesai')
                                         ->color('gray'),
                                 ])
-                                ->label('Periode Asuransi')
-                                ->columns(2),
+                                    ->label('Periode Asuransi')
+                                    ->columns(2),
 
                                 Infolists\Components\TextEntry::make('nominal')
                                     ->label('Nominal')
