@@ -92,6 +92,7 @@
             margin-left: auto;
             margin-right: auto;
         }
+
         .img-nota {
             max-width: 100%;
             max-height: 120mm;
@@ -153,47 +154,55 @@
             </tr>
             <tr>
                 <th>Tanggal Pengajuan</th>
-                <td>{{ \Carbon\Carbon::parse($asuransi->tanggal_pengajuan)->format('d M Y') }}</td>
+                <td>
+                    {{ !empty($asuransi->tanggal_pengajuan) ? \Carbon\Carbon::parse($asuransi->tanggal_pengajuan)->format('d M Y') : '-' }}
+                </td>
             </tr>
             <tr>
                 <th>Unit Pelaksana</th>
-                <td>{{ $asuransi->up }}</td>
+                <td>{{ $asuransi->up ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Lokasi</th>
-                <td>{{ $asuransi->lokasi }}</td>
+                <td>{{ $asuransi->lokasi ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Nama Asuransi</th>
-                <td>{{ $asuransi->nama }}</td>
+                <td>{{ $asuransi->nama ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Jenis Asuransi</th>
-                <td>{{ $asuransi->jenis }}</td>
+                <td>{{ $asuransi->jenis ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Periode</th>
-                <td>{{ $asuransi->periode_mulai }} - {{ $asuransi->periode_selesai }}</td>
+                <td>
+                    {{ !empty($asuransi->periode_mulai) ? $asuransi->periode_mulai : '-' }}
+                    -
+                    {{ !empty($asuransi->periode_selesai) ? $asuransi->periode_selesai : '-' }}
+                </td>
             </tr>
             <tr>
                 <th>Nominal</th>
-                <td>Rp {{ number_format($asuransi->nominal, 0, ',', '.') }}</td>
+                <td>
+                    Rp {{ isset($asuransi->nominal) ? number_format($asuransi->nominal, 0, ',', '.') : '-' }}
+                </td>
             </tr>
             <tr>
                 <th>Kategori</th>
-                <td>{{ $asuransi->kategori }}</td>
+                <td>{{ $asuransi->kategori ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Status</th>
-                <td>{{ $asuransi->status }}</td>
+                <td>{{ $asuransi->status ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Keterangan Insiden</th>
-                <td>{{ $asuransi->keterangan }}</td>
+                <td>{{ $asuransi->keterangan ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Tujuan Pengajuan</th>
-                <td>{{ $asuransi->tujuan_pengajuan }}</td>
+                <td>{{ $asuransi->tujuan_pengajuan ?? '-' }}</td>
             </tr>
         </table>
         <div class="meta">
@@ -202,77 +211,103 @@
     </div>
 
     <!-- Halaman Dokumen Pendukung (setiap gambar 1 halaman) -->
-    <div class="page">
-        <div class="card"> 
-            <h2>Foto KTP</h2>
-            <img src="{{ public_path('storage/' . $asuransi->foto_ktp) }}" alt="Foto KTP" class="img-small" />
-        </div>
-        <div class="card"> 
-            <h2>Foto SIM</h2>
-            <img src="{{ public_path('storage/' . $asuransi->foto_sim) }}" alt="Foto SIM" class="img-small" />
-        </div>
-    </div>
-
-    <div class="page">
-        <div class="card"> 
-            <h2>Foto STNK</h2>
-            <img src="{{ public_path('storage/' . $asuransi->foto_sntk) }}" alt="Foto STNK" class="img-small" />
-        </div>
-        <div class="card"> 
-            <h2>Foto BPKB</h2>
-            <img src="{{ public_path('storage/' . $asuransi->foto_bpkb) }}" alt="Foto BPKB" class="img-small" />
-        </div>
-    </div>
-
-    <div class="page">
-        <h2>Foto Polis Asuransi</h2>
-        <img src="{{ public_path('storage/' . $asuransi->foto_polis_asuransi) }}" alt="Foto Polis Asuransi" class="img-full" />
-    </div>
-
-    <div class="page">
-        <h2>Foto Berita Acara (BA)</h2>
-        <img src="{{ public_path('storage/' . $asuransi->foto_ba) }}" alt="Foto BA" class="img-full" />
-    </div>
-
-    <div class="page">
-        <h2>Foto Keterangan Bengkel</h2>
-        <img src="{{ public_path('storage/' . $asuransi->foto_keterangan_bengkel) }}" alt="Foto Keterangan Bengkel" class="img-full" />
-    </div>
-
-    <!-- Halaman Foto Unit (max 4 per halaman) -->
-    @php
-        $notaFotos = is_array($asuransi->foto_nota)
-            ? $asuransi->foto_nota
-            : json_decode($asuransi->foto_nota, true) ?? [];
-        $notas = array_chunk($notaFotos, 4);
-    @endphp
-    @foreach ($notas as $nota)
+    @if (!empty($asuransi->foto_ktp) || !empty($asuransi->foto_sim))
         <div class="page">
-            <h2>Foto Nota</h2>
             <div class="card">
-                @foreach ($nota as $img)
-                    <img src="{{ public_path('storage/' . $img) }}" alt="Foto Nota" class="img-nota" />
-                @endforeach
+                @if (!empty($asuransi->foto_ktp))
+                    <h2>Foto KTP</h2>
+                    <img src="{{ public_path('storage/' . $asuransi->foto_ktp) }}" alt="Foto KTP" class="img-small" />
+                @endif
+            </div>
+            <div class="card">
+                @if (!empty($asuransi->foto_sim))
+                    <h2>Foto SIM</h2>
+                    <img src="{{ public_path('storage/' . $asuransi->foto_sim) }}" alt="Foto SIM" class="img-small" />
+                @endif
             </div>
         </div>
-    @endforeach
-    <!-- Halaman Foto Unit (max 4 per halaman) -->
-    @php
-        $unitFotos = is_array($asuransi->foto_unit)
-            ? $asuransi->foto_unit
-            : json_decode($asuransi->foto_unit, true) ?? [];
-        $chunks = array_chunk($unitFotos, 4);
-    @endphp
-    @foreach ($chunks as $chunk)
+    @endif
+
+    @if (!empty($asuransi->foto_stnk) || !empty($asuransi->foto_bpkb))
         <div class="page">
-            <h2>Foto Unit</h2>
-            <div class="unit-grid">
-                @foreach ($chunk as $img)
-                    <img src="{{ public_path('storage/' . $img) }}" alt="Foto Unit" class="unit-img" />
-                @endforeach
+            <div class="card">
+                @if (!empty($asuransi->foto_stnk))
+                    <h2>Foto STNK</h2>
+                    <img src="{{ public_path('storage/' . $asuransi->foto_stnk) }}" alt="Foto STNK" class="img-small" />
+                @endif
+            </div>
+            <div class="card">
+                @if (!empty($asuransi->foto_bpkb))
+                    <h2>Foto BPKB</h2>
+                    <img src="{{ public_path('storage/' . $asuransi->foto_bpkb) }}" alt="Foto BPKB" class="img-small" />
+                @endif
             </div>
         </div>
-    @endforeach
+    @endif
+
+    @if (!empty($asuransi->foto_polis_asuransi))
+        <div class="page">
+            <h2>Foto Polis Asuransi</h2>
+            <img src="{{ public_path('storage/' . $asuransi->foto_polis_asuransi) }}" alt="Foto Polis Asuransi"
+                class="img-full" />
+        </div>
+    @endif
+
+    @if (!empty($asuransi->foto_ba))
+        <div class="page">
+            <h2>Foto Berita Acara (BA)</h2>
+            <img src="{{ public_path('storage/' . $asuransi->foto_ba) }}" alt="Foto BA" class="img-full" />
+        </div>
+    @endif
+
+    @if (!empty($asuransi->foto_keterangan_bengkel))
+        <div class="page">
+            <h2>Foto Keterangan Bengkel</h2>
+            <img src="{{ public_path('storage/' . $asuransi->foto_keterangan_bengkel) }}" alt="Foto Keterangan Bengkel"
+                class="img-full" />
+        </div>
+    @endif
+
+    @if (!empty($asuransi->foto_nota))
+        <!-- Halaman Foto Unit (max 4 per halaman) -->
+        @php
+            $notaFotos = is_array($asuransi->foto_nota)
+                ? $asuransi->foto_nota
+                : json_decode($asuransi->foto_nota, true) ?? [];
+            $notas = array_chunk($notaFotos, 4);
+        @endphp
+        @foreach ($notas as $nota)
+            <div class="page">
+                <h2>Foto Nota</h2>
+                <div class="card">
+                    @foreach ($nota as $img)
+                        <img src="{{ public_path('storage/' . $img) }}" alt="Foto Nota" class="img-nota" />
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+    @endif
+
+    @if (!empty($asuransi->foto_unit))
+        <!-- Halaman Foto Unit (max 4 per halaman) -->
+        @php
+            $unitFotos = is_array($asuransi->foto_unit)
+                ? $asuransi->foto_unit
+                : json_decode($asuransi->foto_unit, true) ?? [];
+            $chunks = array_chunk($unitFotos, 4);
+        @endphp
+        @foreach ($chunks as $chunk)
+            <div class="page">
+                <h2>Foto Unit</h2>
+                <div class="unit-grid">
+                    @foreach ($chunk as $img)
+                        <img src="{{ public_path('storage/' . $img) }}" alt="Foto Unit" class="unit-img" />
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+    @endif
+
 </body>
 
 </html>
