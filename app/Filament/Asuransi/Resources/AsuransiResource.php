@@ -102,8 +102,7 @@ class AsuransiResource extends Resource
                 Forms\Components\Section::make('Keterangan')
                     ->schema([
                         Forms\Components\DatePicker::make('tanggal_kejadian')
-                            ->label('Tanggal Kejadian')
-                            ->default(now()),
+                            ->label('Tanggal Kejadian'),
                         Forms\Components\Textarea::make('keterangan')
                             ->label('Keterangan Insiden')
                             ->rows(3),
@@ -506,6 +505,10 @@ class AsuransiResource extends Resource
 
                 Infolists\Components\Section::make('Keterangan')
                     ->schema([
+                        Infolists\Components\TextEntry::make('tanggal_kejadian')
+                            ->label('Tanggal Kejadian')
+                            ->date('d M Y')
+                            ->color('gray'),
                         Infolists\Components\TextEntry::make('keterangan')
                             ->label('Keterangan Insiden')
                             ->prose()

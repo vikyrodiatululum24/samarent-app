@@ -197,6 +197,12 @@
                 <td>{{ $asuransi->status ?? '-' }}</td>
             </tr>
             <tr>
+                <th>Tanggal Kejadian</th>
+                <td>
+                    {{ !empty($asuransi->tanggal_kejadian) ? \Carbon\Carbon::parse($asuransi->tanggal_kejadian)->format('d M Y') : '-' }}
+                </td>
+            </tr>
+            <tr>
                 <th>Keterangan Insiden</th>
                 <td>{{ $asuransi->keterangan ?? '-' }}</td>
             </tr>
