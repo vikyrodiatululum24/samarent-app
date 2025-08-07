@@ -14,7 +14,7 @@ class PrintController extends Controller
         $pengajuan = Pengajuan::with('complete')->findOrFail($id);
         $namaFile = $pengajuan->nopol . '-' . $pengajuan->no_pengajuan;
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
-        $pdf = PDF::loadView('prints.preview', ['pengajuan' => $pengajuan]);
+        $pdf = PDF::loadView('prints.spk', ['pengajuan' => $pengajuan]);
         return $pdf->stream("$namaFile.pdf");
     }
 
