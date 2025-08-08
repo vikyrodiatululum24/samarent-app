@@ -22,8 +22,6 @@
             width: 185mm;
             min-height: 270mm;
             margin: 0 auto;
-            border: #ccc solid 1px;
-            border: 1px solid #fff;
         }
 
         h1 {
@@ -132,13 +130,26 @@
             margin-bottom: 10px;
             box-sizing: border-box;
         }
+
+        .img-header {
+            position: absolute;
+            top: -7mm;
+            left: -7mm;
+            width: 200mm;
+            height: 37mm;
+            border-bottom: 1px solid #ccc;
+            background: #fff;
+        }
     </style>
 </head>
 
 <body>
     <!-- Halaman Data Utama -->
     <div class="page">
-        <h1>Laporan Asuransi</h1>
+        <div class="img-header">
+            <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%">
+        </div>
+        <h1 style="padding-top: 35mm;">Laporan Asuransi</h1>
         <table>
             <tr>
                 <th>No. Polisi</th>
@@ -239,13 +250,15 @@
             <div class="card">
                 @if (!empty($asuransi->foto_stnk))
                     <h2>Foto STNK</h2>
-                    <img src="{{ public_path('storage/' . $asuransi->foto_stnk) }}" alt="Foto STNK" class="img-small" />
+                    <img src="{{ public_path('storage/' . $asuransi->foto_stnk) }}" alt="Foto STNK"
+                        class="img-small" />
                 @endif
             </div>
             <div class="card">
                 @if (!empty($asuransi->foto_bpkb))
                     <h2>Foto BPKB</h2>
-                    <img src="{{ public_path('storage/' . $asuransi->foto_bpkb) }}" alt="Foto BPKB" class="img-small" />
+                    <img src="{{ public_path('storage/' . $asuransi->foto_bpkb) }}" alt="Foto BPKB"
+                        class="img-small" />
                 @endif
             </div>
         </div>
