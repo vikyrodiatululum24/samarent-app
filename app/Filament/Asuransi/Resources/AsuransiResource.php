@@ -475,31 +475,15 @@ class AsuransiResource extends Resource
                                 Infolists\Components\TextEntry::make('nominal')
                                     ->label('Nominal')
                                     ->money('IDR')
-                                    ->size('lg')
-                                    ->weight('bold')
                                     ->color('success'),
 
                                 Infolists\Components\TextEntry::make('kategori')
                                     ->label('Kategori')
-                                    ->badge()
-                                    ->color(fn(string $state): string => match ($state) {
-                                        'Baru' => 'success',
-                                        'Perpanjangan' => 'warning',
-                                        'Klaim' => 'danger',
-                                        default => 'gray',
-                                    }),
+                                    ->color('gray'),
 
                                 Infolists\Components\TextEntry::make('status')
                                     ->label('Status')
-                                    ->badge()
-                                    ->size('lg')
-                                    ->color(fn(string $state): string => match ($state) {
-                                        'Pending' => 'warning',
-                                        'Diproses' => 'info',
-                                        'Selesai' => 'success',
-                                        'Ditolak' => 'danger',
-                                        default => 'gray',
-                                    }),
+                                    ->color('gray'),
                             ]),
                     ]),
 

@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Print SPK</title>
-
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
 </head>
 
@@ -438,106 +437,6 @@
         </div>
     @endforeach
 
-    {{-- Lampiran 3 --}}
-    {{-- <div style="page-break-before: always;">
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                <tr>
-                    <th style="width: 80%; text-align: center; padding: 10px;">
-                        <h1 style="margin: 2px;">LAMPIRAN</h1>
-                    </th>
-                    <th style="width: 20%; text-align: center; border: 2px solid black;">
-                        <h1 style="text-transform: uppercase; margin: 2px;">{{ $pengajuan->complete->kode }}</h1>
-                    </th>>
-                </tr>
-            </table>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                <tr style="vertical-align: top;">
-                    <th style="width: 10%; padding: 10px; text-align: left;">
-                        <p style="margin: 2px;">Bengkel</p>
-                        <p style="margin: 2px;">Estimasi</p>
-                    </th>
-                    <td style="width: 30%; padding: 10px;">
-                        <p style="margin: 2px; text-transform: capitalize;">:
-                            {{ $pengajuan->complete->bengkel_estimasi }}
-                        </p>
-                        <p style="margin: 2px;">: Rp
-                            {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }}</p>
-                    </td>
-                    <th style="width: 20%; padding: 10px; text-align: left;">
-                        <p style="margin: 2px;">No WO</p>
-                        <p style="margin: 2px;">Jenis Kendaraan</p>
-                    </th>
-                    <td style="width: 30%; padding: 10px;">
-                        <p style="margin: 2px;">: {{ $pengajuan->no_pengajuan }}</p>
-                        <p style="margin: 2px; text-transform: capitalize;">:
-                            {{ $unit->unit->jenis . ' - ' . $unit->unit->nopol }}</p>
-                    </td>
-                </tr>
-            </table>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                <tr>
-                    <th style="width: 50%; padding: 10px; text-align: center; border: 1px solid black;">
-                        <p style="margin: 2px;">FOTO PENGERJAAN BENGKEL</p>
-                    </th>
-                    <th style="width: 50%; padding: 10px; text-align: center; border: 1px solid black">
-                        <p style="margin: 2px;">FOTO TAMBAHAN</p>
-                    </th>
-                </tr>
-                <tr>
-                    <td
-                        style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align:top; align-items: left;">
-                        @if ($unit->foto_pengerjaan_bengkel)
-                            <img src="{{ public_path('storage/' . $unit->foto_pengerjaan_bengkel) }}" alt="Foto Unit"
-                                style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                        @else
-                            <p style="margin: 2px;">tidak ada gambar</p>
-                        @endif
-                    </td>
-                    @php
-                        $fotoTambahan = $unit->foto_tambahan;
-                        $fotoArray = is_string($fotoTambahan) ? json_decode($fotoTambahan, true) : $fotoTambahan;
-                    @endphp
-                    <td
-                        style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
-                        @if (!empty($fotoArray) && isset($fotoArray[0]))
-                            <img src="{{ public_path('storage/' . $fotoArray[0]) }}" alt="Foto Tambahan"
-                                style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                        @else
-                            <p style="margin: 2px;">tidak ada gambar</p>
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <th style="width: 50%; padding: 10px; text-align: center; border: 1px solid black;">
-                        <p style="margin: 2px;">FOTO TAMBAHAN</p>
-                    </th>
-                    <th style="width: 50%; padding: 10px; text-align: center; border: 1px solid black">
-                        <p style="margin: 2px;">FOTO TAMBAHAN</p>
-                    </th>
-                </tr>
-                <tr>
-                    <td
-                        style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
-                        @if (!empty($fotoArray) && isset($fotoArray[1]))
-                            <img src="{{ public_path('storage/' . $fotoArray[1]) }}" alt="Foto Tambahan"
-                                style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                        @else
-                            <p style="margin: 2px;">tidak ada gambar</p>
-                        @endif
-                    </td>
-                    <td
-                        style="width: 50%; padding: 10px; text-align: center; height: 300px; border: 1px solid black; vertical-align: top;">
-                        @if (!empty($fotoArray) && isset($fotoArray[2]))
-                            <img src="{{ public_path('storage/' . $fotoArray[2]) }}" alt="Foto Tambahan"
-                                style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                        @else
-                            <p style="margin: 2px;">tidak ada gambar</p>
-                        @endif
-                    </td>
-                </tr>
-            </table>
-        </div> --}}
-
     {{-- sjp --}}
     <div style="page-break-before: always;">
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
@@ -677,8 +576,6 @@
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
             </tr>
         </table>
-    </div>
-
     </div>
 </body>
 

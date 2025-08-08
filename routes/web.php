@@ -37,7 +37,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/pengajuan/{id}/print-spk', [PrintController::class, 'printSpk'])->name('print.spk');
     Route::get('/pengajuan/{id}/preview', [PrintController::class, 'preview'])->name('preview');
-    Route::get('/pengajuan/{id}/print-asuransi', [PrintController::class, 'printAsuransi'])->name('print.asuransi');
+    Route::get('/asuransi/{id}/print-asuransi', [PrintController::class, 'printAsuransi'])->name('print.asuransi');
+    Route::get('/asuransi/{id}/preview', [PrintController::class, 'previewAsuransi'])->name('preview.asuransi');
 });
 
 

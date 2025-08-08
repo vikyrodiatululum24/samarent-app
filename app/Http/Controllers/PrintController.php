@@ -23,22 +23,32 @@ class PrintController extends Controller
         $pengajuan = Pengajuan::with('complete')->findOrFail($id);
         $namaFile = $pengajuan->no_pengajuan;
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
-        Cetak::create(['pengajuan_id' => $pengajuan->id]);
+        Cetak::updateOrCreate(['pengajuan_id' => $pengajuan->id]);
         $pdf = PDF::loadView('prints.spk', [
             'pengajuan' => $pengajuan,
-            'autoPrint' => true // kirim flag ke view
         ]);
         return $pdf->stream("$namaFile.pdf");
     }
 
-    public function printAsuransi($id)
+    public function previewAsuransi($id)
     {
         $asuransi = Asuransi::with('unit')->findOrFail($id);
         $namaFile = $asuransi->unit->nopol ?? 'asuransi';
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
         $pdf = PDF::loadView('prints.asuransi', [
             'asuransi' => $asuransi,
-            'autoPrint' => true // kirim flag ke view
+        ]);
+        return $pdf->stream("$namaFile.pdf");
+    }
+    
+    public function printAsuransi($id)
+    {
+        $asuransi = Asuransi::with('unit')->findOrFail($id);
+        $namaFile = $asuransi->unit->nopol ?? 'asuransi';
+        $namaFile = str_replace(['/', '\\'], '-', $namaFile);
+        Cetak::updateOrCreate(['asuransi_id' => $asuransi->id]);
+        $pdf = PDF::loadView('prints.asuransi', [
+            'asuransi' => $asuransi,
         ]);
         return $pdf->stream("$namaFile.pdf");
     }
