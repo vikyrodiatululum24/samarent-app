@@ -14,8 +14,8 @@
         <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%">
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr style="height : 20mm;">
-                <td style="width: 20%; text-align: center; border: 2px solid black;">
-                    <p style="margin: 2px 0;">KM AWAL</p>
+                <td style="width: 20%;">
+                    <p style="margin: 2px 0;">&nbsp;</p>
                     <h2 style="margin: 2px 0; font-weight: bold;">&nbsp;</h2>
                 </td>
                 <th>
@@ -64,6 +64,7 @@
         <table class="table" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <thead>
                 <tr>
+                    <th style="border: 1px solid black; padding: 0.5rem">No.</th>
                     <th style="border: 1px solid black; padding: 0.5rem">No Polisi</th>
                     <th style="border: 1px solid black; padding: 0.5rem">KM</th>
                     <th style="border: 1px solid black; padding: 0.5rem">Type Unit</th>
@@ -74,6 +75,9 @@
             <tbody>
                 @forelse ($pengajuan->service_unit as $unit)
                     <tr>
+                        <td
+                            style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
+                            {{ $loop->iteration }}</td>
                         <td
                             style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
                             {{ $unit->unit->nopol }}</td>
