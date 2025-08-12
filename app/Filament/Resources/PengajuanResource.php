@@ -567,7 +567,6 @@ class PengajuanResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('bengkel_invoice')
                                     ->label('Bengkel Invoice')
-                                    ->required()
                                     ->default(fn($record) => $record->complete?->bengkel_invoice),
                                 Forms\Components\FileUpload::make('foto_nota')
                                     ->label('Foto Nota')
@@ -716,7 +715,6 @@ class PengajuanResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('bengkel_invoice')
                                     ->label('Bengkel Invoice')
-                                    ->required()
                                     ->default(fn($record) => $record->complete?->bengkel_invoice),
                                 Forms\Components\FileUpload::make('foto_nota')
                                     ->label('Foto Nota')
