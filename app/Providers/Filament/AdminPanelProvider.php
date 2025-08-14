@@ -7,6 +7,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Facades\Filament;
 use Filament\Support\Enums\MaxWidth;
+use App\Filament\Pages\Auth\EditProfile;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -41,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->profile(EditProfile::class, false)
             ->pages([
                 Pages\Dashboard::class,
             ])
