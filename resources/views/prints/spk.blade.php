@@ -14,9 +14,13 @@
         <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%">
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr style="height : 20mm;">
-                <td style="width: 20%;">
-                    <p style="margin: 2px 0;">&nbsp;</p>
-                    <h2 style="margin: 2px 0; font-weight: bold;">&nbsp;</h2>
+                <td style="width: 20%; text-align: center; border: 2px solid black;">
+                    <p style="margin: 2px 0;">Invoice Bengkel</p>
+                    @if ($pengajuan->complete->invoice_bengkel)
+                        <h2 style="margin: 2px 0; font-weight: bold;">{{ $pengajuan->complete->invoice_bengkel }}</h2>
+                    @else
+                        <h2 style="margin: 2px 0; font-weight: bold;">-</h2>
+                    @endif
                 </td>
                 <th>
                     <h1>Surat Perintah Kerja</h1>
@@ -60,7 +64,8 @@
                             @elseif($pengajuan->keterangan == 'INVOICE')
                                 style="color: green; font-weight: bold;"
                             @elseif($pengajuan->keterangan == 'FREE')
-                                style="color: black; font-weight: bold;" @endif>{{ $pengajuan->keterangan }}</span></p>
+                                style="color: black; font-weight: bold;" @endif>{{ $pengajuan->keterangan }}</span>
+                    </p>
                     <p style="margin: 2px 0;">: {{ $pengajuan->created_at->format('d F Y') }}</p>
                     <p style="margin: 2px 0; text-transform: uppercase;">:
                         {{ $pengajuan->up_lainnya ?? $pengajuan->up }} - {{ $pengajuan->provinsi }}</p>
@@ -129,14 +134,16 @@
             </tr>
             <tr>
                 <td style="height: 78px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    <img src="{{ public_path('storage/' . $pengajuan->complete->user->admin->ttd) }}" alt="{{ $pengajuan->complete->user->admin->ttd }}" style="width: auto; height: 100px;">
+                    <img src="{{ public_path('storage/' . $pengajuan->complete->user->admin->ttd) }}"
+                        alt="{{ $pengajuan->complete->user->admin->ttd }}" style="width: auto; height: 100px;">
                 </td>
                 <td style="height: 78px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 78px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 78px; border: 1px solid black;">&nbsp;</td>
             </tr>
             <tr>
-                <td style="height: 38px; border: 1px solid black; padding: 0 0.5rem;">{{ $pengajuan->complete->user->name }}</td>
+                <td style="height: 38px; border: 1px solid black; padding: 0 0.5rem;">
+                    {{ $pengajuan->complete->user->name }}</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
@@ -559,7 +566,10 @@
                 <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Dibukukan Oleh</th>
             </tr>
             <tr>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    <img src="{{ public_path('storage/' . $pengajuan->complete->user->admin->ttd) }}"
+                        alt="{{ $pengajuan->complete->user->admin->ttd }}" style="width: auto; height: 100px;"></td>
                 <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
@@ -575,7 +585,8 @@
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
             </tr>
             <tr>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : {{ $pengajuan->complete->user->name }}</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :
+                    {{ $pengajuan->complete->user->name }}</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
