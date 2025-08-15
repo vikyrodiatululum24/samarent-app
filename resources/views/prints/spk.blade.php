@@ -146,7 +146,7 @@
                 <td style="height: 78px; border: 1px solid black;">&nbsp;</td>
             </tr>
             <tr>
-                <td style="height: 38px; border: 1px solid black; padding: 0 0.5rem;">
+                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     {{ $pengajuan->user->name }}</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
