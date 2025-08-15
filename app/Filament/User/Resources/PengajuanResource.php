@@ -328,7 +328,7 @@ class PengajuanResource extends Resource
                     ->badge()
                     ->color(fn(string $state) => match (true) {
                         str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'black',
-                        str_contains(strtoupper($state), 'CHECKER') => 'danger',
+                        str_contains(strtoupper($state), 'VERIFIKASI') => 'danger',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
                         str_contains(strtoupper($state), 'INPUT FINANCE') => 'brown',
                         str_contains(strtoupper($state), 'OTORISASI') => 'yellow',
@@ -338,7 +338,7 @@ class PengajuanResource extends Resource
                     ->getStateUsing(function ($record) {
                         return match ($record->keterangan_proses) {
                             'cs' => 'Customer Service',
-                            'checker' => 'Checker',
+                            'checker' => 'Verifikasi',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
@@ -352,7 +352,7 @@ class PengajuanResource extends Resource
                     ->label('Status Proses')
                     ->options([
                         'cs' => 'Customer Service',
-                        'checker' => 'Checker',
+                        'checker' => 'Verifikasi',
                         'pengajuan finance' => 'Pengajuan Finance',
                         'finance' => 'Input Finance',
                         'otorisasi' => 'Otorisasi',
@@ -389,7 +389,7 @@ class PengajuanResource extends Resource
                                         ->getStateUsing(function ($record) {
                                             return match ($record->keterangan_proses) {
                                                 'cs' => 'Customer Service',
-                                                'checker' => 'Checker',
+                                                'checker' => 'Verifikasi',
                                                 'pengajuan finance' => 'Pengajuan Finance',
                                                 'finance' => 'Input Finance',
                                                 'otorisasi' => 'Otorisasi',
@@ -399,7 +399,7 @@ class PengajuanResource extends Resource
                                         })
                                         ->color(fn(string $state) => match ($state) {
                                             'Customer Service' => 'black',
-                                            'Checker' => 'danger',
+                                            'Verifikasi' => 'danger',
                                             'Pengajuan Finance' => 'primary',
                                             'Finance' => 'warning',
                                             'Otorisasi' => 'yellow',

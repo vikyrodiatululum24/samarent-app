@@ -16,8 +16,8 @@
             <tr style="height : 20mm;">
                 <td style="width: 20%; text-align: center; border: 2px solid black;">
                     <p style="margin: 2px 0;">Invoice Bengkel</p>
-                    @if ($pengajuan->complete->invoice_bengkel)
-                        <h2 style="margin: 2px 0; font-weight: bold;">{{ $pengajuan->complete->invoice_bengkel }}</h2>
+                    @if ($pengajuan->complete->bengkel_invoice)
+                        <h2 style="margin: 2px 0; font-weight: semibold; font-size: 16px; padding: 0 2px;">{{ $pengajuan->complete->bengkel_invoice }}</h2>
                     @else
                         <h2 style="margin: 2px 0; font-weight: bold;">-</h2>
                     @endif
@@ -134,9 +134,9 @@
             </tr>
             <tr>
                 <td style="height: 78px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($pengajuan->complete->user->admin->ttd))
-                        <img src="{{ public_path('storage/' . $pengajuan->complete->user->admin->ttd) }}"
-                            alt="{{ $pengajuan->complete->user->admin->ttd }}" style="width: auto; height: 100px;">
+                    @if (!empty($pengajuan->user->admin->ttd))
+                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd) }}"
+                            alt="{{ $pengajuan->user->admin->ttd }}" style="width: auto; height: 100px;">
                     @else
                         &nbsp;
                     @endif
@@ -147,7 +147,7 @@
             </tr>
             <tr>
                 <td style="height: 38px; border: 1px solid black; padding: 0 0.5rem;">
-                    {{ $pengajuan->complete->user->name }}</td>
+                    {{ $pengajuan->user->name }}</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
@@ -571,9 +571,9 @@
             </tr>
             <tr>
                 <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($pengajuan->complete->user->admin->ttd))
-                        <img src="{{ public_path('storage/' . $pengajuan->complete->user->admin->ttd) }}"
-                            alt="{{ $pengajuan->complete->user->admin->ttd }}" style="width: auto; height: 100px;">
+                    @if (!empty($pengajuan->user->admin->ttd))
+                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd) }}"
+                            alt="{{ $pengajuan->user->admin->ttd }}" style="width: auto; height: 100px;">
                     @else
                         &nbsp;
                     @endif
@@ -594,7 +594,7 @@
             </tr>
             <tr>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :
-                    {{ $pengajuan->complete->user->name }}</td>
+                    {{ $pengajuan->user->name }}</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
