@@ -134,8 +134,12 @@
             </tr>
             <tr>
                 <td style="height: 78px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    <img src="{{ public_path('storage/' . $pengajuan->complete->user->admin->ttd) }}"
-                        alt="{{ $pengajuan->complete->user->admin->ttd }}" style="width: auto; height: 100px;">
+                    @if (!empty($pengajuan->complete->user->admin->ttd))
+                        <img src="{{ public_path('storage/' . $pengajuan->complete->user->admin->ttd) }}"
+                            alt="{{ $pengajuan->complete->user->admin->ttd }}" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
                 </td>
                 <td style="height: 78px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 78px; border: 1px solid black;">&nbsp;</td>
@@ -566,10 +570,14 @@
                 <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Dibukukan Oleh</th>
             </tr>
             <tr>
-                <td
-                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    <img src="{{ public_path('storage/' . $pengajuan->complete->user->admin->ttd) }}"
-                        alt="{{ $pengajuan->complete->user->admin->ttd }}" style="width: auto; height: 100px;"></td>
+                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    @if (!empty($pengajuan->complete->user->admin->ttd))
+                        <img src="{{ public_path('storage/' . $pengajuan->complete->user->admin->ttd) }}"
+                            alt="{{ $pengajuan->complete->user->admin->ttd }}" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
+                </td>
                 <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
