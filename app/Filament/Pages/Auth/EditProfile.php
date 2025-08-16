@@ -55,6 +55,33 @@ class EditProfile extends BaseEditProfile
                                     ->maxSize(2048)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png'])
                                     ->hidden(fn() => $this->getUser()->role !== 'admin'),
+                                FileUpload::make('ttd2')
+                                    ->label('Tanda Tangan Yang Menyetujui')
+                                    ->image()
+                                    ->directory('foto-ttd')
+                                    ->disk('public')
+                                    ->imageResizeMode('contain')
+                                    ->maxSize(2048)
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                                    ->hidden(fn() => $this->getUser()->role !== 'admin'),
+                                FileUpload::make('ttd3')
+                                    ->label('Tanda Tangan Pemeriksa')
+                                    ->image()
+                                    ->directory('foto-ttd')
+                                    ->disk('public')
+                                    ->imageResizeMode('contain')
+                                    ->maxSize(2048)
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                                    ->hidden(fn() => $this->getUser()->role !== 'admin'),
+                                FileUpload::make('ttd4')
+                                    ->label('Tanda Tangan Yang Mengetahui')
+                                    ->image()
+                                    ->directory('foto-ttd')
+                                    ->disk('public')
+                                    ->imageResizeMode('contain')
+                                    ->maxSize(2048)
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                                    ->hidden(fn() => $this->getUser()->role !== 'admin'),
                             ])
                             ->columnSpan(1),
 
@@ -85,6 +112,10 @@ class EditProfile extends BaseEditProfile
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['ttd'] = $this->getUser()->admin?->ttd;
+        $data['ttd2'] = $this->getUser()->admin?->ttd2;
+        $data['ttd3'] = $this->getUser()->admin?->ttd3;
+        $data['ttd4'] = $this->getUser()->admin?->ttd4;
+
         return $data;
     }
 
@@ -92,29 +123,39 @@ class EditProfile extends BaseEditProfile
     {
         try {
             $data = $this->form->getState();
-
+    
             // Update basic user info
             parent::save();
-
+    
             // Handle TTD for admin users
             if ($this->getUser()->role === 'admin') {
-                $oldTtd = $this->getUser()->admin?->ttd;
-                $newTtd = $data['ttd'] ?? null;
-
-                // Delete old file if different
-                if ($oldTtd && $oldTtd !== $newTtd && Storage::disk('public')->exists($oldTtd)) {
-                    Storage::disk('public')->delete($oldTtd);
+                $ttdFields = ['ttd', 'ttd2', 'ttd3', 'ttd4'];
+                $updateData = [];
+    
+                foreach ($ttdFields as $field) {
+                    $oldTtd = $this->getUser()->admin?->{$field};
+                    $newTtd = $data[$field] ?? null;
+    
+                    // Delete old file if different
+                    if ($oldTtd && $oldTtd !== $newTtd && Storage::disk('public')->exists($oldTtd)) {
+                        Storage::disk('public')->delete($oldTtd);
+                    }
+    
+                    // Add to update data if new TTD exists
+                    if ($newTtd) {
+                        $updateData[$field] = $newTtd;
+                    }
                 }
-
-                // Save new TTD
-                if ($newTtd) {
+    
+                // Save all TTDs if there are any changes
+                if (!empty($updateData)) {
                     Admin::updateOrCreate(
                         ['user_id' => $this->getUser()->id],
-                        ['ttd' => $newTtd]
+                        $updateData
                     );
                 }
             }
-
+    
             Notification::make()
                 ->title('Profile Updated')
                 ->success()

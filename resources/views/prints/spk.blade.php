@@ -141,9 +141,30 @@
                         &nbsp;
                     @endif
                 </td>
-                <td style="height: 78px; border: 1px solid black;">&nbsp;</td>
-                <td style="height: 78px; border: 1px solid black;">&nbsp;</td>
-                <td style="height: 78px; border: 1px solid black;">&nbsp;</td>
+                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    @if (!empty($pengajuan->user->admin->ttd2))
+                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd2) }}"
+                            alt="{{ $pengajuan->user->admin->ttd2 }}" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
+                </td>
+                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    @if (!empty($pengajuan->user->admin->ttd3))
+                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd3) }}"
+                            alt="{{ $pengajuan->user->admin->ttd3 }}" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
+                </td>
+                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    @if (!empty($pengajuan->user->admin->ttd4))
+                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd4) }}"
+                            alt="{{ $pengajuan->user->admin->ttd4 }}" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
+                </td>
             </tr>
             <tr>
                 <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle;">
@@ -578,10 +599,33 @@
                         &nbsp;
                     @endif
                 </td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black;">&nbsp;</td>
+                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    @if (!empty($pengajuan->user->admin->ttd2))
+                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd2) }}"
+                            alt="{{ $pengajuan->user->admin->ttd2 }}" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
+                </td>
+                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    @if (!empty($pengajuan->user->admin->ttd3))
+                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd3) }}"
+                            alt="{{ $pengajuan->user->admin->ttd3 }}" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
+                </td>
+                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    @if (!empty($pengajuan->user->admin->ttd4))
+                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd4) }}"
+                            alt="{{ $pengajuan->user->admin->ttd4 }}" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
+                </td>
+                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    &nbsp;
+                </td>
             </tr>
             <tr>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :

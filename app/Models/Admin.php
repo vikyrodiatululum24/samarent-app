@@ -8,11 +8,17 @@ class Admin extends Model
 {
     protected $fillable = [
         'user_id',
-        'ttd'
+        'ttd',
+        'ttd2',
+        'ttd3',
+        'ttd4',
     ];
 
     protected $casts = [
         'ttd' => 'string',
+        'ttd2' => 'string',
+        'ttd3' => 'string',
+        'ttd4' => 'string',
     ];
 
     public function user()
