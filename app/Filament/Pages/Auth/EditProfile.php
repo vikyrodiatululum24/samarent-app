@@ -123,30 +123,36 @@ class EditProfile extends BaseEditProfile
     {
         try {
             $data = $this->form->getState();
-    
+
             // Update basic user info
             parent::save();
-    
+
             // Handle TTD for admin users
             if ($this->getUser()->role === 'admin') {
                 $ttdFields = ['ttd', 'ttd2', 'ttd3', 'ttd4'];
                 $updateData = [];
-    
+
                 foreach ($ttdFields as $field) {
                     $oldTtd = $this->getUser()->admin?->{$field};
                     $newTtd = $data[$field] ?? null;
-    
-                    // Delete old file if different
-                    if ($oldTtd && $oldTtd !== $newTtd && Storage::disk('public')->exists($oldTtd)) {
-                        Storage::disk('public')->delete($oldTtd);
+
+                    // If image is removed (empty), delete old file and set DB field to null
+                    if (empty($newTtd) && !empty($oldTtd)) {
+                        if (Storage::disk('public')->exists($oldTtd)) {
+                            Storage::disk('public')->delete($oldTtd);
+                        }
+                        $updateData[$field] = null;
                     }
-    
-                    // Add to update data if new TTD exists
-                    if ($newTtd) {
+
+                    // If image is changed, update DB and delete old file
+                    if (!empty($newTtd) && $newTtd !== $oldTtd) {
+                        if (!empty($oldTtd) && Storage::disk('public')->exists($oldTtd)) {
+                            Storage::disk('public')->delete($oldTtd);
+                        }
                         $updateData[$field] = $newTtd;
                     }
                 }
-    
+
                 // Save all TTDs if there are any changes
                 if (!empty($updateData)) {
                     Admin::updateOrCreate(
@@ -155,7 +161,7 @@ class EditProfile extends BaseEditProfile
                     );
                 }
             }
-    
+
             Notification::make()
                 ->title('Profile Updated')
                 ->success()
