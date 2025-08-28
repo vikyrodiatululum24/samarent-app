@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('cetaks', function (Blueprint $table) {
             $table->unsignedBigInteger('asuransi_id')->nullable()->after('pengajuan_id');
-            $table->string('pengajuan_id')->nullable()->change();
+            $table->unsignedBigInteger('pengajuan_id')->nullable()->change();
             $table->foreign('asuransi_id')->references('id')->on('asuransis')->onDelete('cascade');
         });
     }

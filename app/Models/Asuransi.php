@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
 
 class Asuransi extends Model
 {
@@ -34,7 +37,8 @@ class Asuransi extends Model
         'foto_keterangan_bengkel',
         'foto_npwp_pt',
         'foto_unit',
-        'foto_nota'
+        'foto_nota',
+        'unit_pengganti_id',
     ];
 
     protected $casts = [
@@ -47,6 +51,11 @@ class Asuransi extends Model
     /**
      * Relasi ke model Unit
      */
+    public function unitPengganti(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'unit_pengganti_id');
+    }
+
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);

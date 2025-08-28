@@ -266,46 +266,57 @@ class PengajuanResource extends Resource
                                         ->schema([
                                             Forms\Components\Grid::make(3)
                                                 ->schema([
-                                                    Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
-                                                        ->label('Foto Pengerjaan Bengkel')
-                                                        // ->image()
-                                                        ->maxSize(2048) // Maksimal 2MB
-                                                        ->disk('public')
-                                                        ->directory('foto_pengerjaan_bengkel')
-                                                        ->nullable()
-                                                        ->reactive()
-                                                        ->dehydrated(),
-
                                                     Forms\Components\FileUpload::make('foto_unit')
                                                         ->label('Foto Unit')
-                                                        // ->image()
+                                                        ->image()
+                                                        ->resize(50)
+                                                        ->optimize('webp')
+                                                        ->maxWidth(1024)
                                                         ->maxSize(2048) // Maksimal 2MB
                                                         ->disk('public')
                                                         ->directory('foto_unit')
                                                         ->nullable(),
-
                                                     Forms\Components\FileUpload::make('foto_odometer')
                                                         ->label('Foto Odometer')
-                                                        // ->image()
+                                                        ->image()
+                                                        ->resize(50)
+                                                        ->optimize('webp')
+                                                        ->maxWidth(1024)
                                                         ->maxSize(2048) // Maksimal 2MB
                                                         ->disk('public')
                                                         ->directory('foto_odometer')
                                                         ->nullable(),
+                                                    Forms\Components\FileUpload::make('foto_kondisi')
+                                                        ->label('Foto Kondisi')
+                                                        ->image()
+                                                        ->resize(50)
+                                                        ->optimize('webp')
+                                                        ->maxWidth(1024)
+                                                        ->maxSize(2048) // Maksimal 2MB
+                                                        ->multiple()
+                                                        ->maxFiles(3)
+                                                        ->disk('public')
+                                                        ->directory('foto_kondisi')
+                                                        ->nullable(),
                                                 ]),
-
-                                            Forms\Components\FileUpload::make('foto_kondisi')
-                                                ->label('Foto Kondisi')
-                                                // ->image()
+                                            Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
+                                                ->label('Foto Pengerjaan Bengkel')
+                                                ->image()
+                                                ->resize(50)
+                                                ->optimize('webp')
+                                                ->maxWidth(1024)
                                                 ->maxSize(2048) // Maksimal 2MB
-                                                ->multiple()
-                                                ->maxFiles(3)
                                                 ->disk('public')
-                                                ->directory('foto_kondisi')
-                                                ->nullable(),
-
+                                                ->directory('foto_pengerjaan_bengkel')
+                                                ->nullable()
+                                                ->reactive()
+                                                ->dehydrated(),
                                             Forms\Components\FileUpload::make('foto_tambahan')
                                                 ->label('Foto Tambahan')
-                                                // ->image()
+                                                ->image()
+                                                ->resize(50)
+                                                ->optimize('webp')
+                                                ->maxWidth(1024)
                                                 ->maxSize(2048) // Maksimal 2MB
                                                 ->disk('public')
                                                 ->directory('foto_tambahan')
@@ -571,6 +582,9 @@ class PengajuanResource extends Resource
                                 Forms\Components\FileUpload::make('foto_nota')
                                     ->label('Foto Nota')
                                     ->image()
+                                    ->resize(50)
+                                    ->maxWidth(1024)
+                                    ->optimize('webp')
                                     ->maxSize(2048) // Maksimal 2MB
                                     ->disk('public')
                                     ->directory('foto_nota')

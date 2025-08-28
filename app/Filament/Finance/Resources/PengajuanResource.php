@@ -255,6 +255,7 @@ class PengajuanResource extends Resource
                                     ]),
                                 Forms\Components\FileUpload::make('finance.bukti_transaksi')
                                     ->label('Bukti Transaksi')
+                                    ->resize(50)
                                     ->maxSize(2048) // Maksimal 2MB
                                     ->helperText('Hanya dapat mengunggah file dengan tipe PDF atau gambar (image).')
                                     ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required

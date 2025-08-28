@@ -27,12 +27,10 @@ class Complete extends Model
         'bengkel_invoice',
         'status_finance',
         'foto_nota',
-        'foto_tambahan',
     ];
 
     protected $casts = [
         'foto_nota' => 'array',
-        'foto_tambahan' => 'array',
     ];
 
 

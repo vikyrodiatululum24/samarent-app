@@ -149,7 +149,7 @@
         <div class="img-header">
             <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%">
         </div>
-        <h1 style="padding-top: 35mm;">Laporan Asuransi</h1>
+        <h1 style="padding-top: 35mm;">Data Unit Khusus</h1>
         <table>
             <tr>
                 <th>No. Polisi</th>
@@ -158,6 +158,14 @@
             <tr>
                 <th>Tipe Unit</th>
                 <td>{{ $asuransi->unit->type ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>No. Rangka</th>
+                <td>{{ $asuransi->unit->no_rangka ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>No. Mesin</th>
+                <td>{{ $asuransi->unit->no_mesin ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Nama PIC</th>
@@ -220,6 +228,10 @@
             <tr>
                 <th>Tujuan Pengajuan</th>
                 <td>{{ $asuransi->tujuan_pengajuan ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>Unit Pengganti / Unit GS</th>
+                <td>{{ $asuransi->unitPengganti->nopol ?? '' }} - {{ $asuransi->unitPengganti->type ?? '' }}</td>
             </tr>
         </table>
         <div class="meta">

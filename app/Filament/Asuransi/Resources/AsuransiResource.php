@@ -3,7 +3,6 @@
 namespace App\Filament\Asuransi\Resources;
 
 use App\Filament\Asuransi\Resources\AsuransiResource\Pages;
-use App\Filament\Asuransi\Resources\AsuransiResource\RelationManagers;
 use App\Models\Asuransi;
 use App\Models\Unit;
 use Filament\Forms;
@@ -13,8 +12,6 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AsuransiResource extends Resource
 {
@@ -44,7 +41,6 @@ class AsuransiResource extends Resource
                         Forms\Components\DatePicker::make('tanggal_pengajuan')
                             ->label('Tanggal Pengajuan')
                             ->default(now()),
-
                         Forms\Components\Select::make('up')
                             ->label('Unit Pelaksana')
                             ->options([
@@ -61,6 +57,15 @@ class AsuransiResource extends Resource
                                 'sm' => 2,
                             ])
                             ->maxLength(255),
+                        Forms\Components\Select::make('unit_pengganti_id')
+                            ->label('Unit Pengganti')
+                            ->searchable()
+                            ->relationship('unitPengganti', 'nopol')
+                            ->getOptionLabelFromRecordUsing(function (?Unit $unit) {
+                                return $unit ? "{$unit->nopol} - {$unit->type}" : '';
+                            })
+                            ->preload()
+                            ->nullable(),
                     ])
                     ->columns([
                         'sm' => 2,
@@ -117,6 +122,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_ktp')
                             ->label('Foto KTP')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -131,6 +139,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_sim')
                             ->label('Foto SIM')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -145,6 +156,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_sntk')
                             ->label('Foto STNK')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -159,6 +173,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_bpkb')
                             ->label('Foto BPKB')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -173,6 +190,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_polis_asuransi')
                             ->label('Foto Polis Asuransi')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -187,6 +207,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_ba')
                             ->label('Foto BA')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -201,6 +224,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_keterangan_bengkel')
                             ->label('Foto Keterangan Bengkel')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -215,6 +241,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_npwp_pt')
                             ->label('Foto NPWP PT')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -229,6 +258,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_nota')
                             ->label('Foto Nota')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -245,6 +277,9 @@ class AsuransiResource extends Resource
                         Forms\Components\FileUpload::make('foto_unit')
                             ->label('Foto Unit')
                             ->image()
+                            ->resize(50)
+                            ->optimize('webp')
+                            ->maxWidth(1024)
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
@@ -300,7 +335,7 @@ class AsuransiResource extends Resource
                 Tables\Columns\TextColumn::make('kategori')
                     ->label('Kategori')
                     ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 Tables\Columns\TextColumn::make('keterangan')
                     ->label('Keterangan')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -568,18 +603,6 @@ class AsuransiResource extends Resource
                                     ->visible(fn($record) => !empty($record->foto_unit) && is_array($record->foto_unit) && count($record->foto_unit) > 0),
                             ]),
                     ]),
-
-                // Infolists\Components\Section::make('Foto Unit')
-                //     ->schema([
-                //         Infolists\Components\ImageEntry::make('foto_unit')
-                //             ->label('Foto Unit')
-                //             ->disk('public')
-                //             ->height(300)
-                //             ->square()
-                //             ->visible(fn($record) => !empty($record->foto_unit) && is_array($record->foto_unit) && count($record->foto_unit) > 0),
-                //     ])
-                //     ->columns(2)
-                //     ->visible(fn($record) => !empty($record->foto_unit) && is_array($record->foto_unit) && count($record->foto_unit) > 0),
             ]);
     }
 

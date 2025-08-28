@@ -262,7 +262,10 @@ class PengajuanResource extends Resource
 
                                             Forms\Components\FileUpload::make('foto_unit')
                                                 ->label('Foto Unit')
-                                                // ->image()
+                                                ->image()
+                                                ->resize(50)
+                                                ->maxWidth(1024)
+                                                ->optimize('webp')
                                                 ->maxSize(2048) // Maksimal 2MB
                                                 ->disk('public')
                                                 ->directory('foto_unit')
@@ -270,7 +273,10 @@ class PengajuanResource extends Resource
 
                                             Forms\Components\FileUpload::make('foto_odometer')
                                                 ->label('Foto Odometer')
-                                                // ->image()
+                                                ->image()
+                                                ->resize(50)
+                                                ->maxWidth(1024)
+                                                ->optimize('webp')
                                                 ->maxSize(2048) // Maksimal 2MB
                                                 ->disk('public')
                                                 ->directory('foto_odometer')
@@ -278,7 +284,10 @@ class PengajuanResource extends Resource
 
                                             Forms\Components\FileUpload::make('foto_kondisi')
                                                 ->label('Foto Kondisi')
-                                                // ->image()
+                                                ->image()
+                                                ->resize(50)
+                                                ->maxWidth(1024)
+                                                ->optimize('webp')
                                                 ->maxSize(2048) // Maksimal 2MB
                                                 ->multiple()
                                                 ->maxFiles(3)
