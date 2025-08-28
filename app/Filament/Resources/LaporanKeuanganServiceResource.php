@@ -94,7 +94,12 @@ class LaporanKeuanganServiceResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nopol')
                     ->label('No Polisi')
-                    ->getStateUsing(fn($record) => $record->pengajuan?->service_unit?->first()?->unit?->nopol ?? '-')
+                    ->getStateUsing(function ($record) {
+                        $nopols = $record->pengajuan?->service_unit?->map(function ($service_unit) {
+                            return $service_unit->unit?->nopol;
+                        })->filter()->join(', ');
+                        return $nopols ?: '-';
+                    })
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('pengajuan.keterangan')
@@ -303,7 +308,10 @@ class LaporanKeuanganServiceResource extends Resource
             ]) : '-';
             $sheet->setCellValue('D' . $currentRow, $rekBengkel);
 
-            $sheet->setCellValue('E' . $currentRow, $item->pengajuan?->service_unit?->first()?->unit?->nopol ?? '-');
+            $nopols = $item->pengajuan?->service_unit?->map(function ($service_unit) {
+                return $service_unit->unit?->nopol;
+            })->filter()->join(', ');
+            $sheet->setCellValue('E' . $currentRow, $nopols ?: '-');
             $sheet->setCellValue('F' . $currentRow, $item->pengajuan->keterangan);
             $nominalFinance = $item->pengajuan->complete->nominal_tf_finance ?? 0;
             $nominalBengkel = $item->pengajuan->complete->nominal_tf_bengkel ?? 0;
@@ -401,6 +409,13 @@ class LaporanKeuanganServiceResource extends Resource
         }
 
         // Helper functions untuk format data
+        $getNopols = function ($item) {
+            $nopols = $item->pengajuan?->service_unit?->map(function ($service_unit) {
+                return $service_unit->unit?->nopol;
+            })->filter()->join(', ');
+            return $nopols ?: '-';
+        };
+
         $rekPenerima = function ($item) {
             $complete = $item->pengajuan->complete;
             return $complete ? implode(' - ', [
@@ -437,6 +452,7 @@ class LaporanKeuanganServiceResource extends Resource
             'totalFinance',
             'totalBengkel',
             'totalSelisih',
+            'getNopols',
             'rekPenerima',
             'rekBengkel',
             'nominalFinance',

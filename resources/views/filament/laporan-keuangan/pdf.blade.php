@@ -63,7 +63,7 @@
                 <td>{{ $item->pengajuan->no_pengajuan }}</td>
                 <td>{{ $rekPenerima($item) }}</td>
                 <td>{{ $rekBengkel($item) }}</td>
-                <td>{{ $item->pengajuan?->service_unit?->first()?->unit?->nopol ?? '-' }}</td>
+                <td>{{ $getNopols($item) }}</td>
                 <td>{{ $item->pengajuan->keterangan }}</td>
                 <td class="text-right">{{ number_format($nominalFinance($item), 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($nominalBengkel($item), 0, ',', '.') }}</td>
