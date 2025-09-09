@@ -42,6 +42,7 @@ class AsuransiResource extends Resource
                             ->label('Tanggal Pengajuan')
                             ->default(now()),
                         Forms\Components\Select::make('up')
+                            ->required()
                             ->label('Unit Pelaksana')
                             ->options([
                                 'UP 1' => 'UP 1',
@@ -50,7 +51,15 @@ class AsuransiResource extends Resource
                                 'UP 5' => 'UP 5',
                                 'UP 7' => 'UP 7',
                                 'CUST JEPANG' => 'CUST JEPANG',
-                            ]),
+                                'manual' => 'Lainnya',
+                            ])
+                            ->reactive()
+                            ->afterStateUpdated(fn(callable $set, $state) => $set('uplainnya', $state === 'manual' ? '' : null)),
+                        Forms\Components\TextInput::make('uplainnya')
+                            ->label('Unit Pelaksana Lainnya')
+                            ->required(fn(callable $get) => $get('up') === 'manual')
+                            ->visible(fn(callable $get) => $get('up') === 'manual')
+                            ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
                         Forms\Components\Textarea::make('lokasi')
                             ->label('Lokasi')
                             ->columnSpan([
@@ -468,7 +477,12 @@ class AsuransiResource extends Resource
                                 Infolists\Components\TextEntry::make('up')
                                     ->label('Unit Pelaksana')
                                     ->badge()
-                                    ->color('success'),
+                                    ->color('success')
+                                    ->visible(fn($record) => $record->up !== 'manual'),
+
+                                Infolists\Components\TextEntry::make('uplainnya')
+                                    ->label('Unit Pelaksana Lainnya')
+                                    ->visible(fn($record) => $record->up === 'manual'),
 
                                 Infolists\Components\TextEntry::make('lokasi')
                                     ->label('Lokasi')

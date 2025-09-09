@@ -27,6 +27,9 @@ class Complete extends Model
         'bengkel_invoice',
         'status_finance',
         'foto_nota',
+        'rek_bengkel',
+        'nama_rek_bengkel',
+        'bank_bengkel',
     ];
 
     protected $casts = [

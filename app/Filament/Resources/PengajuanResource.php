@@ -544,6 +544,106 @@ class PengajuanResource extends Resource
                             ->columns(2),
                         Forms\Components\Fieldset::make('Transfer Bengkel')
                             ->schema([
+                                Forms\Components\Select::make('nama_rek_bengkel')
+                                    ->label('Nama Rekening Bengkel')
+                                    ->options(
+                                        \App\Models\Norek::pluck('name', 'name')->toArray()
+                                    )
+                                    ->searchable()
+                                    ->nullable()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($component, $state, callable $set) {
+                                        $component->state(strtoupper($state));
+                                        $norek = \App\Models\Norek::where('name', $state)->first();
+                                        $set('rek_bengkel', $norek?->norek);
+                                        $set('bank_bengkel', $norek?->bank);
+                                    })
+                                    ->createOptionForm([
+                                        Forms\Components\TextInput::make('name')
+                                            ->label('Nama Rekening')
+                                            ->required()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('norek')
+                                            ->label('No. Rekening')
+                                            ->required()
+                                            ->numeric()
+                                            ->maxLength(255),
+                                        Forms\Components\Select::make('bank')
+                                            ->label('Bank')
+                                            ->required()
+                                            ->options([
+                                                'BCA' => 'BCA',
+                                                'MANDIRI' => 'MANDIRI',
+                                                'BRI' => 'BRI',
+                                                'BNI' => 'BNI',
+                                                'PERMATA' => 'PERMATA',
+                                                'BTN' => 'BTN',
+                                            ]),
+                                    ])
+                                    ->createOptionUsing(function (array $data) {
+                                        // Cek duplikat berdasarkan name atau norek
+                                        $exists = \App\Models\Norek::where('name', $data['name'])
+                                            ->orWhere('norek', $data['norek'])
+                                            ->exists();
+                                        if ($exists) {
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('Gagal Menambah Rekening')
+                                                ->body('Nama rekening atau nomor rekening sudah terdaftar.')
+                                                ->danger()
+                                                ->send();
+                                            return $data['name'];
+                                        }
+                                        \App\Models\Norek::create(['name' => $data['name'], 'norek' => $data['norek'], 'bank' => $data['bank']]);
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('Berhasil Menambah Rekening')
+                                            ->body('Nama rekening dan nomor rekening berhasil ditambahkan.')
+                                            ->success()
+                                            ->send();
+                                        return $data['name'];
+                                    })
+                                    ->createOptionAction(function ($action) {
+                                        $action->modalHeading('Tambah Nama Rekening Baru');
+                                    }),
+                                Forms\Components\TextInput::make('rek_bengkel')
+                                    ->nullable()
+                                    ->label('No. Rekening Bengkel')
+                                    ->readOnly()
+                                    ->maxLength(255)
+                                    ->numeric()
+                                    ->default(function (callable $get) {
+                                        $nama = $get('nama_rek_bengkel');
+                                        if (!$nama) return null;
+                                        $norek = \App\Models\Norek::where('name', $nama)->first();
+                                        return $norek?->norek;
+                                    })
+                                    ->reactive()
+                                    ->afterStateHydrated(function ($component, $state, callable $get) {
+                                        $nama = $get('nama_rek_bengkel');
+                                        if ($nama) {
+                                            $norek = \App\Models\Norek::where('name', $nama)->first();
+                                            $component->state($norek?->norek);
+                                        }
+                                    }),
+
+                                Forms\Components\TextInput::make('bank_bengkel')
+                                    ->nullable()
+                                    ->label('Bank')
+                                    ->maxLength(255)
+                                    ->readOnly()
+                                    ->default(function (callable $get) {
+                                        $nama = $get('nama_rek_bengkel');
+                                        if (!$nama) return null;
+                                        $norek = \App\Models\Norek::where('name', $nama)->first();
+                                        return $norek?->bank;
+                                    })
+                                    ->reactive()
+                                    ->afterStateHydrated(function ($component, $state, callable $get) {
+                                        $nama = $get('nama_rek_bengkel');
+                                        if ($nama) {
+                                            $norek = \App\Models\Norek::where('name', $nama)->first();
+                                            $component->state($norek?->bank);
+                                        }
+                                    }),
                                 Forms\Components\TextInput::make('nominal_tf_bengkel')
                                     ->label('Nominal Transfer Bengkel')
                                     ->numeric()
@@ -662,28 +762,23 @@ class PengajuanResource extends Resource
                             ->schema([
                                 Forms\Components\DatePicker::make('tanggal_tf_finance')
                                     ->label('Tanggal Transfer Finance')
-                                    // ->required()
                                     ->readOnly()
                                     ->default(fn($record) => $record->complete?->tanggal_tf_finance),
                                 Forms\Components\TextInput::make('nominal_tf_finance')
                                     ->label('Nominal Transfer Finance')
                                     ->numeric()
-                                    // ->required()
                                     ->readOnly()
                                     ->default(fn($record) => $record->complete?->nominal_tf_finance),
                                 Forms\Components\TextInput::make('payment_2')
                                     ->label('Rekening Atas Nama')
-                                    // ->required()
                                     ->readOnly()
                                     ->default(fn($record) => $record->complete?->payment_2),
                                 Forms\Components\TextInput::make('bank_2')
                                     ->label('Bank')
-                                    // ->required()
                                     ->readOnly()
                                     ->default(fn($record) => $record->complete?->bank_2),
                                 Forms\Components\TextInput::make('norek_2')
                                     ->label('No. Rekening')
-                                    // ->required()
                                     ->readOnly()
                                     ->default(fn($record) => $record->complete?->norek_2),
                                 Forms\Components\TextInput::make('status_finance')
@@ -695,6 +790,106 @@ class PengajuanResource extends Resource
                             ->columns(2),
                         Forms\Components\Fieldset::make('Transfer Bengkel')
                             ->schema([
+                                Forms\Components\Select::make('nama_rek_bengkel')
+                                    ->label('Nama Rekening Bengkel')
+                                    ->options(
+                                        \App\Models\Norek::pluck('name', 'name')->toArray()
+                                    )
+                                    ->searchable()
+                                    ->nullable()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($component, $state, callable $set) {
+                                        $component->state(strtoupper($state));
+                                        $norek = \App\Models\Norek::where('name', $state)->first();
+                                        $set('rek_bengkel', $norek?->norek);
+                                        $set('bank_bengkel', $norek?->bank);
+                                    })
+                                    ->createOptionForm([
+                                        Forms\Components\TextInput::make('name')
+                                            ->label('Nama Rekening')
+                                            ->required()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('norek')
+                                            ->label('No. Rekening')
+                                            ->required()
+                                            ->numeric()
+                                            ->maxLength(255),
+                                        Forms\Components\Select::make('bank')
+                                            ->label('Bank')
+                                            ->required()
+                                            ->options([
+                                                'BCA' => 'BCA',
+                                                'MANDIRI' => 'MANDIRI',
+                                                'BRI' => 'BRI',
+                                                'BNI' => 'BNI',
+                                                'PERMATA' => 'PERMATA',
+                                                'BTN' => 'BTN',
+                                            ]),
+                                    ])
+                                    ->createOptionUsing(function (array $data) {
+                                        // Cek duplikat berdasarkan name atau norek
+                                        $exists = \App\Models\Norek::where('name', $data['name'])
+                                            ->orWhere('norek', $data['norek'])
+                                            ->exists();
+                                        if ($exists) {
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('Gagal Menambah Rekening')
+                                                ->body('Nama rekening atau nomor rekening sudah terdaftar.')
+                                                ->danger()
+                                                ->send();
+                                            return $data['name'];
+                                        }
+                                        \App\Models\Norek::create(['name' => $data['name'], 'norek' => $data['norek'], 'bank' => $data['bank']]);
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('Berhasil Menambah Rekening')
+                                            ->body('Nama rekening dan nomor rekening berhasil ditambahkan.')
+                                            ->success()
+                                            ->send();
+                                        return $data['name'];
+                                    })
+                                    ->createOptionAction(function ($action) {
+                                        $action->modalHeading('Tambah Nama Rekening Baru');
+                                    }),
+                                Forms\Components\TextInput::make('rek_bengkel')
+                                    ->nullable()
+                                    ->label('No. Rekening Bengkel')
+                                    ->readOnly()
+                                    ->maxLength(255)
+                                    ->numeric()
+                                    ->default(function (callable $get) {
+                                        $nama = $get('nama_rek_bengkel');
+                                        if (!$nama) return null;
+                                        $norek = \App\Models\Norek::where('name', $nama)->first();
+                                        return $norek?->norek;
+                                    })
+                                    ->reactive()
+                                    ->afterStateHydrated(function ($component, $state, callable $get) {
+                                        $nama = $get('nama_rek_bengkel');
+                                        if ($nama) {
+                                            $norek = \App\Models\Norek::where('name', $nama)->first();
+                                            $component->state($norek?->norek);
+                                        }
+                                    }),
+
+                                Forms\Components\TextInput::make('bank_bengkel')
+                                    ->nullable()
+                                    ->label('Bank')
+                                    ->maxLength(255)
+                                    ->readOnly()
+                                    ->default(function (callable $get) {
+                                        $nama = $get('nama_rek_bengkel');
+                                        if (!$nama) return null;
+                                        $norek = \App\Models\Norek::where('name', $nama)->first();
+                                        return $norek?->bank;
+                                    })
+                                    ->reactive()
+                                    ->afterStateHydrated(function ($component, $state, callable $get) {
+                                        $nama = $get('nama_rek_bengkel');
+                                        if ($nama) {
+                                            $norek = \App\Models\Norek::where('name', $nama)->first();
+                                            $component->state($norek?->bank);
+                                        }
+                                    }),
                                 Forms\Components\TextInput::make('nominal_tf_bengkel')
                                     ->label('Nominal Transfer Bengkel')
                                     ->numeric()
@@ -921,6 +1116,12 @@ class PengajuanResource extends Resource
                             ]),
                         Components\Grid::make(2)
                             ->schema([
+                                Components\TextEntry::make('complete.rek_bengkel')
+                                    ->label('No. Rekening Bengkel'),
+                                Components\TextEntry::make('complete.nama_rek_bengkel')
+                                    ->label('Nama Rekening Bengkel'),
+                                Components\TextEntry::make('complete.bank_bengkel')
+                                    ->label('Bank Bengkel'),
                                 Components\TextEntry::make('complete.nominal_tf_bengkel')
                                     ->label('Nominal Transfer Bengkel'),
                                 Components\TextEntry::make('complete.selisih_tf')

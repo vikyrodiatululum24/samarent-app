@@ -179,7 +179,13 @@
             </tr>
             <tr>
                 <th>Unit Pelaksana</th>
-                <td>{{ $asuransi->up ?? '-' }}</td>
+                <td>
+                    @if (($asuransi->up ?? '-') === 'manual')
+                        {{ $asuransi->uplainnya ?? '-' }}
+                    @else
+                        {{ $asuransi->up ?? '-' }}
+                    @endif
+                </td>
             </tr>
             <tr>
                 <th>Lokasi</th>

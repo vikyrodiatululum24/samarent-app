@@ -9,6 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use PDF;
 
 class LaporanKeuanganServiceResource extends Resource
 {
@@ -82,12 +83,12 @@ class LaporanKeuanganServiceResource extends Resource
                 Tables\Columns\TextColumn::make('rek_bengkel')
                     ->label('Rek. Bengkel')
                     ->getStateUsing(function ($record) {
-                        $pengajuan = $record->pengajuan;
-                        if (!$pengajuan) return '';
+                        $complete = $record->pengajuan->complete;
+                        if (!$complete) return '';
                         return implode(' - ', [
-                            $pengajuan->payment_1,
-                            $pengajuan->norek_1,
-                            $pengajuan->bank_1,
+                            $complete->nama_rek_bengkel,
+                            $complete->rek_bengkel,
+                            $complete->bank_bengkel,
                         ]);
                     })
                     ->searchable()
@@ -174,16 +175,11 @@ class LaporanKeuanganServiceResource extends Resource
                 \Filament\Tables\Actions\Action::make('export_pdf')
                     ->label('Export PDF')
                     ->icon('heroicon-o-document-text')
-                    ->action(function ($livewire) {
-                        $data = self::getFilteredData($livewire);
-                        $filters = [
-                            'dari_tanggal' => $livewire->tableFilters['created_at']['dari_tanggal'] ?? null,
-                            'sampai_tanggal' => $livewire->tableFilters['created_at']['sampai_tanggal'] ?? null,
-                        ];
-                        return response()->streamDownload(function () use ($data, $filters) {
-                            echo self::generatePDF($data, $filters);
-                        }, 'laporan_keuangan_service_' . date('Y-m-d') . '.pdf');
-                    }),
+                    ->url(fn ($livewire) => route('laporan-keuangan-service.export-pdf', [
+                        'dari_tanggal' => $livewire->tableFilters['created_at']['dari_tanggal'] ?? null,
+                        'sampai_tanggal' => $livewire->tableFilters['created_at']['sampai_tanggal'] ?? null,
+                    ]))
+                    ->openUrlInNewTab(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -300,11 +296,10 @@ class LaporanKeuanganServiceResource extends Resource
             $sheet->setCellValue('C' . $currentRow, $rekPenerima);
 
             // Format rek bengkel
-            $pengajuan = $item->pengajuan;
-            $rekBengkel = $pengajuan ? implode(' - ', [
-                $pengajuan->payment_1,
-                $pengajuan->norek_1,
-                $pengajuan->bank_1,
+            $rekBengkel = $complete ? implode(' - ', [
+                $complete->nama_rek_bengkel,
+                $complete->rek_bengkel,
+                $complete->bank_bengkel,
             ]) : '-';
             $sheet->setCellValue('D' . $currentRow, $rekBengkel);
 
@@ -391,87 +386,106 @@ class LaporanKeuanganServiceResource extends Resource
         return ob_get_clean();
     }
 
-    private static function generatePDF($data, $filters = [])
-    {
-        // Set tanggal filter
-        $dari_tanggal = !empty($filters['dari_tanggal']) ? date('d/m/Y', strtotime($filters['dari_tanggal'])) : '-';
-        $sampai_tanggal = !empty($filters['sampai_tanggal']) ? date('d/m/Y', strtotime($filters['sampai_tanggal'])) : '-';
+    // private static function generatePDF($data, $filters = [])
+    // {
+    //     // Set tanggal filter
+    //     $dari_tanggal = !empty($filters['dari_tanggal']) ? date('d/m/Y', strtotime($filters['dari_tanggal'])) : '-';
+    //     $sampai_tanggal = !empty($filters['sampai_tanggal']) ? date('d/m/Y', strtotime($filters['sampai_tanggal'])) : '-';
 
-        // Hitung total terlebih dahulu
-        $totalFinance = 0;
-        $totalBengkel = 0;
-        $totalSelisih = 0;
+    //     // Hitung total terlebih dahulu
+    //     $totalFinance = 0;
+    //     $totalBengkel = 0;
+    //     $totalSelisih = 0;
 
-        foreach ($data as $item) {
-            $totalFinance += $item->pengajuan->complete->nominal_tf_finance ?? 0;
-            $totalBengkel += $item->pengajuan->complete->nominal_tf_bengkel ?? 0;
-            $totalSelisih += $item->pengajuan->complete->selisih_tf ?? 0;
-        }
+    //     foreach ($data as $item) {
+    //         $totalFinance += $item->pengajuan->complete->nominal_tf_finance ?? 0;
+    //         $totalBengkel += $item->pengajuan->complete->nominal_tf_bengkel ?? 0;
+    //         $totalSelisih += $item->pengajuan->complete->selisih_tf ?? 0;
+    //         $item->created_at = \Carbon\Carbon::parse($item->created_at)->format('d/m/Y');
+    //     }
 
-        // Helper functions untuk format data
-        $getNopols = function ($item) {
-            $nopols = $item->pengajuan?->service_unit?->map(function ($service_unit) {
-                return $service_unit->unit?->nopol;
-            })->filter()->join(', ');
-            return $nopols ?: '-';
-        };
+    //     // Helper functions untuk format data
+    //     $getNopols = function ($item) {
+    //         $nopols = $item->pengajuan?->service_unit?->map(function ($service_unit) {
+    //             return $service_unit->unit?->nopol;
+    //         })->filter()->join(', ');
+    //         return $nopols ?: '-';
+    //     };
 
-        $rekPenerima = function ($item) {
-            $complete = $item->pengajuan->complete;
-            return $complete ? implode(' - ', [
-                $complete->payment_2,
-                $complete->norek_2,
-                $complete->bank_2,
-            ]) : '-';
-        };
+    //     $rekPenerima = function ($item) {
+    //         $complete = $item['pengajuan']['complete'];
+    //         return $complete ? implode(' - ', [
+    //             $complete['payment_2'],
+    //             $complete['norek_2'],
+    //             $complete['bank_2'],
+    //         ]) : '-';
+    //     };
 
-        $rekBengkel = function ($item) {
-            $pengajuan = $item->pengajuan;
-            return $pengajuan ? implode(' - ', [
-                $pengajuan->payment_1,
-                $pengajuan->norek_1,
-                $pengajuan->bank_1,
-            ]) : '-';
-        };
+    //     $rekBengkel = function ($item) {
+    //         $complete = $item['pengajuan']['complete'];
+    //         return $complete ? implode(' - ', [
+    //             $complete['nama_rek_bengkel'],
+    //             $complete['rek_bengkel'],
+    //             $complete['bank_bengkel'],
+    //         ]) : '-';
+    //     };
 
-        $nominalFinance = function ($item) {
-            return $item->pengajuan->complete->nominal_tf_finance ?? 0;
-        };
+    //     $nominalFinance = function ($item) {
+    //         return $item['pengajuan']['complete']['nominal_tf_finance'] ?? 0;
+    //     };
 
-        $nominalBengkel = function ($item) {
-            return $item->pengajuan->complete->nominal_tf_bengkel ?? 0;
-        };
+    //     $nominalBengkel = function ($item) {
+    //         return $item['pengajuan']['complete']['nominal_tf_bengkel'] ?? 0;
+    //     };
 
-        $selisihTf = function ($item) {
-            return $item->pengajuan->complete->selisih_tf ?? 0;
-        };
+    //     $selisihTf = function ($item) {
+    //         return $item['pengajuan']['complete']['selisih_tf'] ?? 0;
+    //     };
 
-        // Render view ke HTML
-        $html = view('filament.laporan-keuangan.pdf', compact(
-            'data',
-            'totalFinance',
-            'totalBengkel',
-            'totalSelisih',
-            'getNopols',
-            'rekPenerima',
-            'rekBengkel',
-            'nominalFinance',
-            'nominalBengkel',
-            'selisihTf'
-        ))
-            ->with([
-                'tanggal' => date('d/m/Y'),
-                'dari_tanggal' => $dari_tanggal,
-                'sampai_tanggal' => $sampai_tanggal
-            ])
-            ->render();
+    //     // Render view ke HTML
+    //     // $html = view('filament.laporan-keuangan.pdf', compact(
+    //     //     'data',
+    //     //     'totalFinance',
+    //     //     'totalBengkel',
+    //     //     'totalSelisih',
+    //     //     'getNopols',
+    //     //     'rekPenerima',
+    //     //     'rekBengkel',
+    //     //     'nominalFinance',
+    //     //     'nominalBengkel',
+    //     //     'selisihTf'
+    //     // ))
+    //     //     ->with([
+    //     //         'tanggal' => date('d/m/Y'),
+    //     //         'dari_tanggal' => $dari_tanggal,
+    //     //         'sampai_tanggal' => $sampai_tanggal
+    //     //     ])
+    //     //     ->render();
 
-        // Generate PDF using Dompdf
-        $dompdf = new \Dompdf\Dompdf();
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
+    //     // // Generate PDF using Dompdf
+    //     // $dompdf = new \Dompdf\Dompdf();
+    //     // $dompdf->loadHtml($html);
+    //     // $dompdf->setPaper('A4', 'landscape');
+    //     // $dompdf->render();
 
-        return $dompdf->output();
-    }
+    //     // return $dompdf->stream("laporan_keuangan_service_" . date('Y-m-d') . ".pdf");
+
+    //     $pdf = PDF::loadView('filament.laporan-keuangan.pdf', [
+    //         'data'          => json_decode(json_encode($data), true), // paksa re-encode UTF-8
+    //         'totalFinance'  => $totalFinance,
+    //         'totalBengkel'  => $totalBengkel,
+    //         'totalSelisih'  => $totalSelisih,
+    //         'getNopols'     => $getNopols,
+    //         'rekPenerima'   => $rekPenerima,
+    //         'rekBengkel'    => $rekBengkel,
+    //         'nominalFinance' => $nominalFinance,
+    //         'nominalBengkel' => $nominalBengkel,
+    //         'selisihTf'     => $selisihTf,
+    //         'tanggal'       => date('d/m/Y'),
+    //         'dari_tanggal'  => $dari_tanggal,
+    //         'sampai_tanggal' => $sampai_tanggal,
+    //     ]);
+
+    //     return $pdf->stream("laporan_keuangan_service_" . date('Y-m-d') . ".pdf");
+    // }
 }

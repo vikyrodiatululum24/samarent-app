@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <title>Laporan Keuangan Service</title>
     <style>
         body {
@@ -23,7 +23,7 @@
         }
 
         th {
-            background-color: #f0f0f0;
+            background-color: #b7ffb7;
         }
 
         .text-right {
@@ -42,41 +42,63 @@
 
 <body>
     <h2 class="text-center">Laporan Keuangan Service</h2>
-    <h4 class="text-center">Periode: {{ $dari_tanggal }} s/d {{ $sampai_tanggal }}</h4>
-
+    <h4 class="text-center">Periode: {{ $dari_tanggal ?? '-' }} s/d {{ $sampai_tanggal ?? '-' }}</h4>
+    <p class="text-center">Tanggal Cetak: {{ $tanggal }}</p>
+    <hr>
     <table>
-        <tr>
-            <th>Tanggal</th>
-            <th>No Pengajuan</th>
-            <th>Rek. Penerima</th>
-            <th>Rek. Bengkel</th>
-            <th>No Polisi</th>
-            <th>Keterangan</th>
-            <th>Nominal TF Finance</th>
-            <th>Nominal TF Bengkel</th>
-            <th>Selisih</th>
-        </tr>
-
-        @foreach ($data as $item)
+        <thead>
             <tr>
-                <td>{{ $item->created_at->format('d/m/Y') }}</td>
-                <td>{{ $item->pengajuan->no_pengajuan }}</td>
-                <td>{{ $rekPenerima($item) }}</td>
-                <td>{{ $rekBengkel($item) }}</td>
-                <td>{{ $getNopols($item) }}</td>
-                <td>{{ $item->pengajuan->keterangan }}</td>
-                <td class="text-right">{{ number_format($nominalFinance($item), 0, ',', '.') }}</td>
-                <td class="text-right">{{ number_format($nominalBengkel($item), 0, ',', '.') }}</td>
-                <td class="text-right">{{ number_format($selisihTf($item), 0, ',', '.') }}</td>
+                <th>Tanggal</th>
+                <th>No Pengajuan</th>
+                <th>Rek. Penerima</th>
+                <th>Rek. Bengkel</th>
+                <th>No Polisi</th>
+                <th>Keterangan</th>
+                <th>Nominal TF Finance</th>
+                <th>Nominal TF Bengkel</th>
+                <th>Selisih</th>
             </tr>
-        @endforeach
-
-        <tr class="font-bold">
-            <td colspan="6" class="text-left">TOTAL</td>
-            <td class="text-right">{{ number_format($totalFinance, 0, ',', '.') }}</td>
-            <td class="text-right">{{ number_format($totalBengkel, 0, ',', '.') }}</td>
-            <td class="text-right">{{ number_format($totalSelisih, 0, ',', '.') }}</td>
-        </tr>
+        </thead>
+        <tbody>
+            @foreach ($data as $item)
+                <tr>
+                    <td>{{ $item->created_at->format('d/m/Y') }}</td>
+                    <td>{{ $item->pengajuan->no_pengajuan ?? '-' }}</td>
+                    <td>
+                        @php
+                            $c = $item->pengajuan->complete ?? null;
+                        @endphp
+                        {{ $c ? $c->payment_2 . ' - ' . $c->norek_2 . ' - ' . $c->bank_2 : '-' }}
+                    </td>
+                    <td>
+                        {{ $c ? $c->nama_rek_bengkel . ' - ' . $c->rek_bengkel . ' - ' . $c->bank_bengkel : '-' }}
+                    </td>
+                    <td>
+                        @php
+                            $nopols = $item->pengajuan?->service_unit
+                                ?->map(function ($service_unit) {
+                                    return $service_unit->unit?->nopol;
+                                })
+                                ->filter()
+                                ->join(', ');
+                        @endphp
+                        {{ $nopols ?: '-' }}
+                    </td>
+                    <td>{{ $item->pengajuan->keterangan ?? '-' }}</td>
+                    <td>Rp {{ number_format($c->nominal_tf_finance ?? 0, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($c->nominal_tf_bengkel ?? 0, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($c->selisih_tf ?? 0, 0, ',', '.') }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="6" style="text-align: left;">TOTAL</th>
+                <th>Rp {{ number_format($totalFinance, 0, ',', '.') }}</th>
+                <th>Rp {{ number_format($totalBengkel, 0, ',', '.') }}</th>
+                <th>Rp {{ number_format($totalSelisih, 0, ',', '.') }}</th>
+            </tr>
+        </tfoot>
     </table>
 </body>
 

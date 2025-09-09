@@ -12,6 +12,7 @@ class Asuransi extends Model
     protected $fillable = [
         'unit_id',
         'up',
+        'uplainnya',
         'lokasi',
         'keterangan',
         'nama_pic',

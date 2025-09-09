@@ -29,8 +29,8 @@ class ViewAsuransi extends ViewRecord
                     ->icon('heroicon-o-printer')
                     ->url(fn($record) => route('preview.asuransi', $record->id))
                     ->openUrlInNewTab(),
-                Actions\Action::make('print_spk')
-                    ->label('Print SPK')
+                Actions\Action::make('print_asuransi')
+                    ->label('Print Asuransi')
                     ->icon('heroicon-o-printer')
                     ->url(fn($record) => route('print.asuransi', $record->id))
                     ->openUrlInNewTab()
