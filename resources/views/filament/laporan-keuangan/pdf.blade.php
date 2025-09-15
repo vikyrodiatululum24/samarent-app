@@ -48,6 +48,7 @@
     <table>
         <thead>
             <tr>
+                <th>No</th>
                 <th>Tanggal</th>
                 <th>No Pengajuan</th>
                 <th>Rek. Penerima</th>
@@ -62,6 +63,7 @@
         <tbody>
             @foreach ($data as $item)
                 <tr>
+                    <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>{{ $item->pengajuan->no_pengajuan ?? '-' }}</td>
                     <td>
@@ -93,7 +95,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="6" style="text-align: left;">TOTAL</th>
+                <th colspan="7" style="text-align: left;">TOTAL</th>
                 <th>Rp {{ number_format($totalFinance, 0, ',', '.') }}</th>
                 <th>Rp {{ number_format($totalBengkel, 0, ',', '.') }}</th>
                 <th>Rp {{ number_format($totalSelisih, 0, ',', '.') }}</th>
