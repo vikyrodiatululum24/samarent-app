@@ -1,9 +1,12 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\PrintController;
+use App\Http\Controllers\AuthVueController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Vue\VueController;
 
 
 Route::get('/', function () {
@@ -20,8 +23,9 @@ Route::get('/', function () {
             return redirect('/manager');
         } else if ($user->role === 'asuransi') {
             return redirect('/asuransi');
+        }else if ($user->role === 'driver') {
+            return redirect('/absensi');
         }
-        
     }
 
     return redirect('/login');
@@ -41,6 +45,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/asuransi/{id}/preview', [PrintController::class, 'previewAsuransi'])->name('preview.asuransi');
     Route::get('/laporan-keuangan-service/export-pdf', [PrintController::class, 'keuanganPdf'])->name('laporan-keuangan-service.export-pdf');
 });
+
+Route::prefix('vue')->middleware('auth')->group(function () {
+    Route::get('/dashboard', [VueController::class, 'dashboard'])->name('vue.dashboard');
+    Route::get('/settings', [VueController::class, 'settings'])->name('vue.settings');
+    // Tambahkan route lain sesuai kebutuhan
+    Route::get('/user', [VueController::class, 'getUser'])->name('vue.getUser');
+});
+
+Route::prefix('vue')->group(function () {
+    Route::post('/register', [AuthVueController::class, 'register']);
+    Route::post('/login', [AuthVueController::class, 'login']);
+    Route::post('/logout', [AuthVueController::class, 'logout']);
+});
+
 
 
 require __DIR__ . '/auth.php';

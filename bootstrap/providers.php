@@ -2,6 +2,7 @@
 
 return [
     App\Providers\AppServiceProvider::class,
+    App\Providers\Filament\AbsensiPanelProvider::class,
     App\Providers\Filament\AdminPanelProvider::class,
     App\Providers\Filament\AsuransiPanelProvider::class,
     App\Providers\Filament\FinancePanelProvider::class,

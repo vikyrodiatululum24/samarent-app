@@ -29,4 +29,8 @@ class Unit extends Model
     {
         return $this->hasMany(Asuransi::class, 'unit_id', 'id');
     }
+    public function driverAttendences()
+    {
+        return $this->hasMany(DriverAttendence::class, 'unit_id', 'id');
+    }
 }
