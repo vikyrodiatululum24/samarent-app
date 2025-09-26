@@ -21,7 +21,7 @@ class UnitJual extends Model
 
     public function unit()
     {
-        return $this->belongsTo(Unit::class, 'unit_id');
+        return $this->belongsTo(Unit::class, 'unit_id', 'id');
     }
 
     public function penawars()

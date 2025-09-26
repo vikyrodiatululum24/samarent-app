@@ -33,4 +33,8 @@ class Unit extends Model
     {
         return $this->hasMany(DriverAttendence::class, 'unit_id', 'id');
     }
+    public function unitJual()
+    {
+        return $this->hasOne(UnitJual::class, 'unit_id', 'id');
+    }
 }
