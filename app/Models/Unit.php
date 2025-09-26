@@ -18,6 +18,9 @@ class Unit extends Model
         'no_mesin',
         'tgl_pajak',
         'regional',
+        'warna',
+        'tahun',
+        'bpkb',
     ];
 
     public function serviceUnit()
@@ -32,5 +35,9 @@ class Unit extends Model
     public function driverAttendences()
     {
         return $this->hasMany(DriverAttendence::class, 'unit_id', 'id');
+    }
+    public function unitJual()
+    {
+        return $this->hasOne(UnitJual::class, 'unit_id', 'id');
     }
 }

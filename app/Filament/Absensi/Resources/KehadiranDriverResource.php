@@ -23,7 +23,7 @@ class KehadiranDriverResource extends Resource
     {
         return $form
             ->schema([
-                
+                //
             ]);
     }
 
@@ -38,6 +38,7 @@ class KehadiranDriverResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -53,12 +54,25 @@ class KehadiranDriverResource extends Resource
         ];
     }
 
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListKehadiranDrivers::route('/'),
             'create' => Pages\CreateKehadiranDriver::route('/create'),
             'edit' => Pages\EditKehadiranDriver::route('/{record}/edit'),
+            'view' => Pages\ViewKehadiranDriver::route('/{record}'),
         ];
     }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit($record): bool
+    {
+        return false;
+    }
+
 }

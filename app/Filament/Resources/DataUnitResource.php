@@ -40,6 +40,9 @@ class DataUnitResource extends Resource
                 Forms\Components\TextInput::make('no_mesin')->label('No. Mesin'),
                 Forms\Components\TextInput::make('tgl_pajak')->label('Tanggal Pajak'),
                 Forms\Components\TextInput::make('regional')->label('Regional'),
+                Forms\Components\TextInput::make('warna')->label('Warna Kendaraan'),
+                Forms\Components\TextInput::make('tahun')->label('Tahun Kendaraan'),
+                Forms\Components\TextInput::make('bpkb')->label('BPKB'),
             ]);
     }
 

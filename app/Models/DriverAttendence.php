@@ -23,6 +23,7 @@ class DriverAttendence extends Model
         'time_out',
         'location_out',
         'photo_out',
+        'approval',
     ];
 
     public function user()

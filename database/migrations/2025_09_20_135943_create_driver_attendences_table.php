@@ -29,6 +29,7 @@ return new class extends Migration
             $table->time('time_out')->nullable();
             $table->string('location_out')->nullable();
             $table->string('photo_out')->nullable();
+            $table->boolean('approval')->default(false);
             $table->timestamps();
         });
     }

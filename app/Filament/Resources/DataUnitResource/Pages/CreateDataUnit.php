@@ -9,4 +9,5 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateDataUnit extends CreateRecord
 {
     protected static string $resource = DataUnitResource::class;
+    protected static ?string $title = 'Tambah Data Unit';
 }
