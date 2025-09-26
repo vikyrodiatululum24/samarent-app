@@ -5,14 +5,13 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use App\Models\Unit;
 use Filament\Tables;
-use Filament\Infolists;
 use App\Models\UnitJual;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UnitJualResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -161,44 +160,71 @@ class UnitJualResource extends Resource
     {
         return $infolist
             ->components([
-                Infolists\Components\TextEntry::make('unit.name')
-                    ->label('Unit')
-                    ->formatStateUsing(function ($record) {
-                        return $record->unit ? "{$record->unit->type} - {$record->unit->nopol}" : '-';
-                    }),
-                Infolists\Components\TextEntry::make('harga_jual')
-                    ->label('Harga Jual')
-                    ->money('IDR'),
-                Infolists\Components\TextEntry::make('harga_netto')
-                    ->label('Harga Netto')
-                    ->money('IDR'),
-                Infolists\Components\TextEntry::make('keterangan')
-                    ->label('Keterangan')
-                    ->columnSpanFull(),
-                Infolists\Components\ImageEntry::make('foto_depan')
-                    ->label('Foto Depan')
-                    ->disk('public')
-                    ->height(200),
-                Infolists\Components\ImageEntry::make('foto_belakang')
-                    ->label('Foto Belakang')
-                    ->disk('public')
-                    ->height(200),
-                Infolists\Components\ImageEntry::make('foto_kiri')
-                    ->label('Foto Kiri')
-                    ->disk('public')
-                    ->height(200),
-                Infolists\Components\ImageEntry::make('foto_kanan')
-                    ->label('Foto Kanan')
-                    ->disk('public')
-                    ->height(200),
-                Infolists\Components\ImageEntry::make('foto_interior')
-                    ->label('Foto Interior')
-                    ->disk('public')
-                    ->height(200),
-                Infolists\Components\ImageEntry::make('foto_odometer')
-                    ->label('Foto Odometer')
-                    ->disk('public')
-                    ->height(200),
+                Infolists\Components\Section::make('Detail Kendaraan')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('unit.type')
+                            ->label('Unit')
+                            ->formatStateUsing(function ($record) {
+                                return $record->unit ? "{$record->unit->type} - {$record->unit->nopol}" : '-';
+                            }),
+                        Infolists\Components\TextEntry::make('unit.no_rangka')
+                            ->label('No Rangka'),
+                        Infolists\Components\TextEntry::make('unit.no_mesin')
+                            ->label('No Mesin'),
+                        Infolists\Components\TextEntry::make('unit.tgl_pajak')
+                            ->label('Tgl Pajak'),
+                        Infolists\Components\TextEntry::make('unit.regional')
+                            ->label('Regional'),
+                        Infolists\Components\TextEntry::make('unit.merk')
+                            ->label('Merk'),
+                        Infolists\Components\TextEntry::make('warna')
+                            ->label('Warna'),
+                        Infolists\Components\TextEntry::make('tahun')
+                            ->label('Tahun'),
+                        Infolists\Components\TextEntry::make('bpkb')
+                            ->label('BPKB'),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Section::make('Informasi Harga')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('harga_jual')
+                            ->label('Harga Jual')
+                            ->money('IDR'),
+                        Infolists\Components\TextEntry::make('harga_netto')
+                            ->label('Harga Netto')
+                            ->money('IDR'),
+                        Infolists\Components\TextEntry::make('keterangan')
+                            ->label('Keterangan')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Infolists\Components\Grid::make(3)
+                    ->schema([
+                        Infolists\Components\ImageEntry::make('foto_depan')
+                            ->label('Foto Depan')
+                            ->disk('public')
+                            ->height(200),
+                        Infolists\Components\ImageEntry::make('foto_belakang')
+                            ->label('Foto Belakang')
+                            ->disk('public')
+                            ->height(200),
+                        Infolists\Components\ImageEntry::make('foto_kiri')
+                            ->label('Foto Kiri')
+                            ->disk('public')
+                            ->height(200),
+                        Infolists\Components\ImageEntry::make('foto_kanan')
+                            ->label('Foto Kanan')
+                            ->disk('public')
+                            ->height(200),
+                        Infolists\Components\ImageEntry::make('foto_interior')
+                            ->label('Foto Interior')
+                            ->disk('public')
+                            ->height(200),
+                        Infolists\Components\ImageEntry::make('foto_odometer')
+                            ->label('Foto Odometer')
+                            ->disk('public')
+                            ->height(200),
+                    ]),
             ]);
     }
 

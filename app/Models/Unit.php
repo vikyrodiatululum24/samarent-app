@@ -18,6 +18,9 @@ class Unit extends Model
         'no_mesin',
         'tgl_pajak',
         'regional',
+        'warna',
+        'tahun',
+        'bpkb',
     ];
 
     public function serviceUnit()
