@@ -225,6 +225,39 @@ class UnitJualResource extends Resource
                             ->disk('public')
                             ->height(200),
                     ]),
+                    Infolists\Components\Section::make('Data Penawar')
+                        ->schema([
+                            Infolists\Components\RepeatableEntry::make('penawars')
+                                ->label('')
+                                ->schema([
+                                    Infolists\Components\Grid::make([
+                                        'sm' => 2,
+                                        'md' => 3, 
+                                        'lg' => 6
+                                    ])
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('nama')
+                                            ->label('Nama Penawar')
+                                            ->weight('bold'),
+                                        Infolists\Components\TextEntry::make('no_wa')
+                                            ->label('No. WhatsApp'),
+                                        Infolists\Components\TextEntry::make('harga_penawaran')
+                                            ->label('Harga Penawaran')
+                                            ->money('IDR')
+                                            ->color('success')
+                                            ->weight('bold'),
+                                        Infolists\Components\TextEntry::make('down_payment')
+                                            ->label('Down Payment')
+                                            ->money('IDR')
+                                            ->color('warning')
+                                            ->weight('bold'),
+                                        Infolists\Components\TextEntry::make('catatan')
+                                            ->label('Catatan'),
+                                    ])
+                                ]),
+                        ])
+                        ->collapsible()
+                        ->collapsed(false),
             ]);
     }
 
