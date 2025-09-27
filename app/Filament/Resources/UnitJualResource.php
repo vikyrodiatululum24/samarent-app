@@ -33,6 +33,10 @@ class UnitJualResource extends Resource
                     ->relationship('unit', 'name')
                     ->searchable()
                     ->preload()
+                    ->unique(ignoreRecord: true)
+                    ->validationMessages([
+                        'unique' => 'Unit sudah terdaftar di daftar penjualan.',
+                    ])
                     ->placeholder('Select a Unit')
                     ->label('Pilih Unit')
                     ->getOptionLabelFromRecordUsing(function (Unit $unit) {
@@ -225,16 +229,16 @@ class UnitJualResource extends Resource
                             ->disk('public')
                             ->height(200),
                     ]),
-                    Infolists\Components\Section::make('Data Penawar')
-                        ->schema([
-                            Infolists\Components\RepeatableEntry::make('penawars')
-                                ->label('')
-                                ->schema([
-                                    Infolists\Components\Grid::make([
-                                        'sm' => 2,
-                                        'md' => 3,
-                                        'lg' => 6
-                                    ])
+                Infolists\Components\Section::make('Data Penawar')
+                    ->schema([
+                        Infolists\Components\RepeatableEntry::make('penawars')
+                            ->label('')
+                            ->schema([
+                                Infolists\Components\Grid::make([
+                                    'sm' => 2,
+                                    'md' => 3,
+                                    'lg' => 6
+                                ])
                                     ->schema([
                                         Infolists\Components\TextEntry::make('nama')
                                             ->label('Nama Penawar')
@@ -254,10 +258,10 @@ class UnitJualResource extends Resource
                                         Infolists\Components\TextEntry::make('catatan')
                                             ->label('Catatan'),
                                     ])
-                                ]),
-                        ])
-                        ->collapsible()
-                        ->collapsed(false),
+                            ]),
+                    ])
+                    ->collapsible()
+                    ->collapsed(false),
             ]);
     }
 
@@ -268,7 +272,7 @@ class UnitJualResource extends Resource
         ];
     }
 
-        public static function canViewAny(): bool
+    public static function canViewAny(): bool
     {
         return auth()->user()?->email === 'centralakun@samarent.com';
     }
