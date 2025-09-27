@@ -21,8 +21,8 @@ class UnitJualResource extends Resource
 {
     protected static ?string $model = UnitJual::class;
     protected static ?string $navigationGroup = 'Unit';
-    protected static ?string $pluralLabel = 'Unit Jual';
-    protected static ?string $navigationLabel = 'Unit Jual';
+    protected static ?string $pluralLabel = 'Jual Unit';
+    protected static ?string $navigationLabel = 'Jual Unit';
 
     public static function form(Form $form): Form
     {
