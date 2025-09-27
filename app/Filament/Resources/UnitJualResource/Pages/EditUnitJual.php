@@ -50,15 +50,15 @@ class EditUnitJual extends EditRecord
             // Check if the image field exists and has been changed
             if (isset($data[$field]) && $this->record->$field !== $data[$field]) {
             // Delete old image from storage if it exists
-            if ($this->record->$field && \Storage::disk('public/unit_jual'. $field)->exists($this->record->$field)) {
-                \Storage::disk('public/unit_jual'. $field)->delete($this->record->$field);
+            if ($this->record->$field && \Storage::disk('public/unit_jual/'. $field)->exists($this->record->$field)) {
+                \Storage::disk('public/unit_jual/'. $field)->delete($this->record->$field);
             }
             }
 
             // If image field is empty but record had an image, delete the old image
             if (empty($data[$field]) && $this->record->$field) {
-            if (\Storage::disk('public/unit_jual'. $field)->exists($this->record->$field)) {
-                \Storage::disk('public/unit_jual'. $field)->delete($this->record->$field);
+            if (\Storage::disk('public/unit_jual/'. $field)->exists($this->record->$field)) {
+                \Storage::disk('public/unit_jual/'. $field)->delete($this->record->$field);
             }
             }
         }
