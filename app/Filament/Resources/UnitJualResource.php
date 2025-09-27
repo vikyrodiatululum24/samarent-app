@@ -50,7 +50,7 @@ class UnitJualResource extends Resource
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
                     ->numeric(),
-                Forms\Components\TextArea::make('keterangan')
+                Forms\Components\Textarea::make('keterangan')
                     ->maxLength(255)
                     ->nullable(),
                 Forms\Components\FileUpload::make('foto_depan')
@@ -232,7 +232,7 @@ class UnitJualResource extends Resource
                                 ->schema([
                                     Infolists\Components\Grid::make([
                                         'sm' => 2,
-                                        'md' => 3, 
+                                        'md' => 3,
                                         'lg' => 6
                                     ])
                                     ->schema([
@@ -266,6 +266,31 @@ class UnitJualResource extends Resource
         return [
             //
         ];
+    }
+
+        public static function canViewAny(): bool
+    {
+        return auth()->user()?->email === 'centralakun@samarent.com';
+    }
+
+    public static function canView($record): bool
+    {
+        return auth()->user()?->email === 'centralakun@samarent.com';
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->email === 'centralakun@samarent.com';
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->email === 'centralakun@samarent.com';
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->email === 'centralakun@samarent.com';
     }
 
     public static function getPages(): array
