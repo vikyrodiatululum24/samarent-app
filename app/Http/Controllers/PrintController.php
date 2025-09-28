@@ -94,4 +94,15 @@ class PrintController extends Controller
 
         return $pdf->stream('laporan_keuangan_service_' . date('Y-m-d') . '.pdf');
     }
+
+    public function jualunit($id)
+    {
+        $unitJual = \App\Models\UnitJual::with('unit', 'penawars')->findOrFail($id);
+        $namaFile = 'Laporan-Jual-Unit-' . ($unitJual->unit->nopol ?? 'unit');
+        $namaFile = str_replace(['/', '\\'], '-', $namaFile);
+        $pdf = PDF::loadView('prints.jualunit', [
+            'jualunit' => $unitJual,
+        ]);
+        return $pdf->stream("$namaFile.pdf");
+    }
 }

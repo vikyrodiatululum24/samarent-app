@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/asuransi/{id}/print-asuransi', [PrintController::class, 'printAsuransi'])->name('print.asuransi');
     Route::get('/asuransi/{id}/preview', [PrintController::class, 'previewAsuransi'])->name('preview.asuransi');
     Route::get('/laporan-keuangan-service/export-pdf', [PrintController::class, 'keuanganPdf'])->name('laporan-keuangan-service.export-pdf');
+    Route::get('/laporan-jualunit/{id}', [PrintController::class, 'jualunit'])->name('laporan-jualunit');
 });
 
 Route::prefix('vue')->middleware('auth')->group(function () {

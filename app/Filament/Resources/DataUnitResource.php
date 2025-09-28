@@ -40,6 +40,9 @@ class DataUnitResource extends Resource
                 Forms\Components\TextInput::make('no_mesin')->label('No. Mesin'),
                 Forms\Components\TextInput::make('tgl_pajak')->label('Tanggal Pajak'),
                 Forms\Components\TextInput::make('regional')->label('Regional'),
+                Forms\Components\TextInput::make('tahun')->label('Tahun'),
+                Forms\Components\TextInput::make('warna')->label('Warna'),
+                Forms\Components\TextInput::make('bpkb')->label('BPKB'),
             ]);
     }
 
@@ -86,6 +89,18 @@ class DataUnitResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('regional')
                     ->label('Regional')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('tahun')
+                    ->label('Tahun')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('warna')
+                    ->label('Warna')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('bpkb')
+                    ->label('BPKB')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
 

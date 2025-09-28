@@ -30,13 +30,9 @@ class UnitJualResource extends Resource
             ->schema([
                 Forms\Components\Select::make('unit_id')
                     ->required()
-                    ->relationship('unit', 'name')
+                    ->relationship('unit', 'nopol')
                     ->searchable()
                     ->preload()
-                    ->unique(ignoreRecord: true)
-                    ->validationMessages([
-                        'unique' => 'Unit sudah terdaftar di daftar penjualan.',
-                    ])
                     ->placeholder('Select a Unit')
                     ->label('Pilih Unit')
                     ->getOptionLabelFromRecordUsing(function (Unit $unit) {
@@ -124,9 +120,6 @@ class UnitJualResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('unit_id')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('harga_jual')
                     ->numeric()
                     ->sortable(),
