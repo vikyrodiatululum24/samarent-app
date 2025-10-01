@@ -27,7 +27,6 @@ Route::get('/', function () {
             return redirect('/absensi');
         }
     }
-
     return redirect('/login');
 })->name('dashboard');
 
@@ -47,18 +46,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/laporan-jualunit/{id}', [PrintController::class, 'jualunit'])->name('laporan-jualunit');
 });
 
-Route::prefix('vue')->middleware('auth')->group(function () {
-    Route::get('/dashboard', [VueController::class, 'dashboard'])->name('vue.dashboard');
-    Route::get('/settings', [VueController::class, 'settings'])->name('vue.settings');
-    // Tambahkan route lain sesuai kebutuhan
-    Route::get('/user', [VueController::class, 'getUser'])->name('vue.getUser');
-});
+// Route::prefix('vue')->middleware('auth')->group(function () {
+//     Route::get('/dashboard', [VueController::class, 'dashboard'])->name('vue.dashboard');
+//     Route::get('/settings', [VueController::class, 'settings'])->name('vue.settings');
+//     // Tambahkan route lain sesuai kebutuhan
+//     Route::get('/user', [VueController::class, 'getUser'])->name('vue.getUser');
+// });
 
-Route::prefix('vue')->group(function () {
-    Route::post('/register', [AuthVueController::class, 'register']);
-    Route::post('/login', [AuthVueController::class, 'login']);
-    Route::post('/logout', [AuthVueController::class, 'logout']);
-});
+// Route::prefix('vue')->group(function () {
+//     Route::post('/register', [AuthVueController::class, 'register']);
+//     Route::post('/login', [AuthVueController::class, 'login']);
+//     Route::post('/logout', [AuthVueController::class, 'logout']);
+// });
 
 
 

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\Absen;
 
 use App\Models\EndUser;
 use App\Models\Project;
 use App\Models\Unit;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class EndUserController extends Controller

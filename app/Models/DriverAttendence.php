@@ -7,22 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 class DriverAttendence extends Model
 {
     protected $fillable = [
-        'user_id',
-        'project_id',
-        'end_user_id',
-        'unit_id',
-        'date',
-        'time_in',
-        'start_km',
-        'note',
-        'location_in',
-        'photo_in',
-        'location_check',
-        'photo_check',
-        'end_km',
-        'time_out',
-        'location_out',
-        'photo_out',
+        'user_id', // masuk
+        'project_id', // masuk
+        'end_user_id', // masuk
+        'unit_id', // masuk
+        'date', // masuk
+        'time_in', // masuk
+        'start_km', // masuk
+        'note', // masuk
+        'location_in', // masuk
+        'photo_in', // masuk
+
+        'location_check', // check
+        'photo_check', // check
+        'time_check', // check
+
+        'end_km', // keluar
+        'time_out', // keluar
+        'location_out', // keluar
+        'photo_out', // keluar
     ];
 
     public function user()
