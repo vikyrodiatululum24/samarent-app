@@ -50,8 +50,14 @@ class UnitJualResource extends Resource
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
                     ->numeric(),
+                Forms\Components\TextInput::make('odometer')
+                    ->label('Odometer (km)')
+                    ->required()
+                    ->suffix('km')
+                    ->numeric(),
                 Forms\Components\Textarea::make('keterangan')
                     ->maxLength(255)
+                    ->columnSpanFull()
                     ->nullable(),
                 Forms\Components\FileUpload::make('foto_depan')
                     ->label('Foto Depan')

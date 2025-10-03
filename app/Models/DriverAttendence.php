@@ -26,6 +26,7 @@ class DriverAttendence extends Model
         'time_out', // keluar
         'location_out', // keluar
         'photo_out', // keluar
+        'is_complete'
     ];
 
     public function user()
@@ -40,4 +41,10 @@ class DriverAttendence extends Model
     {
         return $this->belongsTo(EndUser::class);
     }
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
+    
 }
+

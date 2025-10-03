@@ -20,8 +20,7 @@ use App\Filament\Absensi\Resources\DriverResource\RelationManagers;
 class DriverResource extends Resource
 {
     protected static ?string $model = Driver::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $pluralModelLabel = 'Driver';
 
     public static function form(Form $form): Form
     {
@@ -40,6 +39,7 @@ class DriverResource extends Resource
                         column: 'email',
                         ignorable: fn($record) => $record?->user
                     )
+                    ->validationMessages(['email' => 'Email sudah terdaftar.'])
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
                     ->password()
@@ -54,13 +54,21 @@ class DriverResource extends Resource
                     ->unique(Driver::class, 'nik', ignoreRecord: true)
                     ->maxLength(16)
                     ->minLength(16)
+                    ->validationMessages([
+                        'regex' => 'Nomor NIK harus terdiri dari 16 digit angka.',
+                        'unique' => 'Nomor NIK sudah terdaftar.',
+                    ])
                     ->rules(['regex:/^[0-9]{16}$/']),
                 Forms\Components\TextInput::make('sim')
                     ->label('SIM')
                     ->required()
                     ->numeric()
                     ->unique(Driver::class, 'sim', ignoreRecord: true)
-                    ->rules(['regex:/^[0-9]{12}$/'])
+                    ->rules(['regex:/^[0-9]{12,14}$/'])
+                    ->validationMessages([
+                        'regex' => 'Nomor SIM harus terdiri dari 12 hingga 14 digit angka.',
+                        'unique' => 'Nomor SIM sudah terdaftar.',
+                    ])
                     ->maxLength(14)
                     ->minLength(12),
                 Forms\Components\TextInput::make('alamat')
@@ -71,6 +79,9 @@ class DriverResource extends Resource
                     ->label('No. WhatsApp')
                     ->numeric()
                     ->rules(['regex:/^08[0-9]{8,11}$/'])
+                    ->validationMessages([
+                        'regex' => 'Nomor WhatsApp harus diawali dengan "08" dan terdiri dari 10 hingga 13 digit angka.',
+                    ])
                     ->maxLength(13)
                     ->minLength(11),
                 Forms\Components\TextInput::make('tempat')
@@ -191,10 +202,36 @@ class DriverResource extends Resource
     {
         return $infolist
             ->schema([
-                Infolists\Components\TextEntry::make('user.name'),
-                Infolists\Components\TextEntry::make('user.email'),
-                Infolists\Components\TextEntry::make('password')
-                    ->columnSpanFull(),
+                Infolists\Components\Section::make('Akun')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('user.name')->label('Nama Driver'),
+                        Infolists\Components\TextEntry::make('user.email')->label('Email'),
+                        Infolists\Components\TextEntry::make('password')->label('Password'),
+                    ])
+                    ->columns(3),
+                Infolists\Components\Section::make('Identitas')
+                    ->columns(2)
+                    ->inlineLabel()
+                    ->schema([
+                        Infolists\Components\TextEntry::make('no_wa')->label('No. WhatsApp')->placeholder('Untitled'),
+                        Infolists\Components\TextEntry::make('nik')->label('NIK'),
+                        Infolists\Components\TextEntry::make('sim')->label('SIM'),
+                        Infolists\Components\TextEntry::make('jenis_kelamin')->label('Jenis Kelamin'),
+                        Infolists\Components\TextEntry::make('tempat')->label('Tempat Lahir'),
+                        Infolists\Components\TextEntry::make('tanggal_lahir')->label('Tanggal Lahir')->date(),
+                        Infolists\Components\TextEntry::make('agama')->label('Agama'),
+                        Infolists\Components\ImageEntry::make('photo')->label('Foto Driver')->hiddenLabel(),
+                    ]),
+                Infolists\Components\Section::make('Alamat')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('alamat')->label('Alamat'),
+                        Infolists\Components\TextEntry::make('rt')->label('RT'),
+                        Infolists\Components\TextEntry::make('rw')->label('RW'),
+                        Infolists\Components\TextEntry::make('kelurahan')->label('Kelurahan/Desa'),
+                        Infolists\Components\TextEntry::make('kecamatan')->label('Kecamatan'),
+                    ])
+                    ->inlineLabel()
+                    ->columns(2),
             ]);
     }
 

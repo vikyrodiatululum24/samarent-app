@@ -17,9 +17,9 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Pages\SubNavigationPosition;
 use Filament\Resources\Pages\Page;
-use Filament\Infolists\Components\ViewEntry;
 use Illuminate\Support\Facades\Storage;
 use Filament\Tables\Filters\SelectFilter;
 

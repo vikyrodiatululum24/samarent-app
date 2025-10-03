@@ -16,8 +16,9 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
 
         $this->call([
-            UserSeeder::class,
-            UnitJualSeeder::class,
+            // UserSeeder::class,
+            // UnitJualSeeder::class,
+            EndUserSeeder::class,
         ]);
     }
 }

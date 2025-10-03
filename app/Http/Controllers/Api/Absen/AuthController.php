@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Absen;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
@@ -62,12 +63,12 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . auth()->id(),
-            'password' => 'sometimes|string|min:8|',
+            // 'password' => 'sometimes|string|min:8|',
         ], [
             'email.unique' => 'Email sudah digunakan oleh pengguna lain.',
-            'password.min' => 'Password harus minimal 8 karakter.',
-            'password.sometimes' => 'Field password diperlukan saat ada.',
-            'password.string' => 'Field password harus terisi.',
+            // 'password.min' => 'Password harus minimal 8 karakter.',
+            // 'password.sometimes' => 'Field password diperlukan saat ada.',
+            // 'password.string' => 'Field password harus terisi.',
             'name.sometimes' => 'Field name diperlukan saat ada.',
         ]);
 
@@ -81,15 +82,24 @@ class AuthController extends Controller
             $user->email = $request->email;
         }
 
-        if ($request->has('password')) {
-            $user->password = bcrypt($request->password);
-        }
+        // if ($request->has('password')) {
+        //     $user->password = bcrypt($request->password);
+        //     $user->driver->password = $request->password;
+        //     $user->driver->save();
+        // }
 
         $user->save();
 
         return response()->json([
             'message' => 'Profile updated successfully',
             'user' => $user,
+        ], 200);
+    }
+
+    public function getAvatar(){
+        $user = auth()->user();
+        return response()->json([
+            'avatar' => $user->driver->photo ?? null,
         ], 200);
     }
 }

@@ -44,22 +44,21 @@ Route::middleware('auth:sanctum')->group(function () {
         return $response->json();
     });
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return $request->user()->load('driver');
     });
-
-
     Route::put('/user', [AuthController::class, 'updateProfile']);
+    Route::get('/avatar', [AuthController::class, 'getAvatar']);
     Route::get('/getendusers/{id}', [EndUserController::class, 'getEndUsers']);
     Route::get('/getunit', [EndUserController::class, 'unit']);
     Route::get('/getproject', [EndUserController::class, 'project']);
     Route::post('/absen/masuk', [AbsenController::class, 'absenMasuk']);
     Route::put('/absen/{id}/check', [AbsenController::class, 'absenCheck']);
-    Route::post('/absen/{id}/keluar', [AbsenController::class, 'absenKeluar']);
+    Route::put('/absen/{id}/keluar', [AbsenController::class, 'absenKeluar']);
     Route::get('/absen/history', [AbsenController::class, 'absenHistory']);
+    Route::get('/absen/month', [AbsenController::class, 'mountHistory']);
+    Route::get('/checkmasuk', [AbsenController::class, 'checkmasuk']);
     Route::get('/absen/history/{id}', [AbsenController::class, 'absenDetail']);
-    Route::get('/absen/today', [AbsenController::class, 'absenToday']);
-
-
+    
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 

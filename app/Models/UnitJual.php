@@ -17,6 +17,7 @@ class UnitJual extends Model
         'foto_kanan',
         'foto_interior',
         'foto_odometer',
+        'odometer',
     ];
 
     public function unit()
