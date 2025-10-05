@@ -23,9 +23,10 @@ class EndUserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('project_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('project_id')
+                    ->relationship('project', 'name')
+                    ->searchable()
+                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
