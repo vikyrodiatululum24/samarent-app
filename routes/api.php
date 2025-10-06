@@ -3,7 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PushwaController;
 use App\Http\Controllers\Api\JualController;
+use App\Http\Controllers\Api\ConfirmController;
 use App\Http\Controllers\Api\Absen\AuthController;
 use App\Http\Controllers\Api\Absen\AbsenController;
 use App\Http\Controllers\Api\Absen\EndUserController;
@@ -11,9 +13,9 @@ use App\Http\Controllers\Api\Absen\EndUserController;
 // absensi
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/confirm/{token}', [ConfirmController::class, 'confirmAbsen']);
 
 // routes/api.php
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reverse-geocode', function (Request $request) {
         $lat = $request->query('lat');
@@ -58,7 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/absen/month', [AbsenController::class, 'mountHistory']);
     Route::get('/checkmasuk', [AbsenController::class, 'checkmasuk']);
     Route::get('/absen/history/{id}', [AbsenController::class, 'absenDetail']);
-    
+
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 

@@ -45,6 +45,9 @@ class DriverAttendence extends Model
     {
         return $this->belongsTo(Unit::class);
     }
-    
+    public function confirmation()
+    {
+        return $this->morphOne(Confirmation::class, 'confirmable');
+    }
 }
 

@@ -4,9 +4,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\PrintController;
+use App\Http\Controllers\PushwaController;
 use App\Http\Controllers\AuthVueController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Vue\VueController;
+use App\Http\Controllers\Api\ConfirmController;
 
 
 Route::get('/', function () {
@@ -45,6 +47,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/laporan-keuangan-service/export-pdf', [PrintController::class, 'keuanganPdf'])->name('laporan-keuangan-service.export-pdf');
     Route::get('/laporan-jualunit/{id}', [PrintController::class, 'jualunit'])->name('laporan-jualunit');
 });
+
+// Route::get('/test-wa', [PushwaController::class, 'sendText']);
+// Route::get('/confirm/{token}', [ConfirmController::class, 'confirmAbsen']);
 
 // Route::prefix('vue')->middleware('auth')->group(function () {
 //     Route::get('/dashboard', [VueController::class, 'dashboard'])->name('vue.dashboard');

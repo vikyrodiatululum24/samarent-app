@@ -100,10 +100,12 @@ class AbsenController extends Controller
             'photo_out' => 'required|string',
         ]);
 
-        $absen = DriverAttendence::where('id', $id)
+        $absen = DriverAttendence::with(['endUser', 'user.driver'])->where('id', $id)
             ->whereNull('time_out')
             ->latest()
             ->first();
+
+        $target = $absen && $absen->endUser ? $absen->endUser->no_wa : null;
 
         if ($request->has('photo_out')) {
             // If photo_out is a base64 string, save it as a file
@@ -129,6 +131,39 @@ class AbsenController extends Controller
             'location_out' => $request->location_out,
             'photo_out' => $request->photo_out,
         ]);
+
+        $absen->confirmation()->create([
+            'token' => bin2hex(random_bytes(16)),
+        ]);
+        $url = 'https://driver.servicesamarent.com/confirm/' . $absen->confirmation->token;
+
+        // Jika nomor WhatsApp target tersedia, kirim notifikasi
+        if ($target) {
+            try {
+                // Kirim pesan WhatsApp menggunakan PushWaService
+                app('App\Services\PushWaService')->sendMessage(
+                    $target,
+                    'text',
+                    "Hallo " . ($absen->endUser ? $absen->endUser->name : 'User') . ",\n\n" .
+                    "Terima kasih telah menggunakan layanan kami.\n" .
+                    "Driver " . ($absen->user && $absen->user->driver ? $absen->user->driver->name : 'N/A') . " telah menyelesaikan tugasnya.\n" .
+                    "Informasi Driver:\n" .
+                    "- Nama Driver: " . ($absen->user && $absen->user->driver ? $absen->user->driver->name : 'N/A') . "\n" .
+                    "- No. HP: " . ($absen->user && $absen->user->driver ? $absen->user->driver->phone : 'N/A') . "\n" .
+                    "- Unit: " . ($absen->unit ? $absen->unit->name : 'N/A') . "\n" .
+                    "- Tanggal: " . $absen->date . "\n" .
+                    "- Mulai Dari: " . $absen->time_in . "\n" .
+                    "- Sampai Dengan: " . $absen->time_out . "\n" .
+                    "\n\n" .
+                    "Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:\n" .
+                    $url . "\n\n" .
+                    "Salam,\n" .
+                    "SamaRent.com"
+                );
+            } catch (\Exception $e) {
+                Log::error("Gagal mengirim notifikasi WhatsApp: " . $e->getMessage());
+            }
+        }
 
         return response()->json(['message' => 'Absen keluar berhasil disubmit', 'data' => $absen], 200);
     }
