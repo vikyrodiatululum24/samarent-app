@@ -28,4 +28,15 @@ class Driver extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function driverAttendences()
+    {
+        return $this->hasManyThrough(
+            DriverAttendence::class,
+            User::class,
+            'id', // foreign key di User
+            'user_id', // foreign key di DriverAttendence
+            'user_id', // local key di Driver
+            'id' // local key di User
+        );
+    }
 }

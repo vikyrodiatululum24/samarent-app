@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cetak;
-use App\Models\Pengajuan;
-use App\Models\Asuransi;
-use App\Models\KeuanganService;
 use PDF;
+use App\Models\Cetak;
+use App\Models\Driver;
+use App\Models\Asuransi;
+use App\Models\Pengajuan;
 use Illuminate\Http\Request;
+use App\Models\KeuanganService;
 
 class PrintController extends Controller
 {
@@ -102,6 +103,47 @@ class PrintController extends Controller
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
         $pdf = PDF::loadView('prints.jualunit', [
             'jualunit' => $unitJual,
+        ]);
+        return $pdf->stream("$namaFile.pdf");
+    }
+
+    public function absensi(Request $request, $driver_id)
+    {
+        // Ambil bulan dari query string (?month=10)
+        $month = $request->get('month', date('m'));
+        // Konversi nomor bulan ke nama bulan dalam bahasa Indonesia
+        $monthName = match($month) {
+            '01' => 'Januari',
+            '02' => 'Februari', 
+            '03' => 'Maret',
+            '04' => 'April',
+            '05' => 'Mei',
+            '06' => 'Juni',
+            '07' => 'Juli',
+            '08' => 'Agustus',
+            '09' => 'September',
+            '10' => 'Oktober',
+            '11' => 'November',
+            '12' => 'Desember',
+            default => ''
+        };
+
+        // Ambil driver
+        $driver = Driver::with(['user', 'driverAttendences' => function ($query) use ($month) {
+            $query->whereMonth('date', $month);
+        }])->findOrFail($driver_id);
+
+        // Ambil daftar absensinya
+        $attendences = $driver->driverAttendences;
+        // Buat nama file yang aman untuk disimpan
+
+        $namaFile = 'Laporan-Absensi-' . ($driver->user->name ?? 'driver');
+        $namaFile = str_replace(['/', '\\'], '-', $namaFile);
+
+        $pdf = PDF::loadView('prints.absensi', [
+            'driver' => $driver,
+            'attendences' => $attendences->load('project', 'endUser', 'unit'),
+            'month' => $monthName,
         ]);
         return $pdf->stream("$namaFile.pdf");
     }

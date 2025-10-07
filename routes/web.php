@@ -25,7 +25,7 @@ Route::get('/', function () {
             return redirect('/manager');
         } else if ($user->role === 'asuransi') {
             return redirect('/asuransi');
-        }else if ($user->role === 'driver') {
+        } else if ($user->role === 'admin_driver') {
             return redirect('/absensi');
         }
     }
@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/asuransi/{id}/preview', [PrintController::class, 'previewAsuransi'])->name('preview.asuransi');
     Route::get('/laporan-keuangan-service/export-pdf', [PrintController::class, 'keuanganPdf'])->name('laporan-keuangan-service.export-pdf');
     Route::get('/laporan-jualunit/{id}', [PrintController::class, 'jualunit'])->name('laporan-jualunit');
+    Route::get('/laporan/absensi/{driver_id}', [PrintController::class, 'absensi'])->name('laporan-absensi');
 });
 
 // Route::get('/test-wa', [PushwaController::class, 'sendText']);

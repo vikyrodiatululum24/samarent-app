@@ -146,11 +146,11 @@ class AbsenController extends Controller
                     'text',
                     "Hallo " . ($absen->endUser ? $absen->endUser->name : 'User') . ",\n\n" .
                     "Terima kasih telah menggunakan layanan kami.\n" .
-                    "Driver " . ($absen->user && $absen->user->driver ? $absen->user->driver->name : 'N/A') . " telah menyelesaikan tugasnya.\n" .
+                    "Driver " . ($absen->user ? $absen->user->name : 'N/A') . " telah menyelesaikan tugasnya.\n" .
                     "Informasi Driver:\n" .
-                    "- Nama Driver: " . ($absen->user && $absen->user->driver ? $absen->user->driver->name : 'N/A') . "\n" .
-                    "- No. HP: " . ($absen->user && $absen->user->driver ? $absen->user->driver->phone : 'N/A') . "\n" .
-                    "- Unit: " . ($absen->unit ? $absen->unit->name : 'N/A') . "\n" .
+                    "- Nama Driver: " . ($absen->user ? $absen->user->name : 'N/A') . "\n" .
+                    "- No. HP: " . ($absen->user && $absen->user->driver ? $absen->user->driver->no_wa : 'N/A') . "\n" .
+                    "- Unit: " . ($absen->unit ? $absen->unit->type : 'N/A') . "\n" .
                     "- Tanggal: " . $absen->date . "\n" .
                     "- Mulai Dari: " . $absen->time_in . "\n" .
                     "- Sampai Dengan: " . $absen->time_out . "\n" .
