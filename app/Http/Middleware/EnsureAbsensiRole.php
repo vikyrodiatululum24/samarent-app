@@ -17,7 +17,7 @@ class EnsureAbsensiRole
     {
         if (auth()->check()) {
             $user = auth()->user();
-            if ($user->role === 'driver' || $user->email === 'centralakun@samarent.com') {
+            if ($user->role === 'admin_driver' || $user->email === 'centralakun@samarent.com') {
                 return $next($request);
             }
         }
