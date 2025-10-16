@@ -17,4 +17,9 @@ class Project extends Model
     {
         return $this->hasMany(Pengajuan::class, 'project_id');
     }
+
+    public function setSalary()
+    {
+        return $this->hasOne(SetSalary::class);
+    }
 }

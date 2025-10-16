@@ -10,6 +10,11 @@ use App\Http\Controllers\Api\Absen\AuthController;
 use App\Http\Controllers\Api\Absen\AbsenController;
 use App\Http\Controllers\Api\Absen\EndUserController;
 
+
+// Hitung Overtime Routes
+use App\Http\Controllers\HitungController;
+Route::post('/hitung/calculate', [HitungController::class, 'calculate'])->name('hitung.calculate');
+
 // absensi
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

@@ -105,6 +105,10 @@ class AbsenController extends Controller
             ->latest()
             ->first();
 
+        $startTime = $absen ? $absen->time_in : null;
+        $endTime = $absen ? $absen->time_out : null;
+        $project = $absen ? $absen->project : null;
+
         $target = $absen && $absen->endUser ? $absen->endUser->no_wa : null;
 
         if ($request->has('photo_out')) {
