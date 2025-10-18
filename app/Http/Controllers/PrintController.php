@@ -8,7 +8,10 @@ use App\Models\Driver;
 use App\Models\Asuransi;
 use App\Models\Pengajuan;
 use Illuminate\Http\Request;
+use App\Exports\AbsensiExport;
 use App\Models\KeuanganService;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DriverAttendenceExport;
 
 class PrintController extends Controller
 {
@@ -71,10 +74,7 @@ class PrintController extends Controller
             $query->whereDate('created_at', '<=', $sampai_tanggal);
         }
 
-        $data = $query->with([
-            'pengajuan',
-            'pengajuan.complete'
-        ])->get();
+        $data = $query->with(['pengajuan', 'pengajuan.complete'])->get();
 
         // Hitung total
         $totalFinance = $data->sum(fn($item) => $item->pengajuan->complete->nominal_tf_finance ?? 0);
@@ -109,34 +109,27 @@ class PrintController extends Controller
 
     public function absensi(Request $request, $driver_id)
     {
-        // Ambil bulan dari query string (?month=10)
-        $month = $request->get('month', date('m'));
-        // Konversi nomor bulan ke nama bulan dalam bahasa Indonesia
-        $monthName = match($month) {
-            '01' => 'Januari',
-            '02' => 'Februari', 
-            '03' => 'Maret',
-            '04' => 'April',
-            '05' => 'Mei',
-            '06' => 'Juni',
-            '07' => 'Juli',
-            '08' => 'Agustus',
-            '09' => 'September',
-            '10' => 'Oktober',
-            '11' => 'November',
-            '12' => 'Desember',
-            default => ''
-        };
-
+        $month = $request->get('month', date('m-Y'));
+        $monthParts = explode('-', $month);
+        $monthNumber = isset($monthParts[0]) ? (int) $monthParts[0] : date('m');
+        $monthName = \Carbon\Carbon::create()->month($monthNumber)->locale('id')->translatedFormat('F');
         // Ambil driver
-        $driver = Driver::with(['user', 'driverAttendences' => function ($query) use ($month) {
-            $query->whereMonth('date', $month);
-        }])->findOrFail($driver_id);
-
+        $driver = Driver::with([
+            'user',
+            'driverAttendences' => function ($query) use ($month) {
+                $query->whereMonth('date', substr($month, 5, 2))->whereYear('date', substr($month, 0, 4));
+            },
+        ])->findOrFail($driver_id);
+        if (!$driver) {
+            abort(404, 'Driver not found');
+        }
         // Ambil daftar absensinya
         $attendences = $driver->driverAttendences;
-        // Buat nama file yang aman untuk disimpan
+        $jumlahData = $attendences->count();
+        $rowPerPage = 25;
+        $maxPages = ceil($jumlahData / $rowPerPage);
 
+        // Buat nama file yang aman untuk disimpan
         $namaFile = 'Laporan-Absensi-' . ($driver->user->name ?? 'driver');
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
 
@@ -144,7 +137,26 @@ class PrintController extends Controller
             'driver' => $driver,
             'attendences' => $attendences->load('project', 'endUser', 'unit'),
             'month' => $monthName,
-        ]);
+            'maxPages' => $maxPages,
+        ])->setPaper('a4', 'portrait');
         return $pdf->stream("$namaFile.pdf");
+    }
+
+    public function exportAbsensiExcel(Request $request, $driver_id)
+    {
+        $month = $request->get('month', date('m-Y'));
+        $driver = Driver::with([
+            'user',
+            'driverAttendences' => function ($query) use ($month) {
+                $query->whereMonth('date', substr($month, 5, 2))->whereYear('date', substr($month, 0, 4));
+            },
+        ])->findOrFail($driver_id);
+
+        $attendences = $driver->driverAttendences->load('project', 'endUser', 'unit');
+        $driverName = $driver->user->name ?? 'driver';
+
+        $filename = 'Laporan-Absensi-' . str_replace(['/', '\\'], '-', $driverName) . '-Bulan-' . $month . '.xlsx';
+        $month = intval($month);
+        return Excel::download(new AbsensiExport($attendences, $driverName, $month), $filename);
     }
 }

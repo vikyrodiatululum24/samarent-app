@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Settings
@@ -11,9 +10,9 @@ return [
     | in dompdf_config.inc.php. You can also override the entire config file.
     |
     */
-    'show_warnings' => false,   // Throw an Exception on warnings from dompdf
+    'show_warnings' => false, // Throw an Exception on warnings from dompdf
 
-    'public_path' => null,  // Override the public path if needed
+    'public_path' => null, // Override the public path if needed
 
     /*
      * Dejavu Sans font is missing glyphs for converted entities, turn it off if you need to show € and £.
@@ -239,7 +238,9 @@ return [
          * Rnable inline JavaScript
          *
          * If this setting is set to true then DOMPDF will automatically insert JavaScript code contained
-         * within <script type="text/javascript"> ... </script> tags as written into the PDF.
+         * within <script type="text/javascript">
+             ...
+         </script> tags as written into the PDF.
          * NOTE: This is PDF-based JavaScript to be executed by the PDF viewer,
          * not browser-based JavaScript executed by Dompdf.
          *
@@ -296,6 +297,8 @@ return [
          * @var bool
          */
         'enable_html5_parser' => true,
+        'isPhpEnabled' => true, // wajib agar <script type="text/php"> dieksekusi
+        'isHtml5ParserEnabled' => true,
+        'isRemoteEnabled' => true,
     ],
-
 ];

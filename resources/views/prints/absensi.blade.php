@@ -17,9 +17,9 @@
         .table th,
         .table td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 2px;
             text-align: left;
-            font-size: 10px;
+            font-size: 11px;
         }
 
         .table th {
@@ -33,9 +33,9 @@
 
         .img-header {
             position: absolute;
-            top: -7mm;
-            left: -7mm;
-            width: 200mm;
+            top: -9mm;
+            left: -9mm;
+            width: 204mm;
             height: 37mm;
             background: #fff;
         }
@@ -43,7 +43,7 @@
         .driver-info {
             margin-bottom: 20px;
             font-size: 11px;
-            padding-top: 25mm;
+            padding-top: 20mm;
         }
 
         /* Tambahkan style untuk watermark */
@@ -242,6 +242,23 @@
             @endforeach
         </table>
     </div>
+
+<script type="text/php">
+if (isset($pdf)) {
+    $pdf->page_script('
+        $font = $fontMetrics->get_font("Helvetica", "normal");
+        $size = 9;
+        $text = "Halaman " . $PAGE_NUM . " dari " . $PAGE_COUNT;
+        $width = $fontMetrics->get_text_width($text, $font, $size);
+        $x = ($pdf->get_width() - $width) / 2;
+        $y = $pdf->get_height() - 20;
+        $pdf->text($x, $y, $text, $font, $size, [0, 0, 0]); // tambahkan argumen warna RGB
+    ');
+}
+</script>
+
+</script>
+
 </body>
 
 </html>

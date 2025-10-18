@@ -3,12 +3,16 @@
 namespace App\Filament\Absensi\Resources\DriverResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Actions;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Carbon;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Resources\RelationManagers\RelationManager;
+use Illuminate\Support\Facades\Route;
 
 class DriverAttendenceRelationManager extends RelationManager
 {
@@ -60,35 +64,79 @@ class DriverAttendenceRelationManager extends RelationManager
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('month')
-                    ->options([
-                        '01' => 'January',
-                        '02' => 'February',
-                        '03' => 'March',
-                        '04' => 'April',
-                        '05' => 'May',
-                        '06' => 'June',
-                        '07' => 'July',
-                        '08' => 'August',
-                        '09' => 'September',
-                        '10' => 'October',
-                        '11' => 'November',
-                        '12' => 'December',
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        // Get the selected value
-                        $selectedMonth = $data['value'] ?? date('m');
+                    ->options(function () {
+                            $months = [];
+                            for ($i = 0; $i < 12; $i++) {
+                                $date = Carbon::now()->subMonths($i);
+                                $months[$date->format('Y-m')] = $date->translatedFormat('F Y');
+                            }
+                            return array_reverse($months, true); // urut dari lama ke baru
+                        })
+                        ->default(date('Y-m'))
+                        ->query(function (Builder $query, array $data): Builder {
+                            // Get the selected value
+                            $selectedMonth = $data['value'] ?? date('Y-m');
 
-                        return $selectedMonth ? $query->whereMonth('date', $selectedMonth) : $query;
-                    })
+                            return $selectedMonth ? $query->whereMonth('date', substr($selectedMonth, 5, 2))
+                                ->whereYear('date', substr($selectedMonth, 0, 4)) : $query;
+                        })
             ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
-                Tables\Actions\Action::make('printPdf')
-                    ->label('Print Laporan')
-                    ->icon('heroicon-o-printer')
-                    ->url(fn($record) => route('laporan-absensi', ['driver_id' => $this->ownerRecord->id, 'month' => request()->get('tableFilters')['month'] ?? date('m')]))
-                    ->openUrlInNewTab(),
-            ])
+->headerActions([
+    Tables\Actions\CreateAction::make(),
+    Tables\Actions\ActionGroup::make([
+        Tables\Actions\Action::make('printPdf')
+            ->label('Print PDF')
+            ->icon('heroicon-o-printer')
+            ->action(function ($livewire) {
+                $filters = $livewire->tableFilters;
+                $month = $filters['month']['value'] ?? null;
+
+                if (!$month) {
+                    Notification::make()
+                        ->title('Filter belum dipilih')
+                        ->body('Silakan pilih bulan terlebih dahulu sebelum mencetak PDF.')
+                        ->danger()
+                        ->send();
+                    return;
+                }
+
+                $driverId = $this->ownerRecord->id;
+                $url = route('laporan-absensi', [
+                    'driver_id' => $driverId,
+                    'month' => $month,
+                ]);
+
+                $this->js("window.open('{$url}', '_blank')");
+            }),
+
+        Tables\Actions\Action::make('exportExcel')
+            ->label('Export to Excel')
+            ->icon('heroicon-o-document-plus')
+            ->action(function ($livewire) {
+                $filters = $livewire->tableFilters;
+                $month = $filters['month']['value'] ?? null;
+
+                if (!$month) {
+                    Notification::make()
+                        ->title('Filter belum dipilih')
+                        ->body('Silakan pilih bulan terlebih dahulu sebelum mengekspor ke Excel.')
+                        ->danger()
+                        ->send();
+                    return;
+                }
+
+                $driverId = $this->ownerRecord->id;
+                $url = route('export-absensi-excel', [
+                    'driver_id' => $driverId,
+                    'month' => $month,
+                ]);
+
+                $this->js("window.open('{$url}', '_blank')");
+            }),
+    ])
+    ->label('Export')
+    ->icon('heroicon-o-arrow-down-tray'),
+])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

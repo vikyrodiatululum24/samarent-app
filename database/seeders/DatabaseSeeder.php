@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             // UserSeeder::class,
             // UnitJualSeeder::class,
             EndUserSeeder::class,
+            DriverAttendenceSeeder::class,
         ]);
     }
 }
