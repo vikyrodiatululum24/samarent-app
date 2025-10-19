@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('set_salaries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained()->onDelete('cascade');
+            $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->decimal('amount', 10, 2)->default(0);
+            $table->integer('overtime1')->default(0);
+            $table->integer('overtime2')->default(0);
+            $table->integer('overtime3')->default(0);
+            $table->integer('overtime4')->default(0);
             $table->decimal('transport', 10, 2)->default(0);
             $table->timestamps();
         });

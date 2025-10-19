@@ -107,7 +107,7 @@ class PrintController extends Controller
         return $pdf->stream("$namaFile.pdf");
     }
 
-    public function absensi(Request $request, $driver_id)
+    public function previewAbsensi(Request $request, $driver_id)
     {
         $month = $request->get('month', date('m-Y'));
         $monthParts = explode('-', $month);
@@ -140,6 +140,18 @@ class PrintController extends Controller
             'maxPages' => $maxPages,
         ])->setPaper('a4', 'portrait');
         return $pdf->stream("$namaFile.pdf");
+    }
+
+    public function absensi(Request $request, $driver_id)
+    {
+        $month = $request->get('month', date('m-Y'));
+        Cetak::updateOrCreate(
+            [
+                'driver_id' => $driver_id,
+                'periode' => $month,
+            ]
+        );
+        return $this->previewAbsensi($request, $driver_id);
     }
 
     public function exportAbsensiExcel(Request $request, $driver_id)

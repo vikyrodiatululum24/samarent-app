@@ -81,62 +81,91 @@ class DriverAttendenceRelationManager extends RelationManager
                                 ->whereYear('date', substr($selectedMonth, 0, 4)) : $query;
                         })
             ])
-->headerActions([
-    Tables\Actions\CreateAction::make(),
-    Tables\Actions\ActionGroup::make([
-        Tables\Actions\Action::make('printPdf')
-            ->label('Print PDF')
-            ->icon('heroicon-o-printer')
-            ->action(function ($livewire) {
-                $filters = $livewire->tableFilters;
-                $month = $filters['month']['value'] ?? null;
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('priviewPdf')
+                        ->label('Preview PDF')
+                        ->icon('heroicon-o-eye')
+                        ->action(function ($livewire) {
+                            $filters = $livewire->tableFilters;
+                            $month = $filters['month']['value'] ?? null;
 
-                if (!$month) {
-                    Notification::make()
-                        ->title('Filter belum dipilih')
-                        ->body('Silakan pilih bulan terlebih dahulu sebelum mencetak PDF.')
-                        ->danger()
-                        ->send();
-                    return;
-                }
+                            if (!$month) {
+                                Notification::make()
+                                    ->title('Filter belum dipilih')
+                                    ->body('Silakan pilih bulan terlebih dahulu sebelum melihat pratinjau PDF.')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
 
-                $driverId = $this->ownerRecord->id;
-                $url = route('laporan-absensi', [
-                    'driver_id' => $driverId,
-                    'month' => $month,
-                ]);
+                            $driverId = $this->ownerRecord->id;
+                            $url = route('preview-laporan-absensi', [
+                                'driver_id' => $driverId,
+                                'month' => $month,
+                            ]);
 
-                $this->js("window.open('{$url}', '_blank')");
-            }),
+                            $this->js("window.open('{$url}', '_blank')");
+                        }),
+                    Tables\Actions\Action::make('printPdf')
+                        ->label('Print PDF')
+                        ->icon('heroicon-o-printer')
+                        ->badge(function($livewire) {
+                            $filters = $livewire->tableFilters;
+                            $cetak = \App\Models\Cetak::where('driver_id', $this->ownerRecord->id)->where('periode', $filters['month']['value'] ?? null)->first();
+                            return $cetak ? 'sudah di print' : null;
+                        })
+                        ->action(function ($livewire) {
+                            $filters = $livewire->tableFilters;
+                            $month = $filters['month']['value'] ?? null;
 
-        Tables\Actions\Action::make('exportExcel')
-            ->label('Export to Excel')
-            ->icon('heroicon-o-document-plus')
-            ->action(function ($livewire) {
-                $filters = $livewire->tableFilters;
-                $month = $filters['month']['value'] ?? null;
+                            if (!$month) {
+                                Notification::make()
+                                    ->title('Filter belum dipilih')
+                                    ->body('Silakan pilih bulan terlebih dahulu sebelum mencetak PDF.')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
 
-                if (!$month) {
-                    Notification::make()
-                        ->title('Filter belum dipilih')
-                        ->body('Silakan pilih bulan terlebih dahulu sebelum mengekspor ke Excel.')
-                        ->danger()
-                        ->send();
-                    return;
-                }
+                            $driverId = $this->ownerRecord->id;
+                            $url = route('laporan-absensi', [
+                                'driver_id' => $driverId,
+                                'month' => $month,
+                            ]);
 
-                $driverId = $this->ownerRecord->id;
-                $url = route('export-absensi-excel', [
-                    'driver_id' => $driverId,
-                    'month' => $month,
-                ]);
+                            $this->js("window.open('{$url}', '_blank')");
+                        }),
 
-                $this->js("window.open('{$url}', '_blank')");
-            }),
-    ])
-    ->label('Export')
-    ->icon('heroicon-o-arrow-down-tray'),
-])
+                    Tables\Actions\Action::make('exportExcel')
+                        ->label('Export to Excel')
+                        ->icon('heroicon-o-document-plus')
+                        ->action(function ($livewire) {
+                            $filters = $livewire->tableFilters;
+                            $month = $filters['month']['value'] ?? null;
+
+                            if (!$month) {
+                                Notification::make()
+                                    ->title('Filter belum dipilih')
+                                    ->body('Silakan pilih bulan terlebih dahulu sebelum mengekspor ke Excel.')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+
+                            $driverId = $this->ownerRecord->id;
+                            $url = route('export-absensi-excel', [
+                                'driver_id' => $driverId,
+                                'month' => $month,
+                            ]);
+
+                            $this->js("window.open('{$url}', '_blank')");
+                        }),
+                ])
+                ->label('Export')
+                ->icon('heroicon-o-arrow-down-tray'),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/laporan-keuangan-service/export-pdf', [PrintController::class, 'keuanganPdf'])->name('laporan-keuangan-service.export-pdf');
     Route::get('/laporan-jualunit/{id}', [PrintController::class, 'jualunit'])->name('laporan-jualunit');
     Route::get('/laporan/absensi/{driver_id}', [PrintController::class, 'absensi'])->name('laporan-absensi');
+    Route::get('/preview/absensi/{driver_id}', [PrintController::class, 'previewAbsensi'])->name('preview-laporan-absensi');
     Route::get('/export/absensi/{driver_id}/excel', [PrintController::class, 'exportAbsensiExcel'])->name('export-absensi-excel');
 });
 
