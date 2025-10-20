@@ -36,7 +36,29 @@ class SetSalaryResource extends Resource
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->label('Amount/Hour')
+                    ->helperText('Masukan nilai sesuai dengan nominal gaji per jam'),
+                Forms\Components\TextInput::make('overtime1')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->label('Overtime 1'),
+                Forms\Components\TextInput::make('overtime2')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->label('Overtime 2'),
+                Forms\Components\TextInput::make('overtime3')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->label('Overtime 3'),
+                Forms\Components\TextInput::make('overtime4')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->label('Overtime 4'),
                 Forms\Components\TextInput::make('transport')
                     ->required()
                     ->prefix('Rp ')
@@ -55,10 +77,24 @@ class SetSalaryResource extends Resource
                     ->label('Project')
                     ->getStateUsing(fn (SetSalary $record) => $record->project ? $record->project->name : '-')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('amount')
                     ->numeric()
                     ->label('Amount/Hour')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('overtime1')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('overtime2')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('overtime3')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('overtime4')
+                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('transport')
                     ->numeric()

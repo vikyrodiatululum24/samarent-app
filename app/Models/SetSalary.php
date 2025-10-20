@@ -9,6 +9,10 @@ class SetSalary extends Model
     protected $fillable = [
         'project_id',
         'amount',
+        'overtime1',
+        'overtime2',
+        'overtime3',
+        'overtime4',
         'transport',
     ];
 
@@ -16,4 +20,5 @@ class SetSalary extends Model
     {
         return $this->belongsTo(Project::class);
     }
+
 }

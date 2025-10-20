@@ -49,5 +49,10 @@ class DriverAttendence extends Model
     {
         return $this->morphOne(Confirmation::class, 'confirmable');
     }
+    public function overtimePay()
+    {
+        return $this->hasMany(OvertimePay::class, 'driver_attendence_id');
+    }
+
 }
 

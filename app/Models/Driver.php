@@ -39,4 +39,8 @@ class Driver extends Model
             'id' // local key di User
         );
     }
+    public function overtimePays()
+    {
+        return $this->hasMany(OvertimePay::class, 'driver_id');
+    }
 }
