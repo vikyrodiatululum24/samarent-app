@@ -27,10 +27,8 @@ class HitungController extends Controller
             return response()->json(['message' => 'Absen not found'], 404);
         }
 
-        $endTime = now()->format('H:i:s');
-
         try {
-            $calculation = PayrollHelpers::calculateOvertimePay($endTime, $absen);
+            $calculation = PayrollHelpers::calculateOvertimePay($absen);
             if (!$calculation) {
             return response()->json([
                 'message' => 'Perhitungan gagal',
@@ -45,9 +43,6 @@ class HitungController extends Controller
             ], 500);
         }
 
-        $absen->update([
-            'time_out' => $endTime,
-        ]);
 
         return response()->json([
             'message' => 'Perhitungan berhasil',

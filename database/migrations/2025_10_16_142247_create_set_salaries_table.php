@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->decimal('amount', 10, 2)->default(0);
-            $table->integer('overtime1')->default(0);
-            $table->integer('overtime2')->default(0);
-            $table->integer('overtime3')->default(0);
-            $table->integer('overtime4')->default(0);
+            $table->decimal('overtime1')->default(0);
+            $table->decimal('overtime2')->default(0);
+            $table->decimal('overtime3')->default(0);
+            $table->decimal('overtime4')->default(0);
             $table->decimal('transport', 10, 2)->default(0);
             $table->timestamps();
         });

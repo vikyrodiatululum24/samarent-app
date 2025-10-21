@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Absen;
 
 use Illuminate\Http\Request;
+use App\Helpers\PayrollHelpers;
 use App\Models\DriverAttendence;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -73,10 +74,7 @@ class AbsenController extends Controller
             }
         }
 
-        $absen = DriverAttendence::where('id', $id)
-            ->whereNull('time_check')
-            ->latest()
-            ->first();
+        $absen = DriverAttendence::where('id', $id)->whereNull('time_check')->latest()->first();
 
         if (!$absen) {
             // Jika data absen tidak ditemukan, kembalikan respon dengan pesan error
@@ -100,7 +98,8 @@ class AbsenController extends Controller
             'photo_out' => 'required|string',
         ]);
 
-        $absen = DriverAttendence::with(['endUser', 'user.driver'])->where('id', $id)
+        $absen = DriverAttendence::with(['endUser', 'user.driver'])
+            ->where('id', $id)
             ->whereNull('time_out')
             ->latest()
             ->first();
@@ -130,7 +129,30 @@ class AbsenController extends Controller
             'time_out' => now()->format('H:i:s'),
             'location_out' => $request->location_out,
             'photo_out' => $request->photo_out,
+            'note' => $request->note ?? null,
         ]);
+
+        try {
+            $calculation = PayrollHelpers::calculateOvertimePay($absen);
+            if (!$calculation) {
+                return response()->json(
+                    [
+                        'message' => 'Perhitungan gagal',
+                        'detail' => 'Hasil perhitungan tidak tersedia',
+                    ],
+                    422,
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::error('Perhitungan overtime gagal: ' . $e->getMessage(), ['absen_id' => $absen->id]);
+            return response()->json(
+                [
+                    'message' => 'Perhitungan gagal',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
+        }
 
         $startTime = $absen ? $absen->time_in : null;
         $endTime = $absen ? $absen->time_out : null;
@@ -145,27 +167,9 @@ class AbsenController extends Controller
         if ($target) {
             try {
                 // Kirim pesan WhatsApp menggunakan PushWaService
-                app('App\Services\PushWaService')->sendMessage(
-                    $target,
-                    'text',
-                    "Hallo " . ($absen->endUser ? $absen->endUser->name : 'User') . ",\n\n" .
-                    "Terima kasih telah menggunakan layanan kami.\n" .
-                    "Driver " . ($absen->user ? $absen->user->name : 'N/A') . " telah menyelesaikan tugasnya.\n" .
-                    "Informasi Driver:\n" .
-                    "- Nama Driver: " . ($absen->user ? $absen->user->name : 'N/A') . "\n" .
-                    "- No. HP: " . ($absen->user && $absen->user->driver ? $absen->user->driver->no_wa : 'N/A') . "\n" .
-                    "- Unit: " . ($absen->unit ? $absen->unit->type : 'N/A') . "\n" .
-                    "- Tanggal: " . $absen->date . "\n" .
-                    "- Mulai Dari: " . $absen->time_in . "\n" .
-                    "- Sampai Dengan: " . $absen->time_out . "\n" .
-                    "\n\n" .
-                    "Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:\n" .
-                    $url . "\n\n" .
-                    "Salam,\n" .
-                    "SamaRent.com"
-                );
+                app('App\Services\PushWaService')->sendMessage($target, 'text', 'Hallo ' . ($absen->endUser ? $absen->endUser->name : 'User') . ",\n\n" . "Terima kasih telah menggunakan layanan kami.\n" . 'Driver ' . ($absen->user ? $absen->user->name : 'N/A') . " telah menyelesaikan tugasnya.\n" . "Informasi Driver:\n" . '- Nama Driver: ' . ($absen->user ? $absen->user->name : 'N/A') . "\n" . '- No. HP: ' . ($absen->user && $absen->user->driver ? $absen->user->driver->no_wa : 'N/A') . "\n" . '- Unit: ' . ($absen->unit ? $absen->unit->type : 'N/A') . "\n" . '- Tanggal: ' . $absen->date . "\n" . '- Mulai Dari: ' . $absen->time_in . "\n" . '- Sampai Dengan: ' . $absen->time_out . "\n" . "\n\n" . "Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:\n" . $url . "\n\n" . "Salam,\n" . 'SamaRent.com');
             } catch (\Exception $e) {
-                Log::error("Gagal mengirim notifikasi WhatsApp: " . $e->getMessage());
+                Log::error('Gagal mengirim notifikasi WhatsApp: ' . $e->getMessage());
             }
         }
 
@@ -175,10 +179,7 @@ class AbsenController extends Controller
     public function absenHistory(Request $request)
     {
         $userId = $request->user()->id;
-        $history = DriverAttendence::where('user_id', $userId)
-            ->orderBy('date', 'desc')
-            ->limit(10)
-            ->get();
+        $history = DriverAttendence::where('user_id', $userId)->orderBy('date', 'desc')->limit(10)->get();
 
         return response()->json(['data' => $history], 200);
     }
@@ -189,11 +190,7 @@ class AbsenController extends Controller
         $month = $request->input('month', now()->format('m'));
         $year = $request->input('year', now()->format('Y'));
 
-        $history = DriverAttendence::where('user_id', $userId)
-            ->whereMonth('date', $month)
-            ->whereYear('date', $year)
-            ->orderBy('date', 'desc')
-            ->get();
+        $history = DriverAttendence::where('user_id', $userId)->whereMonth('date', $month)->whereYear('date', $year)->orderBy('date', 'desc')->get();
 
         return response()->json(['data' => $history], 200);
     }
@@ -225,38 +222,4 @@ class AbsenController extends Controller
 
         return response()->json(['data' => $absen], 200);
     }
-
-    // public function checkabsen(Request $request)
-    // {
-    //     $userId = $request->user()->id;
-    //     $today = now()->format('Y-m-d');
-    //     $absen = DriverAttendence::where('user_id', $userId)
-    //         ->where('date', $today)
-    //         ->whereNull('time_check')
-    //         ->first();
-
-    //     Log::info($absen);
-
-    //     if (!$absen) {
-    //         return response()->json(['message' => 'Data absen check tidak ditemukan untuk pengguna ini'], 404);
-    //     }
-
-    //     return response()->json(['data' => $absen], 200);
-    // }
-
-    // public function checkpulang(Request $request)
-    // {
-    //     $userId = $request->user()->id;
-    //     $today = now()->format('Y-m-d');
-    //     $absen = DriverAttendence::where('user_id', $userId)
-    //         ->where('date', $today)
-    //         ->whereNull('time_check')
-    //         ->first();
-
-    //     if (!$absen) {
-    //         return response()->json(['message' => 'Data absen pulang tidak ditemukan untuk pengguna ini'], 404);
-    //     }
-
-    //     return response()->json(['data' => $absen], 200);
-    // }
 }

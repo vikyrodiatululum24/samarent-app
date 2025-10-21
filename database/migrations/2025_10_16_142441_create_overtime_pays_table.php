@@ -26,7 +26,7 @@ return new class extends Migration
             $table->time('ot_2x')->nullable();
             $table->time('ot_3x')->nullable();
             $table->time('ot_4x')->nullable();
-            // $table->decimal('calculated_ot_hours', 5, 2)->default(0);
+            $table->decimal('calculated_ot_hours', 5, 2)->default(0);
             $table->decimal('amount_per_hour', 10, 2)->default(0);
             $table->decimal('ot_amount', 10, 2)->default(0);
             $table->string('out_of_town', 50)->nullable();

@@ -26,6 +26,8 @@ class PayrollHelpers
                 'year' => $tanggal->year,
             ]);
 
+            https://api-harilibur.vercel.app/api/?year=2024
+
             if ($response->successful()) {
                 $holidays = collect($response->json());
                 $isHoliday = $holidays->firstWhere('holiday_date', $tanggal->toDateString());
@@ -46,15 +48,16 @@ class PayrollHelpers
      */
     // shift, project_id, driver_id,
 
-    public static function calculateOvertimePay($endTime, $absen)
+    public static function calculateOvertimePay($absen)
     {
         $startTime = Carbon::createFromFormat('H:i:s', $absen->time_in);
-        $endTime = Carbon::createFromFormat('H:i:s', $endTime);
+        $endTime = Carbon::createFromFormat('H:i:s', $absen->time_out);
         $driver_id = $absen->user->driver->id ?? null;
         if (! $driver_id) {
             throw new \Exception("Driver ID tidak ditemukan untuk absen ID {$absen->id}");
         }
-        $shift = self::cekHari($absen->date);
+        $tanggal = $absen->date;
+        $shift = self::cekHari($tanggal);
         $project_id = $absen->project_id;
         $hoursWorked = $startTime->diffInMinutes($endTime) / 60;
 
@@ -68,10 +71,10 @@ class PayrollHelpers
 
         $amount_per_hour = $setSalary ? $setSalary->amount : 0;
         $overtimeRates = [
-            'overtime_1' => $setSalary ? $setSalary->overtime1 / 100 : 0,
-            'overtime_2' => $setSalary ? $setSalary->overtime2 / 100 : 0,
-            'overtime_3' => $setSalary ? $setSalary->overtime3 / 100 : 0,
-            'overtime_4' => $setSalary ? $setSalary->overtime4 / 100 : 0,
+            'overtime_1' => $setSalary ? $setSalary->overtime1 : 0,
+            'overtime_2' => $setSalary ? $setSalary->overtime2 : 0,
+            'overtime_3' => $setSalary ? $setSalary->overtime3 : 0,
+            'overtime_4' => $setSalary ? $setSalary->overtime4 : 0,
         ];
 
         // transport allowance: jika start_time kurang dari 05:00 berikan transport
@@ -90,12 +93,16 @@ class PayrollHelpers
 
         if ($shift === 'Weekday' && $hoursWorked > 9) {
             $overtimeHours = $hoursWorked - 9;
-            if ($overtimeHours > 1) {
+            if ($overtimeHours >= 1) {
                 // more than 1 hour overtime: first 1 hour at overtime_1, remaining at overtime_2
-                $firstHourPay = 1 * $amount_per_hour * $overtimeRates['overtime_1'];
+                $firstHour = 1 * $overtimeRates['overtime_1'];
+                $firstHour = round($firstHour, 2);
                 $remainingHours = $overtimeHours - 1;
-                $remainingPay = $remainingHours * $amount_per_hour * $overtimeRates['overtime_2'];
-                $overtimePay = $firstHourPay + $remainingPay;
+                $remainingHours = round($remainingHours, 2);
+                $totalRemainingHours = $remainingHours * $overtimeRates['overtime_2'];
+                $totalRemainingHours = round($totalRemainingHours, 2);
+                $totalOvertime = $firstHour + $totalRemainingHours;
+                $overtimePay = $totalOvertime * $amount_per_hour;
             }
         }
 
@@ -103,43 +110,58 @@ class PayrollHelpers
             $overtimeHours = $hoursWorked;
             // All hours worked on Holiday are considered overtime
             if ($hoursWorked <= 8) {
-                $overtimePay = $hoursWorked * $amount_per_hour * $overtimeRates['overtime_2'];
+                $totalOvertime = $hoursWorked * $overtimeRates['overtime_2'];
+                $totalOvertime = round($totalOvertime, 2);
+                $overtimePay = $totalOvertime * $amount_per_hour;
             }
 
-            if ($hoursWorked > 8) {
-                $overtimeHours = 8 * $amount_per_hour * $overtimeRates['overtime_2'];
-                $overtimetwoHours = $hoursWorked - 8;
-                $ninthHourPay = $overtimetwoHours * $amount_per_hour * $overtimeRates['overtime_3'];
-                $overtimePay = $overtimeHours + $ninthHourPay;
+            if ($hoursWorked > 8 && $hoursWorked <= 9) {
+                $firstEightHours = 8 * $overtimeRates['overtime_2'];
+                $firstEightHours = round($firstEightHours, 2);
+                $ninthHour = ($hoursWorked - 8) * $overtimeRates['overtime_3'];
+                $ninthHour = round($ninthHour, 2);
+                $totalOvertime = $firstEightHours + $ninthHour;
+                $totalOvertime = round($totalOvertime, 2);
+                $overtimePay = $totalOvertime * $amount_per_hour;
             }
 
             if ($hoursWorked > 9) {
-                $firstEightHoursPay = 8 * $amount_per_hour * $overtimeRates['overtime_2'];
-                $ninthHourPay = 1 * $amount_per_hour * $overtimeRates['overtime_3'];
+                $firstEightHours = 8 * $overtimeRates['overtime_2'];
+                $firstEightHours = round($firstEightHours, 2);
+                $ninthHour = 1 * $overtimeRates['overtime_3'];
+                $ninthHour = round($ninthHour, 2);
                 $remainingHours = $hoursWorked - 9;
-                $remainingPay = $remainingHours * $amount_per_hour * $overtimeRates['overtime_4'];
-                $overtimePay = $firstEightHoursPay + $ninthHourPay + $remainingPay;
+                $remainingHours = round($remainingHours, 2);
+                $remainingHours = $remainingHours * $overtimeRates['overtime_4'];
+                $totalOvertime = $firstEightHours + $ninthHour + $remainingHours;
+                $totalOvertime = round($totalOvertime, 2);
+                $overtimePay = $totalOvertime * $amount_per_hour;
             }
         }
 
-        OvertimePay::updateOrCreate(
+        $result = OvertimePay::updateOrCreate(
             [
                 'driver_attendence_id' => $absen->id,
             ],
             [
                 'driver_id' => $driver_id,
-                'tanggal' => $absen->date,
-                'hari' => Carbon::parse($absen->date)->locale('id')->translatedFormat('l'),
+                'tanggal' => $tanggal,
+                'hari' => Carbon::parse($tanggal)->locale('id')->translatedFormat('l'),
                 'shift' => $shift,
                 'from_time' => $startTime->format('H:i:s'),
                 'to_time' => $endTime->format('H:i:s'),
                 'ot_hours_time' => $overtimeHours ? gmdate('H:i:s', (int) ($overtimeHours * 3600)) : null,
+                'ot_1x' => $overtimeRates['overtime_1'],
+                'ot_2x' => $overtimeRates['overtime_2'],
+                'ot_3x' => $overtimeRates['overtime_3'],
+                'ot_4x' => $overtimeRates['overtime_4'],
+                'calculated_ot_hours' => $totalOvertime ?? 0,
                 'amount_per_hour' => $amount_per_hour,
                 'ot_amount' => round($overtimePay),
                 'transport' => $transport,
             ],
         );
 
-        return round($overtimePay);
+        return $result;
     }
 }
