@@ -39,7 +39,6 @@ class PayrollHelpers
         } catch (\Exception $e) {
             return 'Weekday';
         }
-
         return 'Weekday';
     }
 
@@ -95,9 +94,11 @@ class PayrollHelpers
             $overtimeHours = $hoursWorked - 9;
             if ($overtimeHours >= 1) {
                 // more than 1 hour overtime: first 1 hour at overtime_1, remaining at overtime_2
+                $ot_1x = 1;
                 $firstHour = 1 * $overtimeRates['overtime_1'];
                 $firstHour = round($firstHour, 2);
                 $remainingHours = $overtimeHours - 1;
+                $ot_2x = round($remainingHours, 2);
                 $remainingHours = round($remainingHours, 2);
                 $totalRemainingHours = $remainingHours * $overtimeRates['overtime_2'];
                 $totalRemainingHours = round($totalRemainingHours, 2);
@@ -110,14 +111,17 @@ class PayrollHelpers
             $overtimeHours = $hoursWorked;
             // All hours worked on Holiday are considered overtime
             if ($hoursWorked <= 8) {
+                $ot_2x = $totalOvertime;
                 $totalOvertime = $hoursWorked * $overtimeRates['overtime_2'];
                 $totalOvertime = round($totalOvertime, 2);
                 $overtimePay = $totalOvertime * $amount_per_hour;
             }
 
             if ($hoursWorked > 8 && $hoursWorked <= 9) {
+                $ot_2x = 8;
                 $firstEightHours = 8 * $overtimeRates['overtime_2'];
                 $firstEightHours = round($firstEightHours, 2);
+                $ot_3x = round($hoursWorked - 8, 2);
                 $ninthHour = ($hoursWorked - 8) * $overtimeRates['overtime_3'];
                 $ninthHour = round($ninthHour, 2);
                 $totalOvertime = $firstEightHours + $ninthHour;
@@ -126,12 +130,15 @@ class PayrollHelpers
             }
 
             if ($hoursWorked > 9) {
+                $ot_2x = 8;
                 $firstEightHours = 8 * $overtimeRates['overtime_2'];
                 $firstEightHours = round($firstEightHours, 2);
+                $ot_3x = 1;
                 $ninthHour = 1 * $overtimeRates['overtime_3'];
                 $ninthHour = round($ninthHour, 2);
                 $remainingHours = $hoursWorked - 9;
                 $remainingHours = round($remainingHours, 2);
+                $ot_4x = $remainingHours;
                 $remainingHours = $remainingHours * $overtimeRates['overtime_4'];
                 $totalOvertime = $firstEightHours + $ninthHour + $remainingHours;
                 $totalOvertime = round($totalOvertime, 2);
@@ -151,10 +158,10 @@ class PayrollHelpers
                 'from_time' => $startTime->format('H:i:s'),
                 'to_time' => $endTime->format('H:i:s'),
                 'ot_hours_time' => $overtimeHours ? gmdate('H:i:s', (int) ($overtimeHours * 3600)) : null,
-                'ot_1x' => $overtimeRates['overtime_1'],
-                'ot_2x' => $overtimeRates['overtime_2'],
-                'ot_3x' => $overtimeRates['overtime_3'],
-                'ot_4x' => $overtimeRates['overtime_4'],
+                'ot_1x' => $ot_1x ?? 0,
+                'ot_2x' => $ot_2x ?? 0,
+                'ot_3x' => $ot_3x ?? 0,
+                'ot_4x' => $ot_4x ?? 0,
                 'calculated_ot_hours' => $totalOvertime ?? 0,
                 'amount_per_hour' => $amount_per_hour,
                 'ot_amount' => round($overtimePay),
