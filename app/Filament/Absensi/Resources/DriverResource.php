@@ -239,6 +239,7 @@ class DriverResource extends Resource
     {
         return [
             RelationManagers\DriverAttendenceRelationManager::class,
+            RelationManagers\OvertimePaysRelationManager::class,
         ];
     }
 

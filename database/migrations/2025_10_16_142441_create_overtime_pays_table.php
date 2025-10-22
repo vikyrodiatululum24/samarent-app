@@ -22,10 +22,10 @@ return new class extends Migration
             $table->time('to_time')->nullable();
             $table->time('ot_hours_time')->nullable();
             // $table->decimal('ot_hours_numeric', 5, 2)->default(0);
-            $table->time('ot_1x')->nullable();
-            $table->time('ot_2x')->nullable();
-            $table->time('ot_3x')->nullable();
-            $table->time('ot_4x')->nullable();
+            $table->decimal('ot_1x')->nullable();
+            $table->decimal('ot_2x')->nullable();
+            $table->decimal('ot_3x')->nullable();
+            $table->decimal('ot_4x')->nullable();
             $table->decimal('calculated_ot_hours', 5, 2)->default(0);
             $table->decimal('amount_per_hour', 10, 2)->default(0);
             $table->decimal('ot_amount', 10, 2)->default(0);
