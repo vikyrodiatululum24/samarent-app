@@ -11,13 +11,9 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Infolists\Components\Group;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Absensi\Resources\KehadiranDriverResource\Pages;
-use App\Filament\Absensi\Resources\KehadiranDriverResource\RelationManagers;
 
 
 class KehadiranDriverResource extends Resource

@@ -26,7 +26,7 @@ class PayrollHelpers
                 'year' => $tanggal->year,
             ]);
 
-            https://api-harilibur.vercel.app/api/?year=2024
+            https: //api-harilibur.vercel.app/api/?year=2024
 
             if ($response->successful()) {
                 $holidays = collect($response->json());
@@ -52,7 +52,7 @@ class PayrollHelpers
         $startTime = Carbon::createFromFormat('H:i:s', $absen->time_in);
         $endTime = Carbon::createFromFormat('H:i:s', $absen->time_out);
         $driver_id = $absen->user->driver->id ?? null;
-        if (! $driver_id) {
+        if (!$driver_id) {
             throw new \Exception("Driver ID tidak ditemukan untuk absen ID {$absen->id}");
         }
         $tanggal = $absen->date;
@@ -93,17 +93,13 @@ class PayrollHelpers
         if ($shift === 'Weekday' && $hoursWorked > 9) {
             $overtimeHours = $hoursWorked - 9;
             if ($overtimeHours >= 1) {
-                // more than 1 hour overtime: first 1 hour at overtime_1, remaining at overtime_2
-                $ot_1x = 1;
-                $firstHour = 1 * $overtimeRates['overtime_1'];
-                $firstHour = round($firstHour, 2);
-                $remainingHours = $overtimeHours - 1;
-                $ot_2x = round($remainingHours, 2);
-                $remainingHours = round($remainingHours, 2);
-                $totalRemainingHours = $remainingHours * $overtimeRates['overtime_2'];
-                $totalRemainingHours = round($totalRemainingHours, 2);
-                $totalOvertime = $firstHour + $totalRemainingHours;
-                $overtimePay = $totalOvertime * $amount_per_hour;
+                // Jam lembur dihitung mulai dari jam ke-10
+                $ot_1x = 1 * $overtimeRates['overtime_1'];
+                // Jam ke-11 dst → rate overtime_2
+                $ot_2x = ($overtimeHours - 1) * $overtimeRates['overtime_2'];
+                // Total gaji lembur dalam rupiah
+                $totalOvertime = $ot_1x + $ot_2x;
+                $overtimePay = round($totalOvertime * $amount_per_hour, 2);
             }
         }
 
@@ -111,38 +107,43 @@ class PayrollHelpers
             $overtimeHours = $hoursWorked;
             // All hours worked on Holiday are considered overtime
             if ($hoursWorked <= 8) {
-                $ot_2x = $totalOvertime;
-                $totalOvertime = $hoursWorked * $overtimeRates['overtime_2'];
-                $totalOvertime = round($totalOvertime, 2);
-                $overtimePay = $totalOvertime * $amount_per_hour;
+                // Jam 1–8 → rate overtime_2
+                $ot_2x = $hoursWorked * $overtimeRates['overtime_2'];
+                // Total gaji lembur dalam rupiah
+                $totalOvertime = $ot_2x;
+                $overtimePay = round($totalOvertime * $amount_per_hour, 2);
             }
 
             if ($hoursWorked > 8 && $hoursWorked <= 9) {
-                $ot_2x = 8;
-                $firstEightHours = 8 * $overtimeRates['overtime_2'];
-                $firstEightHours = round($firstEightHours, 2);
-                $ot_3x = round($hoursWorked - 8, 2);
-                $ninthHour = ($hoursWorked - 8) * $overtimeRates['overtime_3'];
-                $ninthHour = round($ninthHour, 2);
-                $totalOvertime = $firstEightHours + $ninthHour;
-                $totalOvertime = round($totalOvertime, 2);
-                $overtimePay = $totalOvertime * $amount_per_hour;
+                // Jam 1–8 → rate overtime_2
+                $ot_2x = 8 * $overtimeRates['overtime_2'];
+
+                // Jam ke-9 → rate overtime_3
+                $ot_3x = ($hoursWorked - 8) * $overtimeRates['overtime_3'];
+
+                // Total semua
+                $totalOvertime = $ot_2x + $ot_3x;
+
+                // Total gaji lembur dalam rupiah
+                $overtimePay = round($totalOvertime * $amount_per_hour, 2);
             }
 
             if ($hoursWorked > 9) {
-                $ot_2x = 8;
-                $firstEightHours = 8 * $overtimeRates['overtime_2'];
-                $firstEightHours = round($firstEightHours, 2);
-                $ot_3x = 1;
-                $ninthHour = 1 * $overtimeRates['overtime_3'];
-                $ninthHour = round($ninthHour, 2);
-                $remainingHours = $hoursWorked - 9;
-                $remainingHours = round($remainingHours, 2);
-                $ot_4x = $remainingHours;
-                $remainingHours = $remainingHours * $overtimeRates['overtime_4'];
-                $totalOvertime = $firstEightHours + $ninthHour + $remainingHours;
-                $totalOvertime = round($totalOvertime, 2);
-                $overtimePay = $totalOvertime * $amount_per_hour;
+                // Jam 1–8 → rate overtime_2
+                $ot_2x = 8 * $overtimeRates['overtime_2'];
+
+                // Jam ke-9 → rate overtime_3
+                $ot_3x = 1 * $overtimeRates['overtime_3'];
+
+                // Jam ke-10 dst → rate overtime_4
+                $extraHours = $hoursWorked - 9;
+                $ot_4x = $extraHours * $overtimeRates['overtime_4'];
+
+                // Total semua
+                $totalOvertime = $ot_2x + $ot_3x + $ot_4x;
+
+                // Total gaji lembur dalam rupiah
+                $overtimePay = round($totalOvertime * $amount_per_hour, 2);
             }
         }
 

@@ -128,7 +128,6 @@ class DriverResource extends Resource
                 Forms\Components\FileUpload::make('photo')
                     ->image()
                     ->label('Foto Driver')
-                    ->maxSize(1024)
                     ->maxWidth('1080')
                     ->imageResizeMode('cover')
                     ->imageCropAspectRatio('1:1')

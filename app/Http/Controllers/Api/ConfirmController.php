@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Helpers\PayrollHelpers;
+use App\Http\Controllers\Controller;
 
 class ConfirmController extends Controller
 {
@@ -26,21 +27,44 @@ class ConfirmController extends Controller
                 $absen->load('user', 'unit');
                 $absen->is_complete = true;
                 $absen->save();
-                $driver = $absen->user ? $absen->user->name  : null;
+                $driver = $absen->user ? $absen->user->name : null;
                 $type_unit = $absen->unit ? $absen->unit->type : 'N/A';
                 $mulai = $absen->time_in ? $absen->time_in : 'N/A';
                 $selesai = $absen->time_out ? $absen->time_out : 'N/A';
             }
 
+            // try {
+            //     $calculation = PayrollHelpers::calculateOvertimePay($absen);
+            //     if (!$calculation) {
+            //         return response()->json(
+            //             [
+            //                 'message' => 'Perhitungan gagal',
+            //                 'detail' => 'Hasil perhitungan tidak tersedia',
+            //             ],
+            //             422,
+            //         );
+            //     }
+            // } catch (\Exception $e) {
+            //     \Log::error('Perhitungan overtime gagal: ' . $e->getMessage(), ['absen_id' => $absen->id]);
+            //     return response()->json(
+            //         [
+            //             'message' => 'Perhitungan gagal',
+            //             'error' => $e->getMessage(),
+            //         ],
+            //         500,
+            //     );
+            // }
         }
 
-        return response()->json(['data' => [
-            'message' => 'Absen berhasil dikonfirmasi',
-            'date' => $absen->date,
-            'driver' => $driver ?? 'N/A',
-            'type_unit' => $type_unit ?? 'N/A',
-            'mulai' => $mulai ?? 'N/A',
-            'selesai' => $selesai ?? 'N/A',
-        ]]);
+        return response()->json([
+            'data' => [
+                'message' => 'Absen berhasil dikonfirmasi',
+                'date' => $absen->date,
+                'driver' => $driver ?? 'N/A',
+                'type_unit' => $type_unit ?? 'N/A',
+                'mulai' => $mulai ?? 'N/A',
+                'selesai' => $selesai ?? 'N/A',
+            ],
+        ]);
     }
 }
