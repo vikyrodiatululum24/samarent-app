@@ -9,10 +9,8 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Carbon;
 use App\Helpers\PayrollHelpers;
-use Illuminate\Support\Facades\Route;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\RelationManagers\RelationManager;
 
 class DriverAttendenceRelationManager extends RelationManager
@@ -65,44 +63,35 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->disk('public')
                     ->directory('photos/attendances')
                     ->maxFiles(1),
-
                 Forms\Components\TimePicker::make('time_check')
                     ->label('Waktu Cek'),
-
                 Forms\Components\TextInput::make('location_check')
                     ->label('Lokasi Cek')
                     ->maxLength(255),
-
                 Forms\Components\FileUpload::make('photo_check')
                     ->label('Foto Cek')
                     ->image()
                     ->disk('public')
                     ->directory('photos/attendances')
                     ->maxFiles(1),
-
                 Forms\Components\TextInput::make('end_km')
                     ->label('End KM')
                     ->numeric(),
-
                 Forms\Components\TimePicker::make('time_out')
                     ->label('Waktu Keluar'),
-
                 Forms\Components\TextInput::make('location_out')
                     ->label('Lokasi Keluar')
                     ->maxLength(255),
-
                 Forms\Components\FileUpload::make('photo_out')
                     ->label('Foto Keluar')
                     ->image()
                     ->disk('public')
                     ->directory('photos/attendances')
                     ->maxFiles(1),
-
                 Forms\Components\Textarea::make('note')
                     ->label('Catatan')
                     ->rows(3)
                     ->maxLength(65535),
-
                 Forms\Components\Toggle::make('is_complete')
                     ->label('Approved'),
             ]);
@@ -253,6 +242,9 @@ class DriverAttendenceRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make()
                 ->after(function ($record) {
+                    if (!$record->is_complete) {
+                        return;
+                    }
                     PayrollHelpers::calculateOvertimePay($record);
                 }),
                 Tables\Actions\DeleteAction::make(),

@@ -29,8 +29,8 @@ return new class extends Migration
             $table->decimal('calculated_ot_hours', 5, 2)->default(0);
             $table->decimal('amount_per_hour', 10, 2)->default(0);
             $table->decimal('ot_amount', 10, 2)->default(0);
-            $table->string('out_of_town', 50)->nullable();
-            $table->string('overnight', 50)->nullable();
+            $table->decimal('out_of_town', 10, 2)->default(0);
+            $table->decimal('overnight', 10, 2)->default(0);
             $table->decimal('transport', 10, 2)->default(0);
             $table->decimal('monthly_allowance', 10, 2)->default(0);
             $table->text('remarks')->nullable();

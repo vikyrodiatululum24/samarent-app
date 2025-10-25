@@ -8,6 +8,7 @@ class DriverAttendence extends Model
 {
     protected $fillable = [
         'user_id', // masuk
+        'driver_id', // masuk
         'project_id', // masuk
         'end_user_id', // masuk
         'unit_id', // masuk
@@ -52,6 +53,10 @@ class DriverAttendence extends Model
     public function overtimePay()
     {
         return $this->hasMany(OvertimePay::class, 'driver_attendence_id');
+    }
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class, 'driver_id');
     }
 
 }

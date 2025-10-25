@@ -10,6 +10,7 @@ use App\Models\Pengajuan;
 use Illuminate\Http\Request;
 use App\Exports\AbsensiExport;
 use App\Models\KeuanganService;
+use App\Exports\OvertimePayExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DriverAttendenceExport;
 
@@ -170,5 +171,23 @@ class PrintController extends Controller
         $filename = 'Laporan-Absensi-' . str_replace(['/', '\\'], '-', $driverName) . '-Bulan-' . $month . '.xlsx';
         $month = intval($month);
         return Excel::download(new AbsensiExport($attendences, $driverName, $month), $filename);
+    }
+
+    public function exportOvertimeExcel(Request $request, $driver_id)
+    {
+        $month = $request->get('month', date('m-Y'));
+        $driver = Driver::with([
+            'user',
+            'overtimePay' => function ($query) use ($month) {
+                $query->whereMonth('tanggal', substr($month, 5, 2))->whereYear('tanggal', substr($month, 0, 4));
+            },
+        ])->findOrFail($driver_id);
+
+        $overtimePays = $driver->overtimePay;
+        $driverName = $driver->user->name ?? 'driver';
+        $filename = 'Laporan-Overtime-' . str_replace(['/', '\\'], '-', $driverName) . '-Bulan-' . $month . '.xlsx';
+        $month = intval($month);
+        
+        return Excel::download(new OvertimePayExport($overtimePays, $driverName, $month), $filename);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Absen;
 
+use App\Models\Driver;
 use Illuminate\Http\Request;
 use App\Helpers\PayrollHelpers;
 use App\Models\DriverAttendence;
@@ -36,9 +37,11 @@ class AbsenController extends Controller
                 $request->merge(['photo_in' => 'storage/' . $filePath]);
             }
         }
+        $driver = Driver::where('user_id', $request->user_id)->first();
 
         $absen = DriverAttendence::create([
             'user_id' => $request->user_id,
+            'driver_id' => $driver ? $driver->id : null,
             'project_id' => $request->project_id,
             'end_user_id' => $request->end_user_id,
             'unit_id' => $request->unit_id,
@@ -132,28 +135,6 @@ class AbsenController extends Controller
             'note' => $request->note ?? null,
         ]);
 
-        // try {
-        //     $calculation = PayrollHelpers::calculateOvertimePay($absen);
-        //     if (!$calculation) {
-        //         return response()->json(
-        //             [
-        //                 'message' => 'Perhitungan gagal',
-        //                 'detail' => 'Hasil perhitungan tidak tersedia',
-        //             ],
-        //             422,
-        //         );
-        //     }
-        // } catch (\Exception $e) {
-        //     \Log::error('Perhitungan overtime gagal: ' . $e->getMessage(), ['absen_id' => $absen->id]);
-        //     return response()->json(
-        //         [
-        //             'message' => 'Perhitungan gagal',
-        //             'error' => $e->getMessage(),
-        //         ],
-        //         500,
-        //     );
-        // }
-
         $startTime = $absen ? $absen->time_in : null;
         $endTime = $absen ? $absen->time_out : null;
         $project = $absen ? $absen->project : null;
@@ -167,7 +148,7 @@ class AbsenController extends Controller
         if ($target) {
             try {
                 // Kirim pesan WhatsApp menggunakan PushWaService
-                app('App\Services\PushWaService')->sendMessage($target, 'text', 'Hallo ' . ($absen->endUser ? $absen->endUser->name : 'User') . ",\n\n" . "Terima kasih telah menggunakan layanan kami.\n" . 'Driver ' . ($absen->user ? $absen->user->name : 'N/A') . " telah menyelesaikan tugasnya.\n" . "Informasi Driver:\n" . '- Nama Driver: ' . ($absen->user ? $absen->user->name : 'N/A') . "\n" . '- No. HP: ' . ($absen->user && $absen->user->driver ? $absen->user->driver->no_wa : 'N/A') . "\n" . '- Unit: ' . ($absen->unit ? $absen->unit->type : 'N/A') . "\n" . '- Tanggal: ' . $absen->date . "\n" . '- Mulai Dari: ' . $absen->time_in . "\n" . '- Sampai Dengan: ' . $absen->time_out . "\n" . "\n\n" . "Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:\n" . $url . "\n\n" . "Salam,\n" . 'SamaRent.com');
+                app('App\Services\PushWaService')->sendMessage($target, 'text', 'Hallo ' . ($absen->endUser ? $absen->endUser->name : 'User') . ",\n\n" . "Terima kasih telah menggunakan layanan kami.\n" . 'Driver ' . ($absen->user ? $absen->user->name : 'N/A') . " telah menyelesaikan tugasnya.\n" . "Informasi Driver:\n" . '- Nama Driver: ' . ($absen->user ? $absen->user->name : 'N/A') . "\n" . '- No. HP: ' . ($absen->user && $absen->user->driver ? $absen->user->driver->no_wa : 'N/A') . "\n" . '- Unit: ' . ($absen->unit ? $absen->unit->type : 'N/A') . "\n" . '- Tanggal: ' . $absen->date . "\n" . '- Mulai Dari: ' . $absen->time_in . "\n" . '- Sampai Dengan: ' . $absen->time_out . "\n" . "\n\n" . "Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:\n" . $url . "\n\n" . "Jika merasa tidak melakukan servis ini, silakan abaikan pesan ini.\n" . "Salam,\n" . 'Samarent.com');
             } catch (\Exception $e) {
                 Log::error('Gagal mengirim notifikasi WhatsApp: ' . $e->getMessage());
             }

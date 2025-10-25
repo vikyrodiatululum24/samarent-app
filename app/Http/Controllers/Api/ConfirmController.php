@@ -33,27 +33,27 @@ class ConfirmController extends Controller
                 $selesai = $absen->time_out ? $absen->time_out : 'N/A';
             }
 
-            // try {
-            //     $calculation = PayrollHelpers::calculateOvertimePay($absen);
-            //     if (!$calculation) {
-            //         return response()->json(
-            //             [
-            //                 'message' => 'Perhitungan gagal',
-            //                 'detail' => 'Hasil perhitungan tidak tersedia',
-            //             ],
-            //             422,
-            //         );
-            //     }
-            // } catch (\Exception $e) {
-            //     \Log::error('Perhitungan overtime gagal: ' . $e->getMessage(), ['absen_id' => $absen->id]);
-            //     return response()->json(
-            //         [
-            //             'message' => 'Perhitungan gagal',
-            //             'error' => $e->getMessage(),
-            //         ],
-            //         500,
-            //     );
-            // }
+            try {
+                $calculation = PayrollHelpers::calculateOvertimePay($absen);
+                if (!$calculation) {
+                    return response()->json(
+                        [
+                            'message' => 'Perhitungan gagal',
+                            'detail' => 'Hasil perhitungan tidak tersedia',
+                        ],
+                        422,
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Perhitungan overtime gagal: ' . $e->getMessage(), ['absen_id' => $absen->id]);
+                return response()->json(
+                    [
+                        'message' => 'Perhitungan gagal',
+                        'error' => $e->getMessage(),
+                    ],
+                    500,
+                );
+            }
         }
 
         return response()->json([

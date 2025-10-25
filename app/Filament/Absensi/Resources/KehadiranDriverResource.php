@@ -25,7 +25,20 @@ class KehadiranDriverResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([]);
+            ->schema([
+                Forms\Components\DatePicker::make('date')
+                    ->label('Tanggal')
+                    ->required(),
+                Forms\Components\TimePicker::make('time_in')
+                    ->label('Waktu Masuk')
+                    ->required(),
+                Forms\Components\TimePicker::make('time_check')
+                    ->label('Waktu Check')
+                    ->required(),
+                Forms\Components\TimePicker::make('time_out')
+                    ->label('Waktu Keluar')
+                    ->required(),
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -161,7 +174,7 @@ class KehadiranDriverResource extends Resource
 
     public static function canEdit(Model $record): bool
     {
-        return false;
+        return true;
     }
 
     public static function canDelete(Model $record): bool
