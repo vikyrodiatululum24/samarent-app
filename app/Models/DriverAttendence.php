@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+
 class DriverAttendence extends Model
 {
     protected $fillable = [
@@ -27,7 +28,7 @@ class DriverAttendence extends Model
         'time_out', // keluar
         'location_out', // keluar
         'photo_out', // keluar
-        'is_complete'
+        'is_complete',
     ];
 
     public function user()
@@ -58,6 +59,5 @@ class DriverAttendence extends Model
     {
         return $this->belongsTo(Driver::class, 'driver_id');
     }
-
+    
 }
-

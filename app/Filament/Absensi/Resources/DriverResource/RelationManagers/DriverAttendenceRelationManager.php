@@ -155,7 +155,7 @@ class DriverAttendenceRelationManager extends RelationManager
                         })
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                // Tables\Actions\CreateAction::make(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('priviewPdf')
                         ->label('Preview PDF')

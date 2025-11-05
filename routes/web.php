@@ -27,6 +27,8 @@ Route::get('/', function () {
             return redirect('/asuransi');
         } else if ($user->role === 'admin_driver') {
             return redirect('/absensi');
+        } else if ($user->role === 'admin_jual') {
+            return redirect('/penjualan');
         }
     }
     return redirect('/login');
@@ -51,23 +53,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/export/absensi/{driver_id}/excel', [PrintController::class, 'exportAbsensiExcel'])->name('export-absensi-excel');
     Route::get('/export/overtime/{driver_id}/excel', [PrintController::class, 'exportOvertimeExcel'])->name('export-overtime-excel');
 });
-
-// Route::get('/test-wa', [PushwaController::class, 'sendText']);
-// Route::get('/confirm/{token}', [ConfirmController::class, 'confirmAbsen']);
-
-// Route::prefix('vue')->middleware('auth')->group(function () {
-//     Route::get('/dashboard', [VueController::class, 'dashboard'])->name('vue.dashboard');
-//     Route::get('/settings', [VueController::class, 'settings'])->name('vue.settings');
-//     // Tambahkan route lain sesuai kebutuhan
-//     Route::get('/user', [VueController::class, 'getUser'])->name('vue.getUser');
-// });
-
-// Route::prefix('vue')->group(function () {
-//     Route::post('/register', [AuthVueController::class, 'register']);
-//     Route::post('/login', [AuthVueController::class, 'login']);
-//     Route::post('/logout', [AuthVueController::class, 'logout']);
-// });
-
-
 
 require __DIR__ . '/auth.php';

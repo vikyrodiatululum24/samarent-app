@@ -7,5 +7,6 @@ return [
     App\Providers\Filament\AsuransiPanelProvider::class,
     App\Providers\Filament\FinancePanelProvider::class,
     App\Providers\Filament\ManagerPanelProvider::class,
+    App\Providers\Filament\PenjualanPanelProvider::class,
     App\Providers\Filament\UserPanelProvider::class,
 ];

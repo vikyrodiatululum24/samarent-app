@@ -52,6 +52,7 @@ class PenggunaResource extends Resource
                         'manager' => 'Manager',
                         'asuransi' => 'Asuransi',
                         'admin_driver' => 'Admin Driver',
+                        'admin_jual' => 'Admin Penjualan',
                     ])
                     ->required(),
             ]);

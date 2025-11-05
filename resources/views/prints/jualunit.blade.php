@@ -11,6 +11,7 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            position: relative;
         }
 
         table {
@@ -40,7 +41,7 @@
 
         .header-section {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .unit-image {
@@ -116,10 +117,11 @@
 </head>
 
 <body>
+    <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header image" style="width: 200mm; position: relative; top: -50px; left: -50px;">
+
     <div class="header-section">
-        <img src="{{ public_path('images/logo.jpg') }}" alt="" style="width: 150px; height: auto;">
-        <h2>Laporan Unit yang Dijual</h2>
-        <p>Tanggal: {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
+        Laporan Penjualan Unit<br>
+        {{ $jualunit->unit->merk }} {{ $jualunit->unit->type }} - {{ $jualunit->unit->nopol }}
     </div>
 
     <!-- Data Unit yang Dijual -->
@@ -241,10 +243,18 @@
     @endif
 
     <div class="signature">
-        <p>{{ \Carbon\Carbon::now()->format('d F Y') }}</p>
-        <br><br><br><br>
-        <p>(________________________)</p>
-        <p>Penanggung Jawab</p>
+        <table style="border: none; width: 100%;">
+            <tr>
+                <td style="border: none; text-align: right; padding-right: 50px; width: 70%;">
+                    &nbsp;
+                </td>
+                <td style="border: none; text-align: center; width: 30%;">
+                    Samarinda, {{ \Carbon\Carbon::now()->format('d F Y') }}<br><br><br><br>
+                    ___________________________<br>
+                    (Penanggung Jawab Penjualan)
+                </td>
+            </tr>
+        </table>
     </div>
 
     <!-- Halaman Khusus untuk Gambar Unit -->
