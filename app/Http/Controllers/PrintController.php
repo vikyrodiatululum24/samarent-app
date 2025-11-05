@@ -18,6 +18,7 @@ class PrintController extends Controller
 {
     public function preview($id)
     {
+        ini_set('max_execution_time', 300);
         $pengajuan = Pengajuan::with('complete')->findOrFail($id);
         $namaFile = $pengajuan->nopol . '-' . $pengajuan->no_pengajuan;
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
@@ -27,6 +28,7 @@ class PrintController extends Controller
 
     public function printSpk($id)
     {
+        ini_set('max_execution_time', 300);
         $pengajuan = Pengajuan::with('complete')->findOrFail($id);
         $namaFile = $pengajuan->no_pengajuan;
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
