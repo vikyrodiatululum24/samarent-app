@@ -18,13 +18,11 @@ class EditKehadiranDriver extends EditRecord
         ];
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array
+    protected function afterSave(): void
     {
-        if ($data['is_complete'] == true) {
+        if ($this->record->is_complete) {
             PayrollHelpers::calculateOvertimePay($this->record);
         }
-
-        return $data;
     }
 
     public function getRelationManagers(): array
