@@ -130,11 +130,11 @@
             <td colspan="2">INFORMASI PENJUALAN UNIT</td>
         </tr>
         <tr>
-            <th style="width: 30%;">Harga Jual</th>
+            <th style="width: 30%;">Open Price</th>
             <td>{{ 'Rp ' . number_format($jualunit->harga_jual, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <th>Harga Netto</th>
+            <th>Harga Target</th>
             <td>{{ 'Rp ' . number_format($jualunit->harga_netto, 0, ',', '.') }}</td>
         </tr>
         <tr>
@@ -249,7 +249,7 @@
                     &nbsp;
                 </td>
                 <td style="border: none; text-align: center; width: 30%;">
-                    Samarinda, {{ \Carbon\Carbon::now()->format('d F Y') }}<br><br><br><br>
+                    Jakarta, {{ \Carbon\Carbon::now()->format('d F Y') }}<br><br><br><br>
                     ___________________________<br>
                     (Penanggung Jawab Penjualan)
                 </td>

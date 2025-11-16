@@ -119,4 +119,14 @@ class JualController extends Controller
             'data' => $unitJual
         ]);
     }
+
+    public function event()
+    {
+        $events = \App\Models\OpenHouse::where('is_active', true)->first();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $events
+        ]);
+    }
 }

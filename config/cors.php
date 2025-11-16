@@ -17,7 +17,7 @@ return [
 
 'paths' => ['api/*', 'vue/*', 'login', 'logout', 'register', 'sanctum/csrf-cookie'],
 'allowed_methods' => ['*'],
-'allowed_origins' => ['https://jualmobil.servicesamarent.com', 'https://driver.servicesamarent.com', 'http://driver.servicesamarent.com', 'http://localhost:5173'], // alamat frontend Vue
+'allowed_origins' => ['https://jualmobil.servicesamarent.com', 'https://driver.servicesamarent.com', 'http://localhost:5173'], // alamat frontend Vue
 'allowed_headers' => ['*'],
 'exposed_headers' => [],
 'supports_credentials' => true,

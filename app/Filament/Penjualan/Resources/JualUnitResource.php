@@ -38,23 +38,55 @@ class JualUnitResource extends Resource
                     ->getOptionLabelFromRecordUsing(function (Unit $unit) {
                         return "{$unit->type} - {$unit->nopol}";
                     }),
+                    Forms\Components\TextInput::make('odometer')
+                        ->label('Odometer (km)')
+                        ->required()
+                        ->suffix('km')
+                        ->numeric(),
                 Forms\Components\TextInput::make('harga_jual')
+                    ->label('Open Price')
                     ->required()
                     ->prefix('Rp ')
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
                     ->numeric(),
                 Forms\Components\TextInput::make('harga_netto')
+                    ->label('Harga Target')
                     ->required()
                     ->prefix('Rp ')
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
                     ->numeric(),
-                Forms\Components\TextInput::make('odometer')
-                    ->label('Odometer (km)')
-                    ->required()
-                    ->suffix('km')
-                    ->numeric(),
+                Forms\Components\Select::make('rateBody')
+                    ->label('Rate Body')
+                    ->options([
+                        10 => '10%',
+                        20 => '20%',
+                        30 => '30%',
+                        40 => '40%',
+                        50 => '50%',
+                        60 => '60%',
+                        70 => '70%',
+                        80 => '80%',
+                        90 => '90%',
+                        100 => '100%',
+                    ])
+                    ->required(),
+                Forms\Components\Select::make('rateInterior')
+                    ->label('Rate Interior')
+                    ->options([
+                        10 => '10%',
+                        20 => '20%',
+                        30 => '30%',
+                        40 => '40%',
+                        50 => '50%',
+                        60 => '60%',
+                        70 => '70%',
+                        80 => '80%',
+                        90 => '90%',
+                        100 => '100%',
+                    ])
+                    ->required(),
                 Forms\Components\Textarea::make('keterangan')
                     ->maxLength(255)
                     ->columnSpanFull()
@@ -65,7 +97,6 @@ class JualUnitResource extends Resource
                     ->resize(50)
                     ->maxWidth(1024)
                     ->optimize('webp')
-                    ->maxSize(2048) // Maksimal 2MB
                     ->disk('public')
                     ->directory('unit_jual/foto_depan')
                     ->nullable(),
@@ -75,7 +106,6 @@ class JualUnitResource extends Resource
                     ->resize(50)
                     ->maxWidth(1024)
                     ->optimize('webp')
-                    ->maxSize(2048) // Maksimal 2MB
                     ->disk('public')
                     ->directory('unit_jual/foto_belakang')
                     ->nullable(),
@@ -85,7 +115,6 @@ class JualUnitResource extends Resource
                     ->resize(50)
                     ->maxWidth(1024)
                     ->optimize('webp')
-                    ->maxSize(2048) // Maksimal 2MB
                     ->disk('public')
                     ->directory('unit_jual/foto_kiri')
                     ->nullable(),
@@ -95,7 +124,6 @@ class JualUnitResource extends Resource
                     ->resize(50)
                     ->maxWidth(1024)
                     ->optimize('webp')
-                    ->maxSize(2048) // Maksimal 2MB
                     ->disk('public')
                     ->directory('unit_jual/foto_kanan')
                     ->nullable(),
@@ -105,7 +133,6 @@ class JualUnitResource extends Resource
                     ->resize(50)
                     ->maxWidth(1024)
                     ->optimize('webp')
-                    ->maxSize(2048) // Maksimal 2MB
                     ->disk('public')
                     ->directory('unit_jual/foto_interior')
                     ->nullable(),
@@ -115,7 +142,6 @@ class JualUnitResource extends Resource
                     ->resize(50)
                     ->maxWidth(1024)
                     ->optimize('webp')
-                    ->maxSize(2048) // Maksimal 2MB
                     ->disk('public')
                     ->directory('unit_jual/foto_odometer')
                     ->nullable(),
@@ -138,10 +164,20 @@ class JualUnitResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_jual')
+                    ->label('Open Price')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_netto')
+                    ->label('Harga Target')
                     ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('rateBody')
+                    ->label('Rate Body')
+                    ->suffix('%')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('rateInterior')
+                    ->label('Rate Interior')
+                    ->suffix('%')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('keterangan')
                     ->searchable(),
@@ -197,15 +233,24 @@ class JualUnitResource extends Resource
                             ->label('Tahun'),
                         Infolists\Components\TextEntry::make('bpkb')
                             ->label('BPKB'),
+                        Infolists\Components\TextEntry::make('odometer')
+                            ->label('Odometer')
+                            ->suffix('km'),
+                        Infolists\Components\TextEntry::make('rateBody')
+                            ->label('Rate Body')
+                            ->suffix('%'),
+                        Infolists\Components\TextEntry::make('rateInterior')
+                            ->label('Rate Interior')
+                            ->suffix('%'),
                     ])
                     ->columns(2),
                 Infolists\Components\Section::make('Informasi Harga')
                     ->schema([
                         Infolists\Components\TextEntry::make('harga_jual')
-                            ->label('Harga Jual')
+                            ->label('Open Price')
                             ->money('IDR'),
                         Infolists\Components\TextEntry::make('harga_netto')
-                            ->label('Harga Netto')
+                            ->label('Harga Target')
                             ->money('IDR'),
                         Infolists\Components\TextEntry::make('keterangan')
                             ->label('Keterangan')

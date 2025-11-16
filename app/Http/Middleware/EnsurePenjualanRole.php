@@ -20,7 +20,6 @@ class EnsurePenjualanRole
             if ($user->role === 'admin_jual' || $user->email === 'centralakun@samarent.com') {
                 return $next($request);
             }
-
             abort(403);
         }
     }

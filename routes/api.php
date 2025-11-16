@@ -74,3 +74,4 @@ Route::get('/jualunit', [JualController::class, 'getunit']);
 Route::get('/filters', [JualController::class, 'filters']);
 Route::get('/detail/{id}', [JualController::class, 'detail']);
 Route::post('/penawar', [JualController::class, 'penawar']);
+Route::get('/event', [JualController::class, 'event']);

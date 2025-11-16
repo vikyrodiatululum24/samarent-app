@@ -10,6 +10,8 @@ class UnitJual extends Model
         'unit_id',
         'harga_jual',
         'harga_netto',
+        'rateBody',
+        'rateInterior',
         'keterangan',
         'foto_depan',
         'foto_belakang',

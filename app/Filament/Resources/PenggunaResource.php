@@ -128,23 +128,23 @@ class PenggunaResource extends Resource
 
                         $action->success('Data manager berhasil disimpan.');
                     }),
-                Tables\Actions\Action::make('delete-manager') // tombol hapus
-                    ->color('danger')
-                    ->label('')
-                    ->icon('heroicon-o-trash')
-                    ->visible(fn($record) => $record->role === 'manager' && $record->manager !== null)
-                    ->requiresConfirmation()
-                    ->deselectRecordsAfterCompletion()
-                    ->modalHeading('Unmanage')
-                    ->modalSubheading('Apakah Anda yakin ingin Unmanage? Tindakan ini tidak dapat dibatalkan.')
-                    ->modalButton('Ya, Hapus Data')
-                    ->action(function ($record, $action) {
-                        $record->manager?->delete();
-                        $action->success('Data manager berhasil dihapus.');
-                    }),
+                // Tables\Actions\Action::make('delete-manager') // tombol hapus
+                //     ->color('danger')
+                //     ->label('')
+                //     ->icon('heroicon-o-trash')
+                //     ->visible(fn($record) => $record->role === 'manager' && $record->manager !== null)
+                //     ->requiresConfirmation()
+                //     ->deselectRecordsAfterCompletion()
+                //     ->modalHeading('Unmanage')
+                //     ->modalSubheading('Apakah Anda yakin ingin Unmanage? Tindakan ini tidak dapat dibatalkan.')
+                //     ->modalButton('Ya, Hapus Data')
+                //     ->action(function ($record, $action) {
+                //         $record->manager?->delete();
+                //         $action->success('Data manager berhasil dihapus.');
+                //     }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                // Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
@@ -181,11 +181,6 @@ class PenggunaResource extends Resource
     }
 
     public static function canEdit($record): bool
-    {
-        return auth()->user()?->email === 'centralakun@samarent.com';
-    }
-
-    public static function canDelete($record): bool
     {
         return auth()->user()?->email === 'centralakun@samarent.com';
     }

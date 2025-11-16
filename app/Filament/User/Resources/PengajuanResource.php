@@ -34,8 +34,6 @@ class PengajuanResource extends Resource
 
     protected static ?string $navigationLabel = 'Pengajuan';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Form $form): Form
