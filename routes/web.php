@@ -29,6 +29,8 @@ Route::get('/', function () {
             return redirect('/absensi');
         } else if ($user->role === 'admin_jual') {
             return redirect('/penjualan');
+        } else {
+            abort(403, 'Unauthorized action.');
         }
     }
     return redirect('/login');

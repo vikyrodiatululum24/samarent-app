@@ -5,13 +5,14 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use App\Models\Unit;
 use Filament\Tables;
+use Filament\Infolists;
 use App\Models\UnitJual;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
-use Filament\Resources\Resource;
-use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use Infolists\Components\GalleryEntry;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UnitJualResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -145,6 +146,32 @@ class UnitJualResource extends Resource
                     ->disk('public')
                     ->directory('unit_jual/foto_odometer')
                     ->nullable(),
+                Forms\Components\TextInput::make('harga_terjual')
+                    ->label('Harga Terjual')
+                    ->prefix('Rp ')
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
+                    ->numeric(),
+                Forms\Components\Select::make('status')
+                    ->label('Status Unit')
+                    ->options([
+                        'available' => 'Available',
+                        'sold' => 'Sold',
+                        'pending' => 'Pending',
+                    ])
+                    ->default('available')
+                    ->required(),
+                Forms\Components\FileUpload::make('bukti_pembayaran')
+                    ->label('Bukti Pembayaran')
+                    ->image()
+                    ->resize(50)
+                    ->maxWidth(1024)
+                    ->optimize('webp')
+                    ->disk('public')
+                    ->directory('unit_jual/bukti_pembayaran')
+                    ->multiple()
+                    ->maxFiles(4)
+                    ->nullable(),
             ]);
     }
 
@@ -179,8 +206,26 @@ class UnitJualResource extends Resource
                     ->label('Rate Interior')
                     ->suffix('%')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->colors([
+                        'success' => 'available',
+                        'danger' => 'sold',
+                        'warning' => 'pending',
+                    ])
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('harga_terjual')
+                    ->label('Harga Terjual')
+                    ->numeric()
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('keterangan')
-                    ->searchable(),
+                    ->searchable()
+                    ->limit(50)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -255,6 +300,14 @@ class UnitJualResource extends Resource
                         Infolists\Components\TextEntry::make('keterangan')
                             ->label('Keterangan')
                             ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('status')
+                            ->label('Status')
+                            ->badge()
+                            ->colors([
+                                'success' => 'available',
+                                'danger' => 'sold',
+                                'warning' => 'pending',
+                            ]),
                     ])
                     ->columns(2),
                 Infolists\Components\Grid::make(3)
@@ -317,6 +370,18 @@ class UnitJualResource extends Resource
                     ])
                     ->collapsible()
                     ->collapsed(false),
+                Infolists\Components\Section::make('Bukti Pembayaran')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('harga_terjual')
+                            ->label('Harga Terjual')
+                            ->money('IDR'),
+                        Infolists\Components\ViewEntry::make('bukti_pembayaran')
+                            ->label('Bukti Pembayaran')
+                            ->view('filament.resources.pages.unit-jual.bukti-pembayaran')
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->collapsed(true),
             ]);
     }
 

@@ -10,6 +10,9 @@ class UnitJual extends Model
         'unit_id',
         'harga_jual',
         'harga_netto',
+        'status',
+        'harga_terjual',
+        'bukti_pembayaran',
         'rateBody',
         'rateInterior',
         'keterangan',
@@ -20,6 +23,10 @@ class UnitJual extends Model
         'foto_interior',
         'foto_odometer',
         'odometer',
+    ];
+
+    protected $casts = [
+        'bukti_pembayaran' => 'array',
     ];
 
     public function unit()

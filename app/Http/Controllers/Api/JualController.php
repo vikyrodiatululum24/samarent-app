@@ -24,7 +24,8 @@ class JualController extends Controller
             'foto_interior',
             'foto_odometer',
             'keterangan',
-            'odometer'
+            'odometer',
+            'status'
         ); // field dari tabel data_units
 
         // 🔍 Filter Search (misalnya berdasarkan merk, nopol, atau type)
