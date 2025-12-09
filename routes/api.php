@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PushwaController;
 use App\Http\Controllers\Api\JualController;
+use App\Http\Controllers\Api\UnitController;
 use App\Http\Controllers\Api\ConfirmController;
 use App\Http\Controllers\Api\Absen\AuthController;
 use App\Http\Controllers\Api\Absen\AbsenController;
@@ -75,3 +76,6 @@ Route::get('/filters', [JualController::class, 'filters']);
 Route::get('/detail/{id}', [JualController::class, 'detail']);
 Route::post('/penawar', [JualController::class, 'penawar']);
 Route::get('/event', [JualController::class, 'event']);
+
+// unit api - get all data untuk sync
+Route::get('/units', [UnitController::class, 'getAllUnits']);
