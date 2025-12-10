@@ -16,7 +16,7 @@ class UnitController extends Controller
     public function getAllUnits()
     {
         try {
-            $units = Unit::all();
+            $units = Unit::select('id', 'merk', 'jenis', 'type', 'nopol')->get();
 
             return response()->json([
                 'success' => true,
