@@ -30,6 +30,7 @@ class Complete extends Model
         'rek_bengkel',
         'nama_rek_bengkel',
         'bank_bengkel',
+        'prioritas',
     ];
 
     protected $casts = [

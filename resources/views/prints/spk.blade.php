@@ -17,7 +17,8 @@
                 <td style="width: 20%; text-align: center; border: 2px solid black;">
                     <p style="margin: 2px 0;">Invoice Bengkel</p>
                     @if ($pengajuan->complete->bengkel_invoice)
-                        <h2 style="margin: 2px 0; font-weight: semibold; font-size: 16px; padding: 0 2px;">{{ $pengajuan->complete->bengkel_invoice }}</h2>
+                        <h2 style="margin: 2px 0; font-weight: semibold; font-size: 16px; padding: 0 2px;">
+                            {{ $pengajuan->complete->bengkel_invoice }}</h2>
                     @else
                         <h2 style="margin: 2px 0; font-weight: bold;">-</h2>
                     @endif
@@ -141,7 +142,8 @@
                         &nbsp;
                     @endif
                 </td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd2))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd2) }}"
                             alt="{{ $pengajuan->user->admin->ttd2 }}" style="width: auto; height: 100px;">
@@ -149,7 +151,8 @@
                         &nbsp;
                     @endif
                 </td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd3))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd3) }}"
                             alt="{{ $pengajuan->user->admin->ttd3 }}" style="width: auto; height: 100px;">
@@ -157,7 +160,8 @@
                         &nbsp;
                     @endif
                 </td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd4))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd4) }}"
                             alt="{{ $pengajuan->user->admin->ttd4 }}" style="width: auto; height: 100px;">
@@ -484,6 +488,18 @@
 
     {{-- sjp --}}
     <div style="page-break-before: always;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <th style="width: 70%;">&nbsp;</th>
+
+                <th style="width: 30%; text-align: center; padding: 10px; float: right;">
+                    <h3
+                        style="margin: 0; border: 4px solid; padding: 10px; text-align: center; text-transform: uppercase; font-weight: bold; @if ($pengajuan->complete->prioritas === 'urgent') border-color: #cc0000; color: #cc0000; @elseif($pengajuan->complete->prioritas === 'segera') border-color: #0047ab; color: #0047ab; @elseif($pengajuan->complete->prioritas === 'pengambilan_ba') border-color: #2b8a3e; color: #2b8a3e; @else border-color: #f59f00; color:  #f59f00; @endif">
+                        {{ $pengajuan->complete->prioritas }}
+                    </h3>
+                </th>
+            </tr>
+        </table>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr>
                 <th style="width: 20%; text-align: center; border: 1px solid black;">
@@ -591,7 +607,8 @@
                 <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Dibukukan Oleh</th>
             </tr>
             <tr>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd) }}"
                             alt="{{ $pengajuan->user->admin->ttd }}" style="width: auto; height: 100px;">
@@ -599,7 +616,8 @@
                         &nbsp;
                     @endif
                 </td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd2))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd2) }}"
                             alt="{{ $pengajuan->user->admin->ttd2 }}" style="width: auto; height: 100px;">
@@ -607,7 +625,8 @@
                         &nbsp;
                     @endif
                 </td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd3))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd3) }}"
                             alt="{{ $pengajuan->user->admin->ttd3 }}" style="width: auto; height: 100px;">
@@ -615,7 +634,8 @@
                         &nbsp;
                     @endif
                 </td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd4))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd4) }}"
                             alt="{{ $pengajuan->user->admin->ttd4 }}" style="width: auto; height: 100px;">
@@ -623,7 +643,8 @@
                         &nbsp;
                     @endif
                 </td>
-                <td style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     &nbsp;
                 </td>
             </tr>
@@ -639,8 +660,8 @@
             <tr>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :
                     {{ $pengajuan->user->name }}</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : Achmad Fadil</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : Masni Renova</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
             </tr>

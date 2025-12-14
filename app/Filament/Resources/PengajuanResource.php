@@ -504,6 +504,16 @@ class PengajuanResource extends Resource
                                     ->label('Tanggal Masuk Finance')
                                     ->required()
                                     ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
+                                Forms\Components\Select::make('prioritas')
+                                    ->label('Prioritas')
+                                    ->options([
+                                        'pengambilan_ba' => 'PENGAMBILAN BA',
+                                        'segera' => 'SEGERA',
+                                        'urgent' => 'URGENT',
+                                        'lainnya' => 'LAINNYA',
+                                    ])
+                                    ->required()
+                                    ->default(fn($record) => $record->complete?->prioritas ?? 'pengambilan_ba'),
                             ])
                             ->columns(2),
                         Forms\Components\Fieldset::make('Informasi Finance')
@@ -755,6 +765,16 @@ class PengajuanResource extends Resource
                                     ->label('Tanggal Masuk Finance')
                                     ->required()
                                     ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
+                                Forms\Components\Select::make('prioritas')
+                                    ->label('Prioritas')
+                                    ->options([
+                                        'pengambilan_ba' => 'PENGAMBILAN BA',
+                                        'segera' => 'SEGERA',
+                                        'urgent' => 'URGENT',
+                                        'lainnya' => 'LAINNYA',
+                                    ])
+                                    ->required()
+                                    ->default(fn($record) => $record->complete?->prioritas ?? 'pengambilan_ba'),
                             ])
                             ->columns(2),
                         Forms\Components\Fieldset::make('Informasi Finance')
