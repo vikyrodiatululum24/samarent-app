@@ -7,6 +7,7 @@ use App\Models\Cetak;
 use App\Models\Driver;
 use App\Models\Asuransi;
 use App\Models\Pengajuan;
+use App\Models\FormTugas;
 use Illuminate\Http\Request;
 use App\Exports\AbsensiExport;
 use App\Models\KeuanganService;
@@ -189,7 +190,24 @@ class PrintController extends Controller
         $driverName = $driver->user->name ?? 'driver';
         $filename = 'Laporan-Overtime-' . str_replace(['/', '\\'], '-', $driverName) . '-Bulan-' . $month . '.xlsx';
         $month = intval($month);
-        
+
         return Excel::download(new OvertimePayExport($overtimePays, $driverName, $month), $filename);
+    }
+
+    public function previewFormTugas($id)
+    {
+        ini_set('max_execution_time', 300);
+        $formTugas = FormTugas::with(['user', 'unit', 'tujuanTugas'])->findOrFail($id);
+        $namaFile = 'Form-Tugas-' . $formTugas->no_form;
+        $namaFile = str_replace(['/', '\\'], '-', $namaFile);
+        $pdf = PDF::loadView('prints.form-tugas', ['formTugas' => $formTugas]);
+        return $pdf->stream("$namaFile.pdf");
+    }
+
+    public function printFormTugas($id)
+    {
+        $formTugas = FormTugas::with(['user', 'unit', 'tujuanTugas'])->findOrFail($id);
+        Cetak::updateOrCreate(['form_tugas_id' => $formTugas->id]);
+        return $this->previewFormTugas($id);
     }
 }

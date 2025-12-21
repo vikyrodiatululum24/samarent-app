@@ -9,15 +9,15 @@
 </head>
 
 <body>
+    <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%" style="margin-bottom: 20px;">
     {{-- spk --}}
     <div>
-        <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%">
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr style="height : 20mm;">
                 <td style="width: 20%; text-align: center; border: 2px solid black;">
                     <p style="margin: 2px 0;">Invoice Bengkel</p>
                     @if ($pengajuan->complete->bengkel_invoice)
-                        <h2 style="margin: 2px 0; font-weight: semibold; font-size: 16px; padding: 0 2px;">
+                        <h2 style="margin: 2px 0; font-weight: semibold; font-size: 16px; padding: 0 2px; text-transform: uppercase;">
                             {{ $pengajuan->complete->bengkel_invoice }}</h2>
                     @else
                         <h2 style="margin: 2px 0; font-weight: bold;">-</h2>
@@ -42,10 +42,10 @@
                     <p style="margin: 2px 0;">No Rek</p>
                 </th>
                 <td style="width: 30%;">
-                    <p style="margin: 2px 0; text-transform: capitalize;">: {{ $pengajuan->complete->bengkel_estimasi }}
+                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->complete->bengkel_estimasi }}
                     </p>
-                    <p style="margin: 2px 0;">: {{ $pengajuan->complete->no_telp_bengkel }}</p>
-                    <p style="margin: 2px 0;">: Rp
+                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->complete->no_telp_bengkel }}</p>
+                    <p style="margin: 2px 0; text-transform: uppercase;">: Rp
                         {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }}</p>
                     <p style="margin: 2px 0;">: </p>
                 </td>
@@ -57,8 +57,8 @@
                     <p style="margin: 2px 0;">Telp</p>
                 </th>
                 <td style="width: 30%;">
-                    <p style="margin: 2px 0;">: {{ $pengajuan->no_pengajuan }}</p>
-                    <p style="margin: 2px 0; text-transform: capitalize;">: <span
+                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->no_pengajuan }}</p>
+                    <p style="margin: 2px 0; text-transform: uppercase;">: <span
                             @if ($pengajuan->keterangan == 'REIMBURSE') style="color: red; font-weight: bold;"
                             @elseif(strtoupper($pengajuan->keterangan) == 'CASH ADVANCE')
                                 style="color: blue; font-weight: bold;"
@@ -67,10 +67,10 @@
                             @elseif($pengajuan->keterangan == 'FREE')
                                 style="color: black; font-weight: bold;" @endif>{{ $pengajuan->keterangan }}</span>
                     </p>
-                    <p style="margin: 2px 0;">: {{ $pengajuan->created_at->format('d F Y') }}</p>
+                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->created_at->format('d F Y') }}</p>
                     <p style="margin: 2px 0; text-transform: uppercase;">:
                         {{ $pengajuan->up_lainnya ?? $pengajuan->up }} - {{ $pengajuan->provinsi }}</p>
-                    <p style="margin: 2px 0;">: {{ $pengajuan->no_wa }}</p>
+                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->no_wa }}</p>
                 </td>
             </tr>
         </table>
@@ -94,13 +94,13 @@
                         <td
                             style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
                             {{ $unit->unit->nopol }}</td>
-                        <td style="border: 1px solid black; padding: 0.5rem; text-align: center;">
+                        <td style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
                             {{ number_format($unit->odometer, 0, ',', '.') }}</td>
-                        <td style="border: 1px solid black; padding: 0.5rem; text-align: center;">
+                        <td style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
                             {{ $unit->unit->type }}
                         </td>
                         <td
-                            style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : capitalize">
+                            style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
                             {{ $unit->service }}</td>
                         <td
                             style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
@@ -171,7 +171,7 @@
                 </td>
             </tr>
             <tr>
-                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: uppercase;">
                     {{ $pengajuan->user->name }}</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
                 <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
@@ -199,9 +199,9 @@
                     <p style="margin: 2px;">Estimasi</p>
                 </th>
                 <td style="width: 30%; padding: 10px;">
-                    <p style="margin: 2px; text-transform: capitalize;">: {{ $pengajuan->complete->bengkel_estimasi }}
+                    <p style="margin: 2px; text-transform: uppercase;">: {{ $pengajuan->complete->bengkel_estimasi }}
                     </p>
-                    <p style="margin: 2px;">: Rp
+                    <p style="margin: 2px; text-transform: uppercase;">: Rp
                         {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }}</p>
                 </td>
                 <th style="width: 20%; padding: 10px; text-align: left;">
@@ -209,8 +209,8 @@
                     <p style="margin: 2px;">Jenis Pengajuan</p>
                 </th>
                 <td style="width: 30%; padding: 10px;">
-                    <p style="margin: 2px;">: {{ $pengajuan->no_pengajuan }}</p>
-                    <p style="margin: 2px; text-transform: capitalize;">: {{ $pengajuan->keterangan }}</p>
+                    <p style="margin: 2px; text-transform: uppercase;">: {{ $pengajuan->no_pengajuan }}</p>
+                    <p style="margin: 2px; text-transform: uppercase;">: {{ $pengajuan->keterangan }}</p>
                 </td>
             </tr>
         </table>
@@ -313,8 +313,8 @@
                         <p style="margin: 2px;">Jenis Kendaraan</p>
                     </th>
                     <td style="width: 30%; padding: 10px;">
-                        <p style="margin: 2px;">: {{ $pengajuan->no_pengajuan }}</p>
-                        <p style="margin: 2px; text-transform: capitalize;">:
+                        <p style="margin: 2px; text-transform: uppercase;">: {{ $pengajuan->no_pengajuan }}</p>
+                        <p style="margin: 2px; text-transform: uppercase;">:
                             {{ $unit->unit->jenis . ' - ' . $unit->unit->nopol }}</p>
                     </td>
                 </tr>
@@ -488,6 +488,7 @@
 
     {{-- sjp --}}
     <div style="page-break-before: always;">
+        @if ($pengajuan->complete->prioritas)
         <table style="width: 100%; border-collapse: collapse;">
             <tr>
                 <th style="width: 70%;">&nbsp;</th>
@@ -500,6 +501,7 @@
                 </th>
             </tr>
         </table>
+        @endif
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr>
                 <th style="width: 20%; text-align: center; border: 1px solid black;">
@@ -523,7 +525,7 @@
                     <p style="margin: 0;">Tanggal</p>
                 </th>
                 <td style="width: 30%; padding: 2px; font-size: 12px">
-                    <p style="margin: 0;">:
+                    <p style="margin: 0; text-transform: uppercase;">:
                         {{ \Carbon\Carbon::parse($pengajuan->complete->tanggal_masuk_finance)->format('d F Y') }} </p>
                 </td>
             </tr>
@@ -532,7 +534,7 @@
                     <p style="margin: 0;">Jumlah</p>
                 </th>
                 <td style="width: 30%; padding: 2px; font-size: 12px">
-                    <p style="margin: 0;">: Rp
+                    <p style="margin: 0; text-transform: uppercase;">: Rp
                         {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }} </p>
                 </td>
             </tr>
@@ -541,7 +543,7 @@
                     <p style="margin: 0;">Terbilang</p>
                 </th>
                 <td style="width: 30%; padding: 2px; font-size: 12px">
-                    <p style="margin: 0;">: ({{ ucwords(terbilang($pengajuan->complete->nominal_estimasi)) }}
+                    <p style="margin: 0; text-transform: uppercase;">: ({{ ucwords(terbilang($pengajuan->complete->nominal_estimasi)) }}
                         Rupiah) </p>
                 </td>
             </tr>
@@ -552,22 +554,20 @@
                 <td style="width: 30%; padding: 2px; font-size: 12px">
                     @if ($pengajuan->service_unit->count() === 1)
                         @foreach ($pengajuan->service_unit as $serviceUnit)
-                            <p style="margin: 0; text-transform: capitalize">
+                            <p style="margin: 0; text-transform: uppercase">
                                 : {{ $serviceUnit->service }}
-                                <span style="text-transform: uppercase;">{{ $serviceUnit->unit->nopol }}</span>
+                                {{ $serviceUnit->unit->nopol }}
                                 {{ ' KM ' . $serviceUnit->odometer . ' ' . $serviceUnit->unit->type . ' ' . ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) }}
-                                <span
-                                    style="text-transform: uppercase;">{{ $pengajuan->provinsi . ' - ' . $pengajuan->kota }}</span>
+                                {{ $pengajuan->provinsi . ' - ' . $pengajuan->kota }}
                             </p>
                         @endforeach
                     @else
-                        <p style="margin: 0;">:
+                        <p style="margin: 0; text-transform: uppercase;">:
                             {{ $pengajuan->service_unit->count() .
                                 ' Unit, ' .
                                 ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) .
                                 ', ' }}
-                            <span
-                                style="text-transform: uppercase;">{{ $pengajuan->provinsi . ' - ' . $pengajuan->kota . ', ' . $pengajuan->complete->kode }}</span>
+                            {{ $pengajuan->provinsi . ' - ' . $pengajuan->kota . ', ' . $pengajuan->complete->kode }}
                         </p>
                     @endif
                 </td>
@@ -585,7 +585,7 @@
                     <p style="margin: 0;">Dibayarkan Kepada</p>
                 </th>
                 <td style="width: 30%; padding: 2px; font-size: 12px">
-                    <p style="margin: 0; text-transform: uppercase">: {{ $pengajuan->payment_1 }}
+                    <p style="margin: 0; text-transform: uppercase;">: {{ $pengajuan->payment_1 }}
                         {{ $pengajuan->bank_1 . ' ' . $pengajuan->norek_1 }} <span
                             @if ($pengajuan->keterangan == 'REIMBURSE') style="color: red; font-weight: bold;"
                             @elseif(strtoupper($pengajuan->keterangan) == 'CASH ADVANCE')
@@ -649,8 +649,8 @@
                 </td>
             </tr>
             <tr>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :
-                    {{ $pengajuan->created_at->format('d F Y') }}
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl : <span style="text-transform: uppercase;">
+                    {{ $pengajuan->created_at->format('d F Y') }}</span>
                 </td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
@@ -658,10 +658,10 @@
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
             </tr>
             <tr>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :
-                    {{ $pengajuan->user->name }}</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : Achmad Fadil</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : Masni Renova</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: uppercase;">
+                    {{ $pengajuan->user->name }}</span></td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black; ">Nama : <span style="text-transform: uppercase;">Achmad Fadil</span></td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: uppercase;">Masni Renova</span></td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
             </tr>
