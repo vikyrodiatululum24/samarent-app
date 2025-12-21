@@ -95,7 +95,7 @@ class ViewFormTugas extends ViewRecord
                             ->label('Durasi')
                             ->state(function ($record) {
                                 if ($record->tanggal_mulai && $record->tanggal_selesai) {
-                                    $diff = $record->tanggal_mulai->diffInDays($record->tanggal_selesai);
+                                    $diff = $record->tanggal_mulai->diffInDays($record->tanggal_selesai) + 1;
                                     $hours = $record->tanggal_mulai->diffInHours($record->tanggal_selesai) % 24;
 
                                     $result = '';

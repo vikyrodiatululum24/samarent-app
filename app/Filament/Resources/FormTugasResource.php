@@ -122,6 +122,7 @@ class FormTugasResource extends Resource
                             })
                             ->searchable()
                             ->preload()
+                            ->nullable()
                             ->placeholder('Cari berdasarkan nopol')
                             ->helperText('Pilih unit kendaraan yang akan digunakan')
                             ->columnSpan(1),
@@ -326,7 +327,7 @@ class FormTugasResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('unit.nopol')
-                    ->label('Unit')
+                    ->label('Kendaraan')
                     ->searchable()
                     ->sortable()
                     ->badge()

@@ -122,6 +122,7 @@ class FormTugasResource extends Resource
                             })
                             ->searchable()
                             ->preload()
+                            ->nullable()
                             ->placeholder('Cari berdasarkan nopol')
                             ->helperText('Pilih unit kendaraan yang akan digunakan')
                             ->columnSpan(1),

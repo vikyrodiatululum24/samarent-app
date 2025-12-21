@@ -210,12 +210,14 @@
                     @endif
                 </div>
             </div>
+            @if ($formTugas->unit)
             <div class="info-row">
                 <div class="info-label">Kendaraan</div>
                 <div class="info-value">: {{ $formTugas->unit->jenis ?? '-' }}
                     {{ ' - ' . $formTugas->unit->nopol . ' ' . $formTugas->unit->merk . ' ' . $formTugas->unit->type }}
                 </div>
             </div>
+            @endif
             @if ($formTugas->lainnya)
                 <div class="info-row">
                     <div class="info-label">Lainnya</div>
@@ -232,7 +234,7 @@
                 <div class="info-label">Waktu Tugas</div>
                 <div class="info-value">:
                     @php
-                        $diff = $formTugas->tanggal_mulai->diffInDays($formTugas->tanggal_selesai);
+                        $diff = $formTugas->tanggal_mulai->diffInDays($formTugas->tanggal_selesai) + 1;
                         $hours = $formTugas->tanggal_mulai->diffInHours($formTugas->tanggal_selesai) % 24;
                         $result = '';
                         if ($diff > 0) {
