@@ -489,7 +489,7 @@
     {{-- sjp --}}
     <div style="page-break-before: always;">
         @if ($pengajuan->complete->prioritas)
-        <table style="width: 100%; border-collapse: collapse;">
+        {{-- <table style="width: 100%; border-collapse: collapse;">
             <tr>
                 <th style="width: 70%;">&nbsp;</th>
 
@@ -500,7 +500,7 @@
                     </h3>
                 </th>
             </tr>
-        </table>
+        </table> --}}
         @endif
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr>
@@ -528,12 +528,18 @@
                     <p style="margin: 0; text-transform: uppercase;">:
                         {{ \Carbon\Carbon::parse($pengajuan->complete->tanggal_masuk_finance)->format('d F Y') }} </p>
                 </td>
+                <td rowspan="2" style="width: 20%; padding: 2px; text-align: center;">
+                    <h4
+                        style="margin: 0; border: 4px solid; padding: 5px; text-align: center; text-transform: uppercase; font-weight: bold; @if ($pengajuan->complete->prioritas === 'urgent') border-color: #cc0000; color: #cc0000; @elseif($pengajuan->complete->prioritas === 'segera') border-color: #0047ab; color: #0047ab; @elseif($pengajuan->complete->prioritas === 'pengambilan_ba') border-color: #2b8a3e; color: #2b8a3e; @else border-color: #f59f00; color:  #f59f00; @endif">
+                        {{ $pengajuan->complete->prioritas }}
+                    </h4>
+                </td>
             </tr>
             <tr style="vertical-align: top; font-size: 12px">
                 <th style="width: 10%; padding: 2px; text-align: left;">
                     <p style="margin: 0;">Jumlah</p>
                 </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px">
+                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
                     <p style="margin: 0; text-transform: uppercase;">: Rp
                         {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }} </p>
                 </td>
@@ -542,7 +548,7 @@
                 <th style="width: 10%; padding: 2px; text-align: left;">
                     <p style="margin: 0;">Terbilang</p>
                 </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px">
+                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
                     <p style="margin: 0; text-transform: uppercase;">: ({{ ucwords(terbilang($pengajuan->complete->nominal_estimasi)) }}
                         Rupiah) </p>
                 </td>
@@ -551,7 +557,7 @@
                 <th style="width: 10%; padding: 2px; text-align: left;">
                     <p style="margin: 0;">Untuk Keperluan</p>
                 </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px">
+                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
                     @if ($pengajuan->service_unit->count() === 1)
                         @foreach ($pengajuan->service_unit as $serviceUnit)
                             <p style="margin: 0; text-transform: uppercase">
@@ -576,7 +582,7 @@
                 <th style="width: 10%; padding: 2px; text-align: left;">
                     <p style="margin: 0;">Dibayarkan Oleh</p>
                 </th>
-                <td style="width: 30%; padding: 2px;">
+                <td style="width: 30%; padding: 2px;" colspan="2">
                     <p style="margin: 0;">: PT. Samana Jaya Propertindo </p>
                 </td>
             </tr>
@@ -584,7 +590,7 @@
                 <th style="width: 10%; padding: 2px; text-align: left;">
                     <p style="margin: 0;">Dibayarkan Kepada</p>
                 </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px">
+                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
                     <p style="margin: 0; text-transform: uppercase;">: {{ $pengajuan->payment_1 }}
                         {{ $pengajuan->bank_1 . ' ' . $pengajuan->norek_1 }} <span
                             @if ($pengajuan->keterangan == 'REIMBURSE') style="color: red; font-weight: bold;"

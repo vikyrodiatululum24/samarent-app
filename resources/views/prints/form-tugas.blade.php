@@ -321,8 +321,8 @@
             <table class="data-table">
                 <tr>
                     <td class="label header">Pemohon</td>
-                    <td class="label header">Keputusan</td>
-                    <td class="label header" colspan="2">Mengetahui</td>
+                    <td class="label header" colspan="2">Menyetujui</td>
+                    <td class="label header">Mengetahui</td>
                 </tr>
                 <tr>
                     <td class="body">
@@ -336,14 +336,14 @@
                         <p>Nama :</p>
                     </td>
                     <td class="body">
-                        <br>
+                        <p>*) Setuju/Tidak</p>
                         <br>
                         <p>Jam :</p>
                         <p>Tgl :</p>
                         <p>Nama :</p>
                     </td>
                     <td class="body">
-                        <br>
+                        <p>*) Setuju/Tidak</p>
                         <br>
                         <p>Jam :</p>
                         <p>Tgl :</p>
@@ -354,9 +354,9 @@
                     <td class="label header">
                         <div style="text-transform: capitalize;">{{ $formTugas->pemohon }}</div>
                     </td>
-                    <td class="label header">Spv/Head Dept./Div</td>
-                    <td class="label header">General Affair</td>
+                    <td class="label header">Spv. Lapangan</td>
                     <td class="label header">HRD</td>
+                    <td class="label header">Direktur Ops.</td>
                 </tr>
             </table>
         </div>
