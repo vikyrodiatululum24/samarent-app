@@ -94,7 +94,6 @@ class FormTugasResource extends Resource
                             ->native(false)
                             ->displayFormat('d/m/Y')
                             ->seconds(false)
-                            ->after('tanggal_mulai')
                             ->columnSpan(1),
                     ])
                     ->columns(2)
