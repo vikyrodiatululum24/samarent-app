@@ -8,6 +8,7 @@ use App\Models\Driver;
 use App\Models\Asuransi;
 use App\Models\Pengajuan;
 use App\Models\FormTugas;
+use App\Models\Settings;
 use Illuminate\Http\Request;
 use App\Exports\AbsensiExport;
 use App\Models\KeuanganService;
@@ -23,7 +24,29 @@ class PrintController extends Controller
         $pengajuan = Pengajuan::with('complete')->findOrFail($id);
         $namaFile = $pengajuan->nopol . '-' . $pengajuan->no_pengajuan;
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
-        $pdf = PDF::loadView('prints.spk', ['pengajuan' => $pengajuan]);
+
+        // Get signature settings
+        $ttdDiketahui = Settings::where('key', 'ttd_diketahui')->first()?->value;
+        $ttdDiperiksa = Settings::where('key', 'ttd_diperiksa')->first()?->value;
+        $ttdDisetujui = Settings::where('key', 'ttd_disetujui')->first()?->value;
+        $ttdDibukukan = Settings::where('key', 'ttd_dibukukan')->first()?->value;
+
+        $namaDiketahui = Settings::where('key', 'nama_diketahui')->first()?->value;
+        $namaDiperiksa = Settings::where('key', 'nama_diperiksa')->first()?->value;
+        $namaDisetujui = Settings::where('key', 'nama_disetujui')->first()?->value;
+        $namaDibukukan = Settings::where('key', 'nama_dibukukan')->first()?->value;
+
+        $pdf = PDF::loadView('prints.spk', [
+            'pengajuan' => $pengajuan,
+            'ttdDiketahui' => $ttdDiketahui,
+            'ttdDiperiksa' => $ttdDiperiksa,
+            'ttdDisetujui' => $ttdDisetujui,
+            'ttdDibukukan' => $ttdDibukukan,
+            'namaDiketahui' => $namaDiketahui,
+            'namaDiperiksa' => $namaDiperiksa,
+            'namaDisetujui' => $namaDisetujui,
+            'namaDibukukan' => $namaDibukukan,
+        ]);
         return $pdf->stream("$namaFile.pdf");
     }
 
@@ -34,8 +57,28 @@ class PrintController extends Controller
         $namaFile = $pengajuan->no_pengajuan;
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
         Cetak::updateOrCreate(['pengajuan_id' => $pengajuan->id]);
+
+        // Get signature settings
+        $ttdDiketahui = Settings::where('key', 'ttd_diketahui')->first()?->value;
+        $ttdDiperiksa = Settings::where('key', 'ttd_diperiksa')->first()?->value;
+        $ttdDisetujui = Settings::where('key', 'ttd_disetujui')->first()?->value;
+        $ttdDibukukan = Settings::where('key', 'ttd_dibukukan')->first()?->value;
+
+        $namaDiketahui = Settings::where('key', 'nama_diketahui')->first()?->value;
+        $namaDiperiksa = Settings::where('key', 'nama_diperiksa')->first()?->value;
+        $namaDisetujui = Settings::where('key', 'nama_disetujui')->first()?->value;
+        $namaDibukukan = Settings::where('key', 'nama_dibukukan')->first()?->value;
+
         $pdf = PDF::loadView('prints.spk', [
             'pengajuan' => $pengajuan,
+            'ttdDiketahui' => $ttdDiketahui,
+            'ttdDiperiksa' => $ttdDiperiksa,
+            'ttdDisetujui' => $ttdDisetujui,
+            'ttdDibukukan' => $ttdDibukukan,
+            'namaDiketahui' => $namaDiketahui,
+            'namaDiperiksa' => $namaDiperiksa,
+            'namaDisetujui' => $namaDisetujui,
+            'namaDibukukan' => $namaDibukukan,
         ]);
         return $pdf->stream("$namaFile.pdf");
     }

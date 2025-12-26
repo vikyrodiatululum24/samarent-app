@@ -128,10 +128,11 @@
         </div>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr>
-                <th style="border: 1px solid black; padding : 0.5rem; width: 24%;">Dibuat</th>
-                <th style="border: 1px solid black; padding : 0.5rem; width: 24%;">Disetujui</th>
-                <th style="border: 1px solid black; padding : 0.5rem; width: 24%;">Diperiksa</th>
-                <th style="border: 1px solid black; padding : 0.5rem; width: 24%;">Diketahui</th>
+                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Dibuat</th>
+                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Diketahui</th>
+                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Diperiksa</th>
+                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Disetujui</th>
+                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Dibukukan</th>
             </tr>
             <tr>
                 <td style="height: 78px; border: 1px solid black; text-align: center; vertical-align: middle;">
@@ -144,27 +145,36 @@
                 </td>
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($pengajuan->user->admin->ttd2))
-                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd2) }}"
-                            alt="{{ $pengajuan->user->admin->ttd2 }}" style="width: auto; height: 100px;">
+                    @if (!empty($ttdDiketahui))
+                        <img src="{{ public_path('storage/' . $ttdDiketahui) }}"
+                            alt="Tanda Tangan Diketahui" style="width: auto; height: 100px;">
                     @else
                         &nbsp;
                     @endif
                 </td>
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($pengajuan->user->admin->ttd3))
-                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd3) }}"
-                            alt="{{ $pengajuan->user->admin->ttd3 }}" style="width: auto; height: 100px;">
+                    @if (!empty($ttdDiperiksa))
+                        <img src="{{ public_path('storage/' . $ttdDiperiksa) }}"
+                            alt="Tanda Tangan Diperiksa" style="width: auto; height: 100px;">
                     @else
                         &nbsp;
                     @endif
                 </td>
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($pengajuan->user->admin->ttd4))
-                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd4) }}"
-                            alt="{{ $pengajuan->user->admin->ttd4 }}" style="width: auto; height: 100px;">
+                    @if (!empty($ttdDisetujui))
+                        <img src="{{ public_path('storage/' . $ttdDisetujui) }}"
+                            alt="Tanda Tangan Disetujui" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
+                </td>
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                    @if (!empty($ttdDibukukan))
+                        <img src="{{ public_path('storage/' . $ttdDibukukan) }}"
+                            alt="Tanda Tangan Dibukukan" style="width: auto; height: 100px;">
                     @else
                         &nbsp;
                     @endif
@@ -173,9 +183,10 @@
             <tr>
                 <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: uppercase;">
                     {{ $pengajuan->user->name }}</td>
-                <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
-                <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
-                <td style="height: 38px; border: 1px solid black;">&nbsp;</td>
+                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDiketahui ?? '' }}</td>
+                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDiperiksa ?? '' }}</td>
+                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDisetujui ?? '' }}</td>
+                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDibukukan ?? '' }}</td>
             </tr>
         </table>
     </div>
@@ -529,10 +540,12 @@
                         {{ \Carbon\Carbon::parse($pengajuan->complete->tanggal_masuk_finance)->format('d F Y') }} </p>
                 </td>
                 <td rowspan="2" style="width: 20%; padding: 2px; text-align: center;">
+                    @if ($pengajuan->complete->prioritas)
                     <h4
                         style="margin: 0; border: 4px solid; padding: 5px; text-align: center; text-transform: uppercase; font-weight: bold; @if ($pengajuan->complete->prioritas === 'urgent') border-color: #cc0000; color: #cc0000; @elseif($pengajuan->complete->prioritas === 'segera') border-color: #0047ab; color: #0047ab; @elseif($pengajuan->complete->prioritas === 'pengambilan_ba') border-color: #2b8a3e; color: #2b8a3e; @else border-color: #f59f00; color:  #f59f00; @endif">
                         {{ $pengajuan->complete->prioritas }}
                     </h4>
+                    @endif
                 </td>
             </tr>
             <tr style="vertical-align: top; font-size: 12px">
@@ -607,9 +620,9 @@
         <table style="width: 100%; border-collapse: collapse; margin-bottom:">
             <tr>
                 <th style="font-size: 12px; border: 1px solid black; padding: 0.2rem; width: 24%;">Dibuat Oleh</th>
-                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Disetujui Oleh</th>
-                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Diperiksa Oleh</th>
                 <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Diketahui Oleh</th>
+                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Diperiksa Oleh</th>
+                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Disetujui Oleh</th>
                 <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Dibukukan Oleh</th>
             </tr>
             <tr>
@@ -624,38 +637,43 @@
                 </td>
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($pengajuan->user->admin->ttd2))
-                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd2) }}"
-                            alt="{{ $pengajuan->user->admin->ttd2 }}" style="width: auto; height: 100px;">
+                    @if (!empty($ttdDiketahui))
+                        <img src="{{ public_path('storage/' . $ttdDiketahui) }}"
+                            alt="Tanda Tangan Diketahui" style="width: auto; height: 100px;">
                     @else
                         &nbsp;
                     @endif
                 </td>
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($pengajuan->user->admin->ttd3))
-                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd3) }}"
-                            alt="{{ $pengajuan->user->admin->ttd3 }}" style="width: auto; height: 100px;">
+                    @if (!empty($ttdDiperiksa))
+                        <img src="{{ public_path('storage/' . $ttdDiperiksa) }}"
+                            alt="Tanda Tangan Diperiksa" style="width: auto; height: 100px;">
                     @else
                         &nbsp;
                     @endif
                 </td>
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($pengajuan->user->admin->ttd4))
-                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd4) }}"
-                            alt="{{ $pengajuan->user->admin->ttd4 }}" style="width: auto; height: 100px;">
+                    @if (!empty($ttdDisetujui))
+                        <img src="{{ public_path('storage/' . $ttdDisetujui) }}"
+                            alt="Tanda Tangan Disetujui" style="width: auto; height: 100px;">
                     @else
                         &nbsp;
                     @endif
                 </td>
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    &nbsp;
+                    @if (!empty($ttdDibukukan))
+                        <img src="{{ public_path('storage/' . $ttdDibukukan) }}"
+                            alt="Tanda Tangan Dibukukan" style="width: auto; height: 100px;">
+                    @else
+                        &nbsp;
+                    @endif
                 </td>
             </tr>
             <tr>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl : <span style="text-transform: uppercase;">
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl : <span style="text-transform: capitalize;">
                     {{ $pengajuan->created_at->format('d F Y') }}</span>
                 </td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
@@ -664,18 +682,18 @@
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
             </tr>
             <tr>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: uppercase;">
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: capitalize;">
                     {{ $pengajuan->user->name }}</span></td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black; ">Nama : <span style="text-transform: uppercase;">Achmad Fadil</span></td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: uppercase;">Masni Renova</span></td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama :</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black; ">Nama : <span style="text-transform: capitalize;">{{ $namaDiketahui ?? '-' }}</span></td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: capitalize;">{{ $namaDiperiksa ?? '-' }}</span></td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: capitalize;">{{ $namaDisetujui ?? '-' }}</span></td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: capitalize;">{{ $namaDibukukan ?? '-' }}</span></td>
             </tr>
             <tr>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan : Direktur</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan : Finance</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan : Direktur Utama</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
             </tr>
         </table>

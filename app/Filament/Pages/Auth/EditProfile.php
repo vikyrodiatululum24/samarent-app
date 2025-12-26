@@ -55,33 +55,33 @@ class EditProfile extends BaseEditProfile
                                     ->maxSize(2048)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png'])
                                     ->hidden(fn() => $this->getUser()->role !== 'admin'),
-                                FileUpload::make('ttd2')
-                                    ->label('Tanda Tangan Yang Menyetujui')
-                                    ->image()
-                                    ->directory('foto-ttd')
-                                    ->disk('public')
-                                    ->imageResizeMode('contain')
-                                    ->maxSize(2048)
-                                    ->acceptedFileTypes(['image/jpeg', 'image/png'])
-                                    ->hidden(fn() => $this->getUser()->role !== 'admin'),
-                                FileUpload::make('ttd3')
-                                    ->label('Tanda Tangan Pemeriksa')
-                                    ->image()
-                                    ->directory('foto-ttd')
-                                    ->disk('public')
-                                    ->imageResizeMode('contain')
-                                    ->maxSize(2048)
-                                    ->acceptedFileTypes(['image/jpeg', 'image/png'])
-                                    ->hidden(fn() => $this->getUser()->role !== 'admin'),
-                                FileUpload::make('ttd4')
-                                    ->label('Tanda Tangan Yang Mengetahui')
-                                    ->image()
-                                    ->directory('foto-ttd')
-                                    ->disk('public')
-                                    ->imageResizeMode('contain')
-                                    ->maxSize(2048)
-                                    ->acceptedFileTypes(['image/jpeg', 'image/png'])
-                                    ->hidden(fn() => $this->getUser()->role !== 'admin'),
+                                // FileUpload::make('ttd2')
+                                //     ->label('Tanda Tangan Yang Menyetujui')
+                                //     ->image()
+                                //     ->directory('foto-ttd')
+                                //     ->disk('public')
+                                //     ->imageResizeMode('contain')
+                                //     ->maxSize(2048)
+                                //     ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                                //     ->hidden(fn() => $this->getUser()->role !== 'admin'),
+                                // FileUpload::make('ttd3')
+                                //     ->label('Tanda Tangan Pemeriksa')
+                                //     ->image()
+                                //     ->directory('foto-ttd')
+                                //     ->disk('public')
+                                //     ->imageResizeMode('contain')
+                                //     ->maxSize(2048)
+                                //     ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                                //     ->hidden(fn() => $this->getUser()->role !== 'admin'),
+                                // FileUpload::make('ttd4')
+                                //     ->label('Tanda Tangan Yang Mengetahui')
+                                //     ->image()
+                                //     ->directory('foto-ttd')
+                                //     ->disk('public')
+                                //     ->imageResizeMode('contain')
+                                //     ->maxSize(2048)
+                                //     ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                                //     ->hidden(fn() => $this->getUser()->role !== 'admin'),
                             ])
                             ->columnSpan(1),
 
@@ -112,9 +112,9 @@ class EditProfile extends BaseEditProfile
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['ttd'] = $this->getUser()->admin?->ttd;
-        $data['ttd2'] = $this->getUser()->admin?->ttd2;
-        $data['ttd3'] = $this->getUser()->admin?->ttd3;
-        $data['ttd4'] = $this->getUser()->admin?->ttd4;
+        // $data['ttd2'] = $this->getUser()->admin?->ttd2;
+        // $data['ttd3'] = $this->getUser()->admin?->ttd3;
+        // $data['ttd4'] = $this->getUser()->admin?->ttd4;
 
         return $data;
     }
