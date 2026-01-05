@@ -63,6 +63,7 @@ class BbmResource extends Resource
                     ->label('Tanggal')
                     ->date('d/m/Y')
                     ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false)
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('unit.nopol')
@@ -73,11 +74,13 @@ class BbmResource extends Resource
                 Tables\Columns\TextColumn::make('unit.merk')
                     ->label('Merk')
                     ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('unit.type')
                     ->label('Type')
                     ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
 
                 Tables\Columns\ImageColumn::make('barcode_bbm')
