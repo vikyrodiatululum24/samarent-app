@@ -2,14 +2,8 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\PrintController;
-use App\Http\Controllers\PushwaController;
-use App\Http\Controllers\AuthVueController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Vue\VueController;
-use App\Http\Controllers\Api\ConfirmController;
-
 
 Route::get('/', function () {
     $user = Auth::user();
