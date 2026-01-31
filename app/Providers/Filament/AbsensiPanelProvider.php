@@ -42,6 +42,9 @@ class AbsensiPanelProvider extends PanelProvider
                 'yellow' => '#FBBF24', // ganti warna peringatan
             ])
             ->discoverResources(in: app_path('Filament/Absensi/Resources'), for: 'App\\Filament\\Absensi\\Resources')
+            ->resources([
+                \App\Filament\Resources\BengkelResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/Absensi/Pages'), for: 'App\\Filament\\Absensi\\Pages')
             ->pages([
                 // Pages\Dashboard::class,

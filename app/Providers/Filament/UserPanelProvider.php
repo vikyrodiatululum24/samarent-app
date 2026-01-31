@@ -38,6 +38,9 @@ class UserPanelProvider extends PanelProvider
                 'yellow' => '#FBBF24', // ganti warna peringatan
             ])
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
+            ->resources([
+                \App\Filament\Resources\BengkelResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
                 Pages\Dashboard::class,

@@ -181,7 +181,7 @@
                 </td>
             </tr>
             <tr>
-                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: uppercase;">
+                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">
                     {{ $pengajuan->user->name }}</td>
                 <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDiketahui ?? '' }}</td>
                 <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDiperiksa ?? '' }}</td>

@@ -43,6 +43,9 @@ class FinancePanelProvider extends PanelProvider
                 'yellow' => '#FBBF24', // ganti warna peringatan
             ])
             ->discoverResources(in: app_path('Filament/Finance/Resources'), for: 'App\\Filament\\Finance\\Resources')
+            ->resources([
+                \App\Filament\Resources\BengkelResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/Finance/Pages'), for: 'App\\Filament\\Finance\\Pages')
             ->pages([
                 Pages\Dashboard::class,

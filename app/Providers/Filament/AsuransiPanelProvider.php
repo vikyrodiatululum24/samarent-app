@@ -50,6 +50,7 @@ class AsuransiPanelProvider extends PanelProvider
             ])
             ->resources([
                 AsuransiResource::class,
+                \App\Filament\Resources\BengkelResource::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Asuransi/Widgets'), for: 'App\\Filament\\Asuransi\\Widgets')
             ->widgets([

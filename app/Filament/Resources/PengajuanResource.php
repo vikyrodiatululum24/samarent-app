@@ -117,8 +117,6 @@ class PengajuanResource extends Resource
                                         ->label('Kota/Kab')
                                         ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
                                         ->maxLength(255),
-
-
                                 ])
                                 ->columns(2)
                                 ->columnSpan('full')
