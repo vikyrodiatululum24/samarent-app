@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReimbursementPdfController;
 
 Route::get('/', function () {
     $user = Auth::user();
@@ -50,6 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/export/overtime/{driver_id}/excel', [PrintController::class, 'exportOvertimeExcel'])->name('export-overtime-excel');
     Route::get('/form-tugas/{id}/preview', [PrintController::class, 'previewFormTugas'])->name('preview.form-tugas');
     Route::get('/form-tugas/{id}/print', [PrintController::class, 'printFormTugas'])->name('print.form-tugas');
+    Route::get('/reimbursement/print-pdf', [ReimbursementPdfController::class, 'print'])->name('reimbursement.print-pdf');
 });
 
 require __DIR__ . '/auth.php';

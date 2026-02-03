@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use App\Models\Unit;
 use Filament\Tables;
+use App\Models\Norek;
 use App\Models\Project;
 use Filament\Forms\Form;
 use App\Models\Pengajuan;
@@ -13,23 +14,19 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Infolists\Components;
 use Filament\Resources\Pages\Page;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Wizard;
-use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
 use Filament\Pages\SubNavigationPosition;
-use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Wizard\Step;
 use App\Filament\Imports\PengajuanImporter;
 use Filament\Infolists\Components\ViewEntry;
-// use App\Filament\Exports\ServiceUnitExporter;
-// use Filament\Tables\Actions\ExportBulkAction;
-// use App\Filament\Resources\PengajuanResource\RelationManagers\ServiceUnitRelationManager;
 use App\Filament\Resources\PengajuanResource\Pages;
-// use App\Filament\Exports\PengajuanExporter; // Ensure the PengajuanExporter class is imported
+
 
 class PengajuanResource extends Resource
 {
@@ -55,7 +52,7 @@ class PengajuanResource extends Resource
                                     Forms\Components\Group::make()
                                         ->schema([
                                             Hidden::make('user_id')
-                                                ->default(\Illuminate\Support\Facades\Auth::user()->id),
+                                                ->default(Auth::user()->id),
                                             Forms\Components\TextInput::make('nama')
                                                 ->label('Nama PIC')
                                                 ->required()
@@ -334,15 +331,16 @@ class PengajuanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable()->width('130px')->label('No. Pengajuan'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->searchable()
-                    ->label('Tanggal Pengajuan')
+                    ->label('Tanggal')
                     ->date('d M Y')
+                    ->width('120px')
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('User'),
-                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Nama PIC'),
+                Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('User')->width('150px')->wrap(),
+                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Nama PIC')->width('150px')->wrap(),
                 Tables\Columns\TextColumn::make('jenis')
                     ->label('Jenis Kendaraan')
                     ->getStateUsing(function ($record) {
@@ -361,6 +359,8 @@ class PengajuanResource extends Resource
                             $q->where('jenis', 'like', "%{$search}%");
                         });
                     })
+                    ->width('120px')
+                    ->wrap()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('service_unit')
                     ->label('Service')
@@ -379,6 +379,8 @@ class PengajuanResource extends Resource
                             $q->where('service', 'like', "%{$search}%");
                         });
                     })
+                    ->width('200px')
+                    ->wrap()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nopol')
                     ->label('No. Polisi')
@@ -398,26 +400,34 @@ class PengajuanResource extends Resource
                             $q->where('nopol', 'like', "%{$search}%");
                         });
                     })
+                    ->width('120px')
+                    ->wrap()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project'),
-                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana'),
+                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project')->width('150px')->wrap(),
+                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana')->width('120px')->wrap(),
                 Tables\Columns\TextColumn::make('complete.bengkel_estimasi')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Bengkel'),
+                    ->label('Bengkel')
+                    ->width('150px')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('complete.nominal_tf_bengkel')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Nominal Transfer'),
+                    ->label('Nominal Transfer')
+                    ->width('150px')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('complete.nominal_estimasi')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Nominal Estimasi')
-                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
-                Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-')
+                    ->width('150px')
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->width('150px')->wrap(),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
                     ->sortable()
@@ -442,12 +452,16 @@ class PengajuanResource extends Resource
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
-                    }),
+                    })
+                    ->width('150px')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('complete.bengkel_invoice')
                     ->label('Bengkel Invoice')
                     ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->width('150px')
+                    ->wrap(),
             ])
             ->filters([
                 SelectFilter::make('keterangan_proses')
@@ -460,527 +474,32 @@ class PengajuanResource extends Resource
                         'otorisasi' => 'Otorisasi',
                         'done' => 'Selesai',
                     ]),
+                SelectFilter::make('tahun')
+                    ->label('Tahun')
+                    ->options(function () {
+                        return Pengajuan::selectRaw('YEAR(created_at) as year')
+                            ->distinct()
+                            ->orderBy('year', 'desc')
+                            ->pluck('year', 'year')
+                            ->mapWithKeys(fn($year) => [$year => $year])
+                            ->toArray();
+                    })
+                    ->query(function (Builder $query, array $data) {
+                        if (isset($data['value'])) {
+                            $query->whereYear('created_at', $data['value']);
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\Action::make('Edit')
                     ->label('Edit')
                     ->icon('heroicon-o-pencil')
                     ->color('warning')
-                    ->form([
-                        Forms\Components\Fieldset::make('Informasi Bengkel')
-                            ->schema([
-                                Hidden::make('user_id')
-                                    ->default(\Illuminate\Support\Facades\Auth::user()->id),
-                                Forms\Components\TextInput::make('bengkel_estimasi')
-                                    ->label('Nama Bengkel Estimasi')
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->bengkel_estimasi),
-                                Forms\Components\TextInput::make('no_telp_bengkel')
-                                    ->label('No. Telp Bengkel')
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->no_telp_bengkel),
-                                Forms\Components\TextInput::make('nominal_estimasi')
-                                    ->label('Nominal Estimasi')
-                                    ->numeric()
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->nominal_estimasi),
-                            ])
-                            ->columns(2),
-                        Forms\Components\Fieldset::make('Informasi Pengajuan')
-                            ->schema([
-                                Forms\Components\Select::make('kode')
-                                    ->label('Kode')
-                                    ->options([
-                                        'op' => 'OP',
-                                        'sc' => 'SC',
-                                        'sp' => 'SP',
-                                        'stnk' => 'STNK',
-                                    ])
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->kode),
-                                Forms\Components\DatePicker::make('tanggal_masuk_finance')
-                                    ->label('Tanggal Masuk Finance')
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
-                                Forms\Components\Select::make('prioritas')
-                                    ->label('Prioritas')
-                                    ->options([
-                                        'pengambilan_ba' => 'PENGAMBILAN BA',
-                                        'segera' => 'SEGERA',
-                                        'urgent' => 'URGENT',
-                                        'lainnya' => 'LAINNYA',
-                                    ])
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->prioritas ?? 'pengambilan_ba'),
-                            ])
-                            ->columns(2),
-                        Forms\Components\Fieldset::make('Informasi Finance')
-                            ->schema([
-                                Forms\Components\DatePicker::make('tanggal_tf_finance')
-                                    ->label('Tanggal Transfer Finance')
-                                    // ->required()
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->tanggal_tf_finance),
-                                Forms\Components\TextInput::make('nominal_tf_finance')
-                                    ->label('Nominal Transfer Finance')
-                                    ->numeric()
-                                    // ->required()
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->nominal_tf_finance),
-                                Forms\Components\TextInput::make('payment_2')
-                                    ->label('Rekening Atas Nama')
-                                    // ->required()
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->payment_2),
-                                Forms\Components\TextInput::make('bank_2')
-                                    ->label('Bank')
-                                    // ->required()
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->bank_2),
-                                Forms\Components\TextInput::make('norek_2')
-                                    ->label('No. Rekening')
-                                    // ->required()
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->norek_2),
-                                Forms\Components\TextInput::make('status_finance')
-                                    ->label('Status Finance')
-                                    ->required()
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid'),
-                            ])
-                            ->columns(2),
-                        Forms\Components\Fieldset::make('Transfer Bengkel')
-                            ->schema([
-                                Forms\Components\Select::make('nama_rek_bengkel')
-                                    ->label('Nama Rekening Bengkel')
-                                    ->options(
-                                        \App\Models\Norek::pluck('name', 'name')->toArray()
-                                    )
-                                    ->searchable()
-                                    ->nullable()
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($component, $state, callable $set) {
-                                        $component->state(strtoupper($state));
-                                        $norek = \App\Models\Norek::where('name', $state)->first();
-                                        $set('rek_bengkel', $norek?->norek);
-                                        $set('bank_bengkel', $norek?->bank);
-                                    })
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
-                                            ->label('Nama Rekening')
-                                            ->required()
-                                            ->maxLength(255),
-                                        Forms\Components\TextInput::make('norek')
-                                            ->label('No. Rekening')
-                                            ->required()
-                                            ->numeric()
-                                            ->maxLength(255),
-                                        Forms\Components\Select::make('bank')
-                                            ->label('Bank')
-                                            ->required()
-                                            ->options([
-                                                'BCA' => 'BCA',
-                                                'MANDIRI' => 'MANDIRI',
-                                                'BRI' => 'BRI',
-                                                'BNI' => 'BNI',
-                                                'PERMATA' => 'PERMATA',
-                                                'BTN' => 'BTN',
-                                            ]),
-                                    ])
-                                    ->createOptionUsing(function (array $data) {
-                                        // Cek duplikat berdasarkan name atau norek
-                                        $exists = \App\Models\Norek::where('name', $data['name'])
-                                            ->orWhere('norek', $data['norek'])
-                                            ->exists();
-                                        if ($exists) {
-                                            \Filament\Notifications\Notification::make()
-                                                ->title('Gagal Menambah Rekening')
-                                                ->body('Nama rekening atau nomor rekening sudah terdaftar.')
-                                                ->danger()
-                                                ->send();
-                                            return $data['name'];
-                                        }
-                                        \App\Models\Norek::create(['name' => $data['name'], 'norek' => $data['norek'], 'bank' => $data['bank']]);
-                                        \Filament\Notifications\Notification::make()
-                                            ->title('Berhasil Menambah Rekening')
-                                            ->body('Nama rekening dan nomor rekening berhasil ditambahkan.')
-                                            ->success()
-                                            ->send();
-                                        return $data['name'];
-                                    })
-                                    ->createOptionAction(function ($action) {
-                                        $action->modalHeading('Tambah Nama Rekening Baru');
-                                    }),
-                                Forms\Components\TextInput::make('rek_bengkel')
-                                    ->nullable()
-                                    ->label('No. Rekening Bengkel')
-                                    ->readOnly()
-                                    ->maxLength(255)
-                                    ->numeric()
-                                    ->default(function (callable $get) {
-                                        $nama = $get('nama_rek_bengkel');
-                                        if (!$nama) return null;
-                                        $norek = \App\Models\Norek::where('name', $nama)->first();
-                                        return $norek?->norek;
-                                    })
-                                    ->reactive()
-                                    ->afterStateHydrated(function ($component, $state, callable $get) {
-                                        $nama = $get('nama_rek_bengkel');
-                                        if ($nama) {
-                                            $norek = \App\Models\Norek::where('name', $nama)->first();
-                                            $component->state($norek?->norek);
-                                        }
-                                    }),
-
-                                Forms\Components\TextInput::make('bank_bengkel')
-                                    ->nullable()
-                                    ->label('Bank')
-                                    ->maxLength(255)
-                                    ->readOnly()
-                                    ->default(function (callable $get) {
-                                        $nama = $get('nama_rek_bengkel');
-                                        if (!$nama) return null;
-                                        $norek = \App\Models\Norek::where('name', $nama)->first();
-                                        return $norek?->bank;
-                                    })
-                                    ->reactive()
-                                    ->afterStateHydrated(function ($component, $state, callable $get) {
-                                        $nama = $get('nama_rek_bengkel');
-                                        if ($nama) {
-                                            $norek = \App\Models\Norek::where('name', $nama)->first();
-                                            $component->state($norek?->bank);
-                                        }
-                                    }),
-                                Forms\Components\TextInput::make('nominal_tf_bengkel')
-                                    ->label('Nominal Transfer Bengkel')
-                                    ->numeric()
-                                    ->reactive()
-                                    ->required(fn($record) => $record->complete?->status_finance === 'paid')
-                                    ->nullable()
-                                    ->default(fn($record) => $record->complete?->nominal_tf_bengkel),
-                                Forms\Components\TextInput::make('selisih_tf')
-                                    ->label('Selisih Transfer')
-                                    ->numeric()
-                                    ->required(fn($record) => $record->complete?->status_finance === 'paid')
-                                    ->default(fn($record) => $record->complete?->selisih_tf)
-                                    ->reactive()
-                                    ->afterStateUpdated(fn(callable $set, $state, callable $get) => $set(
-                                        'selisih_tf',
-                                        // Ambil nilai nominal_tf_finance dari database berdasarkan record
-                                        $get('nominal_tf_finance') - $get('nominal_tf_bengkel')
-                                    )),
-                                Forms\Components\DatePicker::make('tanggal_tf_bengkel')
-                                    ->label('Tanggal Transfer Bengkel')
-                                    ->nullable()
-                                    ->required(fn(callable $get) => !empty($get('nominal_tf_bengkel')))
-                                    ->default(fn($record) => $record->complete?->tanggal_tf_bengkel),
-                                Forms\Components\DatePicker::make('tanggal_pengerjaan')
-                                    ->label('Tanggal Pengerjaan')
-                                    ->nullable()
-                                    ->required(fn(callable $get) => !empty($get('nominal_tf_bengkel')))
-                                    ->default(fn($record) => $record->complete?->tanggal_pengerjaan),
-                            ])
-                            ->columns(2),
-                        Forms\Components\Fieldset::make('Dokumentasi')
-                            ->schema([
-                                Forms\Components\TextInput::make('bengkel_invoice')
-                                    ->label('Bengkel Invoice')
-                                    ->default(fn($record) => $record->complete?->bengkel_invoice),
-                                Forms\Components\FileUpload::make('foto_nota')
-                                    ->label('Foto Nota')
-                                    ->image()
-                                    ->resize(50)
-                                    ->maxWidth(1024)
-                                    ->optimize('webp')
-                                    ->maxSize(2048) // Maksimal 2MB
-                                    ->disk('public')
-                                    ->directory('foto_nota')
-                                    ->multiple()
-                                    ->maxFiles(3)
-                                    ->nullable()
-                                    ->default(fn($record) => $record->complete?->foto_nota)
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
-                                        if (count($state) > 3) {
-                                            $set('foto_nota', array_slice($state, 0, 3));
-                                        }
-                                        $record = $livewire->record ?? null;
-                                        if ($record && is_array($record->complete->foto_nota)) {
-                                            $lama = collect($record->complete->foto_nota);
-                                            $baru = collect($state);
-                                            $yangDihapus = $lama->diff($baru);
-                                            foreach ($yangDihapus as $path) {
-                                                Storage::disk('public')->delete($path);
-                                            }
-                                        }
-                                    }),
-                            ])
-                            ->columns(2),
-                    ])
-                    ->action(function (array $data, Pengajuan $record) {
-                        $record->complete()->updateOrCreate([], $data);
-                        Notification::make()
-                            ->title('Data pengajuan berhasil di edit.')
-                            ->success()
-                            ->send();
-                    }),
+                    ->url(fn($record) => PengajuanResource::getUrl('edit-complete', ['record' => $record])),
                 Tables\Actions\Action::make('Proses')
                     ->label('Proses')
                     ->icon('heroicon-o-clipboard-document-list')
-                    ->form([
-                        Forms\Components\Fieldset::make('Informasi Bengkel')
-                            ->schema([
-                                Hidden::make('user_id')
-                                    ->default(\Illuminate\Support\Facades\Auth::user()->id),
-                                Forms\Components\TextInput::make('bengkel_estimasi')
-                                    ->label('Nama Bengkel Estimasi')
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->bengkel_estimasi),
-                                Forms\Components\TextInput::make('no_telp_bengkel')
-                                    ->label('No. Telp Bengkel')
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->no_telp_bengkel),
-                                Forms\Components\TextInput::make('nominal_estimasi')
-                                    ->label('Nominal Estimasi')
-                                    ->numeric()
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->nominal_estimasi),
-                            ])
-                            ->columns(2),
-                        Forms\Components\Fieldset::make('Informasi Pengajuan')
-                            ->schema([
-                                Forms\Components\Select::make('kode')
-                                    ->label('Kode')
-                                    ->options([
-                                        'op' => 'OP',
-                                        'sc' => 'SC',
-                                        'sp' => 'SP',
-                                        'stnk' => 'STNK',
-                                    ])
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->kode),
-                                Forms\Components\DatePicker::make('tanggal_masuk_finance')
-                                    ->label('Tanggal Masuk Finance')
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
-                                Forms\Components\Select::make('prioritas')
-                                    ->label('Prioritas')
-                                    ->options([
-                                        'pengambilan_ba' => 'PENGAMBILAN BA',
-                                        'segera' => 'SEGERA',
-                                        'urgent' => 'URGENT',
-                                        'lainnya' => 'LAINNYA',
-                                    ])
-                                    ->required()
-                                    ->default(fn($record) => $record->complete?->prioritas ?? 'pengambilan_ba'),
-                            ])
-                            ->columns(2),
-                        Forms\Components\Fieldset::make('Informasi Finance')
-                            ->schema([
-                                Forms\Components\DatePicker::make('tanggal_tf_finance')
-                                    ->label('Tanggal Transfer Finance')
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->tanggal_tf_finance),
-                                Forms\Components\TextInput::make('nominal_tf_finance')
-                                    ->label('Nominal Transfer Finance')
-                                    ->numeric()
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->nominal_tf_finance),
-                                Forms\Components\TextInput::make('payment_2')
-                                    ->label('Rekening Atas Nama')
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->payment_2),
-                                Forms\Components\TextInput::make('bank_2')
-                                    ->label('Bank')
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->bank_2),
-                                Forms\Components\TextInput::make('norek_2')
-                                    ->label('No. Rekening')
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->norek_2),
-                                Forms\Components\TextInput::make('status_finance')
-                                    ->label('Status Finance')
-                                    ->required()
-                                    ->readOnly()
-                                    ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid'),
-                            ])
-                            ->columns(2),
-                        Forms\Components\Fieldset::make('Transfer Bengkel')
-                            ->schema([
-                                Forms\Components\Select::make('nama_rek_bengkel')
-                                    ->label('Nama Rekening Bengkel')
-                                    ->options(
-                                        \App\Models\Norek::pluck('name', 'name')->toArray()
-                                    )
-                                    ->searchable()
-                                    ->nullable()
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($component, $state, callable $set) {
-                                        $component->state(strtoupper($state));
-                                        $norek = \App\Models\Norek::where('name', $state)->first();
-                                        $set('rek_bengkel', $norek?->norek);
-                                        $set('bank_bengkel', $norek?->bank);
-                                    })
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
-                                            ->label('Nama Rekening')
-                                            ->required()
-                                            ->maxLength(255),
-                                        Forms\Components\TextInput::make('norek')
-                                            ->label('No. Rekening')
-                                            ->required()
-                                            ->numeric()
-                                            ->maxLength(255),
-                                        Forms\Components\Select::make('bank')
-                                            ->label('Bank')
-                                            ->required()
-                                            ->options([
-                                                'BCA' => 'BCA',
-                                                'MANDIRI' => 'MANDIRI',
-                                                'BRI' => 'BRI',
-                                                'BNI' => 'BNI',
-                                                'PERMATA' => 'PERMATA',
-                                                'BTN' => 'BTN',
-                                            ]),
-                                    ])
-                                    ->createOptionUsing(function (array $data) {
-                                        // Cek duplikat berdasarkan name atau norek
-                                        $exists = \App\Models\Norek::where('name', $data['name'])
-                                            ->orWhere('norek', $data['norek'])
-                                            ->exists();
-                                        if ($exists) {
-                                            \Filament\Notifications\Notification::make()
-                                                ->title('Gagal Menambah Rekening')
-                                                ->body('Nama rekening atau nomor rekening sudah terdaftar.')
-                                                ->danger()
-                                                ->send();
-                                            return $data['name'];
-                                        }
-                                        \App\Models\Norek::create(['name' => $data['name'], 'norek' => $data['norek'], 'bank' => $data['bank']]);
-                                        \Filament\Notifications\Notification::make()
-                                            ->title('Berhasil Menambah Rekening')
-                                            ->body('Nama rekening dan nomor rekening berhasil ditambahkan.')
-                                            ->success()
-                                            ->send();
-                                        return $data['name'];
-                                    })
-                                    ->createOptionAction(function ($action) {
-                                        $action->modalHeading('Tambah Nama Rekening Baru');
-                                    }),
-                                Forms\Components\TextInput::make('rek_bengkel')
-                                    ->nullable()
-                                    ->label('No. Rekening Bengkel')
-                                    ->readOnly()
-                                    ->maxLength(255)
-                                    ->numeric()
-                                    ->default(function (callable $get) {
-                                        $nama = $get('nama_rek_bengkel');
-                                        if (!$nama) return null;
-                                        $norek = \App\Models\Norek::where('name', $nama)->first();
-                                        return $norek?->norek;
-                                    })
-                                    ->reactive()
-                                    ->afterStateHydrated(function ($component, $state, callable $get) {
-                                        $nama = $get('nama_rek_bengkel');
-                                        if ($nama) {
-                                            $norek = \App\Models\Norek::where('name', $nama)->first();
-                                            $component->state($norek?->norek);
-                                        }
-                                    }),
-
-                                Forms\Components\TextInput::make('bank_bengkel')
-                                    ->nullable()
-                                    ->label('Bank')
-                                    ->maxLength(255)
-                                    ->readOnly()
-                                    ->default(function (callable $get) {
-                                        $nama = $get('nama_rek_bengkel');
-                                        if (!$nama) return null;
-                                        $norek = \App\Models\Norek::where('name', $nama)->first();
-                                        return $norek?->bank;
-                                    })
-                                    ->reactive()
-                                    ->afterStateHydrated(function ($component, $state, callable $get) {
-                                        $nama = $get('nama_rek_bengkel');
-                                        if ($nama) {
-                                            $norek = \App\Models\Norek::where('name', $nama)->first();
-                                            $component->state($norek?->bank);
-                                        }
-                                    }),
-                                Forms\Components\TextInput::make('nominal_tf_bengkel')
-                                    ->label('Nominal Transfer Bengkel')
-                                    ->numeric()
-                                    ->reactive()
-                                    ->required(fn($record) => $record->complete?->status_finance === 'paid')
-                                    ->nullable()
-                                    ->default(fn($record) => $record->complete?->nominal_tf_bengkel),
-                                Forms\Components\TextInput::make('selisih_tf')
-                                    ->label('Selisih Transfer')
-                                    ->numeric()
-                                    ->required(fn($record) => $record->complete?->status_finance === 'paid')
-                                    ->default(fn($record) => $record->complete?->selisih_tf)
-                                    ->reactive()
-                                    ->afterStateUpdated(fn(callable $set, $state, callable $get) => $set(
-                                        'selisih_tf',
-                                        // Ambil nilai nominal_tf_finance dari database berdasarkan record
-                                        $get('nominal_tf_finance') - $get('nominal_tf_bengkel')
-                                    )),
-                                Forms\Components\DatePicker::make('tanggal_tf_bengkel')
-                                    ->label('Tanggal Transfer Bengkel')
-                                    ->nullable()
-                                    ->required(fn(callable $get) => !empty($get('nominal_tf_bengkel')))
-                                    ->default(fn($record) => $record->complete?->tanggal_tf_bengkel),
-                                Forms\Components\DatePicker::make('tanggal_pengerjaan')
-                                    ->label('Tanggal Pengerjaan')
-                                    ->nullable()
-                                    ->required(fn(callable $get) => !empty($get('nominal_tf_bengkel')))
-                                    ->default(fn($record) => $record->complete?->tanggal_pengerjaan),
-                            ])
-                            ->columns(2),
-                        Forms\Components\Fieldset::make('Dokumentasi')
-                            ->schema([
-                                Forms\Components\TextInput::make('bengkel_invoice')
-                                    ->label('Bengkel Invoice')
-                                    ->default(fn($record) => $record->complete?->bengkel_invoice),
-                                Forms\Components\FileUpload::make('foto_nota')
-                                    ->label('Foto Nota')
-                                    ->image()
-                                    ->maxSize(2048) // Maksimal 2MB
-                                    ->disk('public')
-                                    ->directory('foto_nota')
-                                    ->multiple()
-                                    ->maxFiles(3)
-                                    ->nullable()
-                                    ->default(fn($record) => $record->complete?->foto_nota)
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
-                                        if (count($state) > 3) {
-                                            $set('foto_nota', array_slice($state, 0, 3));
-                                        }
-                                        $record = $livewire->record ?? null;
-                                        if ($record && is_array($record->complete->foto_nota)) {
-                                            $lama = collect($record->complete->foto_nota);
-                                            $baru = collect($state);
-                                            $yangDihapus = $lama->diff($baru);
-                                            foreach ($yangDihapus as $path) {
-                                                Storage::disk('public')->delete($path);
-                                            }
-                                        }
-                                    }),
-                            ])
-                            ->columns(2),
-                    ])
-                    ->action(function (array $data, Pengajuan $record) {
-                        $record->complete()->updateOrCreate([], $data);
-                        $nominalTfBengkel = $data['nominal_tf_bengkel'] ?? null;
-                        $record->update([
-                            'keterangan_proses' => !empty($nominalTfBengkel) ? 'done' : 'checker'
-                        ]);
-                        Notification::make()
-                            ->title('Data pengajuan berhasil diproses.')
-                            ->success()
-                            ->send();
-                    }),
+                    ->url(fn($record) => PengajuanResource::getUrl('proses-complete', ['record' => $record])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -1182,7 +701,8 @@ class PengajuanResource extends Resource
         return $page->generateNavigationItems([
             Pages\ViewPengajuan::class,
             Pages\EditPengajuan::class,
-            // Pages\ProsesPengajuans::class,
+            Pages\ProsesCompletePengajuan::class,
+            Pages\EditCompletePengajuan::class,
         ]);
     }
 
@@ -1205,6 +725,8 @@ class PengajuanResource extends Resource
             'create' => Pages\CreatePengajuan::route('/create'),
             'edit' => Pages\EditPengajuan::route('/{record}/edit'),
             'view' => Pages\ViewPengajuan::route('/{record}'),
+            'edit-complete' => Pages\EditCompletePengajuan::route('/{record}/edit-complete'),
+            'proses-complete' => Pages\ProsesCompletePengajuan::route('/{record}/proses-complete'),
         ];
     }
 

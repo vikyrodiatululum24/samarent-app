@@ -17,6 +17,8 @@ class LaporanKeuanganServiceResource extends Resource
 
     protected static ?string $navigationLabel = 'Laporan Keuangan Service';
 
+    protected static ?string $navigationGroup = 'Keuangan';
+
     protected static ?string $label = 'Laporan Keuangan Service';
 
     private static function getTotalAll(): array

@@ -41,8 +41,9 @@ class AbsensiPanelProvider extends PanelProvider
                 'success' => '#22C55E', // ganti warna sukses
                 'yellow' => '#FBBF24', // ganti warna peringatan
             ])
-            ->discoverResources(in: app_path('Filament/Absensi/Resources'), for: 'App\\Filament\\Absensi\\Resources')
-            ->resources([
+            ->discoverResources(in: app_path('Filament/Absensi/Resources'), for: 'App\\Filament\\Absensi\\Resources')            ->resources([
+                \App\Filament\Resources\ReimbursementResource::class,
+            ])            ->resources([
                 \App\Filament\Resources\BengkelResource::class,
             ])
             ->discoverPages(in: app_path('Filament/Absensi/Pages'), for: 'App\\Filament\\Absensi\\Pages')
@@ -130,14 +131,14 @@ class AbsensiPanelProvider extends PanelProvider
 
                 NavigationItem::make('Absensi Driver')
                     ->url('https://driver.servicesamarent.com', shouldOpenInNewTab: true)
-                    ->group('External Links')
+                    ->group('Panels')
                     ->sort(7)
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
-                    ->group('External Links')
+                    ->group('Panels')
                     ->sort(8)
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',

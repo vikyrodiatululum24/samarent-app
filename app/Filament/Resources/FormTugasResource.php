@@ -26,6 +26,8 @@ class FormTugasResource extends Resource
 
     protected static ?string $navigationLabel = 'Form Tugas Keluar';
 
+    protected static ?string $navigationGroup = 'Master Data';
+
     protected static ?string $modelLabel = 'Form Tugas';
 
     protected static ?string $pluralModelLabel = 'Form Tugas';

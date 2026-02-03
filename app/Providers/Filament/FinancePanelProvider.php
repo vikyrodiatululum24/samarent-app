@@ -10,6 +10,7 @@ use Filament\Facades\Filament;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Navigation\NavigationItem;
+use App\Filament\Pages\Auth\EditProfile;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -42,11 +43,13 @@ class FinancePanelProvider extends PanelProvider
                 'success' => '#22C55E', // ganti warna sukses
                 'yellow' => '#FBBF24', // ganti warna peringatan
             ])
-            ->discoverResources(in: app_path('Filament/Finance/Resources'), for: 'App\\Filament\\Finance\\Resources')
-            ->resources([
+            ->discoverResources(in: app_path('Filament/Finance/Resources'), for: 'App\\Filament\\Finance\\Resources')            ->resources([
+                \App\Filament\Resources\ReimbursementResource::class,
+            ])            ->resources([
                 \App\Filament\Resources\BengkelResource::class,
             ])
             ->discoverPages(in: app_path('Filament/Finance/Pages'), for: 'App\\Filament\\Finance\\Pages')
+            ->profile(EditProfile::class, false)
             ->pages([
                 Pages\Dashboard::class,
             ])
@@ -134,14 +137,14 @@ class FinancePanelProvider extends PanelProvider
 
                 NavigationItem::make('Absensi Driver')
                     ->url('https://driver.servicesamarent.com', shouldOpenInNewTab: true)
-                    ->group('External Links')
+                    ->group('Panels')
                     ->sort(7)
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
-                    ->group('External Links')
+                    ->group('Panels')
                     ->sort(8)
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',

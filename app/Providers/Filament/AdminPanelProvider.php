@@ -152,14 +152,14 @@ class AdminPanelProvider extends PanelProvider
 
                 NavigationItem::make('Absensi Driver')
                     ->url('https://driver.servicesamarent.com', shouldOpenInNewTab: true)
-                    ->group('External Links')
+                    ->group('Panels')
                     ->sort(3)
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
-                    ->group('External Links')
+                    ->group('Panels')
                     ->sort(3)
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',

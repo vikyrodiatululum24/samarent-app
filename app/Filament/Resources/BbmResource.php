@@ -15,6 +15,8 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\HtmlString;
 
 class BbmResource extends Resource
 {
@@ -84,6 +86,8 @@ class BbmResource extends Resource
                     ->searchable(),
 
                 Tables\Columns\ImageColumn::make('barcode_bbm')
+                    ->url(fn (Bbm $record): ?string => $record->barcode_bbm ? asset('storage/' . $record->barcode_bbm) : null)
+                    ->openUrlInNewTab()
                     ->label('Foto Barcode')
                     ->circular()
                     ->size(60),
