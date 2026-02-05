@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReimbursementPdfController;
+use App\Http\Controllers\PublicReimbursementController;
 
 Route::get('/', function () {
     $user = Auth::user();
@@ -30,6 +31,13 @@ Route::get('/', function () {
     }
     return redirect('/login');
 })->name('dashboard');
+
+// Public Reimbursement Routes (No Authentication Required)
+Route::prefix('public')->name('reimbursement.')->group(function () {
+    Route::get('/reimbursement/create', [PublicReimbursementController::class, 'create'])->name('create');
+    Route::post('/reimbursement/store', [PublicReimbursementController::class, 'store'])->name('store');
+    Route::get('/reimbursement/success', [PublicReimbursementController::class, 'success'])->name('success');
+});
 
 
 Route::middleware('auth')->group(function () {

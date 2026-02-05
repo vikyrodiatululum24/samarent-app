@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Reimbursement Token
+    |--------------------------------------------------------------------------
+    |
+    | This token is used to access the public reimbursement form without
+    | authentication. Change this to a secure random string in production.
+    |
+    */
+
+    'reimbursement_token' => env('REIMBURSEMENT_TOKEN', 'reimbursement2026'),
+
 ];
