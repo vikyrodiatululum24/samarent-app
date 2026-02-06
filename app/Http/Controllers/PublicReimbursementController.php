@@ -45,10 +45,12 @@ class PublicReimbursementController extends Controller
         // Validate the request
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
-            'km_awal' => 'required|numeric|min:0',
-            'foto_odometer_awal' => 'required|image|max:10240', // max 10MB
+            'type' => 'required|in:bbm,tol,parkir,lainnya',
+            'km_awal' => 'nullable|numeric|min:0',
+            'foto_odometer_awal' => 'nullable|image|max:10240',
             'km_akhir' => 'nullable|numeric|min:0|gt:km_awal',
-            'foto_odometer_akhir' => 'image|max:10240',
+            'foto_odometer_akhir' => 'nullable|image|max:10240',
+            'nota' => 'nullable|image|max:10240',
             'tujuan_perjalanan' => 'required|string|max:500',
             'keterangan' => 'nullable|string',
             'dana_masuk' => 'nullable|numeric|min:0',
@@ -66,6 +68,7 @@ class PublicReimbursementController extends Controller
             // Handle file uploads with compression
             $fotoOdometerAwalPath = null;
             $fotoOdometerAkhirPath = null;
+            $notaPath = null;
 
             if ($request->hasFile('foto_odometer_awal')) {
                 $fotoOdometerAwalPath = $this->compressAndStoreImage(
@@ -81,13 +84,22 @@ class PublicReimbursementController extends Controller
                 );
             }
 
+            if ($request->hasFile('nota')) {
+                $notaPath = $this->compressAndStoreImage(
+                    $request->file('nota'),
+                    'reimbursement/nota'
+                );
+            }
+
             // Create reimbursement
             $reimbursement = Reimbursement::create([
                 'user_id' => $request->user_id,
+                'type' => $request->type,
                 'km_awal' => $request->km_awal,
                 'foto_odometer_awal' => $fotoOdometerAwalPath,
                 'km_akhir' => $request->km_akhir,
                 'foto_odometer_akhir' => $fotoOdometerAkhirPath,
+                'nota' => $notaPath,
                 'tujuan_perjalanan' => $request->tujuan_perjalanan,
                 'keterangan' => $request->keterangan,
                 'dana_masuk' => $request->dana_masuk ?? 0,
@@ -106,7 +118,9 @@ class PublicReimbursementController extends Controller
             if (isset($fotoOdometerAkhirPath)) {
                 Storage::disk('public')->delete($fotoOdometerAkhirPath);
             }
-
+            if (isset($notaPath)) {
+                Storage::disk('public')->delete($notaPath);
+            }
             return back()
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());

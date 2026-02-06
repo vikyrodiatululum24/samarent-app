@@ -101,6 +101,16 @@ class ViewReimbursement extends ViewRecord
                             ->label('Keterangan')
                             ->placeholder('-')
                             ->columnSpanFull(),
+                        Components\ImageEntry::make('nota')
+                            ->label('Foto Nota')
+                            ->width('100%')
+                            ->height('auto')
+                            ->extraImgAttributes([
+                                'class' => 'rounded-lg shadow-lg',
+                                'style' => 'max-height: 500px; object-fit: contain;'
+                            ])
+                            ->placeholder('-')
+                            ->columnSpanFull(),
                     ])
                     ->columns(2)
                     ->collapsible(),

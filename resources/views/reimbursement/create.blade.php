@@ -181,15 +181,36 @@
                         @enderror
                     </div>
 
+                    <!-- Type Selection -->
+                    <div class="mb-6">
+                        <label for="type" class="block text-sm font-medium text-gray-700 mb-2">
+                            Tipe Reimbursement <span class="text-red-500">*</span>
+                        </label>
+                        <select
+                            name="type"
+                            id="type"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required>
+                            <option value="">-- Pilih Tipe --</option>
+                            <option value="bbm" {{ old('type') == 'bbm' ? 'selected' : '' }}>BBM</option>
+                            <option value="tol" {{ old('type') == 'tol' ? 'selected' : '' }}>Tol</option>
+                            <option value="parkir" {{ old('type') == 'parkir' ? 'selected' : '' }}>Parkir</option>
+                            <option value="lainnya" {{ old('type') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
+                        </select>
+                        @error('type')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Data Odometer Awal Section -->
-                    <div class="mb-8">
+                    <div class="mb-8" id="section_odometer_awal" style="display: none;">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">
                             Data Odometer Awal
                         </h2>
 
                         <div class="mb-4">
                             <label for="km_awal" class="block text-sm font-medium text-gray-700 mb-2">
-                                KM Awal <span class="text-red-500">*</span>
+                                KM Awal
                             </label>
                             <input
                                 type="number"
@@ -199,8 +220,7 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Contoh: 12345"
                                 min="0"
-                                step="1"
-                                required>
+                                step="1">
                             @error('km_awal')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -208,7 +228,7 @@
 
                         <div class="mb-4">
                             <label for="foto_odometer_awal" class="block text-sm font-medium text-gray-700 mb-2">
-                                Foto Odometer Awal (Kamera) <span class="text-red-500">*</span>
+                                Foto Odometer Awal
                             </label>
                             <input
                                 type="file"
@@ -217,8 +237,7 @@
                                 accept="image/*"
                                 capture="environment"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                onchange="previewImage(this, 'preview_awal')"
-                                required>
+                                onchange="previewImage(this, 'preview_awal')">
                             <p class="text-sm text-gray-500 mt-1">Format: JPG, JPEG, PNG. Maksimal 10MB</p>
                             <img id="preview_awal" class="preview-image hidden rounded-lg border-2 border-gray-300" alt="Preview">
                             @error('foto_odometer_awal')
@@ -228,7 +247,7 @@
                     </div>
 
                     <!-- Data Odometer Akhir Section -->
-                    <div class="mb-8">
+                    <div class="mb-8" id="section_odometer_akhir" style="display: none;">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">
                             Data Odometer Akhir
                         </h2>
@@ -253,7 +272,7 @@
 
                         <div class="mb-4">
                             <label for="foto_odometer_akhir" class="block text-sm font-medium text-gray-700 mb-2">
-                                Foto Odometer Akhir (Kamera)
+                                Foto Odometer Akhir
                             </label>
                             <input
                                 type="file"
@@ -281,13 +300,13 @@
                             <label for="tujuan_perjalanan" class="block text-sm font-medium text-gray-700 mb-2">
                                 Tujuan Perjalanan <span class="text-red-500">*</span>
                             </label>
-                            <textarea
+                            <input
+                                type="text"
                                 name="tujuan_perjalanan"
                                 id="tujuan_perjalanan"
-                                rows="3"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Contoh: Perjalanan dinas ke Jakarta untuk meeting dengan klien"
-                                required>{{ old('tujuan_perjalanan') }}</textarea>
+                                placeholder="Contoh: Bandung"
+                                required value="{{ old('tujuan_perjalanan') }}">
                             @error('tujuan_perjalanan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -295,15 +314,42 @@
 
                         <div class="mb-4">
                             <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-2">
-                                Keterangan Tambahan
+                                Keterangan Tambahan <span class="text-red-500">*</span>
                             </label>
                             <textarea
                                 name="keterangan"
                                 id="keterangan"
                                 rows="3"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Keterangan tambahan jika ada">{{ old('keterangan') }}</textarea>
+                                placeholder="Jelaskan tujuan perjalanan"
+                                required>{{ old('keterangan') }}</textarea>
                             @error('keterangan')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- foto Nota --}}
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">
+                            Foto Nota Pembayaran
+                        </h2>
+
+                        <div class="mb-4">
+                            <label for="nota" class="block text-sm font-medium text-gray-700 mb-2">
+                                Upload Foto Nota <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="file"
+                                name="nota"
+                                id="nota"
+                                accept="image/*"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                onchange="previewImage(this, 'preview_nota')"
+                                required>
+                            <p class="text-sm text-gray-500 mt-1">Format: JPG, JPEG, PNG. Maksimal 10MB</p>
+                            <img id="preview_nota" class="preview-image hidden rounded-lg border-2 border-gray-300" alt="Preview">
+                            @error('nota')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -398,6 +444,14 @@
                 }
             });
 
+            // Handle type selection change
+            $('#type').on('change', function() {
+                toggleOdometerSections();
+            });
+
+            // Initialize on page load
+            toggleOdometerSections();
+
             // Form submit handler
             $('form').on('submit', function(e) {
                 // Show loading overlay
@@ -413,6 +467,28 @@
                 return true;
             });
         });
+
+        // Function to toggle odometer sections visibility
+        function toggleOdometerSections() {
+            const typeValue = $('#type').val();
+            const odometerAwalSection = $('#section_odometer_awal');
+            const odometerAkhirSection = $('#section_odometer_akhir');
+
+            if (typeValue === 'bbm') {
+                odometerAwalSection.slideDown();
+                odometerAkhirSection.slideDown();
+            } else {
+                odometerAwalSection.slideUp();
+                odometerAkhirSection.slideUp();
+                // Clear values when hidden
+                $('#km_awal').val('');
+                $('#km_akhir').val('');
+                $('#foto_odometer_awal').val('');
+                $('#foto_odometer_akhir').val('');
+                $('#preview_awal').addClass('hidden').attr('src', '');
+                $('#preview_akhir').addClass('hidden').attr('src', '');
+            }
+        }
 
         function previewImage(input, previewId) {
             const preview = document.getElementById(previewId);

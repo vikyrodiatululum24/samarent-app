@@ -33,12 +33,24 @@ class ReimbursementResource extends Resource
                     ->default(Auth::id())
                     ->required(),
 
+                Forms\Components\Select::make('type')
+                    ->label('Tipe Reimbursement')
+                    ->options([
+                        'bbm' => 'BBM',
+                        'tol' => 'Tol',
+                        'parkir' => 'Parkir',
+                        'lainnya' => 'Lainnya',
+                    ])
+                    ->required()
+                    ->live()
+                    ->columnSpanFull()
+                    ->placeholder('Pilih tipe reimbursement'),
+
                 Forms\Components\Section::make('Data Odometer Awal')
                     ->schema([
                         Forms\Components\TextInput::make('km_awal')
                             ->label('KM Awal')
                             ->numeric()
-                            ->required()
                             ->minValue(0)
                             ->suffix('KM')
                             ->placeholder('Masukkan KM awal'),
@@ -51,14 +63,14 @@ class ReimbursementResource extends Resource
                             ->directory('reimbursement/odometer-awal')
                             ->visibility('public')
                             ->imagePreviewHeight('250')
-                            ->required()
                             ->acceptedFileTypes(['image/jpeg', 'image/png'])
                             ->extraInputAttributes([
                                 'capture' => 'environment',
                             ])
                             ->columnSpanFull(),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->visible(fn (Forms\Get $get) => $get('type') === 'bbm'),
 
                 Forms\Components\Section::make('Data Odometer Akhir')
                     ->schema([
@@ -85,23 +97,42 @@ class ReimbursementResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
-                    ->collapsible(),
+                    ->collapsible()
+                    ->visible(fn (Forms\Get $get) => $get('type') === 'bbm'),
 
                 Forms\Components\Section::make('Detail Perjalanan')
                     ->schema([
                         Forms\Components\TextInput::make('tujuan_perjalanan')
                             ->label('Tujuan Perjalanan')
+                            ->required()
                             ->maxLength(255)
-                            ->placeholder('Masukkan tujuan perjalanan'),
+                            ->placeholder('Contoh: Bandung'),
 
                         Forms\Components\Textarea::make('keterangan')
                             ->label('Keterangan')
+                            ->required()
                             ->rows(3)
                             ->maxLength(65535)
-                            ->placeholder('Masukkan keterangan tambahan')
+                            ->placeholder('Contoh: Pengisian bahan bakar untuk perjalanan dinas')
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
+                    ->collapsible(),
+
+                Forms\Components\Section::make('Nota Pembayaran')
+                    ->schema([
+                        Forms\Components\FileUpload::make('nota')
+                            ->label('Foto Nota')
+                            ->required()
+                            ->image()
+                            ->imageEditor()
+                            ->resize(50)
+                            ->directory('reimbursement/nota')
+                            ->visibility('public')
+                            ->imagePreviewHeight('250')
+                            ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                            ->columnSpanFull(),
+                    ])
                     ->collapsible(),
 
                 Forms\Components\Section::make('Dana')
@@ -136,6 +167,13 @@ class ReimbursementResource extends Resource
                     ->label('Tanggal')
                     ->date('d/m/Y')
                     ->sortable()
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('type')
+                    ->label('Tipe')
+                    ->formatStateUsing(fn (string $state): string => strtoupper($state))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false)
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('user.name')
@@ -217,6 +255,38 @@ class ReimbursementResource extends Resource
                     ->label('Tujuan')
                     ->searchable()
                     ->limit(30)
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->placeholder('-'),
+
+                Tables\Columns\ImageColumn::make('nota')
+                    ->label('Foto Nota')
+                    ->circular()
+                    ->size(60)
+                    ->extraImgAttributes(['loading' => 'lazy'])
+                    ->action(
+                        Tables\Actions\Action::make('view_nota')
+                            ->modalContent(function (Reimbursement $record) {
+                                if (!$record->nota) {
+                                    return new HtmlString('<p class="text-center p-4">Belum ada foto nota</p>');
+                                }
+                                $imageUrl = \Storage::url($record->nota);
+                                return new HtmlString('
+                                    <div class="flex items-center justify-center p-4">
+                                        <img
+                                            src="' . $imageUrl . '"
+                                            alt="Foto Nota"
+                                            class="max-w-full h-auto rounded-lg shadow-lg"
+                                            style="max-height: 80vh; object-fit: contain;"
+                                        />
+                                    </div>
+                                ');
+                            })
+                            ->modalWidth('xl')
+                            ->modalHeading('Foto Nota')
+                            ->modalSubmitAction(false)
+                            ->modalCancelActionLabel('Tutup')
+                    )
+                    ->toggleable(isToggledHiddenByDefault: false)
                     ->placeholder('-'),
 
                 Tables\Columns\TextColumn::make('dana_masuk')

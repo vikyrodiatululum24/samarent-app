@@ -13,6 +13,8 @@ class Reimbursement extends Model
         'foto_odometer_awal',
         'km_akhir',
         'foto_odometer_akhir',
+        'nota',
+        'type',
         'tujuan_perjalanan',
         'keterangan',
         'dana_masuk',
