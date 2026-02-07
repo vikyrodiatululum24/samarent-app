@@ -185,9 +185,9 @@
                     @endphp
                     @foreach ($reimbursements as $index => $item)
                         @php
-                            $saldo = ($item->dana_masuk ?? 0) - ($item->dana_keluar ?? 0);
                             $totalMasuk += $item->dana_masuk ?? 0;
                             $totalKeluar += $item->dana_keluar ?? 0;
+                            $saldo = $totalMasuk - $totalKeluar;
                         @endphp
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>

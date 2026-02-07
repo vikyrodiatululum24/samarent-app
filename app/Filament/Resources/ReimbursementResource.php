@@ -142,16 +142,14 @@ class ReimbursementResource extends Resource
                             ->numeric()
                             ->prefix('Rp')
                             ->placeholder('0')
-                            ->minValue(0)
-                            ->step(1000),
+                            ->minValue(0),
 
                         Forms\Components\TextInput::make('dana_keluar')
                             ->label('Dana Keluar')
                             ->numeric()
                             ->prefix('Rp')
                             ->placeholder('0')
-                            ->minValue(0)
-                            ->step(1000),
+                            ->minValue(0),
                     ])
                     ->columns(2)
                     ->collapsible(),
