@@ -64,9 +64,6 @@ class ReimbursementResource extends Resource
                             ->visibility('public')
                             ->imagePreviewHeight('250')
                             ->acceptedFileTypes(['image/jpeg', 'image/png'])
-                            ->extraInputAttributes([
-                                'capture' => 'environment',
-                            ])
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
@@ -91,9 +88,6 @@ class ReimbursementResource extends Resource
                             ->visibility('public')
                             ->imagePreviewHeight('250')
                             ->acceptedFileTypes(['image/jpeg', 'image/png'])
-                            ->extraInputAttributes([
-                                'capture' => 'environment',
-                            ])
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
