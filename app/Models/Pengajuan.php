@@ -54,6 +54,6 @@ class Pengajuan extends Model
 
     public function service_unit()
     {
-        return $this->hasMany(ServiceUnit::class, 'pengajuan_id');
+        return $this->hasMany(ServiceUnit::class);
     }
 }

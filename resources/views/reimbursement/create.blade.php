@@ -235,7 +235,6 @@
                                 name="foto_odometer_awal"
                                 id="foto_odometer_awal"
                                 accept="image/*"
-                                capture="environment"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 onchange="previewImage(this, 'preview_awal')">
                             <p class="text-sm text-gray-500 mt-1">Format: JPG, JPEG, PNG. Maksimal 10MB</p>
@@ -279,7 +278,6 @@
                                 name="foto_odometer_akhir"
                                 id="foto_odometer_akhir"
                                 accept="image/*"
-                                capture="environment"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 onchange="previewImage(this, 'preview_akhir')">
                             <p class="text-sm text-gray-500 mt-1">Format: JPG, JPEG, PNG. Maksimal 10MB</p>
