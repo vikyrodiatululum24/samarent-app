@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class EndUserResource extends Resource
 {
     protected static ?string $model = EndUser::class;
-    
+
     protected static ?string $pluralModelLabel = 'End User';
 
     public static function form(Form $form): Form
@@ -44,9 +44,8 @@ class EndUserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('project_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('project.name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
