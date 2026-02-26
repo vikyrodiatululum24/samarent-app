@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PenggunaResource\Pages;
+use App\Models\Project;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -80,6 +81,13 @@ class PenggunaResource extends Resource
                             ->options([
                                 'admin' => 'Admin',
                                 'user' => 'User',
+                                'finance' => 'Finance',
+                                'manager' => 'Manager',
+                                'asuransi' => 'Asuransi',
+                                'driver' => 'Driver',
+                                'admin_driver' => 'Admin Driver',
+                                'admin_jual' => 'Admin Penjualan',
+                                
                             ]),
                     ])
                     ->query(fn($query, $data) => $query->when(
@@ -115,8 +123,11 @@ class PenggunaResource extends Resource
                                 ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null))
                                 ->default($manager?->up),
 
-                            Forms\Components\Textarea::make('perusahaan')
+                            Forms\Components\Select::make('perusahaan')
+                                ->required()
                                 ->label('Perusahaan')
+                                ->options(Project::pluck('name', 'name')->toArray())
+                                ->searchable()
                                 ->default($manager?->perusahaan),
                         ];
                     })
