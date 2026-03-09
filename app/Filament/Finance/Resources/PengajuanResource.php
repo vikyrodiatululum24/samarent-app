@@ -34,6 +34,7 @@ class PengajuanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -122,161 +123,9 @@ class PengajuanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('Proses')
-                    ->label('Proses')
+                    ->label(fn($record) => 'Proses' . ($record->keterangan_proses === 'finance' ? ' (Otorisasi)' : ''))
                     ->icon('heroicon-o-pencil')
-                    ->form([
-                        Forms\Components\Fieldset::make('Informasi Finance')
-                            ->schema([
-                                Hidden::make('finance.user_id')
-                                    ->default(\Illuminate\Support\Facades\Auth::user()->id),
-                                Forms\Components\Grid::make(3)
-                                    ->schema([
-                                        Forms\Components\Select::make('complete.payment_2')
-                                            ->label('Nama Rekening')
-                                            ->options(
-                                                \App\Models\Norek::pluck('name', 'name')->toArray()
-                                            )
-                                            ->searchable()
-                                            ->nullable()
-                                            ->reactive()
-                                            ->default(fn($record) => $record->complete?->payment_2)
-                                            ->afterStateUpdated(function ($component, $state, callable $set) {
-                                                $component->state(strtoupper($state));
-                                                $norek = \App\Models\Norek::where('name', $state)->first();
-                                                $set('complete.norek_2', $norek?->norek);
-                                                $set('complete.bank_2', $norek?->bank);
-                                                $set('complete.payment_2', $norek?->name);
-                                            })
-                                            ->createOptionForm([
-                                                Forms\Components\TextInput::make('name')
-                                                    ->label('Nama Rekening')
-                                                    ->required()
-                                                    ->maxLength(255),
-                                                Forms\Components\TextInput::make('norek')
-                                                    ->label('No. Rekening')
-                                                    ->required()
-                                                    ->numeric()
-                                                    ->maxLength(255),
-                                                Forms\Components\Select::make('bank')
-                                                    ->label('Bank')
-                                                    ->required()
-                                                    ->options([
-                                                        'BCA' => 'BCA',
-                                                        'MANDIRI' => 'MANDIRI',
-                                                        'BRI' => 'BRI',
-                                                        'BNI' => 'BNI',
-                                                        'PERMATA' => 'PERMATA',
-                                                        'BTN' => 'BTN',
-                                                    ]),
-                                            ])
-                                            ->createOptionUsing(function (array $data) {
-                                                // Cek duplikat berdasarkan name atau norek
-                                                $exists = \App\Models\Norek::where('name', $data['name'])
-                                                    ->orWhere('norek', $data['norek'])
-                                                    ->exists();
-                                                if ($exists) {
-                                                    \Filament\Notifications\Notification::make()
-                                                        ->title('Gagal Menambah Rekening')
-                                                        ->body('Nama rekening atau nomor rekening sudah terdaftar.')
-                                                        ->danger()
-                                                        ->send();
-                                                    return $data['name'];
-                                                }
-                                                \App\Models\Norek::create(['name' => $data['name'], 'norek' => $data['norek'], 'bank' => $data['bank']]);
-                                                \Filament\Notifications\Notification::make()
-                                                    ->title('Berhasil Menambah Rekening')
-                                                    ->body('Nama rekening dan nomor rekening berhasil ditambahkan.')
-                                                    ->success()
-                                                    ->send();
-                                                return $data['name'];
-                                            })
-                                            ->createOptionAction(function ($action) {
-                                                $action->modalHeading('Tambah Nama Rekening Baru');
-                                            }),
-                                        Forms\Components\TextInput::make('complete.bank_2')
-                                            ->nullable()
-                                            ->label('Bank')
-                                            ->readOnly()
-                                            ->default(function (callable $get) {
-                                                $nama = $get('complete.payment_2');
-                                                if (!$nama) return null;
-                                                $norek = \App\Models\Norek::where('name', $nama)->first();
-                                                return $norek?->bank;
-                                            })
-                                            ->reactive()
-                                            ->afterStateHydrated(function ($component, $state, callable $get) {
-                                                $nama = $get('complete.payment_2');
-                                                if ($nama) {
-                                                    $norek = \App\Models\Norek::where('name', $nama)->first();
-                                                    $component->state($norek?->bank);
-                                                }
-                                            }),
-                                        Forms\Components\TextInput::make('complete.norek_2')
-                                            ->nullable()
-                                            ->label('No. Rekening')
-                                            ->numeric()
-                                            ->maxLength(255)
-                                            ->readOnly()
-                                            ->default(function (callable $get) {
-                                                $nama = $get('complete.payment_2');
-                                                if (!$nama) return null;
-                                                $norek = \App\Models\Norek::where('name', $nama)->first();
-                                                return $norek?->norek;
-                                            })
-                                            ->reactive()
-                                            ->afterStateHydrated(function ($component, $state, callable $get) {
-                                                $nama = $get('complete.payment_2');
-                                                if ($nama) {
-                                                    $norek = \App\Models\Norek::where('name', $nama)->first();
-                                                    $component->state($norek?->norek);
-                                                }
-                                            }),
-                                    ]),
-                                Forms\Components\Grid::make(3)
-                                    ->schema([
-                                        Forms\Components\DatePicker::make('complete.tanggal_tf_finance')
-                                            ->label('Tanggal Transfer')
-                                            ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
-                                            ->default(fn($record) => $record->complete?->tanggal_tf_finance),
-
-                                        Forms\Components\TextInput::make('complete.nominal_tf_finance')
-                                            ->label('Nominal Transfer')
-                                            ->numeric()
-                                            ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
-                                            ->default(fn($record) => $record->complete?->nominal_tf_finance),
-
-                                        Forms\Components\Select::make('complete.status_finance')
-                                            ->label('Status')
-                                            ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid')
-                                            ->options([
-                                                'paid' => 'Paid',
-                                                'unpaid' => 'Unpaid',
-                                            ]),
-                                    ]),
-                                Forms\Components\FileUpload::make('finance.bukti_transaksi')
-                                    ->label('Bukti Transaksi')
-                                    ->resize(50)
-                                    ->maxSize(2048) // Maksimal 2MB
-                                    ->helperText('Hanya dapat mengunggah file dengan tipe PDF atau gambar (image).')
-                                    ->required(fn($get) => $get('complete.status_finance') === 'paid') // Kondisi required
-                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                    ->disk('public')
-                                    ->directory('bukti_transaksi')
-                                    ->default(fn($record) => $record->finance?->bukti_transaksi),
-                            ])
-                            ->columns(1),
-                    ])
-                    ->action(function (array $data, Pengajuan $record) {
-                        $data['finance']['user_id'] = \Illuminate\Support\Facades\Auth::user()->id;
-                        $record->complete()->updateOrCreate([], $data['complete']); // Update or create related data
-                        $record->finance()->updateOrCreate([], $data['finance']); // Update or create related data
-                        $statusFinance = $data['complete']['status_finance'] ?? 'unpaid';
-                        $record->update(['keterangan_proses' => $statusFinance === 'paid' ? 'otorisasi' : 'finance']);
-                        Notification::make()
-                            ->title('Data pengajuan berhasil diproses.')
-                            ->success()
-                            ->send();
-                    }),
+                    ->url(fn(Pengajuan $record): string => static::getUrl('proses', ['record' => $record])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -460,6 +309,7 @@ class PengajuanResource extends Resource
             // 'create' => Pages\CreatePengajuan::route('/create'),
             'view' => Pages\ViewPengajuan::route('/{record}'),
             // 'edit' => Pages\EditPengajuan::route('/{record}/edit'),
+            'proses' => Pages\ProsesPengajuan::route('/{record}/proses'),
         ];
     }
 

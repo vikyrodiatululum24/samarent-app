@@ -22,4 +22,9 @@ class Project extends Model
     {
         return $this->hasOne(SetSalary::class);
     }
+
+    public function drivers()
+    {
+        return $this->hasMany(Driver::class);
+    }
 }

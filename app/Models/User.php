@@ -82,4 +82,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(Profile::class);
     }
+    public function reimbursements()
+    {
+        return $this->hasMany(Reimbursement::class);
+    }
+    public function logUpdateStatusPengajuans()
+    {
+        return $this->hasMany(LogUpdateStatusPengajuan::class);
+    }
 }

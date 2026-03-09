@@ -35,11 +35,12 @@
         </table>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr style="vertical-align: top;">
-                <th style="width: 10%; text-align: left;">
+                <th style="width: 20%; text-align: left;">
                     <p style="margin: 2px 0;">Bengkel</p>
                     <p style="margin: 2px 0;">Telp</p>
                     <p style="margin: 2px 0;">Estimasi</p>
                     <p style="margin: 2px 0;">No Rek</p>
+                    <p style="margin: 2px 0;">Jenis Pengajuan</p>
                 </th>
                 <td style="width: 30%;">
                     <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->complete->bengkel_estimasi }}
@@ -48,16 +49,6 @@
                     <p style="margin: 2px 0; text-transform: uppercase;">: Rp
                         {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }}</p>
                     <p style="margin: 2px 0;">: </p>
-                </td>
-                <th style="width: 20%; text-align: left;">
-                    <p style="margin: 2px 0;">No WO</p>
-                    <p style="margin: 2px 0;">Jenis Pengajuan</p>
-                    <p style="margin: 2px 0;">Tanggal WO</p>
-                    <p style="margin: 2px 0;">User</p>
-                    <p style="margin: 2px 0;">Telp</p>
-                </th>
-                <td style="width: 30%;">
-                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->no_pengajuan }}</p>
                     <p style="margin: 2px 0; text-transform: uppercase;">: <span
                             @if ($pengajuan->keterangan == 'REIMBURSE') style="color: red; font-weight: bold;"
                             @elseif(strtoupper($pengajuan->keterangan) == 'CASH ADVANCE')
@@ -67,9 +58,20 @@
                             @elseif($pengajuan->keterangan == 'FREE')
                                 style="color: black; font-weight: bold;" @endif>{{ $pengajuan->keterangan }}</span>
                     </p>
+                </td>
+                <th style="width: 20%; text-align: left;">
+                    <p style="margin: 2px 0;">No WO</p>
+                    <p style="margin: 2px 0;">Tanggal WO</p>
+                    <p style="margin: 2px 0;">User</p>
+                    <p style="margin: 2px 0;">Kota</p>
+                    <p style="margin: 2px 0;">Telp</p>
+                </th>
+                <td style="width: 30%;">
+                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->no_pengajuan }}</p>
                     <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->created_at->format('d F Y') }}</p>
                     <p style="margin: 2px 0; text-transform: uppercase;">:
                         {{ $pengajuan->up_lainnya ?? $pengajuan->up }} - {{ $pengajuan->provinsi }}</p>
+                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->kota }}</p>
                     <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->no_wa }}</p>
                 </td>
             </tr>
@@ -138,7 +140,7 @@
                 <td style="height: 78px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd) }}"
-                            alt="{{ $pengajuan->user->admin->ttd }}" style="width: auto; height: 100px;">
+                            alt="{{ $pengajuan->user->admin->ttd }}" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
@@ -630,7 +632,7 @@
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd) }}"
-                            alt="{{ $pengajuan->user->admin->ttd }}" style="width: auto; height: 100px;">
+                            alt="{{ $pengajuan->user->admin->ttd }}" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
@@ -639,7 +641,7 @@
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($ttdDiketahui))
                         <img src="{{ public_path('storage/' . $ttdDiketahui) }}"
-                            alt="Tanda Tangan Diketahui" style="width: auto; height: 100px;">
+                            alt="Tanda Tangan Diketahui" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
@@ -648,7 +650,7 @@
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($ttdDiperiksa))
                         <img src="{{ public_path('storage/' . $ttdDiperiksa) }}"
-                            alt="Tanda Tangan Diperiksa" style="width: auto; height: 100px;">
+                            alt="Tanda Tangan Diperiksa" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
@@ -657,7 +659,7 @@
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($ttdDisetujui))
                         <img src="{{ public_path('storage/' . $ttdDisetujui) }}"
-                            alt="Tanda Tangan Disetujui" style="width: auto; height: 100px;">
+                            alt="Tanda Tangan Disetujui" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
@@ -666,7 +668,7 @@
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($ttdDibukukan))
                         <img src="{{ public_path('storage/' . $ttdDibukukan) }}"
-                            alt="Tanda Tangan Dibukukan" style="width: auto; height: 100px;">
+                            alt="Tanda Tangan Dibukukan" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif

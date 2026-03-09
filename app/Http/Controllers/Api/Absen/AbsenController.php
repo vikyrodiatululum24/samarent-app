@@ -99,6 +99,7 @@ class AbsenController extends Controller
             'end_km' => 'required|numeric',
             'location_out' => 'required|string',
             'photo_out' => 'required|string',
+            'send_wa' => 'sometimes|boolean',
         ]);
 
         $absen = DriverAttendence::with(['endUser', 'user.driver'])
@@ -107,7 +108,6 @@ class AbsenController extends Controller
             ->latest()
             ->first();
 
-        $target = $absen && $absen->endUser ? $absen->endUser->no_wa : null;
 
         if ($request->has('photo_out')) {
             // If photo_out is a base64 string, save it as a file
@@ -135,24 +135,37 @@ class AbsenController extends Controller
             'note' => $request->note ?? null,
         ]);
 
-        $startTime = $absen ? $absen->time_in : null;
-        $endTime = $absen ? $absen->time_out : null;
-        $project = $absen ? $absen->project : null;
+        // $startTime = $absen ? $absen->time_in : null;
+        // $endTime = $absen ? $absen->time_out : null;
+        // $project = $absen ? $absen->project : null;
 
         $absen->confirmation()->create([
             'token' => bin2hex(random_bytes(16)),
         ]);
+
+        $target = $absen && $absen->endUser ? $absen->endUser->no_wa : null;
+
+        if ($request->send_wa && !$target) {
+            return response()->json(['message' => 'Nomor WhatsApp end user tidak tersedia untuk mengirim notifikasi'], 400);
+        }
+
         $url = 'https://driver.servicesamarent.com/confirm/' . $absen->confirmation->token;
 
+        $message = 'Hallo ' . ($absen->endUser ? $absen->endUser->name : 'User') . ",\n\n" . "Terima kasih telah menggunakan layanan kami.\n" . 'Driver ' . ($absen->user ? $absen->user->name : 'N/A') . " telah menyelesaikan tugasnya.\n" . "Informasi Driver:\n" . '- Nama Driver: ' . ($absen->user ? $absen->user->name : 'N/A') . "\n" . '- No. HP: ' . ($absen->user && $absen->user->driver ? $absen->user->driver->no_wa : 'N/A') . "\n" . '- Unit: ' . ($absen->unit ? $absen->unit->type : 'N/A') . "\n" . '- Tanggal: ' . $absen->date . "\n" . '- Mulai Dari: ' . $absen->time_in . "\n" . '- Sampai Dengan: ' . $absen->time_out . "\n" . "\n\n" . "Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:\n" . $url . "\n\n" . "Jika merasa tidak melakukan servis ini, silakan abaikan pesan ini.\n" . "Salam,\n" . 'Samarent.com';
+
         // Jika nomor WhatsApp target tersedia, kirim notifikasi
-        if ($target) {
+        Log::info('Mulai kirim WhatsApp' . ' ke ' . $target . ' untuk absen keluar dengan ID: ' . $absen->id . ($request->send_wa ? ' dengan notifikasi WA' : ' tanpa notifikasi WA ') . $request->send_wa);
+        if ($request->send_wa && $target) {
             try {
                 // Kirim pesan WhatsApp menggunakan PushWaService
-                app('App\Services\PushWaService')->sendMessage($target, 'text', 'Hallo ' . ($absen->endUser ? $absen->endUser->name : 'User') . ",\n\n" . "Terima kasih telah menggunakan layanan kami.\n" . 'Driver ' . ($absen->user ? $absen->user->name : 'N/A') . " telah menyelesaikan tugasnya.\n" . "Informasi Driver:\n" . '- Nama Driver: ' . ($absen->user ? $absen->user->name : 'N/A') . "\n" . '- No. HP: ' . ($absen->user && $absen->user->driver ? $absen->user->driver->no_wa : 'N/A') . "\n" . '- Unit: ' . ($absen->unit ? $absen->unit->type : 'N/A') . "\n" . '- Tanggal: ' . $absen->date . "\n" . '- Mulai Dari: ' . $absen->time_in . "\n" . '- Sampai Dengan: ' . $absen->time_out . "\n" . "\n\n" . "Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:\n" . $url . "\n\n" . "Jika merasa tidak melakukan servis ini, silakan abaikan pesan ini.\n" . "Salam,\n" . 'Samarent.com');
+                app('App\Services\PushWaService')->sendMessage($target, 'text', $message);
+                Log::info('Notifikasi WhatsApp berhasil dikirim ke ' . $target);
             } catch (\Exception $e) {
                 Log::error('Gagal mengirim notifikasi WhatsApp: ' . $e->getMessage());
             }
         }
+
+        Log::info('Absen keluar berhasil disimpan dengan ID: ' . $absen->id . ', url : ' . $url . ($request->send_wa ? ' dengan notifikasi WA' : ' tanpa notifikasi WA'));
 
         return response()->json(['message' => 'Absen keluar berhasil disubmit', 'data' => $absen], 200);
     }
@@ -160,7 +173,7 @@ class AbsenController extends Controller
     public function absenHistory(Request $request)
     {
         $userId = $request->user()->id;
-        $history = DriverAttendence::where('user_id', $userId)->orderBy('date', 'desc')->limit(10)->get();
+        $history = DriverAttendence::where('user_id', $userId)->orderBy('date', 'desc')->limit(5)->get();
 
         return response()->json(['data' => $history], 200);
     }

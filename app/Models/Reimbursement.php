@@ -21,8 +21,28 @@ class Reimbursement extends Model
         'dana_keluar',
     ];
 
+    public function getFotoOdometerAwalUrlAttribute()
+    {
+        return $this->foto_odometer_awal ? asset('storage/' . $this->foto_odometer_awal) : null;
+    }
+
+    public function getFotoOdometerAkhirUrlAttribute()
+    {
+        return $this->foto_odometer_akhir ? asset('storage/' . $this->foto_odometer_akhir) : null;
+    }
+
+    public function getNotaUrlAttribute()
+    {
+        return $this->nota ? asset('storage/' . $this->nota) : null;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function driver(): BelongsTo
+    {
+        return $this->belongsTo(Driver::class, 'user_id', 'user_id');
     }
 }

@@ -8,6 +8,7 @@ class Driver extends Model
 {
     protected $fillable = [
         'user_id',
+        'project_id',
         'password',
         'nik',
         'sim',
@@ -23,6 +24,14 @@ class Driver extends Model
         'agama',
         'photo',
     ];
+
+    public function getPhotoUrlAttribute()
+    {
+        if ($this->photo) {
+            return asset('storage/' . $this->photo);
+        }
+        return null;
+    }
 
     public function user()
     {
@@ -46,5 +55,13 @@ class Driver extends Model
     public function overtimePay()
     {
         return $this->hasMany(OvertimePay::class, 'driver_id');
+    }
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+    public function reimbursements()
+    {
+        return $this->hasMany(Reimbursement::class, 'user_id', 'user_id');
     }
 }

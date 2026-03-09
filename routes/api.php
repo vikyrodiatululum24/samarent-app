@@ -1,19 +1,19 @@
 <?php
 
+use App\Http\Controllers\Api\Absen\AbsenController;
+use App\Http\Controllers\Api\Absen\AuthController;
+use App\Http\Controllers\Api\Absen\EndUserController;
+use App\Http\Controllers\Api\Absen\ReimbursementController;
+use App\Http\Controllers\Api\Absen\UserController;
+use App\Http\Controllers\Api\ConfirmController;
+use App\Http\Controllers\Api\JualController;
+use App\Http\Controllers\Api\UnitController;
+use App\Http\Controllers\HitungController;
+use App\Http\Controllers\PushwaController;
+use App\Http\Controllers\ReimbursementPdfController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PushwaController;
-use App\Http\Controllers\Api\JualController;
-use App\Http\Controllers\Api\UnitController;
-use App\Http\Controllers\Api\ConfirmController;
-use App\Http\Controllers\Api\Absen\AuthController;
-use App\Http\Controllers\Api\Absen\AbsenController;
-use App\Http\Controllers\Api\Absen\EndUserController;
-
-
-// Hitung Overtime Routes
-use App\Http\Controllers\HitungController;
 Route::post('/hitung/calculate', [HitungController::class, 'calculate'])->name('hitung.calculate');
 
 // absensi
@@ -51,9 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         return $response->json();
     });
-    Route::get('/user', function (Request $request) {
-        return $request->user()->load('driver');
-    });
+    Route::get('/user', [UserController::class, 'getUser']);
     Route::put('/user', [AuthController::class, 'updateProfile']);
     Route::get('/avatar', [AuthController::class, 'getAvatar']);
     Route::get('/getendusers/{id}', [EndUserController::class, 'getEndUsers']);
@@ -66,6 +64,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/absen/month', [AbsenController::class, 'mountHistory']);
     Route::get('/checkmasuk', [AbsenController::class, 'checkmasuk']);
     Route::get('/absen/history/{id}', [AbsenController::class, 'absenDetail']);
+
+    // reimbursement
+    Route::get('/reimbursement', [ReimbursementController::class, 'index']);
+    Route::post('/reimbursement/submit', [ReimbursementController::class, 'submitReimbursement']);
+    Route::get('/reimbursement/{id}', [ReimbursementController::class, 'show']);
+    Route::put('/reimbursement/{id}', [ReimbursementController::class, 'update']);
+    Route::delete('/reimbursement/{id}', [ReimbursementController::class, 'destroy']);
+
+    Route::post('/generatePrintUrlReimbursement', [ReimbursementPdfController::class, 'generatePrintUrl']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

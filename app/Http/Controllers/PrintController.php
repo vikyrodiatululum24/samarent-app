@@ -22,7 +22,7 @@ class PrintController extends Controller
     {
         ini_set('max_execution_time', 300);
         $pengajuan = Pengajuan::with('complete')->findOrFail($id);
-        $namaFile = $pengajuan->nopol . '-' . $pengajuan->no_pengajuan;
+        $namaFile = $pengajuan->no_pengajuan;
         $namaFile = str_replace(['/', '\\'], '-', $namaFile);
 
         // Get signature settings
@@ -252,5 +252,11 @@ class PrintController extends Controller
         $formTugas = FormTugas::with(['user', 'unit', 'tujuanTugas'])->findOrFail($id);
         Cetak::updateOrCreate(['form_tugas_id' => $formTugas->id]);
         return $this->previewFormTugas($id);
+    }
+
+    public function printFormDriver()
+    {
+        $pdf = PDF::loadView('prints.form-driver');
+        return $pdf->stream('form-driver.pdf');
     }
 }

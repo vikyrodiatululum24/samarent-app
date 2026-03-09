@@ -129,6 +129,7 @@ class PengajuanResource extends Resource
     {
         return [
             'index' => Pages\ListPengajuans::route('/'),
+            'view' => Pages\ViewPengajuan::route('/{record}'),
         ];
     }
 

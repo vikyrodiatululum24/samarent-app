@@ -4,7 +4,9 @@ namespace App\Filament\Resources\ReimbursementResource\Pages;
 
 use App\Filament\Resources\ReimbursementResource;
 use Filament\Actions;
+use Filament\Notifications\Collection;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Support\Facades\Log;
 
 class ListReimbursements extends ListRecords
 {
@@ -14,7 +16,7 @@ class ListReimbursements extends ListRecords
     {
         return [
             Actions\Action::make('print_pdf')
-                ->label('Cetak PDF')
+                ->label('Export PDF')
                 ->icon('heroicon-o-printer')
                 ->color('success')
                 ->url(function (): string {

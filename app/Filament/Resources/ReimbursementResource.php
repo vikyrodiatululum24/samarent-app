@@ -7,13 +7,17 @@ use App\Filament\Resources\ReimbursementResource\RelationManagers;
 use App\Models\Reimbursement;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\HtmlString;
 
 class ReimbursementResource extends Resource
 {
@@ -185,26 +189,8 @@ class ReimbursementResource extends Resource
                     ->circular()
                     ->size(60)
                     ->extraImgAttributes(['loading' => 'lazy'])
-                    ->action(
-                        Tables\Actions\Action::make('view_foto_awal')
-                            ->modalContent(function (Reimbursement $record) {
-                                $imageUrl = \Storage::url($record->foto_odometer_awal);
-                                return new HtmlString('
-                                    <div class="flex items-center justify-center p-4">
-                                        <img
-                                            src="' . $imageUrl . '"
-                                            alt="Foto Odometer Awal"
-                                            class="max-w-full h-auto rounded-lg shadow-lg"
-                                            style="max-height: 80vh; object-fit: contain;"
-                                        />
-                                    </div>
-                                ');
-                            })
-                            ->modalWidth('xl')
-                            ->modalHeading(fn (Reimbursement $record) => 'Foto Odometer Awal - ' . number_format($record->km_awal) . ' KM')
-                            ->modalSubmitAction(false)
-                            ->modalCancelActionLabel('Tutup')
-                    ),
+                    ->url(fn (Reimbursement $record) => $record->foto_odometer_awal ? Storage::url($record->foto_odometer_awal) : null)
+                    ->openUrlInNewTab(),
 
                 Tables\Columns\TextColumn::make('km_akhir')
                     ->label('KM Akhir')
@@ -218,29 +204,8 @@ class ReimbursementResource extends Resource
                     ->circular()
                     ->size(60)
                     ->extraImgAttributes(['loading' => 'lazy'])
-                    ->action(
-                        Tables\Actions\Action::make('view_foto_akhir')
-                            ->modalContent(function (Reimbursement $record) {
-                                if (!$record->foto_odometer_akhir) {
-                                    return new HtmlString('<p class="text-center p-4">Belum ada foto</p>');
-                                }
-                                $imageUrl = \Storage::url($record->foto_odometer_akhir);
-                                return new HtmlString('
-                                    <div class="flex items-center justify-center p-4">
-                                        <img
-                                            src="' . $imageUrl . '"
-                                            alt="Foto Odometer Akhir"
-                                            class="max-w-full h-auto rounded-lg shadow-lg"
-                                            style="max-height: 80vh; object-fit: contain;"
-                                        />
-                                    </div>
-                                ');
-                            })
-                            ->modalWidth('xl')
-                            ->modalHeading(fn (Reimbursement $record) => 'Foto Odometer Akhir' . ($record->km_akhir ? ' - ' . number_format($record->km_akhir) . ' KM' : ''))
-                            ->modalSubmitAction(false)
-                            ->modalCancelActionLabel('Tutup')
-                    )
+                    ->url(fn (Reimbursement $record) => $record->foto_odometer_akhir ? Storage::url($record->foto_odometer_akhir) : null)
+                    ->openUrlInNewTab()
                     ->placeholder('-'),
 
                 Tables\Columns\TextColumn::make('tujuan_perjalanan')
@@ -255,29 +220,8 @@ class ReimbursementResource extends Resource
                     ->circular()
                     ->size(60)
                     ->extraImgAttributes(['loading' => 'lazy'])
-                    ->action(
-                        Tables\Actions\Action::make('view_nota')
-                            ->modalContent(function (Reimbursement $record) {
-                                if (!$record->nota) {
-                                    return new HtmlString('<p class="text-center p-4">Belum ada foto nota</p>');
-                                }
-                                $imageUrl = \Storage::url($record->nota);
-                                return new HtmlString('
-                                    <div class="flex items-center justify-center p-4">
-                                        <img
-                                            src="' . $imageUrl . '"
-                                            alt="Foto Nota"
-                                            class="max-w-full h-auto rounded-lg shadow-lg"
-                                            style="max-height: 80vh; object-fit: contain;"
-                                        />
-                                    </div>
-                                ');
-                            })
-                            ->modalWidth('xl')
-                            ->modalHeading('Foto Nota')
-                            ->modalSubmitAction(false)
-                            ->modalCancelActionLabel('Tutup')
-                    )
+                    ->url(fn (Reimbursement $record) => $record->nota ? Storage::url($record->nota) : null)
+                    ->openUrlInNewTab()
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->placeholder('-'),
 
@@ -336,9 +280,15 @@ class ReimbursementResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkAction::make('export')
+                    ->label('Export Selected')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->action(function (Collection $records) {
+                        $ids = $records->pluck('id')->toArray();
+                        return redirect()->route('reimbursement.print-pdf', ['ids' => implode(',', $ids)]);
+                    })
+                    ->openUrlInNewTab(),
             ])
             ->defaultSort('created_at', 'desc');
     }

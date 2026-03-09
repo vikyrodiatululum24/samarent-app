@@ -11,9 +11,6 @@ use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Absensi\Resources\DriverResource\Pages;
 use App\Filament\Absensi\Resources\DriverResource\RelationManagers;
 
@@ -94,10 +91,12 @@ class DriverResource extends Resource
                     ->label('Tanggal Lahir'),
                 Forms\Components\Select::make('jenis_kelamin')
                     ->required()
+                    ->label('Jenis Kelamin')
                     ->options([
-                        'Laki-laki' => 'Laki-laki',
-                        'Perempuan' => 'Perempuan',
-                    ]),
+                        'laki-laki' => 'Laki-laki',
+                        'perempuan' => 'Perempuan',
+                    ])
+                    ->default(null),
                 Forms\Components\TextInput::make('rt')
                     ->maxLength(3)
                     ->label('RT')
@@ -124,6 +123,11 @@ class DriverResource extends Resource
                         'Buddha' => 'Buddha',
                         'Konghucu' => 'Konghucu',
                     ])
+                    ->default(null),
+                Forms\Components\Select::make('project_id')
+                    ->label('Penempatan')
+                    ->relationship('project', 'name')
+                    ->searchable()
                     ->default(null),
                 Forms\Components\FileUpload::make('photo')
                     ->image()
@@ -174,6 +178,10 @@ class DriverResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('photo')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('project.name')
+                    ->searchable()
+                    ->label('Penempatan')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

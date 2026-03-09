@@ -14,6 +14,12 @@ class ListDrivers extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+            Actions\Action::make('printForm')
+                ->label('Print Form Driver')
+                ->url(route('filament.driver.print-form-driver'))
+                ->openUrlInNewTab()
+                ->icon('heroicon-o-printer')
+                ->color('success'),
         ];
     }
 }

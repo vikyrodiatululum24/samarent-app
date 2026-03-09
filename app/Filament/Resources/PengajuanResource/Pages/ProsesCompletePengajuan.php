@@ -2,14 +2,15 @@
 
 namespace App\Filament\Resources\PengajuanResource\Pages;
 
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Hidden;
 use App\Filament\Resources\PengajuanResource;
-use Filament\Resources\Pages\EditRecord;
+use App\Services\LogUpdateStatusPengajuanService;
+use Filament\Actions\Action;
+use Filament\Forms;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ProsesCompletePengajuan extends EditRecord
@@ -165,18 +166,19 @@ class ProsesCompletePengajuan extends EditRecord
                         Forms\Components\TextInput::make('complete.nominal_tf_bengkel')
                             ->label('Nominal Transfer Bengkel')
                             ->numeric()
-                            ->reactive()
+                            ->live(onBlur: true)
                             ->required(fn($record) => $record->complete?->status_finance === 'paid')
-                            ->nullable(),
+                            ->nullable()
+                            ->afterStateUpdated(function (callable $set, callable $get) {
+                                $nominalFinance = (float) ($get('complete.nominal_tf_finance') ?? 0);
+                                $nominalBengkel = (float) ($get('complete.nominal_tf_bengkel') ?? 0);
+                                $set('complete.selisih_tf', $nominalFinance - $nominalBengkel);
+                            }),
                         Forms\Components\TextInput::make('complete.selisih_tf')
                             ->label('Selisih Transfer')
                             ->numeric()
                             ->required(fn($record) => $record->complete?->status_finance === 'paid')
-                            ->reactive()
-                            ->afterStateUpdated(fn(callable $set, $state, callable $get) => $set(
-                                'complete.selisih_tf',
-                                $get('complete.nominal_tf_finance') - $get('complete.nominal_tf_bengkel')
-                            )),
+                            ->readOnly(),
                         Forms\Components\DatePicker::make('complete.tanggal_tf_bengkel')
                             ->label('Tanggal Transfer Bengkel')
                             ->nullable()
@@ -260,11 +262,15 @@ class ProsesCompletePengajuan extends EditRecord
 
             $this->record->complete()->updateOrCreate([], $this->completeData);
 
-            // Update keterangan_proses based on nominal_tf_bengkel
-            $nominalTfBengkel = $this->completeData['nominal_tf_bengkel'] ?? null;
-            $this->record->update([
-                'keterangan_proses' => !empty($nominalTfBengkel) ? 'done' : 'checker'
-            ]);
+            // Update keterangan_proses based on status_finance
+            if (isset($this->completeData['status_finance'])) {
+                if ($this->completeData['status_finance'] === 'paid' && isset($this->completeData['nominal_tf_bengkel'])) {
+                    $this->record->update(['keterangan_proses' => 'done']);
+                } elseif ($this->completeData['status_finance'] === 'unpaid') {
+                    $this->record->update(['keterangan_proses' => 'checker']);
+                }
+            }
+
         }
 
         Notification::make()

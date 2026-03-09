@@ -60,6 +60,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/form-tugas/{id}/preview', [PrintController::class, 'previewFormTugas'])->name('preview.form-tugas');
     Route::get('/form-tugas/{id}/print', [PrintController::class, 'printFormTugas'])->name('print.form-tugas');
     Route::get('/reimbursement/print-pdf', [ReimbursementPdfController::class, 'print'])->name('reimbursement.print-pdf');
+    Route::get('print-form-driver', [PrintController::class, 'printFormDriver'])->name('filament.driver.print-form-driver');
 });
+
+Route::get('driver/reimbursement/print-pdf', [ReimbursementPdfController::class, 'driverReimbursementPrint'])->name('driver.reimbursement.print-pdf');
 
 require __DIR__ . '/auth.php';
