@@ -67,7 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/absen/month', [AbsenController::class, 'mountHistory']);
     Route::get('/checkmasuk', [AbsenController::class, 'checkmasuk']);
     Route::get('/absen/history/{id}', [AbsenController::class, 'absenDetail']);
-    Route::post('/absen/notify', [AbsenController::class, 'sendNotification'])->throttle('10,1');
+    Route::post('/absen/notify', [AbsenController::class, 'sendNotification'])->middleware('throttle:20,1');
 
     // reimbursement
     Route::get('/reimbursement', [ReimbursementController::class, 'index']);
