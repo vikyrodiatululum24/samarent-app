@@ -19,7 +19,7 @@ Route::post('/hitung/calculate', [HitungController::class, 'calculate'])->name('
 
 // absensi
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');
 Route::get('/confirm/{token}', [ConfirmController::class, 'confirmAbsen']);
 Route::post('/absen/confirm', [AbsenController::class, 'confirmAbsen']);
 Route::get('/absen/detail-confirmation', [AbsenController::class, 'detailConfirmation']);
@@ -67,7 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/absen/month', [AbsenController::class, 'mountHistory']);
     Route::get('/checkmasuk', [AbsenController::class, 'checkmasuk']);
     Route::get('/absen/history/{id}', [AbsenController::class, 'absenDetail']);
-    Route::post('/absen/notify', [AbsenController::class, 'sendNotification'])->middleware('throttle:20,1');
+    Route::post('/absen/notify', [AbsenController::class, 'sendNotification'])->middleware('throttle:10,1');
 
     // reimbursement
     Route::get('/reimbursement', [ReimbursementController::class, 'index']);

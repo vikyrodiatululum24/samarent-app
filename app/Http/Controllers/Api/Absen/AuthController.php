@@ -34,7 +34,7 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Invalid login details'], 401);
+            return response()->json(['message' => 'Email dan Password tidak valid'], 401);
         }
 
         $user = Auth::user();
