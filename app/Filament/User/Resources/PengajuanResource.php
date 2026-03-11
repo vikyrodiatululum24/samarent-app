@@ -12,17 +12,15 @@ use Filament\Tables\Table;
 use Filament\Facades\Filament;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Infolists\Components;
 use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Wizard;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\Group;
 use Filament\Pages\SubNavigationPosition;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use App\Filament\User\Resources\PengajuanResource\Pages;
 
@@ -255,9 +253,8 @@ class PengajuanResource extends Resource
                                     Forms\Components\TextInput::make('service')
                                         ->label('Jenis Permintaan Service')
                                         ->required(),
-                                    Forms\Components\Grid::make(2)
+                                    Forms\Components\Grid::make(3)
                                         ->schema([
-
                                             Forms\Components\FileUpload::make('foto_unit')
                                                 ->label('Foto Unit')
                                                 ->image()
@@ -306,28 +303,103 @@ class PengajuanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable()->width('130px')->label('No. Pengajuan'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->searchable()
-                    ->label('Tanggal Pengajuan')
+                    ->label('Tanggal')
                     ->date('d M Y')
+                    ->width('120px')
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('User'),
-                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Nama PIC'),
-                Tables\Columns\TextColumn::make('nopol')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('No. Polisi'),
-                Tables\Columns\TextColumn::make('jenis')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Jenis Kendaraan'),
-                Tables\Columns\TextColumn::make('type')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Type Unit'),
-                Tables\Columns\TextColumn::make('service')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Permintaan Service'),
-                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project'),
-                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana'),
+                Tables\Columns\TextColumn::make('user.name')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('User')->width('150px')->wrap(),
+                Tables\Columns\TextColumn::make('nama')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Nama PIC')->width('150px')->wrap(),
+                Tables\Columns\TextColumn::make('jenis')
+                    ->label('Jenis Kendaraan')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            $jenis = $service->unit?->jenis ?? '-';
+                            return "{$jenis}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('jenis', 'like', "%{$search}%");
+                        });
+                    })
+                    ->width('120px')
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('service_unit')
+                    ->label('Service')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            return "{$service->service}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('service', 'like', "%{$search}%");
+                        });
+                    })
+                    ->width('200px')
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('nopol')
+                    ->label('No. Polisi')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            $nopol = $service->unit?->nopol ?? '-';
+                            return "{$nopol}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('nopol', 'like', "%{$search}%");
+                        });
+                    })
+                    ->width('120px')
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project')->width('150px')->wrap(),
+                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana')->width('120px')->wrap(),
+                Tables\Columns\TextColumn::make('complete.bengkel_estimasi')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Bengkel')
+                    ->width('150px')
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('complete.nominal_tf_bengkel')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Nominal Transfer')
+                    ->width('150px')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('complete.nominal_estimasi')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Nominal Estimasi')
-                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
-                Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
+                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-')
+                    ->width('150px')
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->width('150px')->wrap(),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
                     ->sortable()
@@ -352,7 +424,16 @@ class PengajuanResource extends Resource
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
-                    }),
+                    })
+                    ->width('150px')
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('complete.bengkel_invoice')
+                    ->label('Bengkel Invoice')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->width('150px')
+                    ->wrap(),
             ])
             ->filters([
                 SelectFilter::make('keterangan_proses')
@@ -383,57 +464,87 @@ class PengajuanResource extends Resource
             ->schema([
                 Section::make('Informasi Umum')
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                Group::make([
-                                    TextEntry::make('nama'),
-                                    TextEntry::make('no_wa'),
-                                ]),
-                                Group::make([
-                                    TextEntry::make('keterangan_proses')
-                                        ->label('Status Proses')
-                                        ->badge()
-                                        ->getStateUsing(function ($record) {
-                                            return match ($record->keterangan_proses) {
-                                                'cs' => 'Customer Service',
-                                                'checker' => 'Verifikasi',
-                                                'pengajuan finance' => 'Pengajuan Finance',
-                                                'finance' => 'Input Finance',
-                                                'otorisasi' => 'Otorisasi',
-                                                'done' => 'Selesai',
-                                                default => 'Tidak Diketahui',
-                                            };
-                                        })
-                                        ->color(fn(string $state) => match ($state) {
-                                            'Customer Service' => 'black',
-                                            'Verifikasi' => 'danger',
-                                            'Pengajuan Finance' => 'primary',
-                                            'Finance' => 'warning',
-                                            'Otorisasi' => 'yellow',
-                                            'Selesai' => 'success',
-                                            default => 'gray',
-                                        }),
-                                    TextEntry::make('created_at')
-                                        ->label('Tanggal Pengajuan')
-                                        ->dateTime()
-                                        ->getStateUsing(fn($record) => $record->created_at->format('d M Y H:i:s')),
-                                ]),
-                                Group::make([
-                                    TextEntry::make('project'),
-                                    TextEntry::make('keterangan'),
-                                    TextEntry::make('up'),
-                                    TextEntry::make('provinsi'),
-                                    TextEntry::make('kota'),
-                                ]),
-                            ])
-                    ]),
+                        Components\TextEntry::make('nama')
+                            ->label('Nama PIC')
+                            ->getStateUsing(fn($record) => strtoupper($record->nama)),
+                        Components\TextEntry::make('no_wa')
+                            ->label('Nomor WhatsApp')
+                            ->getStateUsing(fn($record) => strtoupper($record->no_wa)),
+                        Components\TextEntry::make('project')
+                            ->label('Project')
+                            ->getStateUsing(fn($record) => strtoupper($record->project)),
+                        Components\TextEntry::make('keterangan')
+                            ->label('Keterangan')
+                            ->getStateUsing(fn($record) => strtoupper($record->keterangan)),
+                        Components\TextEntry::make('up')
+                            ->label('Unit Pelaksana')
+                            ->getStateUsing(function ($record) {
+                                if ($record->up === 'manual') {
+                                    return $record->up_lainnya ?? 'Lainnya';
+                                }
+                                return $record->up;
+                            })
+                            ->badge()
+                            ->formatStateUsing(fn($state) => strtoupper($state)),
+                        Components\TextEntry::make('provinsi')
+                            ->label('Provinsi')
+                            ->getStateUsing(fn($record) => strtoupper($record->provinsi)),
+                        Components\TextEntry::make('kota')
+                            ->label('Kota')
+                            ->getStateUsing(fn($record) => strtoupper($record->kota)),
+                        Components\TextEntry::make('keterangan_proses')
+                            ->label('Status Proses')
+                            ->badge()
+                            ->getStateUsing(function ($record) {
+                                return match ($record->keterangan_proses) {
+                                    'cs' => 'Customer Service',
+                                    'checker' => 'Verifikasi',
+                                    'pengajuan finance' => 'Pengajuan Finance',
+                                    'finance' => 'Input Finance',
+                                    'otorisasi' => 'Otorisasi',
+                                    'done' => 'Selesai',
+                                    default => 'Tidak Diketahui',
+                                };
+                            })
+                            ->color(fn(string $state) => match ($state) {
+                                'Customer Service' => 'black',
+                                'Verifikasi' => 'danger',
+                                'Pengajuan Finance' => 'primary',
+                                'Input Finance' => 'brown',
+                                'Otorisasi' => 'yellow',
+                                'Selesai' => 'success',
+                                default => 'gray',
+                            }),
+                        Components\TextEntry::make('created_at')
+                            ->label('Tanggal Pengajuan')
+                            ->dateTime()
+                            ->getStateUsing(fn($record) => $record->created_at->format('d M Y H:i:s')),
+
+                        Components\TextEntry::make('logUpdateStatus')
+                            ->label('History Update Status')
+                            ->getStateUsing(fn($record) =>
+                                $record->logUpdateStatusPengajuans()
+                                    ->orderBy('created_at', 'desc')
+                                    ->get()
+                                    ->map(fn($log) => "{$log->status_baru} - " . $log->created_at->format('d M Y H:i:s'))
+                                    ->implode('<br>')
+                            )
+                            ->html(),
+                    ])
+                    ->columns(2),
                 Section::make('Pembayaran')
                     ->schema([
-                        Grid::make(3)
+                        Components\Grid::make(3)
                             ->schema([
-                                TextEntry::make('payment_1'),
-                                TextEntry::make('bank_1'),
-                                TextEntry::make('norek_1'),
+                                Components\TextEntry::make('payment_1')
+                                    ->label('Nama Rekening')
+                                    ->getStateUsing(fn($record) => strtoupper($record->payment_1)),
+                                Components\TextEntry::make('bank_1')
+                                    ->label('Nama Bank')
+                                    ->getStateUsing(fn($record) => strtoupper($record->bank_1)),
+                                Components\TextEntry::make('norek_1')
+                                    ->label('Nomor Rekening')
+                                    ->getStateUsing(fn($record) => strtoupper($record->norek_1)),
                             ]),
                     ]),
                 Section::make('Detail Kendaraan')

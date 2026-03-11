@@ -220,7 +220,7 @@ class AbsenController extends Controller
         $baseUrl = 'https://driver.servicesamarent.com/confirm-multiple';
         $query = http_build_query(['ids' => implode(',', $ids)]);
         $url = $baseUrl . '?' . $query;
-        $message = "Hallo,\n\n" . "Terima kasih telah menggunakan layanan kami.\n" . "Driver telah menyelesaikan tugasnya.\n" . "Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:\n" . $url . "\n\n" . "Jika merasa tidak melakukan servis ini, silakan abaikan pesan ini.\n" . "Salam,\n" . 'Samarent.com';
+        $message = "Hallo,\n\n" . "Terima kasih telah menggunakan layanan kami.\n" . "Driver telah menyelesaikan tugasnya.\n" . "Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:\n" . $url . "\n\n" . "Jika merasa tidak melakukan servis ini, silakan abaikan pesan ini.\n" . "Salam,\n" . 'Samarent.com' . "\n\n---\n\n" . "Hello,\n\n" . "Thank you for using our service.\n" . "The driver has completed the task.\n" . "Please click the following link to confirm task completion:\n" . $url . "\n\n" . "If you did not request this service, please ignore this message.\n" . "Best regards,\n" . 'Samarent.com';
 
         if ($target) {
             try {

@@ -14,12 +14,15 @@ use App\Http\Controllers\ReimbursementPdfController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+
 Route::post('/hitung/calculate', [HitungController::class, 'calculate'])->name('hitung.calculate');
 
 // absensi
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/confirm/{token}', [ConfirmController::class, 'confirmAbsen']);
+Route::post('/absen/confirm', [AbsenController::class, 'confirmAbsen']);
+Route::get('/absen/detail-confirmation', [AbsenController::class, 'detailConfirmation']);
 
 // routes/api.php
 Route::middleware('auth:sanctum')->group(function () {
@@ -65,8 +68,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/checkmasuk', [AbsenController::class, 'checkmasuk']);
     Route::get('/absen/history/{id}', [AbsenController::class, 'absenDetail']);
     Route::post('/absen/notify', [AbsenController::class, 'sendNotification']);
-    Route::get('/absen/detail-confirmation', [AbsenController::class, 'detailConfirmation']);
-    Route::post('/absen/confirm', [AbsenController::class, 'confirmAbsen']);
 
     // reimbursement
     Route::get('/reimbursement', [ReimbursementController::class, 'index']);
