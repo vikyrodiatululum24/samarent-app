@@ -77,7 +77,7 @@ class PengajuanResource extends Resource
                         });
                     }),
 
-                Tables\Columns\TextColumn::make('up')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('project')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
                     ->sortable()

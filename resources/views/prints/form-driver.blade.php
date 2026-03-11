@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,7 +57,7 @@
         }
 
         .form-label {
-            width: 35%;
+            width: 200px;
             font-weight: bold;
         }
 
@@ -78,12 +79,12 @@
         .photo-box {
             border: 2px solid #333;
             width: 40mm;
-            height: 30mm;
+            height: 42mm;
             text-align: center;
             margin: 0 auto;
             color: #999;
             font-style: italic;
-            padding-top: 25mm;
+            padding-top: 2mm;
             font-size: 9pt;
         }
 
@@ -117,10 +118,11 @@
         }
     </style>
 </head>
+
 <body>
     <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%">
     <div class="header">
-        <h1>Formulir Pendaftaran Driver</h1>
+        <h1>Formulir Data Driver</h1>
     </div>
 
     <!-- DATA PRIBADI -->
@@ -132,6 +134,11 @@
                 <td class="form-label">Nama Lengkap</td>
                 <td class="form-separator">:</td>
                 <td class="form-value"></td>
+                <td class="" rowspan="8" style="width: 30%; text-align: center;">
+                    <div class="photo-box">
+                        Foto 4x6
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td class="form-label">NIK (KTP)</td>
@@ -172,32 +179,32 @@
             <tr>
                 <td class="form-label">Agama</td>
                 <td class="form-separator">:</td>
-                <td class="form-value"></td>
+                <td class="form-value" colspan="2"></td>
             </tr>
             <tr>
                 <td class="form-label">Nomor WhatsApp</td>
                 <td class="form-separator">:</td>
-                <td class="form-value"></td>
+                <td class="form-value" colspan="2"></td>
             </tr>
             <tr>
                 <td class="form-label">Alamat</td>
                 <td class="form-separator">:</td>
-                <td class="form-value form-textarea"></td>
+                <td class="form-value form-textarea" colspan="2" ></td>
             </tr>
             <tr>
                 <td class="form-label">RT / RW</td>
                 <td class="form-separator">:</td>
-                <td class="form-value"></td>
+                <td class="form-value" colspan="2"></td>
             </tr>
             <tr>
                 <td class="form-label">Kelurahan/Desa</td>
                 <td class="form-separator">:</td>
-                <td class="form-value"></td>
+                <td class="form-value" colspan="2"></td>
             </tr>
             <tr>
                 <td class="form-label">Kecamatan</td>
                 <td class="form-separator">:</td>
-                <td class="form-value"></td>
+                <td class="form-value" colspan="2"></td>
             </tr>
         </table>
     </div>
@@ -205,7 +212,6 @@
     <!-- DATA KEPEGAWAIAN -->
     <div class="form-section">
         <div class="section-title">B. DATA KEPEGAWAIAN (Hanya Diisi HRD)</div>
-
         <table>
             <tr>
                 <td class="form-label">Project/Penempatan</td>
@@ -215,29 +221,19 @@
             <tr>
                 <td class="form-label">End User</td>
                 <td class="form-separator">:</td>
-                <td class="form-value"></td>
+                <td class="form-value" colspan="2"></td>
             </tr>
             <tr>
                 <td class="form-label">No. WhatsApp</td>
                 <td class="form-separator">:</td>
-                <td class="form-value"></td>
+                <td class="form-value" colspan="2"></td>
             </tr>
 
         </table>
     </div>
 
-    <!-- PAS FOTO -->
-    <div class="form-section">
-        <div class="section-title">C. PAS FOTO</div>
-        <div style="padding: 5px 0;">
-            <div class="photo-box">
-                Foto 4x6
-            </div>
-        </div>
-    </div>
-
     {{-- Signature --}}
-    <div class="form-section" style="margin-top: 30px;">
+    <div class="form-section" style="margin-top: 60px;">
         <table>
             <tr>
                 <td style="width: 50%; text-align: center;">
@@ -252,4 +248,5 @@
         </table>
     </div>
 </body>
+
 </html>

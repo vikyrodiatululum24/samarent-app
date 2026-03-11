@@ -26,8 +26,17 @@ class ReimbursementResource extends Resource
     protected static ?string $pluralLabel = 'Reimbursement';
     protected static ?string $navigationLabel = 'Reimbursement';
 
-    // Make this resource available in all panels
-    protected static bool $shouldRegisterNavigation = true;
+    // Only show in specific panels
+    public static function shouldRegisterNavigation(): bool
+    {
+        return in_array(\Filament\Facades\Filament::getCurrentPanel()?->getId(), [
+            'admin',
+            'user',
+            'finance',
+            'absensi',
+            'penjualan',
+        ]);
+    }
 
     public static function form(Form $form): Form
     {

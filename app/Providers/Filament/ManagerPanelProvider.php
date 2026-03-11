@@ -44,7 +44,7 @@ class ManagerPanelProvider extends PanelProvider
             ])            ->discoverPages(in: app_path('Filament/Manager/Pages'), for: 'App\\Filament\\Manager\\Pages')
             ->profile(EditProfile::class, false)
             ->pages([
-                Pages\Dashboard::class,
+                // Dashboard hidden
             ])
             ->discoverWidgets(in: app_path('Filament/Manager/Widgets'), for: 'App\\Filament\\Manager\\Widgets')
             ->widgets([

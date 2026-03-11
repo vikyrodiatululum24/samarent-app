@@ -43,6 +43,16 @@ class DataUnitResource extends Resource
                 Forms\Components\TextInput::make('tahun')->label('Tahun'),
                 Forms\Components\TextInput::make('warna')->label('Warna'),
                 Forms\Components\TextInput::make('bpkb')->label('BPKB'),
+                Forms\Components\FileUpload::make('foto_stnk')
+                    ->label('Foto STNK')
+                    ->directory('foto_stnk')
+                    ->visibility('public')
+                    ->image()
+                    ->resize(50)
+                    ->optimize('webp')
+                    ->maxSize(2048) // 1MB
+                    ->maxWidth(1024)
+                    ->nullable(),
             ]);
     }
 
@@ -103,6 +113,13 @@ class DataUnitResource extends Resource
                     ->label('BPKB')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
+                Tables\Columns\ImageColumn::make('foto_stnk')
+                    ->label('Foto STNK')
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->size(50)
+                    ->circular()
+                    ->url(fn($record) => $record->foto_stnk ? asset('storage/' . $record->foto_stnk) : null)
+                    ->openUrlInNewTab(),
 
             ])
             ->filters([

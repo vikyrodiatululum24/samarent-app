@@ -13,6 +13,7 @@ class Confirmation extends Model
         'is_confirmed',
         'used_at',
         'expires_at',
+        'status',
     ];
 
     public function confirmable()

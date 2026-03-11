@@ -9,6 +9,7 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 
 class ProsesPengajuan extends EditRecord
@@ -18,6 +19,11 @@ class ProsesPengajuan extends EditRecord
     protected static ?string $title = 'Proses Pengajuan Finance';
 
     public ?array $data = [];
+
+    public function getMaxContentWidth(): MaxWidth
+    {
+        return MaxWidth::SevenExtraLarge;
+    }
 
     protected function mutateFormDataBeforeFill(array $data): array
     {

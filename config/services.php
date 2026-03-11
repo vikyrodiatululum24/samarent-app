@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'fonnte' => [
+        'api_key' => env('FONTE_API_KEY'),
+        'timeout' => 10, // detik
+        ],
+
 ];

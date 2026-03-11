@@ -21,6 +21,7 @@ class Unit extends Model
         'warna',
         'tahun',
         'bpkb',
+        'foto_stnk',
     ];
 
     public function serviceUnit()
