@@ -31,7 +31,7 @@ class AbsenConfirmationMail extends Mailable
             with: [
                 'confirmationUrl' => $this->confirmationUrl,
                 'appName' => config('app.name', 'Samarent'),
-                'supportEmail' => config('mail.from.address'),
+                'supportEmail' => null,
             ],
         );
     }

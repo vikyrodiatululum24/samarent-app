@@ -228,8 +228,6 @@ class AbsenController extends Controller
         $query = http_build_query(['ids' => implode(',', $ids)]);
         $url = $baseUrl . '?' . $query;
 
-        $sentChannels = [];
-
         // if ($sendWa) {
         //     if ($targetWa) {
         //         try {
@@ -247,8 +245,6 @@ class AbsenController extends Controller
         if ($targetEmail) {
             try {
                 Mail::to($targetEmail)->send(new AbsenConfirmationMail($url));
-                Log::info('Notifikasi email berhasil dikirim ke ' . $targetEmail . ' untuk absen dengan ID: ' . implode(', ', $ids) . ' dengan url konfirmasi: ' . $url);
-                $sentChannels[] = 'Email';
             } catch (\Exception $e) {
                 Log::error('Gagal mengirim notifikasi email: ' . $e->getMessage());
             }
@@ -256,12 +252,8 @@ class AbsenController extends Controller
             Log::warning('Email end user tidak tersedia untuk mengirim notifikasi untuk absen dengan ID: ' . implode(', ', $ids));
         }
 
-        if (empty($sentChannels)) {
-            return response()->json(['message' => 'Notifikasi gagal dikirim. Pastikan nomor WhatsApp atau email end user tersedia'], 400);
-        }
-
         return response()->json([
-            'message' => 'Notifikasi berhasil dikirim melalui ' . implode(' dan ', $sentChannels),
+            'message' => 'Notifikasi berhasil dikirim melalui ' . ($targetEmail ? 'email' : 'tidak ada channel yang valid'),
         ], 200);
     }
 
