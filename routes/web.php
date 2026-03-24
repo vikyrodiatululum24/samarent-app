@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicPraPengajuanController;
 use App\Http\Controllers\ReimbursementPdfController;
 use App\Http\Controllers\PublicReimbursementController;
 
@@ -37,6 +38,12 @@ Route::prefix('public')->name('reimbursement.')->group(function () {
     Route::get('/reimbursement/create', [PublicReimbursementController::class, 'create'])->name('create');
     Route::post('/reimbursement/store', [PublicReimbursementController::class, 'store'])->name('store');
     Route::get('/reimbursement/success', [PublicReimbursementController::class, 'success'])->name('success');
+});
+
+Route::prefix('public')->name('public.')->group(function () {
+    Route::get('/pra-pengajuan/create', [PublicPraPengajuanController::class, 'create'])->name('pra-pengajuan.create');
+    Route::post('/pra-pengajuan/store', [PublicPraPengajuanController::class, 'store'])->name('pra-pengajuan.store');
+    Route::get('/pra-pengajuan/success', [PublicPraPengajuanController::class, 'success'])->name('pra-pengajuan.success');
 });
 
 
