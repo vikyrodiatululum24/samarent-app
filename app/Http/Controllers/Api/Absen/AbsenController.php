@@ -56,7 +56,7 @@ class AbsenController extends Controller
             'end_user_id' => $request->end_user_id,
             'unit_id' => $request->unit_id,
             'date' => now()->format('Y-m-d'),
-            'time_in' => now()->format('H:i:s'),
+            'time_in' => now(),
             'start_km' => $request->start_km,
             'location_in' => $request->location_in,
             'photo_in' => $request->photo_in ?? null,
@@ -73,6 +73,8 @@ class AbsenController extends Controller
             'photo_check' => 'required|string',
         ]);
 
+        $auth = auth()->user() ? auth()->user()->id : null;
+
         if ($request->has('photo_check')) {
             // If photo_check is a base64 string, save it as a file
             if (preg_match('/^data:image\/(\w+);base64,/', $request->photo_check, $type)) {
@@ -87,20 +89,19 @@ class AbsenController extends Controller
             }
         }
 
-        $absen = DriverAttendence::where('id', $id)->whereNull('time_check')->latest()->first();
+        $absen = DriverAttendence::where('user_id', $auth)->whereNull('time_out')->latest()->first();
 
         if (!$absen) {
             // Jika data absen tidak ditemukan, kembalikan respon dengan pesan error
             return response()->json(['message' => 'Data absen aktif tidak ditemukan untuk pengguna ini'], 404);
         }
 
-        $absen->update([
-            'location_check' => $request->location_check,
-            'photo_check' => $request->photo_check,
-            'time_check' => now()->format('H:i:s'),
+        $absenCheck = $absen->checks()->create([
+            'location' => $request->location_check,
+            'photo' => $request->photo_check,
         ]);
 
-        return response()->json(['message' => 'Absen check recorded successfully', 'data' => $absen], 200);
+        return response()->json(['message' => 'Absen check recorded successfully', 'data' => $absenCheck], 200);
     }
 
     public function absenKeluar(Request $request, $id)
@@ -140,7 +141,7 @@ class AbsenController extends Controller
 
         $absen->update([
             'end_km' => $request->end_km,
-            'time_out' => now()->format('H:i:s'),
+            'time_out' => now(),
             'location_out' => $request->location_out,
             'photo_out' => $request->photo_out,
             'note' => $request->note ?? null,
@@ -160,7 +161,7 @@ class AbsenController extends Controller
     public function absenHistory(Request $request)
     {
         $userId = $request->user()->id;
-        $history = DriverAttendence::with('confirmation:confirmable_id,status')->where('user_id', $userId)->orderBy('date', 'desc')->limit(5)->get();
+        $history = DriverAttendence::with('confirmation:confirmable_id,status', 'checks')->where('user_id', $userId)->orderBy('date', 'desc')->limit(5)->get();
 
         return response()->json(['data' => $history], 200);
     }
@@ -171,7 +172,7 @@ class AbsenController extends Controller
         $month = $request->input('month', now()->format('m'));
         $year = $request->input('year', now()->format('Y'));
 
-        $history = DriverAttendence::with('confirmation:confirmable_id,status')->where('user_id', $userId)->whereMonth('date', $month)->whereYear('date', $year)->orderBy('date', 'desc')->get();
+        $history = DriverAttendence::with('confirmation:confirmable_id,status', 'checks')->where('user_id', $userId)->whereMonth('date', $month)->whereYear('date', $year)->orderBy('date', 'desc')->get();
 
         return response()->json(['data' => $history], 200);
     }
@@ -179,7 +180,7 @@ class AbsenController extends Controller
     public function absenDetail(Request $request, $id)
     {
         $userId = $request->user()->id;
-        $absen = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'confirmation:confirmable_id,status'])
+        $absen = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'checks', 'confirmation:confirmable_id,status'])
             ->where('id', $id)
             ->where('user_id', $userId)
             ->first();
@@ -194,8 +195,8 @@ class AbsenController extends Controller
     public function checkmasuk(Request $request)
     {
         $userId = $request->user()->id;
-        $today = now()->format('Y-m-d');
-        $absen = DriverAttendence::where('user_id', $userId)->where('date', $today)->first();
+
+        $absen = DriverAttendence::where('user_id', $userId)->whereNull('time_out')->latest()->first();
 
         if (!$absen) {
             return response()->json(['data' => null], 200);
@@ -220,13 +221,20 @@ class AbsenController extends Controller
             }
         }
 
-        // $targetWa = $absens->first() && $absens->first()->endUser ? $absens->first()->endUser->no_wa : null;
-        $targetEmail = $absens->first() && $absens->first()->endUser ? $absens->first()->endUser->email : null;
+        $targetWa = $absens->first() && $absens->first()->endUser ? $absens->first()->endUser->no_wa : null;
+
+        // format wa menjadi +62 jika belum ada
+        if ($targetWa && !str_starts_with($targetWa, '+')) {
+            $targetWa = '+62' . ltrim($targetWa, '0');
+        }
+
+        $targetEmail = 'vickyrodiatululum24@gmail.com';
 
         // buat url untuk membungkus id absen yang akan dikonfirmasi
-        $baseUrl = 'https://driver.servicesamarent.com/confirm-multiple';
+        $baseUrl = 'driver.servicesamarent.com/confirm-multiple';
         $query = http_build_query(['ids' => implode(',', $ids)]);
         $url = $baseUrl . '?' . $query;
+        $waUrl = 'https://wa.me/' . $targetWa . '?text=' . urlencode('Anda memiliki absen yang perlu dikonfirmasi. Silakan klik link berikut untuk melihat detail dan melakukan konfirmasi: ' . $url . ' (Jika Anda tidak melakukan servis ini, silakan abaikan pesan ini)' . "\n" . 'You have an attendance that needs confirmation. Please click the following link to view details and confirm: ' . $url . ' (If you did not perform this service, please ignore this message)');
 
         // if ($sendWa) {
         //     if ($targetWa) {
@@ -244,7 +252,7 @@ class AbsenController extends Controller
 
         if ($targetEmail) {
             try {
-                Mail::to($targetEmail)->send(new AbsenConfirmationMail($url));
+                Mail::to($targetEmail)->send(new AbsenConfirmationMail($waUrl));
             } catch (\Exception $e) {
                 Log::error('Gagal mengirim notifikasi email: ' . $e->getMessage());
             }
@@ -261,7 +269,7 @@ class AbsenController extends Controller
     {
         $ids = explode(',', $request->input('ids'));
 
-        $absens = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'confirmation:confirmable_id,status,token'])
+        $absens = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'confirmation:confirmable_id,status,token', 'checks'])
             ->whereIn('id', $ids)
             ->get();
 

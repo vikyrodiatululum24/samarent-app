@@ -9,6 +9,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
@@ -151,16 +152,38 @@ class ReimbursementsRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\Action::make('export')
+                    ->label('Export PDF')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->action(function (Collection $records) {
+                        $filters = $this->tableFilters;
+                        $dari = $filters['created_at']['dari'] ?? null;
+                        $sampai = $filters['created_at']['sampai'] ?? null;
+                        $userId = $this->ownerRecord->user_id;
+
+                        $params = ['user_id' => $userId];
+                        if ($dari) $params['dari'] = $dari;
+                        if ($sampai) $params['sampai'] = $sampai;
+                        return redirect()->route('manager.reimbursement.print-pdf', $params);
+                    })
+                    ->openUrlInNewTab(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkAction::make('export')
+                    ->label('Export Selected')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->action(function (Collection $records) {
+                        $ids = $records->pluck('id')->toArray();
+                        $userId = $records->first()->user_id;
+                        return redirect()->route('manager.reimbursement.print-pdf', ['ids' => implode(',', $ids), 'user_id' => $userId]);
+                    })
+                    ->openUrlInNewTab(),
             ]);
     }
 }

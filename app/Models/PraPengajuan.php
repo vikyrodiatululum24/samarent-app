@@ -16,10 +16,6 @@ class PraPengajuan extends Model
         'up_lainnya',
         'provinsi',
         'kota',
-        'unitId',
-        'service',
-        'tanggal',
-        'tanggal_input_user',
         'tanggal_masuk_finance',
         'tanggal_otorisasi',
         'tanggal_pengerjaan',
@@ -27,15 +23,13 @@ class PraPengajuan extends Model
     ];
 
     protected $casts = [
-        'tanggal' => 'date',
-        'tanggal_input_user' => 'date',
         'tanggal_masuk_finance' => 'date',
         'tanggal_otorisasi' => 'date',
         'tanggal_pengerjaan' => 'date',
     ];
 
-    public function unit()
+    public function serviceUnits()
     {
-        return $this->belongsTo(Unit::class, 'unitId');
+        return $this->hasMany(ServiceUnit::class, 'pra_pengajuan_id');
     }
 }

@@ -4,13 +4,16 @@ namespace App\Filament\Manager\Resources;
 
 use App\Filament\Manager\Resources\DriverAttendenceResource\Pages;
 use App\Models\DriverAttendence;
+use App\Services\GeocodingService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Log;
 
 class DriverAttendenceResource extends Resource
 {
@@ -101,31 +104,31 @@ class DriverAttendenceResource extends Resource
                             ->label('KM Awal'),
                         Infolists\Components\TextEntry::make('location_in')
                             ->label('Lokasi Masuk')
+                            ->formatStateUsing(function ($state) {
+
+                                if (!$state) return '-';
+
+                                [$lat, $lng] = explode(',', $state);
+
+                                return app(GeocodingService::class)
+                                    ->getAddressFromCoordinates($lat, $lng);
+                            })
                             ->columnSpanFull(),
                         Infolists\Components\ImageEntry::make('photo_in')
                             ->label('Foto Masuk')
                             ->disk('public')
-                            ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_in))
+                            ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in))
                             ->size(300)
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-
                 Infolists\Components\Section::make('Absensi Check')
                     ->schema([
-                        Infolists\Components\TextEntry::make('time_check')
-                            ->label('Waktu Check'),
-                        Infolists\Components\TextEntry::make('location_check')
-                            ->label('Lokasi Check'),
-                        Infolists\Components\ImageEntry::make('photo_check')
-                            ->label('Foto Check')
-                            ->disk('public')
-                            ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_check))
-                            ->size(300)
-                            ->columnSpanFull(),
+                        ViewEntry::make('checks.attendance_id')
+                            ->label('Absensi Check')
+                            ->view('filament.check-attendences'),
                     ])
-                    ->columns(2)
-                    ->visible(fn ($record) => !empty($record->time_check)),
+                    ->columns(2),
 
                 Infolists\Components\Section::make('Absensi Keluar')
                     ->schema([
@@ -135,16 +138,25 @@ class DriverAttendenceResource extends Resource
                             ->label('KM Akhir'),
                         Infolists\Components\TextEntry::make('location_out')
                             ->label('Lokasi Keluar')
+                            ->formatStateUsing(function ($state) {
+
+                                if (!$state) return '-';
+
+                                [$lat, $lng] = explode(',', $state);
+
+                                return app(GeocodingService::class)
+                                    ->getAddressFromCoordinates($lat, $lng);
+                            })
                             ->columnSpanFull(),
                         Infolists\Components\ImageEntry::make('photo_out')
                             ->label('Foto Keluar')
                             ->disk('public')
-                            ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_out))
+                            ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_out))
                             ->size(300)
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
-                    ->visible(fn ($record) => !empty($record->time_out)),
+                    ->visible(fn($record) => !empty($record->time_out)),
             ]);
     }
 

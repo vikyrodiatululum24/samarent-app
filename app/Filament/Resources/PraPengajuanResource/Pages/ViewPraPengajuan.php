@@ -13,6 +13,10 @@ class ViewPraPengajuan extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('pengajuan')
+                ->label('Ajukan')
+                ->url(fn() => route('ajukan-pra-pengajuan', $this->record))
+                ->openUrlInNewTab(),
             Actions\EditAction::make(),
             Actions\DeleteAction::make(),
         ];

@@ -32,6 +32,8 @@ class PengajuanResource extends Resource
 {
     protected static ?string $model = Pengajuan::class;
 
+    protected static ?string $navigationGroup = 'Pengajuan';
+
     protected static ?string $slug = 'pengajuan';
 
     protected static ?string $recordTitleAttribute = 'no_pengajuan';
@@ -250,7 +252,6 @@ class PengajuanResource extends Resource
                                                 ->preload()
                                                 ->required(),
                                             Forms\Components\TextInput::make('odometer')
-                                                ->numeric()
                                                 ->required(),
                                         ]),
                                     Forms\Components\TextInput::make('service')

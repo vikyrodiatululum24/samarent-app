@@ -20,10 +20,6 @@ return new class extends Migration
             $table->string('up_lainnya')->nullable();
             $table->string('provinsi');
             $table->string('kota');
-            $table->string('unitId');
-            $table->string('service');
-            $table->date('tanggal');
-            $table->date('tanggal_input_user')->nullable();
             $table->date('tanggal_masuk_finance')->nullable();
             $table->date('tanggal_otorisasi')->nullable();
             $table->date('tanggal_pengerjaan')->nullable();

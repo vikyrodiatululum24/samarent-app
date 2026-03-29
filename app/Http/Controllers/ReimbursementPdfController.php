@@ -19,25 +19,28 @@ class ReimbursementPdfController extends Controller
         if ($request->has('ids')) {
             $ids = explode(',', $request->get('ids'));
             $query->whereIn('id', $ids);
-        }
 
-        $dari = $request->get('dari');
-        $sampai = $request->get('sampai');
+            $dari = $query->min('created_at');
+            $sampai = $query->max('created_at');
+        } else {
+            $dari = $request->get('start_date');
+            $sampai = $request->get('end_date');
 
-        if ($dari) {
-            $query->whereDate('created_at', '>=', $dari);
-        }
+            if ($dari) {
+                $query->whereDate('created_at', '>=', $dari);
+            }
 
-        if ($sampai) {
-            $query->whereDate('created_at', '<=', $sampai);
-        }
+            if ($sampai) {
+                $query->whereDate('created_at', '<=', $sampai);
+            }
 
-        if (!$dari && !$sampai) {
-            // Jika tidak ada filter tanggal, batasi ke 30 hari terakhir
-            $dari = now()->subDays(30)->toDateString();
-            $sampai = now()->toDateString();
-            $query->whereDate('created_at', '>=', $dari)
-                  ->whereDate('created_at', '<=', $sampai);
+            if (!$dari && !$sampai) {
+                // Jika tidak ada filter tanggal, batasi ke 30 hari terakhir
+                $dari = now()->subDays(30)->toDateString();
+                $sampai = now()->toDateString();
+                $query->whereDate('created_at', '>=', $dari)
+                    ->whereDate('created_at', '<=', $sampai);
+            }
         }
 
         $reimbursements = $query->orderBy('created_at', 'desc')->get();
@@ -115,6 +118,70 @@ class ReimbursementPdfController extends Controller
                     ->orderBy('created_at', 'desc')
                     ->get();
             } else {
+                $dari = $request->get('start_date');
+                $sampai = $request->get('end_date');
+
+
+                if (!$dari && !$sampai) {
+                    // Jika tidak ada filter tanggal, batasi ke 30 hari terakhir
+                    $dari = now()->subDays(30)->toDateString();
+                    $sampai = now()->toDateString();
+                    $reimbursements = Reimbursement::where('user_id', $userId)
+                        ->whereDate('created_at', '>=', $dari)
+                        ->whereDate('created_at', '<=', $sampai)
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+                }
+            }
+
+            $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))
+                ->setPaper('a4', 'portrait');
+
+            $filename = 'Laporan_Reimbursement_' . $user->name . '_' . now()->format('YmdHis') . '.pdf';
+
+            // Stream PDF to browser (display inline)
+            return $pdf->stream($filename);
+        } catch (\Exception $e) {
+            Log::error('Error in driver reimbursement print: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'parameters' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error generating reimbursement PDF'
+            ], 500);
+        }
+    }
+
+    public function managerPrintReimbursement(Request $request)
+    {
+        try {
+            $userId = $request->query('user_id');
+
+            if (!$userId) {
+                abort(400, 'Missing user_id parameter');
+            }
+
+            $user = User::find($userId);
+
+            if (!$user) {
+                abort(404, 'User not found');
+            }
+
+            $dari = $request->get('dari');
+            $sampai = $request->get('sampai');
+
+            if ($request->query('ids')) {
+                $ids = explode(',', $request->query('ids'));
+                $reimbursements = Reimbursement::where('user_id', $userId)
+                    ->whereIn('id', $ids)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+
+                $dari = $reimbursements->min('created_at');
+                $sampai = $reimbursements->max('created_at');
+            } else {
                 $reimbursements = Reimbursement::where('user_id', $userId)
                     ->whereBetween('created_at', [
                         $dari . ' 00:00:00',
@@ -125,15 +192,14 @@ class ReimbursementPdfController extends Controller
             }
 
             $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))
-            ->setPaper('a4', 'portrait');
+                ->setPaper('a4', 'portrait');
 
             $filename = 'Laporan_Reimbursement_' . $user->name . '_' . now()->format('YmdHis') . '.pdf';
 
             // Stream PDF to browser (display inline)
             return $pdf->stream($filename);
-
         } catch (\Exception $e) {
-            Log::error('Error in driver reimbursement print: ' . $e->getMessage(), [
+            Log::error('Error in manager reimbursement print: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
                 'parameters' => $request->all()
             ]);

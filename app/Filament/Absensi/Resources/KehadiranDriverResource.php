@@ -2,22 +2,25 @@
 
 namespace App\Filament\Absensi\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Filament\Absensi\Resources\KehadiranDriverResource\Pages;
+use App\Filament\Absensi\Resources\KehadiranDriverResource\RelationManagers\OvertimePayRelationManager;
 use App\Models\DriverAttendence;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
-use Illuminate\Database\Eloquent\Model;
+use App\Services\GeocodingService;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\ViewEntry;
+use Filament\Infolists\Infolist;
 use Filament\Pages\SubNavigationPosition;
-use App\Filament\Absensi\Resources\KehadiranDriverResource\Pages;
 use Filament\Resources\Pages\Page;
-use App\Filament\Absensi\Resources\KehadiranDriverResource\RelationManagers\OvertimePayRelationManager;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class KehadiranDriverResource extends Resource
 {
@@ -27,8 +30,12 @@ class KehadiranDriverResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([Forms\Components\DatePicker::make('date')->label('Tanggal')->required(), Forms\Components\TimePicker::make('time_in')->label('Waktu Masuk')->required(), Forms\Components\TimePicker::make('time_check')->label('Waktu Check')->required(), Forms\Components\TimePicker::make('time_out')->label('Waktu Keluar')->required(),
-        Forms\Components\Checkbox::make('is_complete')->label('Selesai')->default(false)]);
+        return $form->schema([
+            Forms\Components\DatePicker::make('date')->label('Tanggal')->required(),
+            Forms\Components\DateTimePicker::make('time_in')->label('Waktu Masuk')->required(),
+            Forms\Components\DateTimePicker::make('time_out')->label('Waktu Keluar')->required(),
+            Forms\Components\Checkbox::make('is_complete')->label('Selesai')->default(false)
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -48,17 +55,68 @@ class KehadiranDriverResource extends Resource
             Section::make('Detail Kehadiran Driver')
                 ->columns(2)
                 ->schema([Group::make()->schema([TextEntry::make('user.name')->label('Driver'), TextEntry::make('unit.type')->label('Unit'), TextEntry::make('unit.nopol')->label('Nopol'), TextEntry::make('date')->label('Tanggal')]), Group::make()->schema([TextEntry::make('project.name')->label('Project'), TextEntry::make('endUser.name')->label('End User'), TextEntry::make('is_complete')->label('Approval')->badge(fn($state) => $state ? 'success' : 'warning')->formatStateUsing(fn($state) => $state ? 'Selesai' : 'Belum Selesai')])]),
-            Section::make('Absen Masuk')
-                ->columns(2)
-                ->schema([TextEntry::make('time_in')->label('Waktu Masuk')->icon('heroicon-o-clock')->dateTime('H:i'), TextEntry::make('start_km')->label('Start KM'), TextEntry::make('location_in')->label('Lokasi Masuk')->formatStateUsing(fn($state, $record) => $state ? "{$state} <br><a href='https://www.google.com/maps?q={$record->location_out}' target='_blank' class='text-primary-600 underline'>Lihat di Maps</a>" : 'Alamat tidak tersedia')->html(), TextEntry::make('photo_in')->label('Foto Masuk')->formatStateUsing(fn(string $state): string => $state ? '<a href="' . asset($state) . '" target="_blank"><img src="' . asset($state) . '" alt="Photo In" style="max-width: 200px; max-height: 200px;"/></a>' : 'No Photo')->html()]),
-            Section::make('Absen Check')
-                ->columns(2)
-                ->schema([TextEntry::make('time_check')->label('Waktu Check')->icon('heroicon-o-clock')->dateTime('H:i'), TextEntry::make('location_check')->label('Lokasi Check')->formatStateUsing(fn($state, $record) => $state ? "{$state} <br><a href='https://www.google.com/maps?q={$record->location_check}' target='_blank' class='text-primary-600 underline'>Lihat di Maps</a>" : 'Alamat tidak tersedia')->html(), TextEntry::make('photo_check')->label('Foto Check')->formatStateUsing(fn(string $state): string => $state ? '<a href="' . asset($state) . '" target="_blank"><img src="' . asset($state) . '" alt="Photo Check" style="max-width: 200px; max-height: 200px;"/></a>' : 'No Photo')->html()]),
-            Section::make('Absen Keluar')
-                ->columns(2)
-                ->schema([TextEntry::make('time_out')->label('Waktu Keluar')->icon('heroicon-o-clock')->dateTime('H:i'), TextEntry::make('end_km')->label('End KM'), TextEntry::make('location_out')->label('Lokasi Keluar')->formatStateUsing(fn($state, $record) => $state ? "{$state} <br><a href='https://www.google.com/maps?q={$record->location_out}' target='_blank' class='text-primary-600 underline'>Lihat di Maps</a>" : 'Alamat tidak tersedia')->html(), TextEntry::make('photo_out')->label('Foto Keluar')->formatStateUsing(fn(string $state): string => $state ? '<a href="' . asset($state) . '" target="_blank"><img src="' . asset($state) . '" alt="Photo Out" style="max-width: 200px; max-height: 200px;"/></a>' : 'No Photo')->html()]),
-            Section::make('Keterangan')->schema([TextEntry::make('note')->label('Catatan')]),
-        ]);
+                Section::make('Absensi Masuk')
+                    ->schema([
+                        TextEntry::make('time_in')
+                            ->label('Waktu Masuk'),
+                        TextEntry::make('start_km')
+                            ->label('KM Awal'),
+                        TextEntry::make('location_in')
+                            ->label('Lokasi Masuk')
+                            ->formatStateUsing(function ($state) {
+
+                                if (!$state) return '-';
+
+                                [$lat, $lng] = explode(',', $state);
+
+                                return app(GeocodingService::class)
+                                    ->getAddressFromCoordinates($lat, $lng);
+                            })
+                            ->columnSpanFull(),
+                        ImageEntry::make('photo_in')
+                            ->label('Foto Masuk')
+                            ->disk('public')
+                            ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in))
+                            ->size(300)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Section::make('Absensi Check')
+                    ->schema([
+                        ViewEntry::make('checks.attendance_id')
+                            ->label('Absensi Check')
+                            ->view('filament.check-attendences'),
+                    ])
+                    ->columns(2),
+
+                Section::make('Absensi Keluar')
+                    ->schema([
+                        TextEntry::make('time_out')
+                            ->label('Waktu Keluar'),
+                        TextEntry::make('end_km')
+                            ->label('KM Akhir'),
+                        TextEntry::make('location_out')
+                            ->label('Lokasi Keluar')
+                            ->formatStateUsing(function ($state) {
+
+                                if (!$state) return '-';
+
+                                [$lat, $lng] = explode(',', $state);
+
+                                return app(GeocodingService::class)
+                                    ->getAddressFromCoordinates($lat, $lng);
+                            })
+                            ->columnSpanFull(),
+                        ImageEntry::make('photo_out')
+                            ->label('Foto Keluar')
+                            ->disk('public')
+                            ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_out))
+                            ->size(300)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->visible(fn($record) => !empty($record->time_out)),
+            ]);
     }
 
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;

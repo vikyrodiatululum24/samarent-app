@@ -17,6 +17,7 @@ class ServiceUnit extends Model
         'foto_kondisi',
         'foto_pengerjaan_bengkel',
         'foto_tambahan',
+        'pra_pengajuan_id',
     ];
 
     protected $casts = [
@@ -60,5 +61,10 @@ class ServiceUnit extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class, 'unit_id', 'id');
+    }
+
+    public function praPengajuan()
+    {
+        return $this->belongsTo(PraPengajuan::class, 'pra_pengajuan_id', 'id');
     }
 }

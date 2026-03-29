@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Models\OvertimePay;
 use App\Models\SetSalary;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 
@@ -49,8 +50,8 @@ class PayrollHelpers
 
     public static function calculateOvertimePay($absen)
     {
-        $startTime = Carbon::createFromFormat('H:i:s', $absen->time_in);
-        $endTime = Carbon::createFromFormat('H:i:s', $absen->time_out);
+        $startTime = Carbon::parse($absen->time_in);
+        $endTime = Carbon::parse($absen->time_out);
         $driver_id = $absen->user->driver->id ?? null;
         if (!$driver_id) {
             throw new \Exception("Driver ID tidak ditemukan untuk absen ID {$absen->id}");

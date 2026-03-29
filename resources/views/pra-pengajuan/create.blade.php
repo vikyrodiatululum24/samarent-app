@@ -14,9 +14,8 @@
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <style>
@@ -60,10 +59,14 @@
 <body class="bg-slate-100">
     <div class="min-h-screen py-8 px-4">
         <div class="max-w-3xl mx-auto">
-            <div class="bg-white rounded-xl shadow p-6 mb-6">
-                <h1 class="text-2xl font-bold text-slate-800 text-center">Form Pra Pengajuan</h1>
-                <p class="text-sm text-slate-500 mt-2 text-center">Silakan isi form di bawah ini dengan data yang
-                    lengkap.</p>
+            <div class="bg-white rounded-xl shadow mb-6">
+                <img src="{{ asset('images/header_samarent.jpg') }}" alt="header samarent" width="100%"
+                    style="border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">
+                <div class="pb-6">
+                    <h1 class="text-2xl font-bold text-slate-800 text-center">Form Pengajuan</h1>
+                    <p class="text-sm text-slate-500 mt-2 text-center">Silakan isi form di bawah ini dengan data yang
+                        lengkap.</p>
+                </div>
             </div>
 
             @if (session('success'))
@@ -84,7 +87,8 @@
             @endif
 
             <div class="bg-white rounded-xl shadow p-6">
-                <form action="{{ route('public.pra-pengajuan.store') }}" method="POST" class="space-y-5">
+                <form action="{{ route('public.pra-pengajuan.store') }}" method="POST" class="space-y-5"
+                    enctype="multipart/form-data">
                     @csrf
 
                     <div>
@@ -100,27 +104,37 @@
                     </div>
 
                     <div>
-                        <label for="project" class="block text-sm font-medium text-slate-700 mb-1">Project</label>
-                        <input type="text" name="project" id="project" value="{{ old('project') }}" required
+                        <label for="project" class="block text-sm font-medium text-slate-700 mb-1">Perusahaan</label>
+                        <select name="project" id="project" required
                             class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Pilih Perusahaan</option>
+                            @foreach ($projects as $project)
+                                <option value="{{ $project->id }}"
+                                    {{ old('project') == $project->id ? 'selected' : '' }}>
+                                    {{ $project->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div>
-                        <label for="up" class="block text-sm font-medium text-slate-700 mb-1">UP</label>
+                        <label for="up" class="block text-sm font-medium text-slate-700 mb-1">Unit
+                            Pelaksana</label>
                         <select name="up" id="up" required
                             class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">Pilih UP</option>
+                            <option value="">Pilih Unit Pelaksana</option>
                             <option value="UP1" {{ old('up') == 'UP1' ? 'selected' : '' }}>UP1</option>
                             <option value="UP2" {{ old('up') == 'UP2' ? 'selected' : '' }}>UP2</option>
                             <option value="UP3" {{ old('up') == 'UP3' ? 'selected' : '' }}>UP3</option>
                             <option value="UP5" {{ old('up') == 'UP5' ? 'selected' : '' }}>UP5</option>
                             <option value="UP7" {{ old('up') == 'UP7' ? 'selected' : '' }}>UP7</option>
-                            <option value="Lainnya" {{ old('up') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                            <option value="manual" {{ old('up') == 'manual' ? 'selected' : '' }}>Lainnya</option>
                         </select>
                     </div>
 
-                    <div id="up_lainnya_wrapper" class="{{ old('up') == 'Lainnya' ? '' : 'hidden' }}">
-                        <label for="up_lainnya" class="block text-sm font-medium text-slate-700 mb-1">UP Lainnya</label>
+                    <div id="up_lainnya_wrapper" class="{{ old('up') == 'manual' ? '' : 'hidden' }}">
+                        <label for="up_lainnya" class="block text-sm font-medium text-slate-700 mb-1">Unit Pelaksana
+                            Lainnya</label>
                         <input type="text" name="up_lainnya" id="up_lainnya" value="{{ old('up_lainnya') }}"
                             class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                     </div>
@@ -139,60 +153,91 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label for="unitId" class="block text-sm font-medium text-slate-700 mb-1">Unit (Ketik untuk
-                            mencari)</label>
-                        <select name="unitId" id="unitId" required>
-                            <option value="">Pilih Unit</option>
-                            @foreach ($units as $unit)
-                                <option value="{{ $unit->id }}"
-                                    {{ old('unitId') == $unit->id ? 'selected' : '' }}>
-                                    {{ $unit->nopol }} - {{ $unit->merk }} {{ $unit->type }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <!-- SERVICE UNITS -->
+                    <h3 class="font-bold text-lg mb-2">Detail Unit Service</h3>
 
-                    <div>
-                        <label for="service" class="block text-sm font-medium text-slate-700 mb-1">Service (bisa pilih lebih dari satu)</label>
-                        <select name="service[]" id="service" multiple required>
-                            <option value="Service Ganti Oli" {{ in_array('Service Ganti Oli', old('service', [])) ? 'selected' : '' }}>Service Ganti Oli</option>
-                            <option value="Rem Depan" {{ in_array('Rem Depan', old('service', [])) ? 'selected' : '' }}>Rem Depan</option>
-                            <option value="Rem Belakang" {{ in_array('Rem Belakang', old('service', [])) ? 'selected' : '' }}>Rem Belakang</option>
-                            <option value="Lampu Depan" {{ in_array('Lampu Depan', old('service', [])) ? 'selected' : '' }}>Lampu Depan</option>
-                            <option value="Lampu Belakang" {{ in_array('Lampu Belakang', old('service', [])) ? 'selected' : '' }}>Lampu Belakang</option>
-                            <option value="Ban Depan" {{ in_array('Ban Depan', old('service', [])) ? 'selected' : '' }}>Ban Depan</option>
-                            <option value="Ban Belakang" {{ in_array('Ban Belakang', old('service', [])) ? 'selected' : '' }}>Ban Belakang</option>
-                            <option value="Gear Set" {{ in_array('Gear Set', old('service', [])) ? 'selected' : '' }}>Gear Set</option>
-                            <option value="Kampas Kopling" {{ in_array('Kampas Kopling', old('service', [])) ? 'selected' : '' }}>Kampas Kopling</option>
-                            <option value="Filter Udara" {{ in_array('Filter Udara', old('service', [])) ? 'selected' : '' }}>Filter Udara</option>
-                            <option value="Filter Oli" {{ in_array('Filter Oli', old('service', [])) ? 'selected' : '' }}>Filter Oli</option>
-                            <option value="Busi" {{ in_array('Busi', old('service', [])) ? 'selected' : '' }}>Busi</option>
-                            <option value="Ban Dalam" {{ in_array('Ban Dalam', old('service', [])) ? 'selected' : '' }}>Ban Dalam</option>
-                            <option value="Spion" {{ in_array('Spion', old('service', [])) ? 'selected' : '' }}>Spion</option>
-                            <option value="Lampu Stop" {{ in_array('Lampu Stop', old('service', [])) ? 'selected' : '' }}>Lampu Stop</option>
-                            <option value="Lampu Sein depan" {{ in_array('Lampu Sein depan', old('service', [])) ? 'selected' : '' }}>Lampu Sein depan</option>
-                            <option value="Lampu Sein Belakang" {{ in_array('Lampu Sein Belakang', old('service', [])) ? 'selected' : '' }}>Lampu Sein Belakang</option>
-                            <option value="Bearing Depan" {{ in_array('Bearing Depan', old('service', [])) ? 'selected' : '' }}>Bearing Depan</option>
-                            <option value="Bearung Belakang" {{ in_array('Bearung Belakang', old('service', [])) ? 'selected' : '' }}>Bearung Belakang</option>
-                            <option value="Accu" {{ in_array('Accu', old('service', [])) ? 'selected' : '' }}>Accu</option>
-                            <option value="Lainnya" {{ in_array('Lainnya', old('service', [])) ? 'selected' : '' }}>Lainnya</option>
-                        </select>
-                    </div>
+                    <div id="service-units-wrapper">
 
-                    <div id="service_lainnya_wrapper" class="{{ in_array('Lainnya', old('service', [])) ? '' : 'hidden' }}">
-                        <label for="service_lainnya" class="block text-sm font-medium text-slate-700 mb-1">Detail Service Lainnya</label>
-                        <div class="flex gap-2">
-                            <input type="text" name="service_lainnya" id="service_lainnya"
-                                class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                                placeholder="Tulis service lainnya lalu klik Tambah">
-                            <button type="button" id="btn_tambah_service_lainnya"
-                                class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-800 text-white text-sm font-medium whitespace-nowrap">
-                                Tambah
+                        <!-- ITEM 1 -->
+                        <div class="service-unit-item border p-4 rounded mb-3">
+
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Unit</label>
+                                <select name="service_units[0][unit_id]" class="unit-select w-full mb-2" required>
+                                    <option value="">Pilih Unit</option>
+                                    @foreach ($units as $unit)
+                                        <option value="{{ $unit->id }}">
+                                            {{ $unit->nopol }} - {{ $unit->merk }} {{ $unit->type }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="odometer"
+                                    class="block text-sm font-medium text-slate-700 mb-1">Odometer</label>
+                                <input type="number" name="service_units[0][odometer]" id="odometer"
+                                    class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Service</label>
+                                <select name="service_units[0][service][]" multiple class="service-select w-full mb-2"
+                                    required>
+                                    <option value="Service Ganti Oli">Service Ganti Oli</option>
+                                    <option value="Rem Depan">Rem Depan</option>
+                                    <option value="Rem Belakang">Rem Belakang</option>
+                                    <option value="Ban Depan">Ban Depan</option>
+                                    <option value="Ban Belakang">Ban Belakang</option>
+                                    <option value="Accu">Accu</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+
+                                <!-- INPUT LAINNYA -->
+                                <div class="service-lainnya-wrapper hidden mt-2">
+                                    <label for="service_lainnya"
+                                        class="block text-sm font-medium text-slate-700 mb-1">Service Lainnya</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" class="service-lainnya-input border rounded p-2 w-full"
+                                            placeholder="Tulis service lainnya">
+                                        <button type="button"
+                                            class="btn-add-service bg-gray-700 text-white px-3 rounded">
+                                            Tambah
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <label for="foto_unit">Foto Unit</label>
+                            <input type="file" name="service_units[0][foto_unit]" id="foto_unit"
+                                class="foto-unit-input w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
+                                accept="image/*">
+                            <div class="preview-foto-unit mb-3"></div>
+
+                            <label for="foto_odometer">Foto Odometer</label>
+                            <input type="file" name="service_units[0][foto_odometer]" id="foto_odometer"
+                                class="input-foto-odometer w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
+                                accept="image/*" placeholder="Masukan Odometer">
+                            <div class="preview-foto_odometer mb-3"></div>
+
+                            <label for="foto_kondisi">Foto Kondisi</label>
+                            <input type="file" multiple name="service_units[0][foto_kondisi][]" id="foto_kondisi"
+                                class="input-foto-kondisi w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
+                                accept="image/*">
+                            <div class="preview-foto-kondisi flex gap-2 flex-wrap mb-3"></div>
+
+                            <button type="button" class="remove-item text-red-500 text-sm">
+                                Hapus
                             </button>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">Service tambahan akan masuk ke daftar service yang dipilih.</p>
+
                     </div>
+
+                    <button type="button" id="add-service-unit"
+                        class="bg-gray-700 text-white px-4 py-2 rounded mb-4">
+                        + Tambah Unit
+                    </button>
 
                     <button type="submit"
                         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition">
@@ -205,80 +250,261 @@
 
     <script>
         $(document).ready(function() {
-            $('#unitId').select2({
-                placeholder: 'Pilih unit',
+            initSelect2();
+
+            $('#project').select2({
+                placeholder: 'Pilih perusahaan',
                 allowClear: true
             });
 
-            $('#service').select2({
-                placeholder: 'Pilih service',
-                closeOnSelect: false,
-                width: '100%'
+            // Initialize Select2 for unit and service dropdowns
+            function initSelect2(target = null) {
+                let unit = target ? target.find('.unit-select') : $('.unit-select');
+                let service = target ? target.find('.service-select') : $('.service-select');
+
+                unit.select2({
+                    placeholder: 'Pilih Unit',
+                    width: '100%'
+                });
+
+                service.select2({
+                    placeholder: 'Pilih Service',
+                    closeOnSelect: false,
+                    width: '100%'
+                });
+            }
+
+            let index = 1; // untuk menghitung jumlah item service unit
+
+            // tambah item service unit
+            $('#add-service-unit').on('click', function() {
+
+                let html = `
+                        <div class="service-unit-item border p-4 rounded mb-3">
+
+                            <div class="mb-3">
+                                <label>Unit</label>
+                                <select name="service_units[${index}][unit_id]" class="unit-select w-full mb-2" required>
+                                    <option value="">Pilih Unit</option>
+                                    @foreach ($units as $unit)
+                                        <option value="{{ $unit->id }}">
+                                            {{ $unit->nopol }} - {{ $unit->merk }} {{ $unit->type }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="odometer" class="block text-sm font-medium text-slate-700 mb-1">Odometer</label>
+                                <input type="number" name="service_units[${index}][odometer]" id="odometer"
+                                    class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Service</label>
+                                <select name="service_units[${index}][service][]" multiple class="service-select w-full mb-2" required>
+                                    <option value="Service Ganti Oli">Service Ganti Oli</option>
+                                    <option value="Rem Depan">Rem Depan</option>
+                                    <option value="Rem Belakang">Rem Belakang</option>
+                                    <option value="Ban Depan">Ban Depan</option>
+                                    <option value="Ban Belakang">Ban Belakang</option>
+                                    <option value="Accu">Accu</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+
+                                <!-- INPUT LAINNYA -->
+                                <div class="service-lainnya-wrapper hidden mt-2">
+                                    <label for="service_lainnya"
+                                        class="block text-sm font-medium text-slate-700 mb-1">Service Lainnya</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" class="service-lainnya-input border rounded p-2 w-full"
+                                            placeholder="Tulis service lainnya">
+                                        <button type="button"
+                                            class="btn-add-service bg-gray-700 text-white px-3 rounded">
+                                            Tambah
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="foto_unit">Foto Unit</label>
+                                <input type="file" name="service_units[${index}][foto_unit]" id="foto_unit"
+                                    class="foto-unit-input w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
+                                    accept="image/*">
+                                <div class="preview-foto-unit mb-3"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="foto_odometer">Foto Odometer</label>
+                                <input type="file" name="service_units[${index}][foto_odometer]" id="foto_odometer"
+                                    class="input-foto-odometer w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
+                                    accept="image/*">
+                                <div class="preview-foto_odometer mb-3"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="foto_kondisi">Foto Kondisi</label>
+                                <input type="file" multiple name="service_units[${index}][foto_kondisi][]" id="foto_kondisi"
+                                    class="input-foto-kondisi w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
+                                    accept="image/*">
+                                <div class="preview-foto-kondisi flex gap-2 flex-wrap mb-3"></div>
+                            </div>
+
+                            <button type="button" class="remove-item text-red-500 text-sm">
+                                Hapus
+                            </button>
+                        </div>`;
+
+                let newItem = $(html);
+
+                $('#service-units-wrapper').append(newItem);
+
+                initSelect2(newItem);
+                index++;
+            });
+
+            // hapus item
+            $(document).on('click', '.remove-item', function() {
+                $(this).closest('.service-unit-item').remove();
+            });
+
+            // Show/hide input service lainnya
+            $(document).on('change', '.service-select', function() {
+
+                let wrapper = $(this).closest('.service-unit-item');
+                let selected = $(this).val() || [];
+
+                if (selected.includes('Lainnya')) {
+                    wrapper.find('.service-lainnya-wrapper').removeClass('hidden');
+                } else {
+                    wrapper.find('.service-lainnya-wrapper').addClass('hidden');
+                    wrapper.find('.service-lainnya-input').val('');
+                }
+            });
+
+            // button add service lainnya
+            $(document).on('click', '.btn-add-service', function() {
+
+                let wrapper = $(this).closest('.service-unit-item');
+                let input = wrapper.find('.service-lainnya-input');
+                let select = wrapper.find('.service-select');
+
+                let value = input.val().trim();
+
+                if (!value) return;
+
+                // cek apakah sudah ada
+                let exists = false;
+
+                select.find('option').each(function() {
+                    if ($(this).val().toLowerCase() === value.toLowerCase()) {
+                        exists = true;
+                    }
+                });
+
+                // kalau belum ada → tambah option baru
+                if (!exists) {
+                    let newOption = new Option(value, value, true, true);
+                    select.append(newOption);
+                } else {
+                    // kalau sudah ada → select saja
+                    select.find(`option[value="${value}"]`).prop('selected', true);
+                }
+
+                // trigger select2 update
+                select.trigger('change');
+
+                // reset input
+                input.val('').focus();
             });
 
             const upSelect = document.getElementById('up');
             const wrapper = document.getElementById('up_lainnya_wrapper');
-            const serviceSelect = document.getElementById('service');
-            const serviceLainnyaWrapper = document.getElementById('service_lainnya_wrapper');
-            const serviceLainnyaInput = document.getElementById('service_lainnya');
-            const tambahServiceButton = document.getElementById('btn_tambah_service_lainnya');
-
             upSelect.addEventListener('change', function() {
-                if (this.value === 'Lainnya') {
+                if (this.value === 'manual') {
                     wrapper.classList.remove('hidden');
                 } else {
                     wrapper.classList.add('hidden');
+                    document.getElementById('up_lainnya').value = '';
                 }
             });
 
-            const toggleServiceLainnya = function() {
-                const selected = $('#service').val() || [];
+            // Preview foto unit
+            $(document).on('change', '.foto-unit-input', function(e) {
 
-                if (selected.includes('Lainnya')) {
-                    serviceLainnyaWrapper.classList.remove('hidden');
-                } else {
-                    serviceLainnyaWrapper.classList.add('hidden');
-                    serviceLainnyaInput.value = '';
+                let wrapper = $(this).closest('.service-unit-item');
+                let preview = wrapper.find('.preview-foto-unit');
+
+                preview.html(''); // reset
+
+                let file = e.target.files[0];
+
+                if (file) {
+                    let reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        preview.html(`
+                <img src="${e.target.result}"
+                    class="w-32 h-32 object-cover rounded border">
+            `);
+                    }
+
+                    reader.readAsDataURL(file);
                 }
-            };
+            });
+            // Preview foto odometer
+            $(document).on('change', '.input-foto-odometer', function(e) {
 
-            $('#service').on('change select2:select select2:unselect', toggleServiceLainnya);
-            toggleServiceLainnya();
+                let wrapper = $(this).closest('.service-unit-item');
+                let preview = wrapper.find('.preview-foto_odometer');
 
-            const addCustomService = function() {
-                const customText = serviceLainnyaInput.value.trim();
+                preview.html(''); // reset
 
-                if (!customText) {
-                    return;
+                let file = e.target.files[0];
+
+                if (file) {
+                    let reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        preview.html(`
+                <img src="${e.target.result}"
+                    class="w-32 h-32 object-cover rounded border">
+            `);
+                    }
+
+                    reader.readAsDataURL(file);
                 }
+            });
+            // Preview foto kondisi -> multiple
+            $(document).on('change', '.input-foto-kondisi', function(e) {
 
-                const customValue = customText;
-                const normalize = (value) => value.trim().toLowerCase();
-                const hasOption = Array.from(serviceSelect.options)
-                    .some(option => normalize(option.value) === normalize(customValue));
+                let wrapper = $(this).closest('.service-unit-item');
+                let preview = wrapper.find('.preview-foto-kondisi');
 
-                if (!hasOption) {
-                    const newOption = new Option(customText, customValue, true, true);
-                    serviceSelect.add(newOption);
-                } else {
-                    Array.from(serviceSelect.options).forEach(option => {
-                        if (normalize(option.value) === normalize(customValue)) {
-                            option.selected = true;
+                preview.html(''); // reset
+
+                let files = e.target.files;
+
+                if (files.length > 0) {
+
+                    Array.from(files).forEach(file => {
+
+                        let reader = new FileReader();
+
+                        reader.onload = function(e) {
+                            preview.append(`
+                    <div class="relative">
+                        <img src="${e.target.result}"
+                            class="w-24 h-24 object-cover rounded border">
+                    </div>
+                `);
                         }
+
+                        reader.readAsDataURL(file);
+
                     });
-                }
 
-                $('#service').trigger('change');
-                serviceLainnyaInput.value = '';
-                serviceLainnyaInput.focus();
-            };
-
-            tambahServiceButton.addEventListener('click', addCustomService);
-
-            serviceLainnyaInput.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    addCustomService();
                 }
             });
         });

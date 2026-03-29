@@ -3,7 +3,7 @@ Halo,
 Terima kasih telah menggunakan layanan kami.
 Driver telah menyelesaikan tugasnya.
 
-Silakan klik tautan berikut untuk mengonfirmasi penyelesaian tugas:
+Silakan klik tautan berikut untuk mengirimkan konfirmasi penyelesaian tugas:
 {{ $confirmationUrl }}
 
 Jika merasa tidak melakukan servis ini, silakan abaikan email ini.

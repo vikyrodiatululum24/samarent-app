@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PraPengajuanResource\Pages;
 use App\Models\PraPengajuan;
+use App\Models\Project;
 use App\Models\Unit;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,9 +18,7 @@ use Filament\Tables\Table;
 class PraPengajuanResource extends Resource
 {
     protected static ?string $model = PraPengajuan::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
-    protected static ?string $navigationGroup = 'Service';
+    protected static ?string $navigationGroup = 'Pengajuan';
     protected static ?string $navigationLabel = 'Pra Pengajuan';
     protected static ?string $pluralLabel = 'Pra Pengajuan';
 
@@ -61,23 +60,43 @@ class PraPengajuanResource extends Resource
                             ->label('No. WhatsApp')
                             ->required()
                             ->maxLength(20),
-                        Forms\Components\TextInput::make('project')
+                        Forms\Components\Select::make('project')
+                            ->label('Project')
                             ->required()
-                            ->maxLength(255),
-                        Forms\Components\Select::make('up')
-                            ->label('UP')
-                            ->options([
-                                'UP1' => 'UP1',
-                                'UP2' => 'UP2',
-                                'UP3' => 'UP3',
-                                'UP5' => 'UP5',
-                                'UP7' => 'UP7',
-                                'Lainnya' => 'Lainnya',
+                            ->options(Project::pluck('name', 'name')->toArray()) // key dan value = name
+                            ->searchable()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nama Project')
+                                    ->required()
+                                    ->maxLength(255),
                             ])
-                            ->required(),
+                            ->createOptionUsing(function (array $data) {
+                                Project::create(['name' => $data['name']]);
+                                return $data['name']; // ini yang akan dipakai sebagai value dari select
+                            })
+                            ->createOptionAction(function ($action) {
+                                $action->modalHeading('Tambah Project Baru');
+                            }),
+                        Forms\Components\Select::make('up')
+                            ->required()
+                            ->label('Unit Pelaksana')
+                            ->options([
+                                'UP 1' => 'UP 1',
+                                'UP 2' => 'UP 2',
+                                'UP 3' => 'UP 3',
+                                'UP 5' => 'UP 5',
+                                'UP 7' => 'UP 7',
+                                'CUST JEPANG' => 'CUST JEPANG',
+                                'manual' => 'Lainnya',
+                            ])
+                            ->reactive()
+                            ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
                         Forms\Components\TextInput::make('up_lainnya')
-                            ->label('UP Lainnya')
-                            ->maxLength(255),
+                            ->label('Unit Pelaksana Lainnya')
+                            ->required(fn(callable $get) => $get('up') === 'manual')
+                            ->visible(fn(callable $get) => $get('up') === 'manual')
+                            ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
                         Forms\Components\Select::make('unitId')
                             ->label('Unit')
                             ->required()
@@ -86,7 +105,7 @@ class PraPengajuanResource extends Resource
                                 return Unit::query()
                                     ->orderBy('nopol')
                                     ->get()
-                                    ->mapWithKeys(fn (Unit $unit) => [
+                                    ->mapWithKeys(fn(Unit $unit) => [
                                         (string) $unit->id => trim(($unit->nopol ?? '-') . ' - ' . ($unit->merk ?? '') . ' ' . ($unit->type ?? '')),
                                     ])
                                     ->toArray();
@@ -97,9 +116,6 @@ class PraPengajuanResource extends Resource
                         Forms\Components\TextInput::make('kota')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\DatePicker::make('tanggal')
-                            ->native(false)
-                            ->required(),
                         Forms\Components\TextInput::make('status')
                             ->default('pending')
                             ->required()
@@ -141,7 +157,7 @@ class PraPengajuanResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('service')
                     ->label('Service')
-                    ->formatStateUsing(fn (?string $state) => static::formatServices($state))
+                    ->formatStateUsing(fn(?string $state) => static::formatServices($state))
                     ->limit(60)
                     ->wrap(),
                 Tables\Columns\TextColumn::make('status')
@@ -197,7 +213,7 @@ class PraPengajuanResource extends Resource
                             ->placeholder('-'),
                         Components\TextEntry::make('service')
                             ->label('Service')
-                            ->formatStateUsing(fn (?string $state) => static::formatServices($state))
+                            ->formatStateUsing(fn(?string $state) => static::formatServices($state))
                             ->columnSpanFull(),
                         Components\TextEntry::make('tanggal')->label('Tanggal')->date('d/m/Y'),
                         Components\TextEntry::make('status')->label('Status')->badge(),
@@ -228,7 +244,7 @@ class PraPengajuanResource extends Resource
         }
 
         $items = collect(explode(',', (string) $state))
-            ->map(fn (string $value) => trim($value))
+            ->map(fn(string $value) => trim($value))
             ->filter()
             ->map(function (string $value) {
                 if (str_starts_with($value, 'custom::')) {

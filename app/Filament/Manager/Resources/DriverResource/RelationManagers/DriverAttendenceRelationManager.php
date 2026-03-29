@@ -42,13 +42,24 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->square()
                     ->label('Foto Masuk')
                     ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_in)),
-                Tables\Columns\TextColumn::make('time_check'),
-                Tables\Columns\TextColumn::make('location_check')->label('Lokasi Cek'),
-                Tables\Columns\ImageColumn::make('photo_check')
-                    ->disk('public')
-                    ->square()
+                Tables\Columns\TextColumn::make('time_chek')
+                    ->label('Jam Cek')
+                    ->getStateUsing(function ($record) {
+                        $check = $record->checks()->latest()->first();
+                        return $check ? $check->created_at->format('H:i:s') : '-';
+                    }),
+                Tables\Columns\TextColumn::make('location_chek')
+                    ->label('Lokasi Cek')
+                    ->getStateUsing(function ($record) {
+                        $check = $record->checks()->latest()->first();
+                        return $check ? $check->location : '-';
+                    }),
+                Tables\Columns\ImageColumn::make('photo_chek')
                     ->label('Foto Cek')
-                    ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_check)),
+                    ->getStateUsing(function ($record) {
+                        $check = $record->checks()->latest()->first();
+                        return $check ? str_replace('storage/', '', $check->photo) : null;
+                    }),
                 Tables\Columns\TextColumn::make('end_km'),
                 Tables\Columns\TextColumn::make('time_out'),
                 Tables\Columns\TextColumn::make('location_out')->label('Lokasi Keluar'),

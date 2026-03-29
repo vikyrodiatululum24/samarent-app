@@ -19,11 +19,6 @@ class DriverAttendence extends Model
         'note', // masuk
         'location_in', // masuk
         'photo_in', // masuk
-
-        'location_check', // check
-        'photo_check', // check
-        'time_check', // check
-
         'end_km', // keluar
         'time_out', // keluar
         'location_out', // keluar
@@ -59,5 +54,9 @@ class DriverAttendence extends Model
     {
         return $this->belongsTo(Driver::class, 'driver_id');
     }
-    
+    public function checks()
+    {
+        return $this->hasMany(DriverCheck::class, 'attendance_id');
+    }
+
 }
