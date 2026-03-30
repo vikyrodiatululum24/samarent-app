@@ -302,6 +302,10 @@ class AbsenController extends Controller
         if (!empty($driverAttendence) && $request->status === 'approved') {
             PayrollHelpers::calculateOvertimePay($driverAttendence);
 
+            $driverAttendence->update([
+                'is_complete' => true,
+            ]);
+
             $confirmation->update([
                 'status' => 'approved',
                 'is_confirmed' => $request->boolean('is_confirmed', true),
