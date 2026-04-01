@@ -263,7 +263,7 @@ class PraPengajuanResource extends Resource
                     ->schema([
                         ViewEntry::make('service_unit.pra_pengajuan_id')
                             ->label('Detail Kendaraan')
-                            ->view('filament.resources.pages.pengajuan.detail-kendaraan')
+                            ->view('filament.resources.pages.pengajuan.detail-kendaraan-praPengajuan')
                             ->columnSpanFull(),
                     ]),
 

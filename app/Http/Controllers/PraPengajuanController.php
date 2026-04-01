@@ -21,12 +21,15 @@ class PraPengajuanController extends Controller
         $pengajuan->up_lainnya = $praPengajuan->up_lainnya;
         $pengajuan->provinsi = $praPengajuan->provinsi;
         $pengajuan->kota = $praPengajuan->kota;
+        $pengajuan->keterangan = 'PraPengajuan';
         $pengajuan->keterangan_proses = 'cs';
         $pengajuan->save();
 
-        $praPengajuan->status = 'cs';
-        $praPengajuan->save();
+            foreach ($praPengajuan->service_unit as $serviceUnit) {
+                $serviceUnit->pengajuan_id = $pengajuan->id;
+                $serviceUnit->save();
+            }
 
-        return redirect()->route('pra-pengajuan.success');
+        return redirect()->route('pra-pengajuan.index')->with('success', 'Pra Pengajuan berhasil diajukan sebagai Pengajuan.');
     }
 }
