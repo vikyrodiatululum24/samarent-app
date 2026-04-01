@@ -9,6 +9,7 @@ use App\Models\Driver;
 use App\Models\DriverAttendence;
 use App\Services\FonnteService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -24,9 +25,8 @@ class AbsenController extends Controller
 
     public function absenMasuk(Request $request)
     {
+        $auth = auth()->user() ? auth()->user()->id : null;
         $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'project_id' => 'required|exists:projects,id',
             'end_user_id' => 'required|exists:end_users,id',
             'unit_id' => 'required|exists:data_units,id',
             'start_km' => 'required|numeric',
@@ -47,22 +47,29 @@ class AbsenController extends Controller
                 $request->merge(['photo_in' => 'storage/' . $filePath]);
             }
         }
-        $driver = Driver::where('user_id', $request->user_id)->first();
+        $driver = Driver::where('user_id', $auth)->first();
 
-        $absen = DriverAttendence::create([
-            'user_id' => $request->user_id,
-            'driver_id' => $driver ? $driver->id : null,
-            'project_id' => $request->project_id,
-            'end_user_id' => $request->end_user_id,
-            'unit_id' => $request->unit_id,
-            'date' => now()->format('Y-m-d'),
-            'time_in' => now(),
-            'start_km' => $request->start_km,
-            'location_in' => $request->location_in,
-            'photo_in' => $request->photo_in ?? null,
-            'note' => $request->note ?? null,
-        ]);
-
+        DB::beginTransaction();
+        try {
+            $absen = DriverAttendence::create([
+                'user_id' => $auth,
+                'driver_id' => $driver ? $driver->id : null,
+                'project_id' => $driver && $driver->project_id ? $driver->project_id : null,
+                'end_user_id' => $request->end_user_id,
+                'unit_id' => $request->unit_id,
+                'date' => now()->format('Y-m-d'),
+                'time_in' => now(),
+                'start_km' => $request->start_km,
+                'location_in' => $request->location_in,
+                'photo_in' => $request->photo_in ?? null,
+                'note' => $request->note ?? null,
+            ]);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to create absen masuk: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to record absen masuk', 'error' => $e->getMessage()], 500);
+        }
         return response()->json(['message' => 'Absen masuk recorded successfully', 'data' => $absen], 201);
     }
 
@@ -221,47 +228,40 @@ class AbsenController extends Controller
             }
         }
 
-        $targetWa = $absens->first() && $absens->first()->endUser ? $absens->first()->endUser->no_wa : null;
+        // Kelompokkan absens berdasarkan endUser
+        $grouped = $absens->groupBy(function ($absen) {
+            return $absen->endUser ? $absen->endUser->id : 'tanpa_enduser';
+        });
 
-        // format wa menjadi +62 jika belum ada
-        if ($targetWa && !str_starts_with($targetWa, '+')) {
-            $targetWa = '+62' . ltrim($targetWa, '0');
-        }
+        $results = [];
+        foreach ($grouped as $endUserId => $groupAbsens) {
+            $groupIds = $groupAbsens->pluck('id')->toArray();
+            $targetEmail = $groupAbsens->first() && $groupAbsens->first()->endUser ? $groupAbsens->first()->endUser->email : null;
 
-        $targetEmail = 'vickyrodiatululum24@gmail.com';
+            // buat url untuk membungkus id absen yang akan dikonfirmasi
+            $baseUrl = 'driver.servicesamarent.com/confirm-multiple';
+            $query = http_build_query(['ids' => implode(',', $groupIds)]);
+            $url = $baseUrl . '?' . $query;
+            // $waUrl = 'https://wa.me/' . $targetWa . '?text=' . urlencode('Anda memiliki absen yang perlu dikonfirmasi. Silakan klik link berikut untuk melihat detail dan melakukan konfirmasi: ' . $url . ' (Jika Anda tidak melakukan servis ini, silakan abaikan pesan ini)' . "\n" . 'You have an attendance that needs confirmation. Please click the following link to view details and confirm: ' . $url . ' (If you did not perform this service, please ignore this message)');
 
-        // buat url untuk membungkus id absen yang akan dikonfirmasi
-        $baseUrl = 'driver.servicesamarent.com/confirm-multiple';
-        $query = http_build_query(['ids' => implode(',', $ids)]);
-        $url = $baseUrl . '?' . $query;
-        $waUrl = 'https://wa.me/' . $targetWa . '?text=' . urlencode('Anda memiliki absen yang perlu dikonfirmasi. Silakan klik link berikut untuk melihat detail dan melakukan konfirmasi: ' . $url . ' (Jika Anda tidak melakukan servis ini, silakan abaikan pesan ini)' . "\n" . 'You have an attendance that needs confirmation. Please click the following link to view details and confirm: ' . $url . ' (If you did not perform this service, please ignore this message)');
-
-        // if ($sendWa) {
-        //     if ($targetWa) {
-        //         try {
-        //             $this->fonteService->sendWhatsAppMessage($targetWa, $message, null);
-        //             Log::info('Notifikasi WhatsApp berhasil dikirim ke ' . $targetWa . ' untuk absen dengan ID: ' . implode(', ', $ids) . ' dengan url konfirmasi: ' . $url);
-        //             $sentChannels[] = 'WhatsApp';
-        //         } catch (\Exception $e) {
-        //             Log::error('Gagal mengirim notifikasi WhatsApp: ' . $e->getMessage());
-        //         }
-        //     } else {
-        //         Log::warning('Nomor WhatsApp end user tidak tersedia untuk mengirim notifikasi untuk absen dengan ID: ' . implode(', ', $ids));
-        //     }
-        // }
-
-        if ($targetEmail) {
-            try {
-                Mail::to($targetEmail)->send(new AbsenConfirmationMail($waUrl));
-            } catch (\Exception $e) {
-                Log::error('Gagal mengirim notifikasi email: ' . $e->getMessage());
+            // Kirim email jika tersedia
+            if ($targetEmail) {
+                try {
+                    Mail::to($targetEmail)->send(new AbsenConfirmationMail($url));
+                    $results[] = 'Notifikasi email berhasil dikirim ke ' . $targetEmail . ' untuk absen ID: ' . implode(', ', $groupIds);
+                } catch (\Exception $e) {
+                    Log::error('Gagal mengirim notifikasi email: ' . $e->getMessage());
+                    $results[] = 'Gagal mengirim email ke ' . $targetEmail . ' untuk absen ID: ' . implode(', ', $groupIds);
+                }
+            } else {
+                Log::warning('Email end user tidak tersedia untuk mengirim notifikasi untuk absen dengan ID: ' . implode(', ', $groupIds));
+                $results[] = 'Email end user tidak tersedia untuk absen ID: ' . implode(', ', $groupIds);
             }
-        } else {
-            Log::warning('Email end user tidak tersedia untuk mengirim notifikasi untuk absen dengan ID: ' . implode(', ', $ids));
         }
 
         return response()->json([
-            'message' => 'Notifikasi berhasil dikirim melalui ' . ($targetEmail ? 'email' : 'tidak ada channel yang valid'),
+            'message' => 'Notifikasi selesai diproses.',
+            'results' => $results,
         ], 200);
     }
 

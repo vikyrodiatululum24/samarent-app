@@ -6,6 +6,8 @@ use App\Models\EndUser;
 use App\Models\Project;
 use App\Models\Unit;
 use App\Http\Controllers\Controller;
+use App\Models\Driver;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class EndUserController extends Controller
@@ -16,9 +18,11 @@ class EndUserController extends Controller
         return response()->json($projects);
     }
 
-    public function getEndUsers($id)
+    public function getEndUsers()
     {
-        $endUsers = EndUser::where('project_id', $id)->get();
+        $driver = Driver::with('project')->where('user_id', auth()->id())->first();
+        Log::info('Mendapatkan end users untuk driver ID: ' . $driver->id . ' dengan penempatan: ' . $driver->project->name);
+        $endUsers = EndUser::where('project_id', $driver->project->id)->get();
         return response()->json($endUsers);
     }
 

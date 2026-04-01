@@ -9,11 +9,13 @@ use App\Models\Unit;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class PraPengajuanResource extends Resource
 {
@@ -133,8 +135,8 @@ class PraPengajuanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('tanggal')
-                    ->label('Tanggal')
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Dibuat')
                     ->date('d/m/Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('nama_pic')
@@ -151,23 +153,71 @@ class PraPengajuanResource extends Resource
                     ->label('UP')
                     ->badge()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('unit.nopol')
-                    ->label('Nopol')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('service')
+                Tables\Columns\TextColumn::make('jenis')
+                    ->label('Jenis Kendaraan')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            $jenis = $service->unit?->jenis ?? '-';
+                            return "{$jenis}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('jenis', 'like', "%{$search}%");
+                        });
+                    })
+                    ->width('120px')
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('service_unit')
                     ->label('Service')
-                    ->formatStateUsing(fn(?string $state) => static::formatServices($state))
-                    ->limit(60)
-                    ->wrap(),
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            return "{$service->service}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('service', 'like', "%{$search}%");
+                        });
+                    })
+                    ->width('200px')
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('nopol')
+                    ->label('No. Polisi')
+                    ->getStateUsing(function ($record) {
+                        // Ambil semua service yang berelasi dengan pengajuan ini
+                        $services = $record->service_unit()->with('unit')->get();
+                        // Format: [nama_service (nopol)], dipisah baris baru
+                        return $services->map(function ($service) {
+                            $nopol = $service->unit?->nopol ?? '-';
+                            return "{$nopol}";
+                        })->implode('<br>');
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
+                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                            $q->where('nopol', 'like', "%{$search}%");
+                        });
+                    })
+                    ->width('120px')
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Dibuat')
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('up')
@@ -207,16 +257,16 @@ class PraPengajuanResource extends Resource
                         Components\TextEntry::make('up_lainnya')->label('UP Lainnya')->placeholder('-'),
                         Components\TextEntry::make('provinsi')->label('Provinsi'),
                         Components\TextEntry::make('kota')->label('Kota'),
-                        Components\TextEntry::make('unit.nopol')->label('Nopol')->placeholder('-'),
-                        Components\TextEntry::make('unit.type')
-                            ->label('Tipe Unit')
-                            ->placeholder('-'),
-                        Components\TextEntry::make('service')
-                            ->label('Service')
-                            ->formatStateUsing(fn(?string $state) => static::formatServices($state))
-                            ->columnSpanFull(),
                         Components\TextEntry::make('tanggal')->label('Tanggal')->date('d/m/Y'),
                         Components\TextEntry::make('status')->label('Status')->badge(),
+                                        Components\Section::make('Detail Kendaraan')
+                    ->schema([
+                        ViewEntry::make('service_unit.pra_pengajuan_id')
+                            ->label('Detail Kendaraan')
+                            ->view('filament.resources.pages.pengajuan.detail-kendaraan')
+                            ->columnSpanFull(),
+                    ]),
+
                     ])
                     ->columns(2),
             ]);

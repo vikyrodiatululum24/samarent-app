@@ -35,7 +35,26 @@ class DataUnitResource extends Resource
                 Forms\Components\TextInput::make('jenis')->label('Jenis Kendaraan')->required(),
                 Forms\Components\TextInput::make('merk')->label('Merk Kendaraan')->required(),
                 Forms\Components\TextInput::make('type')->label('Type Kendaraan')->required(),
-                Forms\Components\TextInput::make('nopol')->label('No. Polisi')->rules('required', 'unique:data_units,nopol', 'max:10')->required(),
+                Forms\Components\TextInput::make('nopol')
+                    ->label('No. Polisi')
+                    ->rules('required', 'max:10')
+                    ->required()
+                    ->validationMessages([
+                        'required' => 'Nomor polisi wajib diisi.',
+                        'max' => 'Nomor polisi maksimal 10 karakter.',
+                    ])
+                    ->validationAttribute('nopol')
+                    ->unique(ignoreRecord: true, table: 'data_units', column: 'nopol')
+                    ->rule(function ($record) {
+                        return function ($attribute, $value, $fail) use ($record) {
+                            $exists = \App\Models\Unit::where('nopol', $value)
+                                ->when($record, fn($q) => $q->where('id', '!=', $record->id))
+                                ->exists();
+                            if ($exists) {
+                                $fail('Nomor polisi sudah terdaftar, silakan gunakan yang lain.');
+                            }
+                        };
+                    }),
                 Forms\Components\TextInput::make('no_rangka')->label('No. Rangka'),
                 Forms\Components\TextInput::make('no_mesin')->label('No. Mesin'),
                 Forms\Components\TextInput::make('tgl_pajak')->label('Tanggal Pajak'),

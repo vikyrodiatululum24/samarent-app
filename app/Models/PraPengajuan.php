@@ -28,8 +28,9 @@ class PraPengajuan extends Model
         'tanggal_pengerjaan' => 'date',
     ];
 
-    public function serviceUnits()
+    public function service_unit()
     {
         return $this->hasMany(ServiceUnit::class, 'pra_pengajuan_id');
     }
+
 }

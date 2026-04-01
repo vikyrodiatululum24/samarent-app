@@ -41,4 +41,8 @@ class Unit extends Model
     {
         return $this->hasOne(UnitJual::class, 'unit_id', 'id');
     }
+    public function praPengajuan()
+    {
+        return $this->hasMany(PraPengajuan::class, 'unit_id', 'id');
+    }
 }

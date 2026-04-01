@@ -152,6 +152,7 @@ class DriverResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->label('Nama Driver')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('nik')
                     ->searchable(),

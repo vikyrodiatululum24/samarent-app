@@ -15,7 +15,6 @@ class DataUnitImporter extends Importer
     {
         return [
             ImportColumn::make('no_rks')
-                ->requiredMapping()
                 ->rules(['max:255']),
             ImportColumn::make('penyerahan_unit'),
             ImportColumn::make('jenis')

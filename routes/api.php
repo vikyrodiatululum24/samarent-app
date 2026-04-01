@@ -57,7 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
     Route::put('/user', [AuthController::class, 'updateProfile']);
     Route::get('/avatar', [AuthController::class, 'getAvatar']);
-    Route::get('/getendusers/{id}', [EndUserController::class, 'getEndUsers']);
+    Route::get('/getendusers', [EndUserController::class, 'getEndUsers']);
     Route::get('/getunit', [EndUserController::class, 'unit']);
     Route::get('/getproject', [EndUserController::class, 'project']);
     Route::post('/absen/masuk', [AbsenController::class, 'absenMasuk']);
