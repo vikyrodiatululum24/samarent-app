@@ -189,7 +189,7 @@ class AbsenController extends Controller
     public function absenDetail(Request $request, $id)
     {
         $userId = $request->user()->id;
-        $absen = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'endUserOut', 'checks', 'confirmation:confirmable_id,status'])
+        $absen = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'endUserOut', 'checks', 'confirmation:confirmable_id,status,end_user_id'])
             ->where('id', $id)
             ->where('user_id', $userId)
             ->first();
