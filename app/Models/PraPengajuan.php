@@ -37,7 +37,7 @@ class PraPengajuan extends Model
         });
     }
 
-    public function service_unit()
+    public function service_units()
     {
         return $this->hasMany(ServiceUnit::class, 'pra_pengajuan_id');
     }

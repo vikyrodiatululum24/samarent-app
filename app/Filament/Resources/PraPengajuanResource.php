@@ -131,7 +131,7 @@ class PraPengajuanResource extends Resource
                             ]),
                     Step::make('Data Service')
                         ->schema([
-                            Forms\Components\Repeater::make('service_unit')
+                            Forms\Components\Repeater::make('service_units')
                                 ->relationship() // penting: ini untuk relasi hasMany
                                 ->schema([
                                     Forms\Components\Grid::make(2)
@@ -346,7 +346,7 @@ class PraPengajuanResource extends Resource
                         Components\TextEntry::make('status')->label('Status')->badge(),
                         Components\Section::make('Detail Kendaraan')
                             ->schema([
-                                ViewEntry::make('service_unit.pra_pengajuan_id')
+                                ViewEntry::make('service_units.pra_pengajuan_id')
                                     ->label('Detail Kendaraan')
                                     ->view('filament.resources.pages.pengajuan.detail-kendaraan-praPengajuan')
                                     ->columnSpanFull(),

@@ -226,19 +226,19 @@
                             <label for="foto_unit">Foto Unit</label>
                             <input type="file" name="service_units[0][foto_unit]" id="foto_unit"
                                 class="foto-unit-input w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
-                                accept="image/*">
+                                accept="image/*" required placeholder="Masukan Foto Unit">
                             <div class="preview-foto-unit mb-3"></div>
 
                             <label for="foto_odometer">Foto Odometer</label>
                             <input type="file" name="service_units[0][foto_odometer]" id="foto_odometer"
                                 class="input-foto-odometer w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
-                                accept="image/*" placeholder="Masukan Odometer">
+                                accept="image/*" required placeholder="Masukan Odometer">
                             <div class="preview-foto_odometer mb-3"></div>
 
                             <label for="foto_kondisi">Foto Kondisi</label>
                             <input type="file" multiple name="service_units[0][foto_kondisi][]" id="foto_kondisi"
                                 class="input-foto-kondisi w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
-                                accept="image/*">
+                                accept="image/*" required placeholder="Masukan Foto Kondisi">
                             <div class="preview-foto-kondisi flex gap-2 flex-wrap mb-3"></div>
 
                             <button type="button" class="remove-item text-red-500 text-sm">

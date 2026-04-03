@@ -54,7 +54,34 @@ class KehadiranDriverResource extends Resource
         return $infolist->schema([
             Section::make('Detail Kehadiran Driver')
                 ->columns(2)
-                ->schema([Group::make()->schema([TextEntry::make('user.name')->label('Driver'), TextEntry::make('unit.type')->label('Unit'), TextEntry::make('unit.nopol')->label('Nopol'), TextEntry::make('date')->label('Tanggal')]), Group::make()->schema([TextEntry::make('project.name')->label('Project'), TextEntry::make('endUser.name')->label('End User'), TextEntry::make('is_complete')->label('Approval')->badge(fn($state) => $state ? 'success' : 'warning')->formatStateUsing(fn($state) => $state ? 'Selesai' : 'Belum Selesai')])]),
+                ->schema([
+                    Group::make()
+                        ->schema([
+                            TextEntry::make('user.name')
+                                ->label('Driver'),
+                            TextEntry::make('unit.type')
+                                ->label('Unit'),
+                            TextEntry::make('unit.nopol')
+                                ->label('Nopol'),
+                            TextEntry::make('date')
+                                ->label('Tanggal'),
+                            TextEntry::make('note')
+                                ->label('Catatan'),
+                        ]),
+                    Group::make()
+                        ->schema([
+                            TextEntry::make('project.name')
+                                ->label('Project'),
+                            TextEntry::make('endUser.name')
+                                ->label('End User 1'),
+                            TextEntry::make('endUserOut.name')
+                                ->label('End User 2'),
+                            TextEntry::make('is_complete')
+                                ->label('Approval')
+                                ->badge(fn($state) => $state ? 'success' : 'warning')
+                                ->formatStateUsing(fn($state) => $state ? 'Selesai' : 'Belum Selesai')
+                        ])
+                ]),
                 Section::make('Absensi Masuk')
                     ->schema([
                         TextEntry::make('time_in')

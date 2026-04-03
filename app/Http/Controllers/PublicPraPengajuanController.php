@@ -47,7 +47,6 @@ class PublicPraPengajuanController extends Controller
 
             // 🔥 service units
             'service_units' => 'required|array|min:1',
-
             'service_units.*.unit_id' => 'required|exists:data_units,id',
             'service_units.*.odometer' => 'required|string|max:20',
             'service_units.*.service' => 'required|array|min:1',
@@ -135,7 +134,7 @@ class PublicPraPengajuanController extends Controller
 
                 $services = array_values(array_filter($unitData['service'], fn($item) => $item !== 'Lainnya'));
 
-                $praPengajuan->serviceUnits()->create([
+                $praPengajuan->service_units()->create([
                     'pra_pengajuan_id' => $praPengajuan->id,
                     'unit_id' => $unit->id,
                     'odometer' => $unitData['odometer'],
