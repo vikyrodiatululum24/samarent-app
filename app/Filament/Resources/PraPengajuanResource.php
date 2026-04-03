@@ -7,15 +7,20 @@ use App\Models\PraPengajuan;
 use App\Models\Project;
 use App\Models\Unit;
 use Filament\Forms;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 use Filament\Infolists\Components;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class PraPengajuanResource extends Resource
 {
@@ -52,82 +57,144 @@ class PraPengajuanResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Forms\Components\TextInput::make('nama_pic')
-                            ->label('Nama PIC')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('no_wa')
-                            ->label('No. WhatsApp')
-                            ->required()
-                            ->maxLength(20),
-                        Forms\Components\Select::make('project')
-                            ->label('Project')
-                            ->required()
-                            ->options(Project::pluck('name', 'name')->toArray()) // key dan value = name
-                            ->searchable()
-                            ->createOptionForm([
-                                Forms\Components\TextInput::make('name')
-                                    ->label('Nama Project')
-                                    ->required()
-                                    ->maxLength(255),
-                            ])
-                            ->createOptionUsing(function (array $data) {
-                                Project::create(['name' => $data['name']]);
-                                return $data['name']; // ini yang akan dipakai sebagai value dari select
-                            })
-                            ->createOptionAction(function ($action) {
-                                $action->modalHeading('Tambah Project Baru');
-                            }),
-                        Forms\Components\Select::make('up')
-                            ->required()
-                            ->label('Unit Pelaksana')
-                            ->options([
-                                'UP 1' => 'UP 1',
-                                'UP 2' => 'UP 2',
-                                'UP 3' => 'UP 3',
-                                'UP 5' => 'UP 5',
-                                'UP 7' => 'UP 7',
-                                'CUST JEPANG' => 'CUST JEPANG',
-                                'manual' => 'Lainnya',
-                            ])
-                            ->reactive()
-                            ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
-                        Forms\Components\TextInput::make('up_lainnya')
-                            ->label('Unit Pelaksana Lainnya')
-                            ->required(fn(callable $get) => $get('up') === 'manual')
-                            ->visible(fn(callable $get) => $get('up') === 'manual')
-                            ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
-                        Forms\Components\Select::make('unitId')
-                            ->label('Unit')
-                            ->required()
-                            ->searchable()
-                            ->options(function () {
-                                return Unit::query()
-                                    ->orderBy('nopol')
-                                    ->get()
-                                    ->mapWithKeys(fn(Unit $unit) => [
-                                        (string) $unit->id => trim(($unit->nopol ?? '-') . ' - ' . ($unit->merk ?? '') . ' ' . ($unit->type ?? '')),
-                                    ])
-                                    ->toArray();
-                            }),
-                        Forms\Components\TextInput::make('provinsi')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('kota')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('status')
-                            ->default('pending')
-                            ->required()
-                            ->maxLength(100),
-                    ]),
-                Forms\Components\Textarea::make('service')
-                    ->label('Service')
-                    ->required()
-                    ->helperText('Data service disimpan dengan format dipisahkan koma.')
-                    ->columnSpanFull(),
+                Wizard::make([
+                    Step::make('Pengajuan')
+                        ->schema([
+                            Forms\Components\Fieldset::make('Informasi Umum')
+                                ->schema([
+                                    Forms\Components\Group::make()
+                                        ->schema([
+                                            Forms\Components\TextInput::make('nama_pic')
+                                                ->label('Nama PIC')
+                                                ->required()
+                                                ->maxLength(255),
+                                            Forms\Components\TextInput::make('no_wa')
+                                                ->label('No. WhatsApp')
+                                                ->required()
+                                                ->numeric()
+                                                ->maxLength(255),
+                                        ]),
+                                    Forms\Components\Group::make()
+                                        ->schema([
+                                            Forms\Components\Select::make('project')
+                                                ->label('Project')
+                                                ->required()
+                                                ->options(Project::pluck('name', 'name')->toArray()) // key dan value = name
+                                                ->searchable()
+                                                ->createOptionForm([
+                                                    Forms\Components\TextInput::make('name')
+                                                        ->label('Nama Project')
+                                                        ->required()
+                                                        ->maxLength(255),
+                                                ])
+                                                ->createOptionUsing(function (array $data) {
+                                                    Project::create(['name' => $data['name']]);
+                                                    return $data['name']; // ini yang akan dipakai sebagai value dari select
+                                                })
+                                                ->createOptionAction(function ($action) {
+                                                    $action->modalHeading('Tambah Project Baru');
+                                                }),
+                                            Forms\Components\Select::make('up')
+                                                ->required()
+                                                ->label('Unit Pelaksana')
+                                                ->options([
+                                                    'UP 1' => 'UP 1',
+                                                    'UP 2' => 'UP 2',
+                                                    'UP 3' => 'UP 3',
+                                                    'UP 5' => 'UP 5',
+                                                    'UP 7' => 'UP 7',
+                                                    'CUST JEPANG' => 'CUST JEPANG',
+                                                    'manual' => 'Lainnya',
+                                                ])
+                                                ->reactive()
+                                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
+                                            Forms\Components\TextInput::make('up_lainnya')
+                                                ->label('Unit Pelaksana Lainnya')
+                                                ->required(fn(callable $get) => $get('up') === 'manual')
+                                                ->visible(fn(callable $get) => $get('up') === 'manual')
+                                                ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
+                                        ]),
+                                    Forms\Components\TextInput::make('provinsi')
+                                        ->required()
+                                        ->label('Provinsi')
+                                        ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('kota')
+                                        ->required()
+                                        ->label('Kota/Kab')
+                                        ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state)))
+                                        ->maxLength(255),
+                                ])
+                                ->columns(2)
+                                ->columnSpan('full')
+                                ->extraAttributes(['class' => 'mb-4']),
+                            ]),
+                    Step::make('Data Service')
+                        ->schema([
+                            Forms\Components\Repeater::make('service_unit')
+                                ->relationship() // penting: ini untuk relasi hasMany
+                                ->schema([
+                                    Forms\Components\Grid::make(2)
+                                        ->schema([
+                                            Forms\Components\Select::make('unit_id')
+                                                ->label('Unit')
+                                                ->relationship('unit', 'nopol')
+                                                ->getOptionLabelFromRecordUsing(function (Unit $unit) {
+                                                    return "{$unit->type} - {$unit->nopol}";
+                                                })
+                                                ->searchable()
+                                                ->preload()
+                                                ->required(),
+                                            Forms\Components\TextInput::make('odometer')
+                                                ->required(),
+                                        ]),
+                                    Forms\Components\TextInput::make('service')
+                                        ->label('Jenis Permintaan Service')
+                                        ->required(),
+                                    Forms\Components\Grid::make(2)
+                                        ->schema([
+                                            Forms\Components\Grid::make(3)
+                                                ->schema([
+                                                    Forms\Components\FileUpload::make('foto_unit')
+                                                        ->label('Foto Unit')
+                                                        ->image()
+                                                        ->resize(50)
+                                                        ->optimize('webp')
+                                                        ->maxWidth(1024)
+                                                        ->maxSize(2048) // Maksimal 2MB
+                                                        ->disk('public')
+                                                        ->directory('foto_unit')
+                                                        ->nullable(),
+                                                    Forms\Components\FileUpload::make('foto_odometer')
+                                                        ->label('Foto Odometer')
+                                                        ->image()
+                                                        ->resize(50)
+                                                        ->optimize('webp')
+                                                        ->maxWidth(1024)
+                                                        ->maxSize(2048) // Maksimal 2MB
+                                                        ->disk('public')
+                                                        ->directory('foto_odometer')
+                                                        ->nullable(),
+                                                    Forms\Components\FileUpload::make('foto_kondisi')
+                                                        ->label('Foto Kondisi')
+                                                        ->image()
+                                                        ->resize(50)
+                                                        ->optimize('webp')
+                                                        ->maxWidth(1024)
+                                                        ->maxSize(2048) // Maksimal 2MB
+                                                        ->multiple()
+                                                        ->maxFiles(3)
+                                                        ->disk('public')
+                                                        ->directory('foto_kondisi')
+                                                        ->nullable(),
+                                                ]),
+                                        ])
+                                ])
+                        ])
+
+                ])
+                ->columnSpan('full')
+
             ]);
     }
 
@@ -239,6 +306,24 @@ class PraPengajuanResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('ajukan')
+                        ->label('Ajukan')
+                        ->icon('heroicon-o-arrow-up')
+                        ->action(function ($records) {
+                            $params = $records->pluck('id')->toArray();
+                            redirect()->route('ajukan-multiple-pra-pengajuan', ['ids' => implode(',', $params)]);
+                            Notification::make()
+                                ->title('Pengajuan Pra Pengajuan')
+                                ->body('Pra Pengajuan berhasil diproses ke Pengajuan.')
+                                ->success()
+                                ->send();
+                        })
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Ajukan Pra Pengajuan')
+                        ->modalSubheading('Apakah Anda yakin ingin mengajukan Pra Pengajuan yang dipilih?')
+                        ->modalButton('Ya, Ajukan')
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ])
             ->defaultSort('id', 'desc');
@@ -259,13 +344,13 @@ class PraPengajuanResource extends Resource
                         Components\TextEntry::make('kota')->label('Kota'),
                         Components\TextEntry::make('tanggal')->label('Tanggal')->date('d/m/Y'),
                         Components\TextEntry::make('status')->label('Status')->badge(),
-                                        Components\Section::make('Detail Kendaraan')
-                    ->schema([
-                        ViewEntry::make('service_unit.pra_pengajuan_id')
-                            ->label('Detail Kendaraan')
-                            ->view('filament.resources.pages.pengajuan.detail-kendaraan-praPengajuan')
-                            ->columnSpanFull(),
-                    ]),
+                        Components\Section::make('Detail Kendaraan')
+                            ->schema([
+                                ViewEntry::make('service_unit.pra_pengajuan_id')
+                                    ->label('Detail Kendaraan')
+                                    ->view('filament.resources.pages.pengajuan.detail-kendaraan-praPengajuan')
+                                    ->columnSpanFull(),
+                            ]),
 
                     ])
                     ->columns(2),

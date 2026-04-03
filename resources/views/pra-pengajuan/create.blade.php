@@ -123,11 +123,12 @@
                         <select name="up" id="up" required
                             class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Pilih Unit Pelaksana</option>
-                            <option value="UP1" {{ old('up') == 'UP1' ? 'selected' : '' }}>UP1</option>
-                            <option value="UP2" {{ old('up') == 'UP2' ? 'selected' : '' }}>UP2</option>
-                            <option value="UP3" {{ old('up') == 'UP3' ? 'selected' : '' }}>UP3</option>
-                            <option value="UP5" {{ old('up') == 'UP5' ? 'selected' : '' }}>UP5</option>
-                            <option value="UP7" {{ old('up') == 'UP7' ? 'selected' : '' }}>UP7</option>
+                            <option value="UP 1" {{ old('up') == 'UP 1' ? 'selected' : '' }}>UP 1</option>
+                            <option value="UP 2" {{ old('up') == 'UP 2' ? 'selected' : '' }}>UP 2</option>
+                            <option value="UP 3" {{ old('up') == 'UP 3' ? 'selected' : '' }}>UP 3</option>
+                            <option value="UP 5" {{ old('up') == 'UP 5' ? 'selected' : '' }}>UP 5</option>
+                            <option value="UP 7" {{ old('up') == 'UP 7' ? 'selected' : '' }}>UP 7</option>
+                            <option value="CUST JEPANG" {{ old('up') == 'CUST JEPANG' ? 'selected' : '' }}>CUST JEPANG</option>
                             <option value="manual" {{ old('up') == 'manual' ? 'selected' : '' }}>Lainnya</option>
                         </select>
                     </div>
@@ -184,11 +185,24 @@
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Service</label>
                                 <select name="service_units[0][service][]" multiple class="service-select w-full mb-2"
                                     required>
-                                    <option value="Service Ganti Oli">Service Ganti Oli</option>
                                     <option value="Rem Depan">Rem Depan</option>
                                     <option value="Rem Belakang">Rem Belakang</option>
+                                    <option value="Lampu Depan">Lampu Depan</option>
+                                    <option value="Lampu Belakang">Lampu Belakang</option>
                                     <option value="Ban Depan">Ban Depan</option>
                                     <option value="Ban Belakang">Ban Belakang</option>
+                                    <option value="Gear Set">Gear Set</option>
+                                    <option value="Kampas Kopling">Kampas Kopling</option>
+                                    <option value="Filter Udara">Filter Udara</option>
+                                    <option value="Filter Oli">Filter Oli</option>
+                                    <option value="Busi">Busi</option>
+                                    <option value="Ban Dalam">Ban Dalam</option>
+                                    <option value="Spion">Spion</option>
+                                    <option value="Lampu Stop">Lampu Stop</option>
+                                    <option value="Lampu Sein depan">Lampu Sein depan</option>
+                                    <option value="Lampu Sein Belakang">Lampu Sein Belakang</option>
+                                    <option value="Bearing Depan">Bearing Depan</option>
+                                    <option value="Bearing Belakang">Bearing Belakang</option>
                                     <option value="Accu">Accu</option>
                                     <option value="Lainnya">Lainnya</option>
                                 </select>
@@ -303,11 +317,24 @@
                             <div class="mb-3">
                                 <label>Service</label>
                                 <select name="service_units[${index}][service][]" multiple class="service-select w-full mb-2" required>
-                                    <option value="Service Ganti Oli">Service Ganti Oli</option>
                                     <option value="Rem Depan">Rem Depan</option>
                                     <option value="Rem Belakang">Rem Belakang</option>
+                                    <option value="Lampu Depan">Lampu Depan</option>
+                                    <option value="Lampu Belakang">Lampu Belakang</option>
                                     <option value="Ban Depan">Ban Depan</option>
                                     <option value="Ban Belakang">Ban Belakang</option>
+                                    <option value="Gear Set">Gear Set</option>
+                                    <option value="Kampas Kopling">Kampas Kopling</option>
+                                    <option value="Filter Udara">Filter Udara</option>
+                                    <option value="Filter Oli">Filter Oli</option>
+                                    <option value="Busi">Busi</option>
+                                    <option value="Ban Dalam">Ban Dalam</option>
+                                    <option value="Spion">Spion</option>
+                                    <option value="Lampu Stop">Lampu Stop</option>
+                                    <option value="Lampu Sein depan">Lampu Sein depan</option>
+                                    <option value="Lampu Sein Belakang">Lampu Sein Belakang</option>
+                                    <option value="Bearing Depan">Bearing Depan</option>
+                                    <option value="Bearing Belakang">Bearing Belakang</option>
                                     <option value="Accu">Accu</option>
                                     <option value="Lainnya">Lainnya</option>
                                 </select>

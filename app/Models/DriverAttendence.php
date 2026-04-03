@@ -18,11 +18,14 @@ class DriverAttendence extends Model
         'start_km', // masuk
         'note', // masuk
         'location_in', // masuk
-        'photo_in', // masuk
         'end_km', // keluar
         'time_out', // keluar
         'location_out', // keluar
         'photo_out', // keluar
+        'photo_in', // masuk
+        'is_approved_in', // masuk
+        'is_approved_out', // masuk
+        'end_user_out', // keluar
         'is_complete',
     ];
 
@@ -36,7 +39,11 @@ class DriverAttendence extends Model
     }
     public function endUser()
     {
-        return $this->belongsTo(EndUser::class);
+        return $this->belongsTo(EndUser::class, 'end_user_id');
+    }
+    public function endUserOut()
+    {
+        return $this->belongsTo(EndUser::class, 'end_user_out');
     }
     public function unit()
     {
@@ -44,7 +51,7 @@ class DriverAttendence extends Model
     }
     public function confirmation()
     {
-        return $this->morphOne(Confirmation::class, 'confirmable');
+        return $this->morphMany(Confirmation::class, 'confirmable');
     }
     public function overtimePay()
     {
@@ -58,5 +65,6 @@ class DriverAttendence extends Model
     {
         return $this->hasMany(DriverCheck::class, 'attendance_id');
     }
+
 
 }

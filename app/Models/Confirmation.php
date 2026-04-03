@@ -11,6 +11,8 @@ class Confirmation extends Model
         'confirmable_type',
         'confirmable_id',
         'is_confirmed',
+        'end_user_id',
+        'approval_type',
         'used_at',
         'expires_at',
         'status',

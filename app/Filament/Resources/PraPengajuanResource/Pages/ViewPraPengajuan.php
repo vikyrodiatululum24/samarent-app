@@ -15,8 +15,7 @@ class ViewPraPengajuan extends ViewRecord
         return [
             Actions\Action::make('pengajuan')
                 ->label('Ajukan')
-                ->url(fn() => route('ajukan-pra-pengajuan', $this->record))
-                ->openUrlInNewTab(),
+                ->url(fn() => route('ajukan-pra-pengajuan', $this->record)),
             Actions\EditAction::make(),
             Actions\DeleteAction::make(),
         ];

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\Absen;
 
 use App\Helpers\PayrollHelpers;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendAbsensiEmailJob;
 use App\Mail\AbsenConfirmationMail;
+use App\Models\Confirmation;
 use App\Models\Driver;
 use App\Models\DriverAttendence;
 use App\Services\FonnteService;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AbsenController extends Controller
 {
@@ -117,11 +120,11 @@ class AbsenController extends Controller
             'end_km' => 'required|numeric',
             'location_out' => 'required|string',
             'photo_out' => 'required|string',
-            'send_wa' => 'sometimes|boolean',
-            'send_email' => 'sometimes|boolean',
+            'end_user_out' => 'nullable|exists:end_users,id',
+            'send_notification' => 'sometimes|boolean',
         ]);
 
-        $absen = DriverAttendence::with(['endUser', 'user.driver'])
+        $absen = DriverAttendence::with(['endUser', 'user.driver', 'endUserOut'])
             ->where('id', $id)
             ->whereNull('time_out')
             ->latest()
@@ -152,13 +155,12 @@ class AbsenController extends Controller
             'location_out' => $request->location_out,
             'photo_out' => $request->photo_out,
             'note' => $request->note ?? null,
+            'end_user_out' => $request->end_user_out ?? null,
         ]);
 
-        if ($request->boolean('send_wa') || $request->boolean('send_email')) {
+        if ($request->boolean('send_notification')) {
             $this->sendNotification(new Request([
                 'ids' => [$absen->id],
-                'send_wa' => $request->boolean('send_wa'),
-                'send_email' => $request->boolean('send_email'),
             ]));
         }
 
@@ -187,7 +189,7 @@ class AbsenController extends Controller
     public function absenDetail(Request $request, $id)
     {
         $userId = $request->user()->id;
-        $absen = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'checks', 'confirmation:confirmable_id,status'])
+        $absen = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'endUserOut', 'checks', 'confirmation:confirmable_id,status'])
             ->where('id', $id)
             ->where('user_id', $userId)
             ->first();
@@ -214,70 +216,136 @@ class AbsenController extends Controller
 
     public function sendNotification(Request $request)
     {
+
         $ids = $request->input('ids', []);
 
-        $absens = DriverAttendence::with(['endUser', 'user.driver', 'confirmation'])->whereIn('id', $ids)->get();
+        // 1. Ambil semua data absen
+        $absens = DriverAttendence::with(['endUser:id,email,name', 'endUserOut:id,email,name',])
+            ->whereIn('id', $ids)
+            ->get();
 
-        // generate token for each absen and create confirmation if not exists
-        foreach ($absens as $absen) {
-            if (!$absen->confirmation) {
-                $absen->confirmation()->create([
-                    'token' => bin2hex(random_bytes(16)),
-                    'status' => 'pending',
+        // 2. Ambil semua user unik (IN & OUT)
+        $endUsers = $absens->pluck('endUser')
+            ->merge($absens->pluck('endUserOut'))
+            ->filter() // 🔥 hindari null
+            ->unique('id')
+            ->values();
+
+        foreach ($endUsers as $endUser) {
+            $token = Str::random(64);
+
+
+
+            $absensForUser = $absens
+                ->filter(
+                    fn($a) =>
+                    $a->end_user_id == $endUser->id ||
+                        $a->end_user_out == $endUser->id
+                )
+                ->unique('id')
+                ->values();
+
+            if ($absensForUser->isEmpty()) {
+                continue;
+            }
+
+            //loop absens untuk menyimpan token konfirmasi
+            foreach ($absensForUser as $a) {
+                if ($a->end_user_id == $endUser->id && $a->end_user_out == $endUser->id) {
+                    $a->type = 'IN_OUT';
+                } elseif ($a->end_user_id == $endUser->id) {
+                    $a->type = 'IN';
+                } else {
+                    $a->type = 'OUT';
+                }
+
+                // Cek apakah sudah ada confirmation dengan confirmable_id dan end_user_id yang sama
+                $existing = Confirmation::where('confirmable_type', DriverAttendence::class)
+                    ->where('confirmable_id', $a->id)
+                    ->where('end_user_id', $endUser->id)
+                    ->first();
+
+                if ($existing) {
+                    // ganti token dan update tanggal kadaluarsanya
+                    Log::info('Existing confirmation found for absen ID: ' . $a->id . ' and end user ID: ' . $endUser->id . '. Updating token and expiration date.');
+                    $existing->update([
+                        'token' => $token,
+                        'expires_at' => now()->addDays(7),
+                        'end_user_id' => $endUser->id,
+                        'approval_type' => $a->type,
+                    ]);
+                    continue;
+                }
+
+                Confirmation::create([
+                    'token' => $token,
+                    'confirmable_type' => DriverAttendence::class,
+                    'confirmable_id' => $a->id,
+                    'is_confirmed' => false,
+                    'end_user_id' => $endUser->id,
+                    'approval_type' => $a->type,
+                    'expires_at' => now()->addDays(7),
                 ]);
             }
-        }
 
-        // Kelompokkan absens berdasarkan endUser
-        $grouped = $absens->groupBy(function ($absen) {
-            return $absen->endUser ? $absen->endUser->id : 'tanpa_enduser';
-        });
+            $url = 'driver.servicesamarent.com/confirm-multiple/' . $token;
 
-        $results = [];
-        foreach ($grouped as $endUserId => $groupAbsens) {
-            $groupIds = $groupAbsens->pluck('id')->toArray();
-            $targetEmail = $groupAbsens->first() && $groupAbsens->first()->endUser ? $groupAbsens->first()->endUser->email : null;
-
-            // buat url untuk membungkus id absen yang akan dikonfirmasi
-            $baseUrl = 'driver.servicesamarent.com/confirm-multiple';
-            $query = http_build_query(['ids' => implode(',', $groupIds)]);
-            $url = $baseUrl . '?' . $query;
-            // $waUrl = 'https://wa.me/' . $targetWa . '?text=' . urlencode('Anda memiliki absen yang perlu dikonfirmasi. Silakan klik link berikut untuk melihat detail dan melakukan konfirmasi: ' . $url . ' (Jika Anda tidak melakukan servis ini, silakan abaikan pesan ini)' . "\n" . 'You have an attendance that needs confirmation. Please click the following link to view details and confirm: ' . $url . ' (If you did not perform this service, please ignore this message)');
-
-            // Kirim email jika tersedia
-            if ($targetEmail) {
-                try {
-                    Mail::to($targetEmail)->send(new AbsenConfirmationMail($url));
-                    $results[] = 'Notifikasi email berhasil dikirim ke ' . $targetEmail . ' untuk absen ID: ' . implode(', ', $groupIds);
-                } catch (\Exception $e) {
-                    Log::error('Gagal mengirim notifikasi email: ' . $e->getMessage());
-                    $results[] = 'Gagal mengirim email ke ' . $targetEmail . ' untuk absen ID: ' . implode(', ', $groupIds);
-                }
-            } else {
-                Log::warning('Email end user tidak tersedia untuk mengirim notifikasi untuk absen dengan ID: ' . implode(', ', $groupIds));
-                $results[] = 'Email end user tidak tersedia untuk absen ID: ' . implode(', ', $groupIds);
+            try {
+                Mail::to($endUser->email)->send(new AbsenConfirmationMail($url));
+            } catch (\Exception $e) {
+                Log::error('Failed to dispatch SendAbsensiEmailJob for end user ' . $endUser->email . ': ' . $e->getMessage());
             }
         }
 
         return response()->json([
             'message' => 'Notifikasi selesai diproses.',
-            'results' => $results,
         ], 200);
     }
 
-    public function detailConfirmation(Request $request)
+    public function detailConfirmation($token)
     {
-        $ids = explode(',', $request->input('ids'));
+        $confirmations = Confirmation::where('token', $token)->get();
 
-        $absens = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'confirmation:confirmable_id,status,token', 'checks'])
-            ->whereIn('id', $ids)
-            ->get();
-
-        if ($absens->isEmpty()) {
-            return response()->json(['message' => 'Absen not found'], 404);
+        if ($confirmations->isEmpty()) {
+            return response()->json(['message' => 'Invalid token'], 404);
         }
 
+        $absens = $confirmations->map(function ($confirmation) {
+            $absen = $confirmation->confirmable;
+            Log::info($absen);
+            if ($absen) {
+                return [
+                    'absen_id' => $absen->id,
+                    'driver' => $absen->user()->first() ? $absen->user()->first()->name : null,
+                    'status' => $absen->confirmation()->first() ? $absen->confirmation()->first()->status : null,
+                    'project' => $absen->project()->first()->name ?? null,
+                    'unit' => $absen->unit()->first() ? $absen->unit()->first()->merk : null,
+                    'merk_unit' => $absen->unit()->first() ? $absen->unit()->first()->merk : null,
+                    'nopol' => $absen->unit()->first() ? $absen->unit()->first()->nopol : null,
+                    'end_user' => $absen->endUser(['name', 'email'])->first() ? $absen->endUser(['name', 'email'])->first()->name : null,
+                    'end_user_email' => $absen->endUser(['name', 'email'])->first() ? $absen->endUser(['name', 'email'])->first()->email : null,
+                    'end_user_out' => $absen->endUserOut(['name', 'email'])->first() ? $absen->endUserOut(['name', 'email'])->first()->name : null,
+                    'end_user_out_email' => $absen->endUserOut(['name', 'email'])->first() ? $absen->endUserOut(['name', 'email'])->first()->email : null,
+                    'location_in' => $absen->location_in,
+                    'location_out' => $absen->location_out,
+                    'photo_in' => $absen->photo_in,
+                    'photo_out' => $absen->photo_out,
+                    'note' => $absen->note,
+                    'date' => $absen->date,
+                    'checks' => $absen->checks()->get(['location', 'photo', 'created_at']),
+                    'start_km' => $absen->start_km,
+                    'end_km' => $absen->end_km,
+                    'time_in' => $absen->time_in,
+                    'time_out' => $absen->time_out,
+                    'status' => $confirmation->status,
+                    'approval_type' => $confirmation->approval_type,
+                ];
+            }
+            return null;
+        })->filter()->values();
+
         return response()->json(['data' => $absens], 200);
+
     }
 
     public function confirmAbsen(Request $request)
@@ -285,10 +353,11 @@ class AbsenController extends Controller
         $request->validate([
             'token' => 'required|string',
             'status' => 'required|in:approved,rejected',
-            'is_confirmed' => 'sometimes|boolean',
+            'absenId' => 'sometimes|exists:driver_attendences,id',
         ]);
 
-        $confirmation = \App\Models\Confirmation::where('token', $request->token)->first();
+        $confirmation = \App\Models\Confirmation::where('token', $request->token)->where('confirmable_id', $request->absenId)->first();
+        $status = $request->status === 'approved' ? 'approved' : 'rejected';
 
         if (!$confirmation) {
             return response()->json(['message' => 'Invalid token'], 404);
@@ -299,24 +368,55 @@ class AbsenController extends Controller
             return response()->json(['message' => 'Associated absen not found'], 404);
         }
 
-        if (!empty($driverAttendence) && $request->status === 'approved') {
-            PayrollHelpers::calculateOvertimePay($driverAttendence);
+        if ($request->status === 'approved') {
+            $confirmation->update([
+                'is_confirmed' => true,
+                'status' => 'approved',
+            ]);
+
+            if ($confirmation->approval_type === 'IN_OUT') {
+                $driverAttendence->update([
+                    'is_approved_in' => true,
+                    'is_approved_out' => true,
+                ]);
+            } elseif ($confirmation->approval_type === 'IN') {
+                $driverAttendence->update([
+                    'is_approved_in' => true,
+                ]);
+            } elseif ($confirmation->approval_type === 'OUT') {
+                $driverAttendence->update([
+                    'is_approved_out' => true,
+                ]);
+            }
+        } else {
+            $confirmation->update([
+                'is_confirmed' => false,
+                'status' => 'rejected',
+            ]);
+
+            if ($confirmation->approval_type === 'IN_OUT') {
+                $driverAttendence->update([
+                    'is_approved_in' => false,
+                    'is_approved_out' => false,
+                ]);
+            } elseif ($confirmation->approval_type === 'IN') {
+                $driverAttendence->update([
+                    'is_approved_in' => false,
+                ]);
+            } elseif ($confirmation->approval_type === 'OUT') {
+                $driverAttendence->update([
+                    'is_approved_out' => false,
+                ]);
+            }
+        }
+
+        if ($driverAttendence->is_approved_in && $driverAttendence->is_approved_out) {
 
             $driverAttendence->update([
                 'is_complete' => true,
             ]);
 
-            $confirmation->update([
-                'status' => 'approved',
-                'is_confirmed' => $request->boolean('is_confirmed', true),
-                'used_at' => now(),
-            ]);
-        } else {
-            $confirmation->update([
-                'status' => 'rejected',
-                'is_confirmed' => $request->boolean('is_confirmed', false),
-                'used_at' => now(),
-            ]);
+            PayrollHelpers::calculateOvertimePay($driverAttendence);
         }
 
         return response()->json(['message' => 'Absen confirmation updated successfully'], 200);

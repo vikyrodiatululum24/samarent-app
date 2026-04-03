@@ -28,6 +28,15 @@ class PraPengajuan extends Model
         'tanggal_pengerjaan' => 'date',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->status = $model->status ?? 'pending';
+        });
+    }
+
     public function service_unit()
     {
         return $this->hasMany(ServiceUnit::class, 'pra_pengajuan_id');

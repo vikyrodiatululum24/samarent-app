@@ -27,9 +27,23 @@ class PraPengajuanController extends Controller
 
             foreach ($praPengajuan->service_unit as $serviceUnit) {
                 $serviceUnit->pengajuan_id = $pengajuan->id;
+                $serviceUnit->pra_pengajuan_id = null;
                 $serviceUnit->save();
             }
 
-        return redirect()->route('pra-pengajuan.index')->with('success', 'Pra Pengajuan berhasil diajukan sebagai Pengajuan.');
+        $praPengajuan->delete();
+
+        return redirect()->route('filament.admin.resources.pra-pengajuans.index')->with('success', 'Pra Pengajuan berhasil diajukan sebagai Pengajuan.');
+    }
+
+    public function ajukanMultiplePraPengajuan(Request $request)
+    {
+        $ids = explode(',', $request->input('ids', []));
+
+        foreach ($ids as $id) {
+            $this->ajukanPraPengajuan($id);
+        }
+
+        return redirect()->route('filament.admin.resources.pra-pengajuans.index')->with('success', 'Pra Pengajuan berhasil diajukan sebagai Pengajuan.');
     }
 }

@@ -22,7 +22,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');
 Route::get('/confirm/{token}', [ConfirmController::class, 'confirmAbsen']);
 Route::post('/absen/confirm', [AbsenController::class, 'confirmAbsen']);
-Route::get('/absen/detail-confirmation', [AbsenController::class, 'detailConfirmation']);
+Route::get('/absen/detail-confirmation/{token}', [AbsenController::class, 'detailConfirmation']);
 
 // routes/api.php
 Route::middleware('auth:sanctum')->group(function () {
