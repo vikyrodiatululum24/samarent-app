@@ -27,7 +27,6 @@ class GeocodingService
               ]);
 
             if ($response->successful()) {
-                Log::info("Geocoding success for coordinates: $lat, $lng" );
                 return $response['display_name'] ?? 'Alamat tidak ditemukan';
             }
             return 'Gagal mengambil alamat';

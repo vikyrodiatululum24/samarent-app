@@ -21,7 +21,6 @@ class EndUserController extends Controller
     public function getEndUsers()
     {
         $driver = Driver::with('project')->where('user_id', auth()->id())->first();
-        Log::info('Mendapatkan end users untuk driver ID: ' . $driver->id . ' dengan penempatan: ' . $driver->project->name);
         $endUsers = EndUser::where('project_id', $driver->project->id)->get();
         return response()->json($endUsers);
     }

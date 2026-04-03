@@ -266,8 +266,6 @@ class AbsenController extends Controller
                     ->first();
 
                 if ($existing) {
-                    // ganti token dan update tanggal kadaluarsanya
-                    Log::info('Existing confirmation found for absen ID: ' . $a->id . ' and end user ID: ' . $endUser->id . '. Updating token and expiration date.');
                     $existing->update([
                         'token' => $token,
                         'expires_at' => now()->addDays(7),
@@ -312,7 +310,6 @@ class AbsenController extends Controller
 
         $absens = $confirmations->map(function ($confirmation) {
             $absen = $confirmation->confirmable;
-            Log::info($absen);
             if ($absen) {
                 return [
                     'absen_id' => $absen->id,

@@ -37,7 +37,6 @@ class Pengajuan extends Model
             $newStatus = $pengajuan->keterangan_proses;
 
             if ($oldStatus !== $newStatus) {
-                Log::info("Update status pengajuan #{$pengajuan->id}: {$oldStatus} -> {$newStatus}");
                 app(LogUpdateStatusPengajuanService::class)->logStatusChange(
                     auth()->id(),
                     $pengajuan->id,

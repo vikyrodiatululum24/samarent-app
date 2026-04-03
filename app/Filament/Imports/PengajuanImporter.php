@@ -112,7 +112,6 @@ class PengajuanImporter extends Importer
         try {
             unset($this->data['nopol'], $this->data['odometer'], $this->data['service']);
 
-            Log::info('Membuat pengajuan dengan data:', $this->data);
             $pengajuan = Pengajuan::create([
                 'user_id' => auth()->id(),
                 'nama' => $this->data['nama'],
