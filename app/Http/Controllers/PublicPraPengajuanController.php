@@ -74,7 +74,7 @@ class PublicPraPengajuanController extends Controller
             'service_units.*.foto_kondisi.*.mimes' => 'Setiap foto kondisi unit harus berformat jpg, jpeg, atau png.',
         ]);
 
-        if (($validated['up'] ?? null) !== 'Lainnya') {
+        if (($validated['up'] ?? null) !== 'manual') {
             $validated['up_lainnya'] = null;
         }
 
