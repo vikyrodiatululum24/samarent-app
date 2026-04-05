@@ -224,7 +224,7 @@ class PraPengajuanResource extends Resource
                     ->label('Jenis Kendaraan')
                     ->getStateUsing(function ($record) {
                         // Ambil semua service yang berelasi dengan pengajuan ini
-                        $services = $record->service_unit()->with('unit')->get();
+                        $services = $record->service_units()->with('unit')->get();
                         // Format: [nama_service (nopol)], dipisah baris baru
                         return $services->map(function ($service) {
                             $jenis = $service->unit?->jenis ?? '-';
@@ -234,18 +234,18 @@ class PraPengajuanResource extends Resource
                     ->html()
                     ->searchable(query: function (Builder $query, string $search) {
                         // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
-                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                        $query->whereHas('service_units.unit', function ($q) use ($search) {
                             $q->where('jenis', 'like', "%{$search}%");
                         });
                     })
                     ->width('120px')
                     ->wrap()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('service_unit')
+                Tables\Columns\TextColumn::make('service_units')
                     ->label('Service')
                     ->getStateUsing(function ($record) {
                         // Ambil semua service yang berelasi dengan pengajuan ini
-                        $services = $record->service_unit()->with('unit')->get();
+                        $services = $record->service_units()->with('unit')->get();
                         // Format: [nama_service (nopol)], dipisah baris baru
                         return $services->map(function ($service) {
                             return "{$service->service}";
@@ -254,7 +254,7 @@ class PraPengajuanResource extends Resource
                     ->html()
                     ->searchable(query: function (Builder $query, string $search) {
                         // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
-                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                        $query->whereHas('service_units.unit', function ($q) use ($search) {
                             $q->where('service', 'like', "%{$search}%");
                         });
                     })
@@ -265,7 +265,7 @@ class PraPengajuanResource extends Resource
                     ->label('No. Polisi')
                     ->getStateUsing(function ($record) {
                         // Ambil semua service yang berelasi dengan pengajuan ini
-                        $services = $record->service_unit()->with('unit')->get();
+                        $services = $record->service_units()->with('unit')->get();
                         // Format: [nama_service (nopol)], dipisah baris baru
                         return $services->map(function ($service) {
                             $nopol = $service->unit?->nopol ?? '-';
@@ -275,7 +275,7 @@ class PraPengajuanResource extends Resource
                     ->html()
                     ->searchable(query: function (Builder $query, string $search) {
                         // Join ke tabel service_unit dan unit, lalu filter berdasarkan nama service atau nopol
-                        $query->whereHas('service_unit.unit', function ($q) use ($search) {
+                        $query->whereHas('service_units.unit', function ($q) use ($search) {
                             $q->where('nopol', 'like', "%{$search}%");
                         });
                     })

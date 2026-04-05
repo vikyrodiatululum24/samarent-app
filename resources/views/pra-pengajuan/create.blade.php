@@ -53,6 +53,62 @@
             border-radius: 0.375rem;
             padding: 0.15rem 0.5rem;
         }
+
+        .file-dropzone {
+            position: relative;
+            display: block;
+            width: 100%;
+            border: 2px dashed #94a3b8;
+            border-radius: 0.75rem;
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: center;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-dropzone:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .file-dropzone.is-dragover {
+            border-color: #2563eb;
+            background: #dbeafe;
+        }
+
+        .file-dropzone input[type="file"] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        .dropzone-title {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .dropzone-subtitle {
+            display: block;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.15rem;
+        }
+
+        .dropzone-filename {
+            display: block;
+            margin-top: 0.45rem;
+            font-size: 0.75rem;
+            color: #1e40af;
+            word-break: break-word;
+        }
     </style>
 </head>
 
@@ -223,22 +279,34 @@
                             </div>
 
 
-                            <label for="foto_unit">Foto Unit</label>
-                            <input type="file" name="service_units[0][foto_unit]" id="foto_unit"
-                                class="foto-unit-input w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
-                                accept="image/*" required placeholder="Masukan Foto Unit">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Foto Unit</label>
+                            <label class="file-dropzone mb-2">
+                                <input type="file" name="service_units[0][foto_unit]"
+                                    class="foto-unit-input file-input-dnd" accept="image/*" required>
+                                <span class="dropzone-title">Drag & drop file di sini</span>
+                                <span class="dropzone-subtitle">atau klik untuk pilih Foto Unit</span>
+                                <span class="dropzone-filename">Belum ada file dipilih</span>
+                            </label>
                             <div class="preview-foto-unit mb-3"></div>
 
-                            <label for="foto_odometer">Foto Odometer</label>
-                            <input type="file" name="service_units[0][foto_odometer]" id="foto_odometer"
-                                class="input-foto-odometer w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
-                                accept="image/*" required placeholder="Masukan Odometer">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Foto Odometer</label>
+                            <label class="file-dropzone mb-2">
+                                <input type="file" name="service_units[0][foto_odometer]"
+                                    class="input-foto-odometer file-input-dnd" accept="image/*" required>
+                                <span class="dropzone-title">Drag & drop file di sini</span>
+                                <span class="dropzone-subtitle">atau klik untuk pilih Foto Odometer</span>
+                                <span class="dropzone-filename">Belum ada file dipilih</span>
+                            </label>
                             <div class="preview-foto_odometer mb-3"></div>
 
-                            <label for="foto_kondisi">Foto Kondisi</label>
-                            <input type="file" multiple name="service_units[0][foto_kondisi][]" id="foto_kondisi"
-                                class="input-foto-kondisi w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
-                                accept="image/*" required placeholder="Masukan Foto Kondisi">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Foto Kondisi</label>
+                            <label class="file-dropzone mb-2">
+                                <input type="file" multiple name="service_units[0][foto_kondisi][]"
+                                    class="input-foto-kondisi file-input-dnd" accept="image/*" required>
+                                <span class="dropzone-title">Drag & drop file di sini</span>
+                                <span class="dropzone-subtitle">atau klik untuk pilih Foto Kondisi</span>
+                                <span class="dropzone-filename">Belum ada file dipilih</span>
+                            </label>
                             <div class="preview-foto-kondisi flex gap-2 flex-wrap mb-3"></div>
 
                             <button type="button" class="remove-item text-red-500 text-sm">
@@ -285,6 +353,65 @@
                     placeholder: 'Pilih Service',
                     closeOnSelect: false,
                     width: '100%'
+                });
+            }
+
+            function updateDropzoneFileName(input) {
+                let fileCount = input.files ? input.files.length : 0;
+                let fileNameText = 'Belum ada file dipilih';
+
+                if (fileCount > 1) {
+                    fileNameText = `${fileCount} file dipilih`;
+                } else if (fileCount === 1) {
+                    fileNameText = input.files[0].name;
+                }
+
+                $(input).closest('.file-dropzone').find('.dropzone-filename').text(fileNameText);
+            }
+
+            function bindDropzoneEvents(target = null) {
+                let dropzones = target ? target.find('.file-dropzone') : $('.file-dropzone');
+
+                dropzones.each(function() {
+                    let zone = $(this);
+
+                    if (zone.data('dnd-bound')) {
+                        return;
+                    }
+
+                    zone.data('dnd-bound', true);
+
+                    zone.on('dragenter dragover', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        zone.addClass('is-dragover');
+                    });
+
+                    zone.on('dragleave dragend drop', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        zone.removeClass('is-dragover');
+                    });
+
+                    zone.on('drop', function(e) {
+                        let input = zone.find('input[type="file"]')[0];
+                        let files = e.originalEvent.dataTransfer.files;
+
+                        if (!input || !files || files.length === 0) {
+                            return;
+                        }
+
+                        let dataTransfer = new DataTransfer();
+
+                        if (input.multiple) {
+                            Array.from(files).forEach(file => dataTransfer.items.add(file));
+                        } else {
+                            dataTransfer.items.add(files[0]);
+                        }
+
+                        input.files = dataTransfer.files;
+                        $(input).trigger('change');
+                    });
                 });
             }
 
@@ -355,26 +482,38 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="foto_unit">Foto Unit</label>
-                                <input type="file" name="service_units[${index}][foto_unit]" id="foto_unit"
-                                    class="foto-unit-input w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
-                                    accept="image/*">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Foto Unit</label>
+                                <label class="file-dropzone mb-2">
+                                    <input type="file" name="service_units[${index}][foto_unit]"
+                                        class="foto-unit-input file-input-dnd" accept="image/*">
+                                    <span class="dropzone-title">Drag & drop file di sini</span>
+                                    <span class="dropzone-subtitle">atau klik untuk pilih Foto Unit</span>
+                                    <span class="dropzone-filename">Belum ada file dipilih</span>
+                                </label>
                                 <div class="preview-foto-unit mb-3"></div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="foto_odometer">Foto Odometer</label>
-                                <input type="file" name="service_units[${index}][foto_odometer]" id="foto_odometer"
-                                    class="input-foto-odometer w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
-                                    accept="image/*">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Foto Odometer</label>
+                                <label class="file-dropzone mb-2">
+                                    <input type="file" name="service_units[${index}][foto_odometer]"
+                                        class="input-foto-odometer file-input-dnd" accept="image/*">
+                                    <span class="dropzone-title">Drag & drop file di sini</span>
+                                    <span class="dropzone-subtitle">atau klik untuk pilih Foto Odometer</span>
+                                    <span class="dropzone-filename">Belum ada file dipilih</span>
+                                </label>
                                 <div class="preview-foto_odometer mb-3"></div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="foto_kondisi">Foto Kondisi</label>
-                                <input type="file" multiple name="service_units[${index}][foto_kondisi][]" id="foto_kondisi"
-                                    class="input-foto-kondisi w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
-                                    accept="image/*">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Foto Kondisi</label>
+                                <label class="file-dropzone mb-2">
+                                    <input type="file" multiple name="service_units[${index}][foto_kondisi][]"
+                                        class="input-foto-kondisi file-input-dnd" accept="image/*">
+                                    <span class="dropzone-title">Drag & drop file di sini</span>
+                                    <span class="dropzone-subtitle">atau klik untuk pilih Foto Kondisi</span>
+                                    <span class="dropzone-filename">Belum ada file dipilih</span>
+                                </label>
                                 <div class="preview-foto-kondisi flex gap-2 flex-wrap mb-3"></div>
                             </div>
 
@@ -388,6 +527,7 @@
                 $('#service-units-wrapper').append(newItem);
 
                 initSelect2(newItem);
+                bindDropzoneEvents(newItem);
                 index++;
             });
 
@@ -459,6 +599,7 @@
 
             // Preview foto unit
             $(document).on('change', '.foto-unit-input', function(e) {
+                updateDropzoneFileName(this);
 
                 let wrapper = $(this).closest('.service-unit-item');
                 let preview = wrapper.find('.preview-foto-unit');
@@ -482,6 +623,7 @@
             });
             // Preview foto odometer
             $(document).on('change', '.input-foto-odometer', function(e) {
+                updateDropzoneFileName(this);
 
                 let wrapper = $(this).closest('.service-unit-item');
                 let preview = wrapper.find('.preview-foto_odometer');
@@ -505,6 +647,7 @@
             });
             // Preview foto kondisi -> multiple
             $(document).on('change', '.input-foto-kondisi', function(e) {
+                updateDropzoneFileName(this);
 
                 let wrapper = $(this).closest('.service-unit-item');
                 let preview = wrapper.find('.preview-foto-kondisi');
@@ -534,6 +677,8 @@
 
                 }
             });
+
+            bindDropzoneEvents();
         });
     </script>
 </body>
