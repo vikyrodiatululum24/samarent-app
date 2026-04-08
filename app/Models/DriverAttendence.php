@@ -65,6 +65,10 @@ class DriverAttendence extends Model
     {
         return $this->hasMany(DriverCheck::class, 'attendance_id');
     }
+    public function logMails()
+    {
+        return $this->hasMany(LogMail::class, 'attendence_id');
+    }
 
 
 }

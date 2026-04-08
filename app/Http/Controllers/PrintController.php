@@ -156,17 +156,19 @@ class PrintController extends Controller
 
     public function previewAbsensi(Request $request, $driver_id)
     {
-        $month = $request->get('month', date('m-Y'));
-        $monthParts = explode('-', $month);
-        $monthNumber = isset($monthParts[0]) ? (int) $monthParts[0] : date('m');
-        $monthName = \Carbon\Carbon::create()->month($monthNumber)->locale('id')->translatedFormat('F');
-        // Ambil driver
+        $month = $request->get('month', now()->format('Y-m'));
+
+        $date = \Carbon\Carbon::parse($month);
+        $monthName = $date->locale('id')->isoFormat('MMMM YYYY');
+
         $driver = Driver::with([
             'user',
-            'driverAttendences' => function ($query) use ($month) {
-                $query->whereMonth('date', substr($month, 5, 2))->whereYear('date', substr($month, 0, 4));
+            'driverAttendences' => function ($query) use ($date) {
+                $query->whereMonth('date', $date->month)
+                    ->whereYear('date', $date->year);
             },
         ])->findOrFail($driver_id);
+
         if (!$driver) {
             abort(404, 'Driver not found');
         }
@@ -182,7 +184,7 @@ class PrintController extends Controller
 
         $pdf = PDF::loadView('prints.absensi', [
             'driver' => $driver,
-            'attendences' => $attendences->load('project', 'endUser', 'unit'),
+            'attendences' => $attendences->load('project', 'endUser', 'unit', 'checks', 'confirmation'),
             'month' => $monthName,
             'maxPages' => $maxPages,
         ])->setPaper('a4', 'portrait');

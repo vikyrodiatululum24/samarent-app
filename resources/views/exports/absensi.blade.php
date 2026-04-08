@@ -85,7 +85,10 @@
                     <td>{{ $attendance->end_km ?? '-' }}</td>
                     <td>{{ $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i') : '-' }}
                     </td>
-                    <td>{{ $attendance->time_check ? \Carbon\Carbon::parse($attendance->time_check)->format('H:i') : '-' }}
+                    <td>
+                        @foreach ($attendance->checks as $check)
+                            {{ \Carbon\Carbon::parse($check->created_at)->format('H:i') }},
+                        @endforeach
                     </td>
                     <td>{{ $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('H:i') : '-' }}
                     </td>

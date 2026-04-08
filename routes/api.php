@@ -18,10 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::post('/hitung/calculate', [HitungController::class, 'calculate'])->name('hitung.calculate');
 
 // absensi
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:8,1');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');
-Route::get('/confirm/{token}', [ConfirmController::class, 'confirmAbsen']);
-Route::post('/absen/confirm', [AbsenController::class, 'confirmAbsen']);
+Route::get('/confirm/{token}', [ConfirmController::class, 'confirmAbsen'])->middleware('throttle:15,1');
+Route::post('/absen/confirm', [AbsenController::class, 'confirmAbsen'])->middleware('throttle:10,1');
 Route::get('/absen/detail-confirmation/{token}', [AbsenController::class, 'detailConfirmation']);
 
 // routes/api.php
@@ -85,7 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/jualunit', [JualController::class, 'getunit']);
 Route::get('/filters', [JualController::class, 'filters']);
 Route::get('/detail/{id}', [JualController::class, 'detail']);
-Route::post('/penawar', [JualController::class, 'penawar']);
+Route::post('/penawar', [JualController::class, 'penawar'])->middleware('throttle:10,1');
 Route::get('/event', [JualController::class, 'event']);
 
 // unit api - get all data untuk sync

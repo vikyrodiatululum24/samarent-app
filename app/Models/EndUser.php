@@ -21,4 +21,8 @@ class EndUser extends Model
     {
         return $this->belongsTo(Project::class);
     }
+    public function logMails()
+    {
+        return $this->hasMany(LogMail::class, 'end_user_id');
+    }
 }

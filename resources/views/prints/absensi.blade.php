@@ -130,7 +130,10 @@
                         <td>{{ $attendance->end_km ?? '-' }}</td>
                         <td>{{ $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i') : '-' }}
                         </td>
-                        <td>{{ $attendance->time_check ? \Carbon\Carbon::parse($attendance->time_check)->format('H:i') : '-' }}
+                        <td>
+                            @foreach ($attendance->checks as $check)
+                                {{ \Carbon\Carbon::parse($check->created_at)->format('H:i') }}<br>
+                            @endforeach
                         </td>
                         <td>{{ $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('H:i') : '-' }}
                         </td>
@@ -219,13 +222,19 @@
                                 @endif
                             </td>
                             <td class="text-center">
-                                @if ($attendance->photo_check)
-                                    <img src="{{ public_path($attendance->photo_check) }}"
-                                        style="max-width: 100px; display: block; margin: 0 auto;"><br>
-                                    <small>{{ $attendance->time_check ? \Carbon\Carbon::parse($attendance->time_check)->format('H:i') : '-' }}</small>
-                                @else
-                                    <p>Tidak ada foto</p>
-                                @endif
+                                @foreach ($attendance->checks as $check)
+                                    @if ($check->photo)
+                                    <div style="display: inline-flex; vertical-align: top;">
+                                        <div style="font-size: 10px;">
+                                            <img src="{{ public_path($check->photo) }}"
+                                                style="max-width: 100px; display: block; margin: 0 auto;"><br>
+                                            <small>{{ $check->created_at ? \Carbon\Carbon::parse($check->created_at)->format('H:i') : '-' }}</small>
+                                        </div>
+                                    </div>
+                                    @else
+                                        <p>Tidak ada foto</p>
+                                    @endif
+                                @endforeach
                             </td>
                             <td class="text-center">
                                 @if ($attendance->photo_out)

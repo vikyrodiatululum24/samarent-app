@@ -83,16 +83,56 @@ class DriverAttendenceResource extends Resource
                             ->label('Nama Driver'),
                         Infolists\Components\TextEntry::make('project.name')
                             ->label('Project'),
+                        Infolists\Components\Group::make([
                         Infolists\Components\TextEntry::make('endUser.name')
                             ->label('End User'),
+                            Infolists\Components\TextEntry::make('endUserOut.name')
+                                ->label('End User Keluar')
+                                ->visible(fn($record) => !empty($record->endUserOut)),
+                        ])
+                        ->label('End User')
+                        ->columns(2),
                         Infolists\Components\TextEntry::make('unit.type')
                             ->label('Unit'),
                         Infolists\Components\TextEntry::make('note')
                             ->label('Catatan')
                             ->columnSpanFull(),
-                        Infolists\Components\IconEntry::make('is_complete')
+                        Infolists\Components\Group::make([
+                            Infolists\Components\Group::make([
+                                Infolists\Components\TextEntry::make('endUserOut.email')
+                                    ->label('Email End User')
+                                    ->copyable(),
+                                Infolists\Components\TextEntry::make('logMails.latest.status')
+                                    ->label('Status Pengiriman')
+                                    ->getStateUsing(function ($record) {
+                                        $logMail = $record->logMails()->latest()->first();
+                                        return $logMail ? ucfirst($logMail->status) : 'Belum Dikirim';
+                                    }),
+                                Infolists\Components\TextEntry::make('logMails.latest.error_message')
+                                    ->label('Error')
+                                    ->getStateUsing(function ($record) {
+                                        $logMail = $record->logMails()->latest()->first();
+                                        return $logMail && $logMail->status === 'failed' ? $logMail->error_message : '-';
+                                    })
+                                    ->color('danger')
+                                    ->visible(fn($record) => $record->logMails()->latest()->first()?->status === 'failed'),
+                            ])
+                            ->columns(3),
+                        Infolists\Components\IconEntry::make('approved')
                             ->label('Status Approved')
-                            ->boolean(),
+                            ->getStateUsing(function ($record) {
+                                if ($record->confirmation()->where('status', 'approved')->exists()) {
+                                    return 'heroicon-o-check-circle';
+                                } elseif ($record->confirmation()->where('status', 'rejected')->exists()) {
+                                    return 'heroicon-o-x-circle';
+                                }  else {
+                                    return 'heroicon-o-clock';
+                                }
+                            })
+                            ->icon(fn($state) => $state)
+                            ->visible(fn($record) => $record->confirmation()->exists()),
+                        ])
+                        ->label('Status'),
                     ])
                     ->columns(3),
 

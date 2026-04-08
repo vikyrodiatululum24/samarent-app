@@ -37,13 +37,13 @@ Route::get('/', function () {
 // Public Reimbursement Routes (No Authentication Required)
 Route::prefix('public')->name('reimbursement.')->group(function () {
     Route::get('/reimbursement/create', [PublicReimbursementController::class, 'create'])->name('create');
-    Route::post('/reimbursement/store', [PublicReimbursementController::class, 'store'])->name('store');
+    Route::post('/reimbursement/store', [PublicReimbursementController::class, 'store'])->middleware('throttle:10,1')->name('store');
     Route::get('/reimbursement/success', [PublicReimbursementController::class, 'success'])->name('success');
 });
 
 Route::prefix('public')->name('public.')->group(function () {
     Route::get('/pra-pengajuan/create', [PublicPraPengajuanController::class, 'create'])->name('pra-pengajuan.create');
-    Route::post('/pra-pengajuan/store', [PublicPraPengajuanController::class, 'store'])->name('pra-pengajuan.store');
+    Route::post('/pra-pengajuan/store', [PublicPraPengajuanController::class, 'store'])->middleware('throttle:10,1')->name('pra-pengajuan.store');
     Route::get('/pra-pengajuan/success', [PublicPraPengajuanController::class, 'success'])->name('pra-pengajuan.success');
 });
 

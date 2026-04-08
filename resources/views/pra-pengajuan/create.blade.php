@@ -241,6 +241,8 @@
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Service</label>
                                 <select name="service_units[0][service][]" multiple class="service-select w-full mb-2"
                                     required>
+                                    <option value="Service Berkala">Service Berkala</option>
+                                    <option value="Ganti Oli">Ganti Oli</option>
                                     <option value="Rem Depan">Rem Depan</option>
                                     <option value="Rem Belakang">Rem Belakang</option>
                                     <option value="Lampu Depan">Lampu Depan</option>
@@ -444,6 +446,8 @@
                             <div class="mb-3">
                                 <label>Service</label>
                                 <select name="service_units[${index}][service][]" multiple class="service-select w-full mb-2" required>
+                                    <option value="Service Berkala">Service Berkala</option>
+                                    <option value="Ganti Oli">Ganti Oli</option>
                                     <option value="Rem Depan">Rem Depan</option>
                                     <option value="Rem Belakang">Rem Belakang</option>
                                     <option value="Lampu Depan">Lampu Depan</option>

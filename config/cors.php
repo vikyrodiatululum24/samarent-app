@@ -15,12 +15,12 @@ return [
     |
     */
 
-'paths' => ['api/*', 'vue/*', 'login', 'logout', 'register', 'sanctum/csrf-cookie'],
-'allowed_methods' => ['*'],
-'allowed_origins' => ['https://jualmobil.servicesamarent.com', 'https://driver.servicesamarent.com', 'http://localhost:5173'], // alamat frontend Vue
-'allowed_headers' => ['*'],
-'exposed_headers' => [],
-'supports_credentials' => true,
+    'paths' => ['api/*', 'vue/*', 'login', 'logout', 'register', 'sanctum/csrf-cookie'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => array_filter(array_map('trim', explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:5173')))),
+    'allowed_headers' => ['*'],
+    'exposed_headers' => [],
+    'supports_credentials' => true,
 
 ];
 
