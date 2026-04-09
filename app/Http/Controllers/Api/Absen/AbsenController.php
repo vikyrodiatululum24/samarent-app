@@ -176,7 +176,7 @@ class AbsenController extends Controller
     public function absenHistory(Request $request)
     {
         $userId = $request->user()->id;
-        $history = DriverAttendence::with('confirmation:confirmable_id,status', 'checks')->where('user_id', $userId)->orderBy('date', 'desc')->limit(5)->get();
+        $history = DriverAttendence::with('confirmation:confirmable_id,status', 'checks', 'logMails')->where('user_id', $userId)->orderBy('date', 'desc')->limit(5)->get();
 
         return response()->json(['data' => $history], 200);
     }
@@ -187,7 +187,7 @@ class AbsenController extends Controller
         $month = $request->input('month', now()->format('m'));
         $year = $request->input('year', now()->format('Y'));
 
-        $history = DriverAttendence::with('confirmation:confirmable_id,status', 'checks')->where('user_id', $userId)->whereMonth('date', $month)->whereYear('date', $year)->orderBy('date', 'desc')->get();
+        $history = DriverAttendence::with('confirmation:confirmable_id,status', 'checks', 'logMails')->where('user_id', $userId)->whereMonth('date', $month)->whereYear('date', $year)->orderBy('date', 'desc')->get();
 
         return response()->json(['data' => $history], 200);
     }
@@ -222,7 +222,6 @@ class AbsenController extends Controller
 
     public function sendNotification(Request $request)
     {
-
         $ids = $request->input('ids', []);
 
         // 1. Ambil semua data absen
@@ -235,6 +234,13 @@ class AbsenController extends Controller
             ->filter() // 🔥 hindari null
             ->unique('id')
             ->values();
+
+        if ($endUsers->isEmpty()) {
+            return response()->json([
+                'message' => 'Absen belum selesai atau tidak memiliki end user untuk notifikasi',
+                'errors' => ['No end users found for the provided absen IDs'],
+            ], 400);
+        }
 
         $errorEmails = [];
 
@@ -302,7 +308,10 @@ class AbsenController extends Controller
         }
 
         if (!empty($errorEmails)) {
-            return response()->json(['message' => 'Notifikasi email gagal dikirim untuk beberapa pengguna', 'emails' => $errorEmails], 500);
+            return response()->json([
+                'message' => 'Absen sudah selesai, tetapi terjadi kesalahan saat mengirim notifikasi ke: ' . implode(', ', $errorEmails),
+                'errors' => $errorEmails,
+            ], 400);
         }
 
         return response()->json([
