@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use App\Models\Unit;
 use Filament\Tables;
-use App\Models\Norek;
 use App\Models\Project;
 use Filament\Forms\Form;
 use App\Models\Pengajuan;
@@ -25,6 +24,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Wizard\Step;
 use App\Filament\Imports\PengajuanImporter;
 use Filament\Infolists\Components\ViewEntry;
+use App\Models\BosJoulmer;
 use App\Filament\Resources\PengajuanResource\Pages;
 
 
@@ -437,6 +437,7 @@ class PengajuanResource extends Resource
                     ->color(fn(string $state) => match (true) {
                         str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'black',
                         str_contains(strtoupper($state), 'VERIFIKASI') => 'danger',
+                        str_contains(strtoupper($state), 'MENUNGGU BOS') => 'info',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
                         str_contains(strtoupper($state), 'INPUT FINANCE') => 'brown',
                         str_contains(strtoupper($state), 'OTORISASI') => 'yellow',
@@ -447,6 +448,7 @@ class PengajuanResource extends Resource
                         return match ($record->keterangan_proses) {
                             'cs' => 'Customer Service',
                             'checker' => 'Verifikasi',
+                            'menunggu bos' => 'Menunggu Bos',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
@@ -470,6 +472,7 @@ class PengajuanResource extends Resource
                     ->options([
                         'cs' => 'Customer Service',
                         'checker' => 'Verifikasi',
+                        'menunggu bos' => 'Menunggu Bos',
                         'pengajuan finance' => 'Pengajuan Finance',
                         'finance' => 'Input Finance',
                         'otorisasi' => 'Otorisasi',
@@ -523,7 +526,53 @@ class PengajuanResource extends Resource
                         ->deselectRecordsAfterCompletion()
                         ->modalHeading('Konfirmasi Pengajuan Finance')
                         ->modalSubheading('Apakah Anda yakin ingin mengubah status semua pengajuan yang dipilih menjadi "Pengajuan Finance"?')
-                        ->modalButton('Ya, Ubah Status')
+                        ->modalButton('Ya, Ubah Status'),
+                    Tables\Actions\BulkAction::make('submit_to_bos')
+                        ->label('Ajukan ke Bos')
+                        ->icon('heroicon-o-paper-airplane')
+                        ->color('info')
+                        ->action(function ($records) {
+                            $submittedCount = 0;
+                            $skippedCount = 0;
+
+                            foreach ($records as $record) {
+                                if ($record->keterangan_proses !== 'checker') {
+                                    $skippedCount++;
+                                    continue;
+                                }
+
+                                BosJoulmer::updateOrCreate(
+                                    ['pengajuan_id' => $record->id],
+                                    [
+                                        'user_id' => Auth::id(),
+                                        'is_approved' => 'pending',
+                                        'note' => null,
+                                    ]
+                                );
+
+                                $record->update(['keterangan_proses' => 'menunggu bos']);
+                                $submittedCount++;
+                            }
+
+                            if ($submittedCount > 0) {
+                                Notification::make()
+                                    ->title("{$submittedCount} pengajuan berhasil diajukan ke Bos.")
+                                    ->success()
+                                    ->send();
+                            }
+
+                            if ($skippedCount > 0) {
+                                Notification::make()
+                                    ->title("{$skippedCount} pengajuan dilewati karena status bukan Verifikasi.")
+                                    ->warning()
+                                    ->send();
+                            }
+                        })
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion()
+                        ->modalHeading('Konfirmasi Ajukan ke Bos')
+                        ->modalSubheading('Pengajuan yang dipilih akan dikirim ke Bos untuk review dan status menjadi "Menunggu Bos".')
+                        ->modalButton('Ya, Ajukan')
                 ]),
             ])
             ->headerActions([
@@ -575,6 +624,7 @@ class PengajuanResource extends Resource
                                 return match ($record->keterangan_proses) {
                                     'cs' => 'Customer Service',
                                     'checker' => 'Verifikasi',
+                                    'menunggu bos' => 'Menunggu Bos',
                                     'pengajuan finance' => 'Pengajuan Finance',
                                     'finance' => 'Input Finance',
                                     'otorisasi' => 'Otorisasi',
@@ -585,6 +635,7 @@ class PengajuanResource extends Resource
                             ->color(fn(string $state) => match ($state) {
                                 'Customer Service' => 'black',
                                 'Verifikasi' => 'danger',
+                                'Menunggu Bos' => 'info',
                                 'Pengajuan Finance' => 'primary',
                                 'Input Finance' => 'brown',
                                 'Otorisasi' => 'yellow',

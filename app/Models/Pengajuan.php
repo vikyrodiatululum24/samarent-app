@@ -74,4 +74,8 @@ class Pengajuan extends Model
     {
         return $this->hasMany(LogUpdateStatusPengajuan::class);
     }
+    public function bos_joulmer()
+    {
+        return $this->hasOne(BosJoulmer::class);
+    }
 }

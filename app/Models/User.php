@@ -90,4 +90,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(LogUpdateStatusPengajuan::class);
     }
+    public function bos_joulmers()
+    {
+        return $this->hasMany(BosJoulmer::class);
+    }
 }
