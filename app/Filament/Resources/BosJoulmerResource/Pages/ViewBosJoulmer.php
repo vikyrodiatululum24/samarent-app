@@ -16,7 +16,7 @@ class ViewBosJoulmer extends EditRecord
 {
     protected static string $resource = BosJoulmerResource::class;
 
-    protected static ?string $title = 'Review Pengajuan Bos';
+    protected static ?string $title = 'Review Pengajuan';
 
     public function form(Form $form): Form
     {
@@ -66,7 +66,7 @@ class ViewBosJoulmer extends EditRecord
                                 return match ($this->record->pengajuan?->keterangan_proses) {
                                     'cs' => 'Customer Service',
                                     'checker' => 'Verifikasi',
-                                    'menunggu bos' => 'Menunggu Bos',
+                                    'menunggu atasan' => 'Menunggu Atasan',
                                     'pengajuan finance' => 'Pengajuan Finance',
                                     'finance' => 'Input Finance',
                                     'otorisasi' => 'Otorisasi',
@@ -132,7 +132,7 @@ class ViewBosJoulmer extends EditRecord
                 Forms\Components\Section::make('Keputusan Review')
                     ->schema([
                         Forms\Components\Textarea::make('note')
-                            ->label('Catatan Bos (Opsional)')
+                            ->label('Catatan (Opsional)')
                             ->maxLength(255)
                             ->nullable()
                             ->rows(4),

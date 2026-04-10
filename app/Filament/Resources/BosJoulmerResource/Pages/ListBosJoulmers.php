@@ -14,7 +14,7 @@ class ListBosJoulmers extends ListRecords
     {
         return [
             Actions\Action::make('info')
-                ->label('Review Pengajuan Bos')
+                ->label('Review Pengajuan')
                 ->disabled(),
         ];
     }

@@ -437,7 +437,7 @@ class PengajuanResource extends Resource
                     ->color(fn(string $state) => match (true) {
                         str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'black',
                         str_contains(strtoupper($state), 'VERIFIKASI') => 'danger',
-                        str_contains(strtoupper($state), 'MENUNGGU BOS') => 'info',
+                        str_contains(strtoupper($state), 'MENUNGGU ATASAN') => 'info',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
                         str_contains(strtoupper($state), 'INPUT FINANCE') => 'brown',
                         str_contains(strtoupper($state), 'OTORISASI') => 'yellow',
@@ -448,7 +448,7 @@ class PengajuanResource extends Resource
                         return match ($record->keterangan_proses) {
                             'cs' => 'Customer Service',
                             'checker' => 'Verifikasi',
-                            'menunggu bos' => 'Menunggu Bos',
+                            'menunggu atasan' => 'Menunggu Atasan',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
@@ -472,7 +472,7 @@ class PengajuanResource extends Resource
                     ->options([
                         'cs' => 'Customer Service',
                         'checker' => 'Verifikasi',
-                        'menunggu bos' => 'Menunggu Bos',
+                        'menunggu atasan' => 'Menunggu Atasan',
                         'pengajuan finance' => 'Pengajuan Finance',
                         'finance' => 'Input Finance',
                         'otorisasi' => 'Otorisasi',
@@ -528,7 +528,7 @@ class PengajuanResource extends Resource
                         ->modalSubheading('Apakah Anda yakin ingin mengubah status semua pengajuan yang dipilih menjadi "Pengajuan Finance"?')
                         ->modalButton('Ya, Ubah Status'),
                     Tables\Actions\BulkAction::make('submit_to_bos')
-                        ->label('Ajukan ke Bos')
+                        ->label('Ajukan Keatasan')
                         ->icon('heroicon-o-paper-airplane')
                         ->color('info')
                         ->action(function ($records) {
@@ -550,13 +550,13 @@ class PengajuanResource extends Resource
                                     ]
                                 );
 
-                                $record->update(['keterangan_proses' => 'menunggu bos']);
+                                $record->update(['keterangan_proses' => 'menunggu atasan']);
                                 $submittedCount++;
                             }
 
                             if ($submittedCount > 0) {
                                 Notification::make()
-                                    ->title("{$submittedCount} pengajuan berhasil diajukan ke Bos.")
+                                    ->title("{$submittedCount} pengajuan berhasil diajukan ke Atasan.")
                                     ->success()
                                     ->send();
                             }
@@ -570,8 +570,8 @@ class PengajuanResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()
-                        ->modalHeading('Konfirmasi Ajukan ke Bos')
-                        ->modalSubheading('Pengajuan yang dipilih akan dikirim ke Bos untuk review dan status menjadi "Menunggu Bos".')
+                        ->modalHeading('Konfirmasi Ajukan ke Atasan')
+                        ->modalSubheading('Pengajuan yang dipilih akan dikirim ke Atasan untuk review dan status menjadi "Menunggu Atasan".')
                         ->modalButton('Ya, Ajukan')
                 ]),
             ])
@@ -624,7 +624,7 @@ class PengajuanResource extends Resource
                                 return match ($record->keterangan_proses) {
                                     'cs' => 'Customer Service',
                                     'checker' => 'Verifikasi',
-                                    'menunggu bos' => 'Menunggu Bos',
+                                    'menunggu atasan' => 'Menunggu Atasan',
                                     'pengajuan finance' => 'Pengajuan Finance',
                                     'finance' => 'Input Finance',
                                     'otorisasi' => 'Otorisasi',

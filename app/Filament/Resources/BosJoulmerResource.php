@@ -19,15 +19,15 @@ class BosJoulmerResource extends Resource
 
     protected static ?string $navigationGroup = 'Pengajuan';
 
-    protected static ?string $navigationLabel = 'Review Bos';
+    protected static ?string $navigationLabel = 'Review Atasan';
 
-    protected static ?string $label = 'Review Bos';
+    protected static ?string $label = 'Review Atasan';
 
-    protected static ?string $pluralLabel = 'Review Bos';
+    protected static ?string $pluralLabel = 'Review Atasan';
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $slug = 'review-bos';
+    protected static ?string $slug = 'review-atasan';
 
     public static function table(Table $table): Table
     {
@@ -94,7 +94,7 @@ class BosJoulmerResource extends Resource
                         return match ($record->pengajuan?->keterangan_proses) {
                             'cs' => 'Customer Service',
                             'checker' => 'Verifikasi',
-                            'menunggu bos' => 'Menunggu Bos',
+                            'menunggu atasan' => 'Menunggu Atasan',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
@@ -105,7 +105,7 @@ class BosJoulmerResource extends Resource
                     ->color(fn (string $state) => match ($state) {
                         'Customer Service' => 'black',
                         'Verifikasi' => 'danger',
-                        'Menunggu Bos' => 'info',
+                        'Menunggu Atasan' => 'info',
                         'Pengajuan Finance' => 'primary',
                         'Input Finance' => 'brown',
                         'Otorisasi' => 'yellow',
@@ -124,7 +124,7 @@ class BosJoulmerResource extends Resource
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('note')
-                    ->label('Catatan Bos')
+                    ->label('Catatan')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->limit(60),
                 Tables\Columns\TextColumn::make('updated_at')
@@ -165,7 +165,7 @@ class BosJoulmerResource extends Resource
                                 return match ($record->pengajuan?->keterangan_proses) {
                                     'cs' => 'Customer Service',
                                     'checker' => 'Verifikasi',
-                                    'menunggu bos' => 'Menunggu Bos',
+                                    'menunggu atasan' => 'Menunggu Atasan',
                                     'pengajuan finance' => 'Pengajuan Finance',
                                     'finance' => 'Input Finance',
                                     'otorisasi' => 'Otorisasi',
@@ -176,7 +176,7 @@ class BosJoulmerResource extends Resource
                             ->color(fn (string $state) => match ($state) {
                                 'Customer Service' => 'black',
                                 'Verifikasi' => 'danger',
-                                'Menunggu Bos' => 'info',
+                                'Menunggu Atasan' => 'info',
                                 'Pengajuan Finance' => 'primary',
                                 'Input Finance' => 'brown',
                                 'Otorisasi' => 'yellow',
@@ -198,7 +198,7 @@ class BosJoulmerResource extends Resource
                                 default => 'gray',
                             }),
                         Components\TextEntry::make('note')
-                            ->label('Catatan Bos')
+                            ->label('Catatan')
                             ->placeholder('-'),
                         Components\TextEntry::make('user.name')
                             ->label('Reviewer'),
