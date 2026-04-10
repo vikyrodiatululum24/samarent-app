@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
@@ -50,9 +49,7 @@ class FinancePanelProvider extends PanelProvider
             ])
             ->discoverPages(in: app_path('Filament/Finance/Pages'), for: 'App\\Filament\\Finance\\Pages')
             ->profile(EditProfile::class, false)
-            ->pages([
-                Pages\Dashboard::class,
-            ])
+            ->pages([])
             ->discoverWidgets(in: app_path('Filament/Finance/Widgets'), for: 'App\\Filament\\Finance\\Widgets')
             ->widgets([
                 // Widgets\AccountWidget::class,

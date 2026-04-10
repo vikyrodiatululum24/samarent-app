@@ -437,7 +437,7 @@ class PengajuanResource extends Resource
                     ->color(fn(string $state) => match (true) {
                         str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'black',
                         str_contains(strtoupper($state), 'VERIFIKASI') => 'danger',
-                        str_contains(strtoupper($state), 'MENUNGGU ATASAN') => 'info',
+                        str_contains(strtoupper($state), 'PENGAJUAN ATASAN') => 'info',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
                         str_contains(strtoupper($state), 'INPUT FINANCE') => 'brown',
                         str_contains(strtoupper($state), 'OTORISASI') => 'yellow',
@@ -445,16 +445,31 @@ class PengajuanResource extends Resource
                         default => 'gray',
                     })
                     ->getStateUsing(function ($record) {
-                        return match ($record->keterangan_proses) {
+                        $prosesPengajuan = $record->keterangan_proses ?? '';
+                        $statusBos = $record->bos_joulmer?->is_approved;
+
+                        $prosesText = match ($prosesPengajuan) {
                             'cs' => 'Customer Service',
                             'checker' => 'Verifikasi',
-                            'menunggu atasan' => 'Menunggu Atasan',
+                            'pengajuan atasan' => 'Pengajuan Atasan',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
+
+                        if ($prosesPengajuan === 'pengajuan atasan') {
+                            $bosText = match ($statusBos) {
+                                'approved' => 'Disetujui',
+                                'rejected' => 'Ditolak',
+                                'pending' => 'Pending',
+                                default => 'Tidak Diketahui',
+                            };
+                            return "{$prosesText} - {$bosText}";
+                        }
+
+                        return $prosesText;
                     })
                     ->width('150px')
                     ->wrap(),
@@ -472,12 +487,26 @@ class PengajuanResource extends Resource
                     ->options([
                         'cs' => 'Customer Service',
                         'checker' => 'Verifikasi',
-                        'menunggu atasan' => 'Menunggu Atasan',
+                        'pengajuan atasan' => 'Pengajuan Atasan',
                         'pengajuan finance' => 'Pengajuan Finance',
                         'finance' => 'Input Finance',
                         'otorisasi' => 'Otorisasi',
                         'done' => 'Selesai',
                     ]),
+                SelectFilter::make('bos_status')
+                    ->label('Status di Atasan')
+                    ->options([
+                        'pending' => 'Menunggu Approval',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (isset($data['value'])) {
+                            $query->whereHas('bos_joulmer', function ($q) use ($data) {
+                                $q->where('is_approved', $data['value']);
+                            });
+                        }
+                    }),
                 SelectFilter::make('tahun')
                     ->label('Tahun')
                     ->options(function () {
@@ -649,7 +678,8 @@ class PengajuanResource extends Resource
 
                         Components\TextEntry::make('logUpdateStatus')
                             ->label('History Update Status')
-                            ->getStateUsing(fn($record) =>
+                            ->getStateUsing(
+                                fn($record) =>
                                 $record->logUpdateStatusPengajuans()
                                     ->orderBy('created_at', 'desc')
                                     ->get()
@@ -657,6 +687,25 @@ class PengajuanResource extends Resource
                                     ->implode('<br>')
                             )
                             ->html(),
+                        Components\TextEntry::make('Status atasan')
+                            ->label('Status di Atasan')
+                            ->getStateUsing(fn($record) => match ($record->bos_joulmer?->is_approved) {
+                                'pending' => 'Menunggu Approval',
+                                'approved' => 'Disetujui',
+                                'rejected' => 'Ditolak',
+                                default => '-',
+                            })
+                            ->badge()
+                            ->color(fn(string $state) => match ($state) {
+                                'Menunggu Approval' => 'info',
+                                'Disetujui' => 'success',
+                                'Ditolak' => 'danger',
+                            }),
+                        Components\TextEntry::make('bos_joulmer.note')
+                            ->label('Catatan Atasan')
+                            ->getStateUsing(fn($record) => $record->bos_joulmer?->note ?: '-')
+                            ->columnSpanFull()
+                            ->visible(fn($record) => in_array($record->bos_joulmer?->is_approved, ['approved', 'rejected'], true)),
                     ])
                     ->columns(2),
                 Components\Section::make('Pembayaran')
@@ -712,8 +761,7 @@ class PengajuanResource extends Resource
                             ->schema([
                                 Components\TextEntry::make('complete.tanggal_masuk_finance')
                                     ->label('Tanggal Masuk Finance')
-                                    ->date()
-                                    ,
+                                    ->date(),
                                 Components\TextEntry::make('complete.tanggal_tf_finance')
                                     ->label('Tanggal Transfer Finance')
                                     ->date(),
@@ -735,22 +783,22 @@ class PengajuanResource extends Resource
                                     ->label('No. Rekening'),
                                 Components\TextEntry::make('complete.status_finance')
                                     ->label('Status Finance')
-                                     ->getStateUsing(function ($record) {
+                                    ->getStateUsing(function ($record) {
                                         return match ($record->complete?->status_finance) {
                                             'paid' => 'PAID',
                                             'unpaid' => 'UNPAID',
                                             default => 'Tidak Diketahui',
                                         };
                                     })
-                                     ->color(fn(string $state) => match ($state) {
+                                    ->color(fn(string $state) => match ($state) {
                                         'PAID' => 'success',
                                         'UNPAID' => 'danger',
-                                         default => 'gray',
-                                     }),
+                                        default => 'gray',
+                                    }),
                             ]),
                     ])
                     ->visible(fn($record) => !empty($record->complete)), // Only show when complete data is filled
-                    Components\Section::make('Informasi Bengkel')
+                Components\Section::make('Informasi Bengkel')
                     ->schema([
                         Components\Grid::make(3)
                             ->schema([

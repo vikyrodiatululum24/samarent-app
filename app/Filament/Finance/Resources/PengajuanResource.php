@@ -91,6 +91,7 @@ class PengajuanResource extends Resource
                     ->color(fn(string $state) => match (true) {
                         str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'black',
                         str_contains(strtoupper($state), 'VERIFIKASI') => 'danger',
+                        str_contains(strtoupper($state), 'PENGAJUAN ATASAN') => 'info',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
                         str_contains(strtoupper($state), 'INPUT FINANCE') => 'brown',
                         str_contains(strtoupper($state), 'OTORISASI') => 'yellow',
@@ -98,15 +99,31 @@ class PengajuanResource extends Resource
                         default => 'gray',
                     })
                     ->getStateUsing(function ($record) {
-                        return match ($record->keterangan_proses) {
+                        $prosesPengajuan = $record->keterangan_proses ?? '';
+                        $statusBos = $record->bos_joulmer?->is_approved;
+
+                        $prosesText = match ($prosesPengajuan) {
                             'cs' => 'Customer Service',
                             'checker' => 'Verifikasi',
+                            'pengajuan atasan' => 'Pengajuan Atasan',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
+
+                        if ($prosesPengajuan === 'pengajuan atasan') {
+                            $bosText = match ($statusBos) {
+                                'approved' => 'Disetujui',
+                                'rejected' => 'Ditolak',
+                                'pending' => 'Pending',
+                                default => 'Tidak Diketahui',
+                            };
+                            return "{$prosesText} - {$bosText}";
+                        }
+
+                        return $prosesText;
                     }),
             ])
             ->filters([
@@ -115,11 +132,26 @@ class PengajuanResource extends Resource
                     ->options([
                         'cs' => 'Customer Service',
                         'checker' => 'Verifikasi',
+                        'pengajuan atasan' => 'Pengajuan Atasan',
                         'pengajuan finance' => 'Pengajuan Finance',
                         'finance' => 'Input Finance',
                         'otorisasi' => 'Otorisasi',
                         'done' => 'Selesai',
                     ]),
+                SelectFilter::make('bos_status')
+                    ->label('Status di Atasan')
+                    ->options([
+                        'pending' => 'Menunggu Approval',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (isset($data['value'])) {
+                            $query->whereHas('bos_joulmer', function ($q) use ($data) {
+                                $q->where('is_approved', $data['value']);
+                            });
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\Action::make('Proses')

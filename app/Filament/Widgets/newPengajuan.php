@@ -77,6 +77,7 @@ class newPengajuan extends BaseWidget
                     ->color(fn(string $state) => match (true) {
                         str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'black',
                         str_contains(strtoupper($state), 'VERIFIKASI') => 'danger',
+                        str_contains(strtoupper($state), 'PENGAJUAN ATASAN') => 'info',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
                         str_contains(strtoupper($state), 'INPUT FINANCE') => 'brown',
                         str_contains(strtoupper($state), 'OTORISASI') => 'yellow',
@@ -87,6 +88,7 @@ class newPengajuan extends BaseWidget
                         return match ($record->keterangan_proses) {
                             'cs' => 'Customer Service',
                             'checker' => 'Verifikasi',
+                            'pengajuan atasan' => 'Pengajuan Atasan',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',

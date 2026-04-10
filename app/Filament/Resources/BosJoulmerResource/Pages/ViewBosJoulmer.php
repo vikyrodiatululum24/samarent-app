@@ -66,7 +66,7 @@ class ViewBosJoulmer extends EditRecord
                                 return match ($this->record->pengajuan?->keterangan_proses) {
                                     'cs' => 'Customer Service',
                                     'checker' => 'Verifikasi',
-                                    'menunggu atasan' => 'Menunggu Atasan',
+                                    'pengajuan atasan' => 'Pengajuan Atasan',
                                     'pengajuan finance' => 'Pengajuan Finance',
                                     'finance' => 'Input Finance',
                                     'otorisasi' => 'Otorisasi',
@@ -149,10 +149,11 @@ class ViewBosJoulmer extends EditRecord
     {
         return [
             Actions\Action::make('approve')
-                ->label('Approve')
+                ->label('Setujui')
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
-                ->visible(fn () => BosJoulmerResource::canView($this->record))
+                ->visible(fn () => BosJoulmerResource::canView($this->record)
+                    && in_array($this->record->pengajuan?->keterangan_proses, ['pengajuan atasan', 'menunggu atasan'], true))
                 ->action(function (): void {
                     $record = $this->record;
                     $formData = $this->form->getState();
@@ -163,20 +164,19 @@ class ViewBosJoulmer extends EditRecord
                         'note' => $formData['note'] ?? null,
                     ]);
 
-                    $record->pengajuan?->update(['keterangan_proses' => 'finance']);
-
                     Notification::make()
-                        ->title('Status berhasil diubah ke Approved dan dikirim ke Finance.')
+                        ->title('pengajuan disetujui.')
                         ->success()
                         ->send();
 
                     $this->redirect(static::getResource()::getUrl('view', ['record' => $record]));
                 }),
             Actions\Action::make('reject')
-                ->label('Reject')
+                ->label('Tolak')
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
-                ->visible(fn () => BosJoulmerResource::canView($this->record))
+                ->visible(fn () => BosJoulmerResource::canView($this->record)
+                    && in_array($this->record->pengajuan?->keterangan_proses, ['pengajuan atasan'], true))
                 ->action(function (): void {
                     $record = $this->record;
                     $formData = $this->form->getState();
@@ -187,10 +187,8 @@ class ViewBosJoulmer extends EditRecord
                         'note' => $formData['note'] ?? null,
                     ]);
 
-                    $record->pengajuan?->update(['keterangan_proses' => 'checker']);
-
                     Notification::make()
-                        ->title('Status berhasil diubah ke Rejected dan dikembalikan ke Checker.')
+                        ->title('pengajuan ditolak.')
                         ->success()
                         ->send();
 

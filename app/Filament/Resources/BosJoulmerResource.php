@@ -94,7 +94,7 @@ class BosJoulmerResource extends Resource
                         return match ($record->pengajuan?->keterangan_proses) {
                             'cs' => 'Customer Service',
                             'checker' => 'Verifikasi',
-                            'menunggu atasan' => 'Menunggu Atasan',
+                            'pengajuan atasan' => 'Pengajuan Atasan',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
@@ -105,7 +105,7 @@ class BosJoulmerResource extends Resource
                     ->color(fn (string $state) => match ($state) {
                         'Customer Service' => 'black',
                         'Verifikasi' => 'danger',
-                        'Menunggu Atasan' => 'info',
+                        'Pengajuan Atasan' => 'info',
                         'Pengajuan Finance' => 'primary',
                         'Input Finance' => 'brown',
                         'Otorisasi' => 'yellow',
@@ -165,7 +165,7 @@ class BosJoulmerResource extends Resource
                                 return match ($record->pengajuan?->keterangan_proses) {
                                     'cs' => 'Customer Service',
                                     'checker' => 'Verifikasi',
-                                    'menunggu atasan' => 'Menunggu Atasan',
+                                    'pengajuan atasan' => 'Pengajuan Atasan',
                                     'pengajuan finance' => 'Pengajuan Finance',
                                     'finance' => 'Input Finance',
                                     'otorisasi' => 'Otorisasi',
@@ -176,7 +176,7 @@ class BosJoulmerResource extends Resource
                             ->color(fn (string $state) => match ($state) {
                                 'Customer Service' => 'black',
                                 'Verifikasi' => 'danger',
-                                'Menunggu Atasan' => 'info',
+                                'Pengajuan Atasan' => 'info',
                                 'Pengajuan Finance' => 'primary',
                                 'Input Finance' => 'brown',
                                 'Otorisasi' => 'yellow',
