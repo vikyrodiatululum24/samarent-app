@@ -689,6 +689,7 @@ class PengajuanResource extends Resource
                             ->html(),
                         Components\TextEntry::make('Status atasan')
                             ->label('Status di Atasan')
+                            ->visible(fn($record) => $record->bos_joulmer !== null)
                             ->getStateUsing(fn($record) => match ($record->bos_joulmer?->is_approved) {
                                 'pending' => 'Menunggu Approval',
                                 'approved' => 'Disetujui',
