@@ -113,17 +113,25 @@ class PengajuanResource extends Resource
                             default => 'Tidak Diketahui',
                         };
 
-                        if ($prosesPengajuan === 'pengajuan atasan') {
-                            $bosText = match ($statusBos) {
-                                'approved' => 'Disetujui',
-                                'rejected' => 'Ditolak',
-                                'pending' => 'Pending',
-                                default => 'Tidak Diketahui',
-                            };
-                            return "{$prosesText} - {$bosText}";
-                        }
-
                         return $prosesText;
+                    }),
+                Tables\Columns\TextColumn::make('bos_joulmer.is_approved')
+                    ->label('Status di Atasan')
+                    ->getStateUsing(function ($record) {
+                        $statusBos = $record->bos_joulmer?->is_approved;
+                        return match ($statusBos) {
+                            'pending' => 'Menunggu Approval',
+                            'approved' => 'Disetujui',
+                            'rejected' => 'Ditolak',
+                            default => '-',
+                        };
+                    })
+                    ->badge()
+                    ->color(fn(string $state) => match ($state) {
+                        'Menunggu Approval' => 'warning',
+                        'Disetujui' => 'success',
+                        'Ditolak' => 'danger',
+                        default => 'gray',
                     }),
             ])
             ->filters([

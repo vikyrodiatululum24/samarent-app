@@ -579,7 +579,7 @@ class PengajuanResource extends Resource
                                     ]
                                 );
 
-                                $record->update(['keterangan_proses' => 'menunggu atasan']);
+                                $record->update(['keterangan_proses' => 'pengajuan atasan']);
                                 $submittedCount++;
                             }
 
@@ -653,7 +653,7 @@ class PengajuanResource extends Resource
                                 return match ($record->keterangan_proses) {
                                     'cs' => 'Customer Service',
                                     'checker' => 'Verifikasi',
-                                    'menunggu atasan' => 'Menunggu Atasan',
+                                    'pengajuan atasan' => 'Pengajuan Atasan',
                                     'pengajuan finance' => 'Pengajuan Finance',
                                     'finance' => 'Input Finance',
                                     'otorisasi' => 'Otorisasi',
@@ -664,7 +664,7 @@ class PengajuanResource extends Resource
                             ->color(fn(string $state) => match ($state) {
                                 'Customer Service' => 'black',
                                 'Verifikasi' => 'danger',
-                                'Menunggu Bos' => 'info',
+                                'Pengajuan Atasan' => 'info',
                                 'Pengajuan Finance' => 'primary',
                                 'Input Finance' => 'brown',
                                 'Otorisasi' => 'yellow',
