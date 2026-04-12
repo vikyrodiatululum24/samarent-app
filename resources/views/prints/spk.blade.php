@@ -9,47 +9,116 @@
 </head>
 
 <body>
-    <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%" style="margin-bottom: 20px;">
-    {{-- spk --}}
+    {{-- sjp --}}
     <div>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-            <tr style="height : 20mm;">
-                <td style="width: 20%; text-align: center; border: 2px solid black;">
-                    <p style="margin: 2px 0;">Invoice Bengkel</p>
-                    @if ($pengajuan->complete->bengkel_invoice)
-                        <h2 style="margin: 2px 0; font-weight: semibold; font-size: 16px; padding: 0 2px; text-transform: uppercase;">
-                            {{ $pengajuan->complete->bengkel_invoice }}</h2>
-                    @else
-                        <h2 style="margin: 2px 0; font-weight: bold;">-</h2>
-                    @endif
-                </td>
-                <th>
-                    <h1>Surat Perintah Kerja</h1>
+        @if ($pengajuan->complete->prioritas)
+            {{-- <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <th style="width: 70%;">&nbsp;</th>
+
+                <th style="width: 30%; text-align: center; padding: 10px; float: right;">
+                    <h3
+                        style="margin: 0; border: 4px solid; padding: 10px; text-align: center; text-transform: uppercase; font-weight: bold; @if ($pengajuan->complete->prioritas === 'urgent') border-color: #cc0000; color: #cc0000; @elseif($pengajuan->complete->prioritas === 'segera') border-color: #0047ab; color: #0047ab; @elseif($pengajuan->complete->prioritas === 'pengambilan_ba') border-color: #2b8a3e; color: #2b8a3e; @else border-color: #f59f00; color:  #f59f00; @endif">
+                        {{ $pengajuan->complete->prioritas }}
+                    </h3>
                 </th>
-                <td style="width: 20%; text-align: center; border: 2px solid black;">
-                    <p style="margin: 2px 0;">KODE</p>
-                    <h1 style="margin: 2px 0; text-transform: uppercase; line-height: 1.2;">
-                        {{ $pengajuan->complete->kode }}</h1>
-                </td>
+            </tr>
+        </table> --}}
+        @endif
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr>
+                <th style="width: 20%; text-align: center; border: 1px solid black;">
+                    <img src="{{ public_path('images/logo_spj_samarent.jpg') }}" alt="logo samarent" width="150">
+                </th>
+                <th style="width: 80%; text-align: center; border: 1px solid black; position: relative;">
+                    <div style="position: relative; text-align: center;">
+                        <h2 style="text-transform: uppercase; margin: 0;">
+                            FORM<br>PERMOHONAN DANA SJP
+                        </h2>
+                        <p style="position: absolute; top: 0; right: 10px; margin: 0; font-weight: normal;">
+                            {{ $pengajuan->no_pengajuan }}
+                        </p>
+                    </div>
+                </th>
             </tr>
         </table>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr style="vertical-align: top;">
-                <th style="width: 20%; text-align: left;">
-                    <p style="margin: 2px 0;">Bengkel</p>
-                    <p style="margin: 2px 0;">Telp</p>
-                    <p style="margin: 2px 0;">Estimasi</p>
-                    <p style="margin: 2px 0;">No Rek</p>
-                    <p style="margin: 2px 0;">Jenis Pengajuan</p>
+                <th style="width: 10%; padding: 2px; text-align: left; font-size: 12px">
+                    <p style="margin: 0;">Tanggal</p>
                 </th>
-                <td style="width: 30%;">
-                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->complete->bengkel_estimasi }}
-                    </p>
-                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->complete->no_telp_bengkel }}</p>
-                    <p style="margin: 2px 0; text-transform: uppercase;">: Rp
-                        {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }}</p>
-                    <p style="margin: 2px 0;">: </p>
-                    <p style="margin: 2px 0; text-transform: uppercase;">: <span
+                <td style="width: 30%; padding: 2px; font-size: 12px">
+                    <p style="margin: 0; text-transform: uppercase;">:
+                        {{ \Carbon\Carbon::parse($pengajuan->complete->tanggal_masuk_finance)->format('d F Y') }} </p>
+                </td>
+                <td rowspan="2" style="width: 20%; padding: 2px; text-align: center;">
+                    @if ($pengajuan->complete->prioritas)
+                        <h4
+                            style="margin: 0; border: 4px solid; padding: 5px; text-align: center; text-transform: uppercase; font-weight: bold; @if ($pengajuan->complete->prioritas === 'urgent') border-color: #cc0000; color: #cc0000; @elseif($pengajuan->complete->prioritas === 'segera') border-color: #0047ab; color: #0047ab; @elseif($pengajuan->complete->prioritas === 'pengambilan_ba') border-color: #2b8a3e; color: #2b8a3e; @else border-color: #f59f00; color:  #f59f00; @endif">
+                            {{ $pengajuan->complete->prioritas }}
+                        </h4>
+                    @endif
+                </td>
+            </tr>
+            <tr style="vertical-align: top; font-size: 12px">
+                <th style="width: 10%; padding: 2px; text-align: left;">
+                    <p style="margin: 0;">Jumlah</p>
+                </th>
+                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
+                    <p style="margin: 0; text-transform: uppercase;">: Rp
+                        {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }} </p>
+                </td>
+            </tr>
+            <tr style="vertical-align: top; font-size: 12px">
+                <th style="width: 10%; padding: 2px; text-align: left;">
+                    <p style="margin: 0;">Terbilang</p>
+                </th>
+                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
+                    <p style="margin: 0; text-transform: uppercase;">:
+                        ({{ ucwords(terbilang($pengajuan->complete->nominal_estimasi)) }}
+                        Rupiah) </p>
+                </td>
+            </tr>
+            <tr style="vertical-align: top; font-size: 12px">
+                <th style="width: 10%; padding: 2px; text-align: left;">
+                    <p style="margin: 0;">Untuk Keperluan</p>
+                </th>
+                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
+                    @if ($pengajuan->service_unit->count() === 1)
+                        @foreach ($pengajuan->service_unit as $serviceUnit)
+                            <p style="margin: 0; text-transform: uppercase">
+                                : {{ $serviceUnit->service }}
+                                {{ $serviceUnit->unit->nopol }}
+                                {{ ' KM ' . $serviceUnit->odometer . ' ' . $serviceUnit->unit->type . ' ' . ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) }}
+                                {{ $pengajuan->provinsi . ' - ' . $pengajuan->kota }}
+                            </p>
+                        @endforeach
+                    @else
+                        <p style="margin: 0; text-transform: uppercase;">:
+                            {{ $pengajuan->service_unit->count() .
+                                ' Unit, ' .
+                                ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) .
+                                ', ' }}
+                            {{ $pengajuan->provinsi . ' - ' . $pengajuan->kota . ', ' . $pengajuan->complete->kode }}
+                        </p>
+                    @endif
+                </td>
+            </tr>
+            <tr style="vertical-align: top; font-size: 12px">
+                <th style="width: 10%; padding: 2px; text-align: left;">
+                    <p style="margin: 0;">Dibayarkan Oleh</p>
+                </th>
+                <td style="width: 30%; padding: 2px;" colspan="2">
+                    <p style="margin: 0;">: PT. Samana Jaya Propertindo </p>
+                </td>
+            </tr>
+            <tr style="vertical-align: top; font-size: 12px">
+                <th style="width: 10%; padding: 2px; text-align: left;">
+                    <p style="margin: 0;">Dibayarkan Kepada</p>
+                </th>
+                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
+                    <p style="margin: 0; text-transform: uppercase;">: {{ $pengajuan->payment_1 }}
+                        {{ $pengajuan->bank_1 . ' ' . $pengajuan->norek_1 }} <span
                             @if ($pengajuan->keterangan == 'REIMBURSE') style="color: red; font-weight: bold;"
                             @elseif(strtoupper($pengajuan->keterangan) == 'CASH ADVANCE')
                                 style="color: blue; font-weight: bold;"
@@ -59,88 +128,23 @@
                                 style="color: black; font-weight: bold;" @endif>{{ $pengajuan->keterangan }}</span>
                     </p>
                 </td>
-                <th style="width: 20%; text-align: left;">
-                    <p style="margin: 2px 0;">No WO</p>
-                    <p style="margin: 2px 0;">Tanggal WO</p>
-                    <p style="margin: 2px 0;">User</p>
-                    <p style="margin: 2px 0;">Kota</p>
-                    <p style="margin: 2px 0;">Telp</p>
-                </th>
-                <td style="width: 30%;">
-                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->no_pengajuan }}</p>
-                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->created_at->format('d F Y') }}</p>
-                    <p style="margin: 2px 0; text-transform: uppercase;">:
-                        {{ $pengajuan->up_lainnya ?? $pengajuan->up }} - {{ $pengajuan->provinsi }}</p>
-                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->kota }}</p>
-                    <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->no_wa }}</p>
-                </td>
             </tr>
         </table>
-        <table class="table" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-            <thead>
-                <tr>
-                    <th style="border: 1px solid black; padding: 0.5rem">No.</th>
-                    <th style="border: 1px solid black; padding: 0.5rem">No Polisi</th>
-                    <th style="border: 1px solid black; padding: 0.5rem">KM</th>
-                    <th style="border: 1px solid black; padding: 0.5rem">Type Unit</th>
-                    <th style="border: 1px solid black; padding: 0.5rem">Permintaan / Part</th>
-                    <th style="border: 1px solid black; padding: 0.5rem">Keterangan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($pengajuan->service_unit as $unit)
-                    <tr>
-                        <td
-                            style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
-                            {{ $loop->iteration }}</td>
-                        <td
-                            style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
-                            {{ $unit->unit->nopol }}</td>
-                        <td style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
-                            {{ number_format($unit->odometer, 0, ',', '.') }}</td>
-                        <td style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
-                            {{ $unit->unit->type }}
-                        </td>
-                        <td
-                            style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
-                            {{ $unit->service }}</td>
-                        <td
-                            style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
-                            {{ $pengajuan->complete->kode ?? '-' }}</td>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" style="border: 1px solid black; padding: 0.5rem; text-align: center;">
-                            Tidak ada data unit yang diajukan
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-        <p>Perhatian :</p>
-        <ol>
-            <li>Bila ada pekerjaan atau pergantian spare part di luar SPK, mohon konfirmasi ke PIC</li>
-            <li>Tagihan dapat dikirimkan segera dan maksimal 14 hari kerja ke PT Samana Jaya Propertindo</li>
-        </ol>
-        <div>
-            <p style="margin: 2px 0;">Jakarta, {{ now()->format('d F Y') }}</p>
-            <p style="margin: 2px 0;">Hormat Kami</p>
-            <p style="margin: 2px 0; font-weight: bold;">PT. Samana Jaya Propertindo</p>
-        </div>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom:">
             <tr>
-                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Dibuat</th>
-                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Diketahui</th>
-                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Diperiksa</th>
-                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Disetujui</th>
-                <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Dibukukan</th>
+                <th style="font-size: 12px; border: 1px solid black; padding: 0.2rem; width: 24%;">Dibuat Oleh</th>
+                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Diketahui Oleh</th>
+                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Diperiksa Oleh</th>
+                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Disetujui Oleh</th>
+                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Dibukukan Oleh</th>
             </tr>
             <tr>
-                <td style="height: 78px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                <td
+                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($pengajuan->user->admin->ttd))
                         <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd) }}"
-                            alt="{{ $pengajuan->user->admin->ttd }}" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
+                            alt="{{ $pengajuan->user->admin->ttd }}"
+                            style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
@@ -148,8 +152,8 @@
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($ttdDiketahui))
-                        <img src="{{ public_path('storage/' . $ttdDiketahui) }}"
-                            alt="Tanda Tangan Diketahui" style="width: auto; height: 100px;">
+                        <img src="{{ public_path('storage/' . $ttdDiketahui) }}" alt="Tanda Tangan Diketahui"
+                            style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
@@ -157,8 +161,8 @@
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($ttdDiperiksa))
-                        <img src="{{ public_path('storage/' . $ttdDiperiksa) }}"
-                            alt="Tanda Tangan Diperiksa" style="width: auto; height: 100px;">
+                        <img src="{{ public_path('storage/' . $ttdDiperiksa) }}" alt="Tanda Tangan Diperiksa"
+                            style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
@@ -166,8 +170,8 @@
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($ttdDisetujui))
-                        <img src="{{ public_path('storage/' . $ttdDisetujui) }}"
-                            alt="Tanda Tangan Disetujui" style="width: auto; height: 100px;">
+                        <img src="{{ public_path('storage/' . $ttdDisetujui) }}" alt="Tanda Tangan Disetujui"
+                            style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
@@ -175,22 +179,246 @@
                 <td
                     style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
                     @if (!empty($ttdDibukukan))
-                        <img src="{{ public_path('storage/' . $ttdDibukukan) }}"
-                            alt="Tanda Tangan Dibukukan" style="width: auto; height: 100px;">
+                        <img src="{{ public_path('storage/' . $ttdDibukukan) }}" alt="Tanda Tangan Dibukukan"
+                            style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
                     @else
                         &nbsp;
                     @endif
                 </td>
             </tr>
             <tr>
-                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">
-                    {{ $pengajuan->user->name }}</td>
-                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDiketahui ?? '' }}</td>
-                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDiperiksa ?? '' }}</td>
-                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDisetujui ?? '' }}</td>
-                <td style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">{{ $namaDibukukan ?? '' }}</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl : <span
+                        style="text-transform: capitalize;">
+                        {{ $pengajuan->created_at->format('d F Y') }}</span>
+                </td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
+            </tr>
+            <tr>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span
+                        style="text-transform: capitalize;">
+                        {{ $pengajuan->user->name }}</span></td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black; ">Nama : <span
+                        style="text-transform: capitalize;">{{ $namaDiketahui ?? '-' }}</span></td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span
+                        style="text-transform: capitalize;">{{ $namaDiperiksa ?? '-' }}</span></td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span
+                        style="text-transform: capitalize;">{{ $namaDisetujui ?? '-' }}</span></td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span
+                        style="text-transform: capitalize;">{{ $namaDibukukan ?? '-' }}</span></td>
+            </tr>
+            <tr>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan : Direktur</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan : Finance</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan : Direktur Utama</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
             </tr>
         </table>
+    </div>
+    <div style="page-break-before: always;">
+        <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%"
+            style="margin-bottom: 20px;">
+        {{-- spk --}}
+        <div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <tr style="height : 20mm;">
+                    <td style="width: 20%; text-align: center; border: 2px solid black;">
+                        <p style="margin: 2px 0;">Invoice Bengkel</p>
+                        @if ($pengajuan->complete->bengkel_invoice)
+                            <h2
+                                style="margin: 2px 0; font-weight: semibold; font-size: 16px; padding: 0 2px; text-transform: uppercase;">
+                                {{ $pengajuan->complete->bengkel_invoice }}</h2>
+                        @else
+                            <h2 style="margin: 2px 0; font-weight: bold;">-</h2>
+                        @endif
+                    </td>
+                    <th>
+                        <h1>Surat Perintah Kerja</h1>
+                    </th>
+                    <td style="width: 20%; text-align: center; border: 2px solid black;">
+                        <p style="margin: 2px 0;">KODE</p>
+                        <h1 style="margin: 2px 0; text-transform: uppercase; line-height: 1.2;">
+                            {{ $pengajuan->complete->kode }}</h1>
+                    </td>
+                </tr>
+            </table>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <tr style="vertical-align: top;">
+                    <th style="width: 20%; text-align: left;">
+                        <p style="margin: 2px 0;">Bengkel</p>
+                        <p style="margin: 2px 0;">Telp</p>
+                        <p style="margin: 2px 0;">Estimasi</p>
+                        <p style="margin: 2px 0;">No Rek</p>
+                        <p style="margin: 2px 0;">Jenis Pengajuan</p>
+                    </th>
+                    <td style="width: 30%;">
+                        <p style="margin: 2px 0; text-transform: uppercase;">:
+                            {{ $pengajuan->complete->bengkel_estimasi }}
+                        </p>
+                        <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->complete->no_telp_bengkel }}
+                        </p>
+                        <p style="margin: 2px 0; text-transform: uppercase;">: Rp
+                            {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }}</p>
+                        <p style="margin: 2px 0;">: </p>
+                        <p style="margin: 2px 0; text-transform: uppercase;">: <span
+                                @if ($pengajuan->keterangan == 'REIMBURSE') style="color: red; font-weight: bold;"
+                                @elseif(strtoupper($pengajuan->keterangan) == 'CASH ADVANCE')
+                                    style="color: blue; font-weight: bold;"
+                                @elseif($pengajuan->keterangan == 'INVOICE')
+                                    style="color: green; font-weight: bold;"
+                                @elseif($pengajuan->keterangan == 'FREE')
+                                    style="color: black; font-weight: bold;" @endif>{{ $pengajuan->keterangan }}</span>
+                        </p>
+                    </td>
+                    <th style="width: 20%; text-align: left;">
+                        <p style="margin: 2px 0;">No WO</p>
+                        <p style="margin: 2px 0;">Tanggal WO</p>
+                        <p style="margin: 2px 0;">User</p>
+                        <p style="margin: 2px 0;">Kota</p>
+                        <p style="margin: 2px 0;">Telp</p>
+                    </th>
+                    <td style="width: 30%;">
+                        <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->no_pengajuan }}</p>
+                        <p style="margin: 2px 0; text-transform: uppercase;">:
+                            {{ $pengajuan->created_at->format('d F Y') }}</p>
+                        <p style="margin: 2px 0; text-transform: uppercase;">:
+                            {{ $pengajuan->up_lainnya ?? $pengajuan->up }} - {{ $pengajuan->provinsi }}</p>
+                        <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->kota }}</p>
+                        <p style="margin: 2px 0; text-transform: uppercase;">: {{ $pengajuan->no_wa }}</p>
+                    </td>
+                </tr>
+            </table>
+            <table class="table" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid black; padding: 0.5rem">No.</th>
+                        <th style="border: 1px solid black; padding: 0.5rem">No Polisi</th>
+                        <th style="border: 1px solid black; padding: 0.5rem">KM</th>
+                        <th style="border: 1px solid black; padding: 0.5rem">Type Unit</th>
+                        <th style="border: 1px solid black; padding: 0.5rem">Permintaan / Part</th>
+                        <th style="border: 1px solid black; padding: 0.5rem">Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($pengajuan->service_unit as $unit)
+                        <tr>
+                            <td
+                                style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
+                                {{ $loop->iteration }}</td>
+                            <td
+                                style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
+                                {{ $unit->unit->nopol }}</td>
+                            <td
+                                style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
+                                {{ number_format($unit->odometer, 0, ',', '.') }}</td>
+                            <td
+                                style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
+                                {{ $unit->unit->type }}
+                            </td>
+                            <td
+                                style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform : uppercase">
+                                {{ $unit->service }}</td>
+                            <td
+                                style="border: 1px solid black; padding: 0.5rem; text-align: center; text-transform: uppercase;">
+                                {{ $pengajuan->complete->kode ?? '-' }}</td>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" style="border: 1px solid black; padding: 0.5rem; text-align: center;">
+                                Tidak ada data unit yang diajukan
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+            <p>Perhatian :</p>
+            <ol>
+                <li>Bila ada pekerjaan atau pergantian spare part di luar SPK, mohon konfirmasi ke PIC</li>
+                <li>Tagihan dapat dikirimkan segera dan maksimal 14 hari kerja ke PT Samana Jaya Propertindo</li>
+            </ol>
+            <div>
+                <p style="margin: 2px 0;">Jakarta, {{ now()->format('d F Y') }}</p>
+                <p style="margin: 2px 0;">Hormat Kami</p>
+                <p style="margin: 2px 0; font-weight: bold;">PT. Samana Jaya Propertindo</p>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <tr>
+                    <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Dibuat</th>
+                    <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Diketahui</th>
+                    <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Diperiksa</th>
+                    <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Disetujui</th>
+                    <th style="border: 1px solid black; padding : 0.5rem; width: 20%;">Dibukukan</th>
+                </tr>
+                <tr>
+                    <td style="height: 78px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                        @if (!empty($pengajuan->user->admin->ttd))
+                            <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd) }}"
+                                alt="{{ $pengajuan->user->admin->ttd }}"
+                                style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
+                        @else
+                            &nbsp;
+                        @endif
+                    </td>
+                    <td
+                        style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                        @if (!empty($ttdDiketahui))
+                            <img src="{{ public_path('storage/' . $ttdDiketahui) }}" alt="Tanda Tangan Diketahui"
+                                style="width: auto; height: 100px;">
+                        @else
+                            &nbsp;
+                        @endif
+                    </td>
+                    <td
+                        style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                        @if (!empty($ttdDiperiksa))
+                            <img src="{{ public_path('storage/' . $ttdDiperiksa) }}" alt="Tanda Tangan Diperiksa"
+                                style="width: auto; height: 100px;">
+                        @else
+                            &nbsp;
+                        @endif
+                    </td>
+                    <td
+                        style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                        @if (!empty($ttdDisetujui))
+                            <img src="{{ public_path('storage/' . $ttdDisetujui) }}" alt="Tanda Tangan Disetujui"
+                                style="width: auto; height: 100px;">
+                        @else
+                            &nbsp;
+                        @endif
+                    </td>
+                    <td
+                        style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
+                        @if (!empty($ttdDibukukan))
+                            <img src="{{ public_path('storage/' . $ttdDibukukan) }}" alt="Tanda Tangan Dibukukan"
+                                style="width: auto; height: 100px;">
+                        @else
+                            &nbsp;
+                        @endif
+                    </td>
+                </tr>
+                <tr>
+                    <td
+                        style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">
+                        {{ $pengajuan->user->name }}</td>
+                    <td
+                        style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">
+                        {{ $namaDiketahui ?? '' }}</td>
+                    <td
+                        style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">
+                        {{ $namaDiperiksa ?? '' }}</td>
+                    <td
+                        style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">
+                        {{ $namaDisetujui ?? '' }}</td>
+                    <td
+                        style="height: 38px; border: 1px solid black; text-align: center; vertical-align: middle; text-transform: capitalize;">
+                        {{ $namaDibukukan ?? '' }}</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     {{-- lampiran kwitansi --}}
@@ -498,208 +726,6 @@
             </table>
         </div>
     @endforeach
-
-    {{-- sjp --}}
-    <div style="page-break-before: always;">
-        @if ($pengajuan->complete->prioritas)
-        {{-- <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-                <th style="width: 70%;">&nbsp;</th>
-
-                <th style="width: 30%; text-align: center; padding: 10px; float: right;">
-                    <h3
-                        style="margin: 0; border: 4px solid; padding: 10px; text-align: center; text-transform: uppercase; font-weight: bold; @if ($pengajuan->complete->prioritas === 'urgent') border-color: #cc0000; color: #cc0000; @elseif($pengajuan->complete->prioritas === 'segera') border-color: #0047ab; color: #0047ab; @elseif($pengajuan->complete->prioritas === 'pengambilan_ba') border-color: #2b8a3e; color: #2b8a3e; @else border-color: #f59f00; color:  #f59f00; @endif">
-                        {{ $pengajuan->complete->prioritas }}
-                    </h3>
-                </th>
-            </tr>
-        </table> --}}
-        @endif
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-            <tr>
-                <th style="width: 20%; text-align: center; border: 1px solid black;">
-                    <img src="{{ public_path('images/logo_spj_samarent.jpg') }}" alt="logo samarent" width="150">
-                </th>
-                <th style="width: 80%; text-align: center; border: 1px solid black; position: relative;">
-                    <div style="position: relative; text-align: center;">
-                        <h2 style="text-transform: uppercase; margin: 0;">
-                            FORM<br>PERMOHONAN DANA SJP
-                        </h2>
-                        <p style="position: absolute; top: 0; right: 10px; margin: 0; font-weight: normal;">
-                            {{ $pengajuan->no_pengajuan }}
-                        </p>
-                    </div>
-                </th>
-            </tr>
-        </table>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-            <tr style="vertical-align: top;">
-                <th style="width: 10%; padding: 2px; text-align: left; font-size: 12px">
-                    <p style="margin: 0;">Tanggal</p>
-                </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px">
-                    <p style="margin: 0; text-transform: uppercase;">:
-                        {{ \Carbon\Carbon::parse($pengajuan->complete->tanggal_masuk_finance)->format('d F Y') }} </p>
-                </td>
-                <td rowspan="2" style="width: 20%; padding: 2px; text-align: center;">
-                    @if ($pengajuan->complete->prioritas)
-                    <h4
-                        style="margin: 0; border: 4px solid; padding: 5px; text-align: center; text-transform: uppercase; font-weight: bold; @if ($pengajuan->complete->prioritas === 'urgent') border-color: #cc0000; color: #cc0000; @elseif($pengajuan->complete->prioritas === 'segera') border-color: #0047ab; color: #0047ab; @elseif($pengajuan->complete->prioritas === 'pengambilan_ba') border-color: #2b8a3e; color: #2b8a3e; @else border-color: #f59f00; color:  #f59f00; @endif">
-                        {{ $pengajuan->complete->prioritas }}
-                    </h4>
-                    @endif
-                </td>
-            </tr>
-            <tr style="vertical-align: top; font-size: 12px">
-                <th style="width: 10%; padding: 2px; text-align: left;">
-                    <p style="margin: 0;">Jumlah</p>
-                </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
-                    <p style="margin: 0; text-transform: uppercase;">: Rp
-                        {{ number_format($pengajuan->complete->nominal_estimasi, 0, ',', '.') }} </p>
-                </td>
-            </tr>
-            <tr style="vertical-align: top; font-size: 12px">
-                <th style="width: 10%; padding: 2px; text-align: left;">
-                    <p style="margin: 0;">Terbilang</p>
-                </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
-                    <p style="margin: 0; text-transform: uppercase;">: ({{ ucwords(terbilang($pengajuan->complete->nominal_estimasi)) }}
-                        Rupiah) </p>
-                </td>
-            </tr>
-            <tr style="vertical-align: top; font-size: 12px">
-                <th style="width: 10%; padding: 2px; text-align: left;">
-                    <p style="margin: 0;">Untuk Keperluan</p>
-                </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
-                    @if ($pengajuan->service_unit->count() === 1)
-                        @foreach ($pengajuan->service_unit as $serviceUnit)
-                            <p style="margin: 0; text-transform: uppercase">
-                                : {{ $serviceUnit->service }}
-                                {{ $serviceUnit->unit->nopol }}
-                                {{ ' KM ' . $serviceUnit->odometer . ' ' . $serviceUnit->unit->type . ' ' . ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) }}
-                                {{ $pengajuan->provinsi . ' - ' . $pengajuan->kota }}
-                            </p>
-                        @endforeach
-                    @else
-                        <p style="margin: 0; text-transform: uppercase;">:
-                            {{ $pengajuan->service_unit->count() .
-                                ' Unit, ' .
-                                ($pengajuan->up === 'manual' ? $pengajuan->up_lainnya : $pengajuan->up) .
-                                ', ' }}
-                            {{ $pengajuan->provinsi . ' - ' . $pengajuan->kota . ', ' . $pengajuan->complete->kode }}
-                        </p>
-                    @endif
-                </td>
-            </tr>
-            <tr style="vertical-align: top; font-size: 12px">
-                <th style="width: 10%; padding: 2px; text-align: left;">
-                    <p style="margin: 0;">Dibayarkan Oleh</p>
-                </th>
-                <td style="width: 30%; padding: 2px;" colspan="2">
-                    <p style="margin: 0;">: PT. Samana Jaya Propertindo </p>
-                </td>
-            </tr>
-            <tr style="vertical-align: top; font-size: 12px">
-                <th style="width: 10%; padding: 2px; text-align: left;">
-                    <p style="margin: 0;">Dibayarkan Kepada</p>
-                </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
-                    <p style="margin: 0; text-transform: uppercase;">: {{ $pengajuan->payment_1 }}
-                        {{ $pengajuan->bank_1 . ' ' . $pengajuan->norek_1 }} <span
-                            @if ($pengajuan->keterangan == 'REIMBURSE') style="color: red; font-weight: bold;"
-                            @elseif(strtoupper($pengajuan->keterangan) == 'CASH ADVANCE')
-                                style="color: blue; font-weight: bold;"
-                            @elseif($pengajuan->keterangan == 'INVOICE')
-                                style="color: green; font-weight: bold;"
-                            @elseif($pengajuan->keterangan == 'FREE')
-                                style="color: black; font-weight: bold;" @endif>{{ $pengajuan->keterangan }}</span>
-                    </p>
-                </td>
-            </tr>
-        </table>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom:">
-            <tr>
-                <th style="font-size: 12px; border: 1px solid black; padding: 0.2rem; width: 24%;">Dibuat Oleh</th>
-                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Diketahui Oleh</th>
-                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Diperiksa Oleh</th>
-                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Disetujui Oleh</th>
-                <th style="font-size: 12px; border: 1px solid black; padding : 0.2rem; width: 24%;">Dibukukan Oleh</th>
-            </tr>
-            <tr>
-                <td
-                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($pengajuan->user->admin->ttd))
-                        <img src="{{ public_path('storage/' . $pengajuan->user->admin->ttd) }}"
-                            alt="{{ $pengajuan->user->admin->ttd }}" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
-                    @else
-                        &nbsp;
-                    @endif
-                </td>
-                <td
-                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($ttdDiketahui))
-                        <img src="{{ public_path('storage/' . $ttdDiketahui) }}"
-                            alt="Tanda Tangan Diketahui" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
-                    @else
-                        &nbsp;
-                    @endif
-                </td>
-                <td
-                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($ttdDiperiksa))
-                        <img src="{{ public_path('storage/' . $ttdDiperiksa) }}"
-                            alt="Tanda Tangan Diperiksa" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
-                    @else
-                        &nbsp;
-                    @endif
-                </td>
-                <td
-                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($ttdDisetujui))
-                        <img src="{{ public_path('storage/' . $ttdDisetujui) }}"
-                            alt="Tanda Tangan Disetujui" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
-                    @else
-                        &nbsp;
-                    @endif
-                </td>
-                <td
-                    style="height: 70px; font-size: 12px; border: 1px solid black; text-align: center; vertical-align: middle;">
-                    @if (!empty($ttdDibukukan))
-                        <img src="{{ public_path('storage/' . $ttdDibukukan) }}"
-                            alt="Tanda Tangan Dibukukan" style="width: 100%; height: auto; max-height: 70px; object-fit: contain;">
-                    @else
-                        &nbsp;
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl : <span style="text-transform: capitalize;">
-                    {{ $pengajuan->created_at->format('d F Y') }}</span>
-                </td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
-            </tr>
-            <tr>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: capitalize;">
-                    {{ $pengajuan->user->name }}</span></td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black; ">Nama : <span style="text-transform: capitalize;">{{ $namaDiketahui ?? '-' }}</span></td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: capitalize;">{{ $namaDiperiksa ?? '-' }}</span></td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: capitalize;">{{ $namaDisetujui ?? '-' }}</span></td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Nama : <span style="text-transform: capitalize;">{{ $namaDibukukan ?? '-' }}</span></td>
-            </tr>
-            <tr>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan : Direktur</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan : Finance</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan : Direktur Utama</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Jabatan :</td>
-            </tr>
-        </table>
-    </div>
 </body>
 
 </html>
