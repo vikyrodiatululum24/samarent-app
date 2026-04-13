@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\BosJoulmerResource\Pages;
+namespace App\Filament\President\Resources\BosJoulmerResource\Pages;
 
-use App\Filament\Resources\BosJoulmerResource;
+use App\Filament\President\Resources\BosJoulmerResource;
 use App\Models\BosJoulmer;
 use Filament\Actions;
 use Filament\Forms;

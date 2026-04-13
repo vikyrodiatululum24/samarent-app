@@ -137,10 +137,19 @@ class AbsensiPanelProvider extends PanelProvider
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),
+                NavigationItem::make('President Panel')
+                    ->url('/president', shouldOpenInNewTab: false)
+                    ->group('Panels')
+                    ->sort(8)
+                    ->visible(fn () => auth()->check()
+                        && Filament::getCurrentPanel()?->getId() !== 'president'
+                        && in_array(auth()->user()->email, [
+                            'centralakun@samarent.com',
+                        ])),
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
-                    ->sort(8)
+                    ->sort(9)
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),

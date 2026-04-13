@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\President\Resources;
 
-use App\Filament\Resources\BosJoulmerResource\Pages;
+use App\Filament\President\Resources\BosJoulmerResource\Pages;
 use App\Models\BosJoulmer;
+use Filament\Facades\Filament;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -44,12 +45,27 @@ class BosJoulmerResource extends Resource
                 Tables\Columns\TextColumn::make('pengajuan.project')
                     ->label('Project')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('nopol')
+                    ->label('No. Polisi')
+                    ->getStateUsing(function (BosJoulmer $record) {
+                        return $record->pengajuan?->service_unit
+                            ?->map(fn($service) => $service->unit?->nopol ?? '-')
+                            ->implode('<br>') ?? '-';
+                    })
+                    ->html()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $query->whereHas('pengajuan.service_unit.unit', function (Builder $q) use ($search) {
+                            $q->where('nopol', 'like', "%{$search}%");
+                        });
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('jenis')
                     ->label('Jenis Kendaraan')
                     ->getStateUsing(function (BosJoulmer $record) {
                         return $record->pengajuan?->service_unit
-                            ?->map(fn ($service) => $service->unit?->jenis ?? '-')
+                            ?->map(fn($service) => $service->unit?->jenis ?? '-')
                             ->implode('<br>') ?? '-';
                     })
                     ->html()
@@ -63,7 +79,7 @@ class BosJoulmerResource extends Resource
                     ->label('Service')
                     ->getStateUsing(function (BosJoulmer $record) {
                         return $record->pengajuan?->service_unit
-                            ?->map(fn ($service) => $service->service ?? '-')
+                            ?->map(fn($service) => $service->service ?? '-')
                             ->implode('<br>') ?? '-';
                     })
                     ->html()
@@ -73,20 +89,11 @@ class BosJoulmerResource extends Resource
                         });
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('nopol')
-                    ->label('No. Polisi')
-                    ->getStateUsing(function (BosJoulmer $record) {
-                        return $record->pengajuan?->service_unit
-                            ?->map(fn ($service) => $service->unit?->nopol ?? '-')
-                            ->implode('<br>') ?? '-';
-                    })
-                    ->html()
-                    ->searchable(query: function (Builder $query, string $search) {
-                        $query->whereHas('pengajuan.service_unit.unit', function (Builder $q) use ($search) {
-                            $q->where('nopol', 'like', "%{$search}%");
-                        });
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('pengajuan.complete.nominal_estimasi')
+                    ->label('Nominal Estimasi')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->money('idr', true)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('pengajuan.keterangan_proses')
                     ->label('Status Pengajuan')
                     ->badge()
@@ -102,7 +109,7 @@ class BosJoulmerResource extends Resource
                             default => 'Tidak Diketahui',
                         };
                     })
-                    ->color(fn (string $state) => match ($state) {
+                    ->color(fn(string $state) => match ($state) {
                         'Customer Service' => 'black',
                         'Verifikasi' => 'danger',
                         'Pengajuan Atasan' => 'info',
@@ -115,8 +122,8 @@ class BosJoulmerResource extends Resource
                 Tables\Columns\TextColumn::make('is_approved')
                     ->label('Status Review')
                     ->badge()
-                    ->formatStateUsing(fn (string $state) => ucfirst($state))
-                    ->color(fn (string $state) => match ($state) {
+                    ->formatStateUsing(fn(string $state) => ucfirst($state))
+                    ->color(fn(string $state) => match ($state) {
                         'pending' => 'warning',
                         'approved' => 'success',
                         'rejected' => 'danger',
@@ -127,10 +134,6 @@ class BosJoulmerResource extends Resource
                     ->label('Catatan')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->limit(60),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Diperbarui')
-                    ->dateTime('d M Y H:i')
-                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('is_approved')
@@ -173,7 +176,7 @@ class BosJoulmerResource extends Resource
                                     default => 'Tidak Diketahui',
                                 };
                             })
-                            ->color(fn (string $state) => match ($state) {
+                            ->color(fn(string $state) => match ($state) {
                                 'Customer Service' => 'black',
                                 'Verifikasi' => 'danger',
                                 'Pengajuan Atasan' => 'info',
@@ -190,8 +193,8 @@ class BosJoulmerResource extends Resource
                         Components\TextEntry::make('is_approved')
                             ->label('Status Review')
                             ->badge()
-                            ->formatStateUsing(fn (string $state) => ucfirst($state))
-                            ->color(fn (string $state) => match ($state) {
+                            ->formatStateUsing(fn(string $state) => ucfirst($state))
+                            ->color(fn(string $state) => match ($state) {
                                 'pending' => 'warning',
                                 'approved' => 'success',
                                 'rejected' => 'danger',
@@ -220,25 +223,30 @@ class BosJoulmerResource extends Resource
         return static::canViewAny();
     }
 
-    public static function canViewAny(): bool
+    public static function getNavigationGroup(): ?string
     {
-        return static::hasBosAccess();
+        return Filament::getCurrentPanel()?->getId() === 'president' ? null : static::$navigationGroup;
     }
 
-    public static function canView($record): bool
-    {
-        return static::hasBosAccess();
-    }
+    // public static function canViewAny(): bool
+    // {
+    //     return static::hasBosAccess();
+    // }
+
+    // public static function canView($record): bool
+    // {
+    //     return static::hasBosAccess();
+    // }
 
     public static function canCreate(): bool
     {
         return false;
     }
 
-    public static function canEdit($record): bool
-    {
-        return static::hasBosAccess();
-    }
+    // public static function canEdit($record): bool
+    // {
+    //     return static::hasBosAccess();
+    // }
 
     public static function canDelete($record): bool
     {
@@ -260,7 +268,7 @@ class BosJoulmerResource extends Resource
 
     protected static function canReview(BosJoulmer $record): bool
     {
-        return static::hasBosAccess() && $record->is_approved === 'pending';
+        return $record->is_approved === 'pending';
     }
 
     public static function canReviewRecord(BosJoulmer $record): bool
@@ -268,11 +276,11 @@ class BosJoulmerResource extends Resource
         return static::canReview($record);
     }
 
-    protected static function hasBosAccess(): bool
-    {
-        return in_array(Auth::user()?->email, [
-            'president@samarent.com',
-            'centralakun@samarent.com',
-        ], true);
-    }
+    // protected static function hasBosAccess(): bool
+    // {
+    //     return in_array(Auth::user()?->email, [
+    //         'president@samarent.com',
+    //         'centralakun@samarent.com',
+    //     ], true);
+    // }
 }

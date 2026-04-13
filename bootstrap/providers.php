@@ -8,5 +8,6 @@ return [
     App\Providers\Filament\FinancePanelProvider::class,
     App\Providers\Filament\ManagerPanelProvider::class,
     App\Providers\Filament\PenjualanPanelProvider::class,
+    App\Providers\Filament\PresidentPanelProvider::class,
     App\Providers\Filament\UserPanelProvider::class,
 ];

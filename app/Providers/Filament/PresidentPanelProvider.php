@@ -2,32 +2,45 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Pages;
-use Filament\Panel;
-use Filament\Widgets;
-use Filament\PanelProvider;
+use App\Filament\Pages\DetailHistori;
+use App\Filament\Pages\HistoriPengajuan;
+use App\Filament\Pages\Mount;
+use App\Filament\Resources\BbmResource;
+use App\Filament\Resources\BengkelResource;
+use App\Filament\Resources\DataUnitResource;
+use App\Filament\Resources\FormTugasResource;
+use App\Filament\Resources\LaporanKeuanganServiceResource;
+use App\Filament\Resources\NorekResource;
+use App\Filament\Resources\ProjectResource;
+use App\Filament\Resources\ReimbursementResource;
+use App\Filament\Resources\UnitJualResource;
+use App\Filament\Pages\SettingsPage;
+use App\Filament\Resources\PenggunaResource;
+use App\Http\Middleware\EnsurePresidentRole;
 use Filament\Facades\Filament;
-use Filament\Support\Enums\MaxWidth;
-use Filament\Navigation\NavigationItem;
-use App\Filament\Pages\Auth\EditProfile;
-use App\Http\Middleware\EnsurePenjualanRole;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Filament\Navigation\NavigationItem;
+use Filament\Pages;
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class PenjualanPanelProvider extends PanelProvider
+class PresidentPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('penjualan')
-            ->path('penjualan')
+            ->id('president')
+            ->path('president')
             ->brandName('SAMARENT')
             ->favicon(asset('images/icon.png'))
             ->brandLogo(asset('images/Samarent.png')) // ganti logo
@@ -41,21 +54,29 @@ class PenjualanPanelProvider extends PanelProvider
                 'success' => '#22C55E', // ganti warna sukses
                 'yellow' => '#FBBF24', // ganti warna peringatan
             ])
-            ->discoverResources(in: app_path('Filament/Penjualan/Resources'), for: 'App\\Filament\\Penjualan\\Resources')
+            ->discoverResources(in: app_path('Filament/President/Resources'), for: 'App\\Filament\\President\\Resources')
             ->resources([
-                \App\Filament\Resources\ReimbursementResource::class,
+                DataUnitResource::class,
+                BbmResource::class,
+                BengkelResource::class,
+                NorekResource::class,
+                ProjectResource::class,
+                ReimbursementResource::class,
+                UnitJualResource::class,
+                FormTugasResource::class,
+                PenggunaResource::class,
             ])
-            ->resources([
-                \App\Filament\Resources\BengkelResource::class,
-            ])
-            ->discoverPages(in: app_path('Filament/Penjualan/Pages'), for: 'App\\Filament\\Penjualan\\Pages')
-            ->profile(EditProfile::class, false)
+            ->discoverPages(in: app_path('Filament/President/Pages'), for: 'App\\Filament\\President\\Pages')
             ->pages([
-                \App\Filament\Penjualan\Pages\Dashboard::class,
+                SettingsPage::class,
+                DetailHistori::class,
+                HistoriPengajuan::class,
+                Mount::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Penjualan/Widgets'), for: 'App\\Filament\\Penjualan\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/President/Widgets'), for: 'App\\Filament\\President\\Widgets')
             ->widgets([
-                //
+                Widgets\AccountWidget::class,
+                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -69,7 +90,7 @@ class PenjualanPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                EnsurePenjualanRole::class,
+                EnsurePresidentRole::class,
             ])
             ->navigationItems([
                 NavigationItem::make('Admin Panel')
@@ -132,6 +153,15 @@ class PenjualanPanelProvider extends PanelProvider
                                 && in_array(auth()->user()->email, [
                                 'centralakun@samarent.com',
                             ])),
+                    NavigationItem::make('Admin Jual Panel')
+                            ->url('/penjualan', shouldOpenInNewTab: false)
+                            ->group('Panels')
+                            ->sort(6)
+                            ->visible(fn () => auth()->check()
+                                && Filament::getCurrentPanel()?->getId() !== 'penjualan'
+                                && in_array(auth()->user()->email, [
+                                'centralakun@samarent.com',
+                            ])),
 
                 NavigationItem::make('Absensi Driver')
                     ->url('https://driver.servicesamarent.com', shouldOpenInNewTab: true)
@@ -140,19 +170,10 @@ class PenjualanPanelProvider extends PanelProvider
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),
-                NavigationItem::make('President Panel')
-                    ->url('/president', shouldOpenInNewTab: false)
-                    ->group('Panels')
-                    ->sort(8)
-                    ->visible(fn () => auth()->check()
-                        && Filament::getCurrentPanel()?->getId() !== 'president'
-                        && in_array(auth()->user()->email, [
-                            'centralakun@samarent.com',
-                        ])),
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
-                    ->sort(9)
+                    ->sort(8)
                     ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),

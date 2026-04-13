@@ -496,7 +496,7 @@ class PengajuanResource extends Resource
                 SelectFilter::make('bos_status')
                     ->label('Status di Atasan')
                     ->options([
-                        'pending' => 'Menunggu Approval',
+                        'pending' => 'Menunggu',
                         'approved' => 'Disetujui',
                         'rejected' => 'Ditolak',
                     ])
@@ -565,22 +565,19 @@ class PengajuanResource extends Resource
                             $skippedCount = 0;
 
                             foreach ($records as $record) {
-                                if ($record->keterangan_proses !== 'checker') {
-                                    $skippedCount++;
-                                    continue;
-                                }
-
-                                BosJoulmer::updateOrCreate(
+                                if ($record->keterangan_proses === 'checker' || $record->keterangan_proses === 'pengajuan atasan' && $record->bos_joulmer?->is_approved === 'rejected') {
+                                    BosJoulmer::updateOrCreate(
                                     ['pengajuan_id' => $record->id],
                                     [
                                         'user_id' => Auth::id(),
                                         'is_approved' => 'pending',
-                                        'note' => null,
                                     ]
                                 );
-
                                 $record->update(['keterangan_proses' => 'pengajuan atasan']);
                                 $submittedCount++;
+                                } else {
+                                    $skippedCount++;
+                                }
                             }
 
                             if ($submittedCount > 0) {
@@ -592,7 +589,7 @@ class PengajuanResource extends Resource
 
                             if ($skippedCount > 0) {
                                 Notification::make()
-                                    ->title("{$skippedCount} pengajuan dilewati karena status bukan Verifikasi.")
+                                    ->title("{$skippedCount} pengajuan dilewati karena status bukan Verifikasi atau sudah diajukan ke Atasan.")
                                     ->warning()
                                     ->send();
                             }

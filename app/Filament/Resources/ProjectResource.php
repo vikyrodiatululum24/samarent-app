@@ -19,13 +19,17 @@ class ProjectResource extends Resource
 
     protected static ?string $navigationGroup = 'Master Data';
 
+    protected static ?string $navigationLabel = 'Perusahaan';
+
+    protected static ?string $pluralLabel = 'Perusahaan';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->label('Nama Project')
+                    ->label('Nama Perusahaan')
                     ->maxLength(255),
             ]);
     }
@@ -36,7 +40,8 @@ class ProjectResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->label('Nama Project'),
+                    ->sortable()
+                    ->label('Nama Perusahaan'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

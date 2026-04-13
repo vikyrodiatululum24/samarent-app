@@ -57,6 +57,7 @@ class PenggunaResource extends Resource
                         'driver' => 'Driver',
                         'admin_driver' => 'Admin Driver',
                         'admin_jual' => 'Admin Penjualan',
+                        'president' => 'President',
                     ])
                     ->required(),
             ]);
@@ -87,7 +88,7 @@ class PenggunaResource extends Resource
                                 'driver' => 'Driver',
                                 'admin_driver' => 'Admin Driver',
                                 'admin_jual' => 'Admin Penjualan',
-                                
+
                             ]),
                     ])
                     ->query(fn($query, $data) => $query->when(

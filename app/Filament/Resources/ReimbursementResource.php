@@ -35,6 +35,7 @@ class ReimbursementResource extends Resource
             'finance',
             'absensi',
             'penjualan',
+            'president',
         ]);
     }
 
