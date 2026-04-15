@@ -99,7 +99,7 @@ class ViewBosJoulmerApproved extends ViewRecord
                             ->content(fn () => $this->record->pengajuan?->complete?->bengkel_estimasi ?? '-'),
                         Placeholder::make('complete_nominal_estimasi')
                             ->label('Nominal Estimasi')
-                            ->content(fn () => $this->record->pengajuan?->complete?->nominal_estimasi ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->complete?->nominal_estimasi !== null ? 'Rp ' . number_format($this->record->pengajuan->complete->nominal_estimasi, 0, ',', '.') : '-'),
                         Placeholder::make('complete_bengkel_invoice')
                             ->label('Bengkel Invoice')
                             ->content(fn () => $this->record->pengajuan?->complete?->bengkel_invoice ?? '-'),

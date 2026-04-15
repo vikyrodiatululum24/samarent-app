@@ -159,6 +159,14 @@ class PengajuanResource extends Resource
                             });
                         }
                     }),
+                SelectFilter::make('keterangan')
+                    ->label('Keterangan')
+                    ->options([
+                        'reimburse' => 'REIMBURSE',
+                        'cash advance' => 'CASH ADVANCE',
+                        'invoice' => 'INVOICE',
+                        'free' => 'FREE',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\Action::make('Proses')
@@ -257,7 +265,8 @@ class PengajuanResource extends Resource
                                 Components\TextEntry::make('complete.no_telp_bengkel')
                                     ->label('No. Telp Bengkel'),
                                 Components\TextEntry::make('complete.nominal_estimasi')
-                                    ->label('Nominal Estimasi'),
+                                    ->label('Nominal Estimasi')
+                                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
                             ])
                             ->label('Informasi Bengkel'),
                         Components\Grid::make(3)
@@ -269,7 +278,8 @@ class PengajuanResource extends Resource
                                     ->label('Tanggal Transfer Finance')
                                     ->dateTime(),
                                 Components\TextEntry::make('complete.nominal_tf_finance')
-                                    ->label('Nominal Transfer Finance'),
+                                    ->label('Nominal Transfer Finance')
+                                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
                             ]),
                         Components\TextEntry::make('complete.tanggal_input_bank')
                             ->label('Tanggal Input Bank')
@@ -313,11 +323,14 @@ class PengajuanResource extends Resource
                                     ->label('Nama Rekening Bengkel')
                                     ->getStateUsing(fn($record) => strtoupper($record->complete?->nama_rek_bengkel)),
                                 Components\TextEntry::make('complete.rek_bengkel')
-                                    ->label('No. Rekening Bengkel'),
+                                    ->label('No. Rekening Bengkel')
+                                    ->formatStateUsing(fn($state) => $state !== null ? $state : '-'),
                                 Components\TextEntry::make('complete.nominal_tf_bengkel')
-                                    ->label('Nominal Transfer Bengkel'),
+                                    ->label('Nominal Transfer Bengkel')
+                                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
                                 Components\TextEntry::make('complete.selisih_tf')
-                                    ->label('Selisih Transfer'),
+                                    ->label('Selisih Transfer')
+                                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
                                 Components\TextEntry::make('complete.tanggal_tf_bengkel')
                                     ->label('Tanggal Transfer Bengkel')
                                     ->date(),
