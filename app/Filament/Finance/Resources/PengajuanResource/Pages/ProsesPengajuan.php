@@ -34,6 +34,7 @@ class ProsesPengajuan extends EditRecord
             'bank_2' => $this->record->complete?->bank_2,
             'norek_2' => $this->record->complete?->norek_2,
             'tanggal_tf_finance' => $this->record->complete?->tanggal_tf_finance,
+            'tanggal_input_bank' => $this->record->complete?->tanggal_input_bank,
             'nominal_tf_finance' => $this->record->complete?->nominal_tf_finance,
             'status_finance' => $this->record->complete?->status_finance ?? 'unpaid',
         ];
@@ -127,8 +128,11 @@ class ProsesPengajuan extends EditRecord
                                     ->maxLength(255)
                                     ->readOnly(),
                             ]),
-                        Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                             ->schema([
+                                Forms\Components\DatePicker::make('complete.tanggal_input_bank')
+                                    ->label('Tanggal Input Bank')
+                                    ->nullable(),
                                 Forms\Components\DatePicker::make('complete.tanggal_tf_finance')
                                     ->label('Tanggal Transfer')
                                     ->required(fn($get) => $get('complete.status_finance') === 'paid'),

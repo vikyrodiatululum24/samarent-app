@@ -20,6 +20,7 @@ class Complete extends Model
         'payment_2',
         'bank_2',
         'norek_2',
+        'tanggal_input_bank',
         'nominal_tf_bengkel',
         'selisih_tf',
         'tanggal_tf_bengkel',

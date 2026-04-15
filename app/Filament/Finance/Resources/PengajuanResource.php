@@ -100,7 +100,6 @@ class PengajuanResource extends Resource
                     })
                     ->getStateUsing(function ($record) {
                         $prosesPengajuan = $record->keterangan_proses ?? '';
-                        $statusBos = $record->bos_joulmer?->is_approved;
 
                         $prosesText = match ($prosesPengajuan) {
                             'cs' => 'Customer Service',
@@ -194,6 +193,7 @@ class PengajuanResource extends Resource
                                             return match ($record->keterangan_proses) {
                                                 'cs' => 'Customer Service',
                                                 'checker' => 'Verifikasi',
+                                                'pengajuan atasan' => 'Pengajuan Atasan',
                                                 'pengajuan finance' => 'Pengajuan Finance',
                                                 'finance' => 'Input Finance',
                                                 'otorisasi' => 'Otorisasi',
@@ -204,8 +204,9 @@ class PengajuanResource extends Resource
                                         ->color(fn(string $state) => match ($state) {
                                             'Customer Service' => 'black',
                                             'Verifikasi' => 'danger',
+                                            'Pengajuan Atasan' => 'info',
                                             'Pengajuan Finance' => 'primary',
-                                            'Finance' => 'warning',
+                                            'Input Finance' => 'brown',
                                             'Otorisasi' => 'yellow',
                                             'Selesai' => 'success',
                                             default => 'gray',
@@ -270,37 +271,62 @@ class PengajuanResource extends Resource
                                 Components\TextEntry::make('complete.nominal_tf_finance')
                                     ->label('Nominal Transfer Finance'),
                             ]),
-                        Components\Grid::make(1)
-                            ->schema([
-                                Components\Group::make([
-                                    Components\TextEntry::make('complete.payment_2')
-                                        ->label('Nama Rekening'),
-                                ]),
-                            ]),
+                        Components\TextEntry::make('complete.tanggal_input_bank')
+                            ->label('Tanggal Input Bank')
+                            ->date(),
                         Components\Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bank_2')
                                     ->label('Bank'),
+                                Components\TextEntry::make('complete.payment_2')
+                                    ->label('Nama Rekening'),
                                 Components\TextEntry::make('complete.norek_2')
                                     ->label('No. Rekening'),
-                                Components\TextEntry::make('complete.status_finance')
-                                    ->label('Status Finance'),
                             ]),
-                        Components\Grid::make(2)
+                        Components\Grid::make(1)
                             ->schema([
+                                Components\TextEntry::make('complete.status_finance')
+                                    ->label('Status Finance')
+                                    ->getStateUsing(function ($record) {
+                                        return match ($record->complete?->status_finance) {
+                                            'paid' => 'PAID',
+                                            'unpaid' => 'UNPAID',
+                                            default => 'Tidak Diketahui',
+                                        };
+                                    })
+                                    ->color(fn(string $state) => match ($state) {
+                                        'PAID' => 'success',
+                                        'UNPAID' => 'danger',
+                                        default => 'gray',
+                                    }),
+                            ]),
+                    ])
+                    ->visible(fn($record) => !empty($record->complete)), // Only show when complete data is filled
+                Components\Section::make('Informasi Bengkel')
+                    ->schema([
+                        Components\Grid::make(3)
+                            ->schema([
+                                Components\TextEntry::make('complete.bank_bengkel')
+                                    ->label('Bank Bengkel')
+                                    ->getStateUsing(fn($record) => strtoupper($record->complete?->bank_bengkel)),
+                                Components\TextEntry::make('complete.nama_rek_bengkel')
+                                    ->label('Nama Rekening Bengkel')
+                                    ->getStateUsing(fn($record) => strtoupper($record->complete?->nama_rek_bengkel)),
+                                Components\TextEntry::make('complete.rek_bengkel')
+                                    ->label('No. Rekening Bengkel'),
                                 Components\TextEntry::make('complete.nominal_tf_bengkel')
                                     ->label('Nominal Transfer Bengkel'),
                                 Components\TextEntry::make('complete.selisih_tf')
                                     ->label('Selisih Transfer'),
                                 Components\TextEntry::make('complete.tanggal_tf_bengkel')
                                     ->label('Tanggal Transfer Bengkel')
-                                    ->dateTime(),
+                                    ->date(),
                                 Components\TextEntry::make('complete.tanggal_pengerjaan')
                                     ->label('Tanggal Pengerjaan')
-                                    ->dateTime(),
+                                    ->date(),
                             ]),
                     ])
-                    ->visible(fn($record) => !empty($record->complete)), // Only show when complete data is filled
+                    ->visible(fn($record) => !empty($record->complete)),
                 Components\Section::make('Dokumentasi Complete')
                     ->schema([
                         ViewEntry::make('complete.foto_nota')

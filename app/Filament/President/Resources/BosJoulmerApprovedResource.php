@@ -2,7 +2,7 @@
 
 namespace App\Filament\President\Resources;
 
-use App\Filament\President\Resources\BosJoulmerResource\Pages;
+use App\Filament\President\Resources\BosJoulmerApprovedResource\Pages;
 use App\Models\BosJoulmer;
 use Filament\Facades\Filament;
 use Filament\Infolists\Components;
@@ -14,21 +14,21 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class BosJoulmerResource extends Resource
+class BosJoulmerApprovedResource extends Resource
 {
     protected static ?string $model = BosJoulmer::class;
 
     protected static ?string $navigationGroup = 'Pengajuan';
 
-    protected static ?string $navigationLabel = 'Review Atasan';
+    protected static ?string $navigationLabel = 'Pengajuan Disetujui';
 
-    protected static ?string $label = 'Review Atasan';
+    protected static ?string $label = 'Pengajuan Disetujui';
 
-    protected static ?string $pluralLabel = 'Review Atasan';
+    protected static ?string $pluralLabel = 'Pengajuan Disetujui';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
-    protected static ?string $slug = 'review-atasan';
+    protected static ?string $slug = 'pengajuan-disetujui';
 
     public static function table(Table $table): Table
     {
@@ -115,36 +115,26 @@ class BosJoulmerResource extends Resource
                         'Selesai' => 'success',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('is_approved')
-                    ->label('Status Review')
-                    ->badge()
-                    ->formatStateUsing(fn(string $state) => ucfirst($state))
-                    ->color(fn(string $state) => match ($state) {
-                        'pending' => 'warning',
-                        'approved' => 'success',
-                        'rejected' => 'danger',
-                        default => 'gray',
-                    })
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('note')
                     ->label('Catatan')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->limit(60),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Reviewer')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Tanggal Review')
+                    ->dateTime('d M Y H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                SelectFilter::make('is_approved')
-                    ->label('Status Review')
-                    ->options([
-                        'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
-                    ]),
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([])
-            ->defaultSort('id', 'desc');
+            ->defaultSort('updated_at', 'desc');
     }
 
     // public static function infolist(Infolist $infolist): Infolist
@@ -184,18 +174,8 @@ class BosJoulmerResource extends Resource
     //                         }),
     //                 ])
     //                 ->columns(2),
-    //             Components\Section::make('Review Bos')
+    //             Components\Section::make('Review Bos (Approved)')
     //                 ->schema([
-    //                     Components\TextEntry::make('is_approved')
-    //                         ->label('Status Review')
-    //                         ->badge()
-    //                         ->formatStateUsing(fn(string $state) => ucfirst($state))
-    //                         ->color(fn(string $state) => match ($state) {
-    //                             'pending' => 'warning',
-    //                             'approved' => 'success',
-    //                             'rejected' => 'danger',
-    //                             default => 'gray',
-    //                         }),
     //                     Components\TextEntry::make('note')
     //                         ->label('Catatan')
     //                         ->placeholder('-'),
@@ -212,7 +192,7 @@ class BosJoulmerResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->whereIn('is_approved', ['pending', 'rejected'])
+            ->where('is_approved', 'approved')
             ->with(['pengajuan.service_unit.unit', 'user']);
     }
 
@@ -226,27 +206,17 @@ class BosJoulmerResource extends Resource
         return Filament::getCurrentPanel()?->getId() === 'president' ? null : static::$navigationGroup;
     }
 
-    // public static function canViewAny(): bool
-    // {
-    //     return static::hasBosAccess();
-    // }
-
-    // public static function canView($record): bool
-    // {
-    //     return static::hasBosAccess();
-    // }
-
     public static function canCreate(): bool
     {
         return false;
     }
 
-    // public static function canEdit($record): bool
-    // {
-    //     return static::hasBosAccess();
-    // }
-
     public static function canDelete($record): bool
+    {
+        return false;
+    }
+
+    public static function canEdit($record): bool
     {
         return false;
     }
@@ -254,31 +224,13 @@ class BosJoulmerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBosJoulmers::route('/'),
-            'view' => Pages\ViewBosJoulmer::route('/{record}'),
+            'index' => Pages\ListBosJoulmersApproved::route('/'),
+            'view' => Pages\ViewBosJoulmerApproved::route('/{record}'),
         ];
     }
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::$model::where('is_approved', 'pending')->count();
+        return (string) static::$model::where('is_approved', 'approved')->count();
     }
-
-    protected static function canReview(BosJoulmer $record): bool
-    {
-        return $record->is_approved === 'pending';
-    }
-
-    public static function canReviewRecord(BosJoulmer $record): bool
-    {
-        return static::canReview($record);
-    }
-
-    // protected static function hasBosAccess(): bool
-    // {
-    //     return in_array(Auth::user()?->email, [
-    //         'president@samarent.com',
-    //         'centralakun@samarent.com',
-    //     ], true);
-    // }
 }

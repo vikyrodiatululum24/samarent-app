@@ -26,19 +26,16 @@ class ViewBosJoulmer extends EditRecord
                     ->schema([
                         Placeholder::make('no_pengajuan')
                             ->label('No. Pengajuan')
-                            ->content(fn () => $this->record->pengajuan?->no_pengajuan ?? '-'),
-                        Placeholder::make('nama_pic')
-                            ->label('Nama PIC')
-                            ->content(fn () => $this->record->pengajuan?->nama ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->no_pengajuan ?? '-'),
                         Placeholder::make('no_wa')
                             ->label('Nomor WhatsApp')
-                            ->content(fn () => $this->record->pengajuan?->no_wa ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->no_wa ?? '-'),
                         Placeholder::make('project')
                             ->label('Project')
-                            ->content(fn () => $this->record->pengajuan?->project ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->project ?? '-'),
                         Placeholder::make('keterangan')
                             ->label('Keterangan')
-                            ->content(fn () => $this->record->pengajuan?->keterangan ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->keterangan ?? '-'),
                         Placeholder::make('up')
                             ->label('Unit Pelaksana')
                             ->content(function () {
@@ -56,10 +53,10 @@ class ViewBosJoulmer extends EditRecord
                             }),
                         Placeholder::make('provinsi')
                             ->label('Provinsi')
-                            ->content(fn () => $this->record->pengajuan?->provinsi ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->provinsi ?? '-'),
                         Placeholder::make('kota')
                             ->label('Kota/Kabupaten')
-                            ->content(fn () => $this->record->pengajuan?->kota ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->kota ?? '-'),
                         Placeholder::make('status_pengajuan')
                             ->label('Status Pengajuan')
                             ->content(function () {
@@ -80,13 +77,13 @@ class ViewBosJoulmer extends EditRecord
                     ->schema([
                         Placeholder::make('payment_1')
                             ->label('Nama Rekening')
-                            ->content(fn () => $this->record->pengajuan?->payment_1 ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->payment_1 ?? '-'),
                         Placeholder::make('bank_1')
                             ->label('Bank')
-                            ->content(fn () => $this->record->pengajuan?->bank_1 ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->bank_1 ?? '-'),
                         Placeholder::make('norek_1')
                             ->label('No. Rekening')
-                            ->content(fn () => $this->record->pengajuan?->norek_1 ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->norek_1 ?? '-'),
                     ])
                     ->columns(3),
                 Forms\Components\Section::make('Detail Kendaraan')
@@ -101,22 +98,22 @@ class ViewBosJoulmer extends EditRecord
                     ->schema([
                         Placeholder::make('complete_bengkel_estimasi')
                             ->label('Bengkel Estimasi')
-                            ->content(fn () => $this->record->pengajuan?->complete?->bengkel_estimasi ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->complete?->bengkel_estimasi ?? '-'),
                         Placeholder::make('complete_nominal_estimasi')
                             ->label('Nominal Estimasi')
-                            ->content(fn () => $this->record->pengajuan?->complete?->nominal_estimasi ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->complete?->nominal_estimasi ?? '-'),
                         Placeholder::make('complete_bengkel_invoice')
                             ->label('Bengkel Invoice')
-                            ->content(fn () => $this->record->pengajuan?->complete?->bengkel_invoice ?? '-'),
-                        Placeholder::make('complete_payment_2')
-                            ->label('Nama Rekening Finance')
-                            ->content(fn () => $this->record->pengajuan?->complete?->payment_2 ?? '-'),
+                            ->content(fn() => $this->record->pengajuan?->complete?->bengkel_invoice ?? '-'),
                         Placeholder::make('complete_bank_2')
-                            ->label('Bank Finance')
-                            ->content(fn () => $this->record->pengajuan?->complete?->bank_2 ?? '-'),
+                            ->label('Bank')
+                            ->content(fn() => $this->record->pengajuan?->complete?->bank_2 ?? '-'),
+                        Placeholder::make('complete_payment_2')
+                            ->label('Nama Rekening')
+                            ->content(fn() => $this->record->pengajuan?->complete?->payment_2 ?? '-'),
                         Placeholder::make('complete_norek_2')
-                            ->label('No. Rekening Finance')
-                            ->content(fn () => $this->record->pengajuan?->complete?->norek_2 ?? '-'),
+                            ->label('No. Rekening')
+                            ->content(fn() => $this->record->pengajuan?->complete?->norek_2 ?? '-'),
                         Placeholder::make('complete_status_finance')
                             ->label('Status Finance')
                             ->content(function () {
@@ -128,7 +125,7 @@ class ViewBosJoulmer extends EditRecord
                             }),
                     ])
                     ->columns(3)
-                    ->visible(fn () => filled($this->record->pengajuan?->complete)),
+                    ->visible(fn() => filled($this->record->pengajuan?->complete)),
                 Forms\Components\Section::make('Keputusan Review')
                     ->schema([
                         Forms\Components\Textarea::make('note')
@@ -152,7 +149,7 @@ class ViewBosJoulmer extends EditRecord
                 ->label('Setujui')
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
-                ->visible(fn () => BosJoulmerResource::canView($this->record)
+                ->visible(fn() => BosJoulmerResource::canView($this->record)
                     && in_array($this->record->pengajuan?->keterangan_proses, ['pengajuan atasan', 'menunggu atasan'], true))
                 ->action(function (): void {
                     $record = $this->record;
@@ -175,7 +172,7 @@ class ViewBosJoulmer extends EditRecord
                 ->label('Tolak')
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
-                ->visible(fn () => BosJoulmerResource::canView($this->record)
+                ->visible(fn() => BosJoulmerResource::canView($this->record)
                     && in_array($this->record->pengajuan?->keterangan_proses, ['pengajuan atasan'], true))
                 ->action(function (): void {
                     $record = $this->record;

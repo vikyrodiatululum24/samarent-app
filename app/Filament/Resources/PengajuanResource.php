@@ -567,14 +567,14 @@ class PengajuanResource extends Resource
                             foreach ($records as $record) {
                                 if ($record->keterangan_proses === 'checker' || $record->keterangan_proses === 'pengajuan atasan' && $record->bos_joulmer?->is_approved === 'rejected') {
                                     BosJoulmer::updateOrCreate(
-                                    ['pengajuan_id' => $record->id],
-                                    [
-                                        'user_id' => Auth::id(),
-                                        'is_approved' => 'pending',
-                                    ]
-                                );
-                                $record->update(['keterangan_proses' => 'pengajuan atasan']);
-                                $submittedCount++;
+                                        ['pengajuan_id' => $record->id],
+                                        [
+                                            'user_id' => Auth::id(),
+                                            'is_approved' => 'pending',
+                                        ]
+                                    );
+                                    $record->update(['keterangan_proses' => 'pengajuan atasan']);
+                                    $submittedCount++;
                                 } else {
                                     $skippedCount++;
                                 }
@@ -766,19 +766,20 @@ class PengajuanResource extends Resource
                                 Components\TextEntry::make('complete.nominal_tf_finance')
                                     ->label('Nominal Transfer Finance'),
                             ]),
-                        Components\Grid::make(1)
-                            ->schema([
-                                Components\Group::make([
-                                    Components\TextEntry::make('complete.payment_2')
-                                        ->label('Nama Rekening'),
-                                ]),
-                            ]),
+                        Components\TextEntry::make('complete.tanggal_input_bank')
+                                    ->label('Tanggal Input Bank')
+                                    ->date(),
                         Components\Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bank_2')
                                     ->label('Bank'),
+                                Components\TextEntry::make('complete.payment_2')
+                                    ->label('Nama Rekening'),
                                 Components\TextEntry::make('complete.norek_2')
                                     ->label('No. Rekening'),
+                            ]),
+                        Components\Grid::make(1)
+                            ->schema([
                                 Components\TextEntry::make('complete.status_finance')
                                     ->label('Status Finance')
                                     ->getStateUsing(function ($record) {
@@ -800,14 +801,14 @@ class PengajuanResource extends Resource
                     ->schema([
                         Components\Grid::make(3)
                             ->schema([
-                                Components\TextEntry::make('complete.rek_bengkel')
-                                    ->label('No. Rekening Bengkel'),
-                                Components\TextEntry::make('complete.nama_rek_bengkel')
-                                    ->label('Nama Rekening Bengkel')
-                                    ->getStateUsing(fn($record) => strtoupper($record->complete?->nama_rek_bengkel)),
                                 Components\TextEntry::make('complete.bank_bengkel')
                                     ->label('Bank Bengkel')
                                     ->getStateUsing(fn($record) => strtoupper($record->complete?->bank_bengkel)),
+                                Components\TextEntry::make('complete.nama_rek_bengkel')
+                                    ->label('Nama Rekening Bengkel')
+                                    ->getStateUsing(fn($record) => strtoupper($record->complete?->nama_rek_bengkel)),
+                                Components\TextEntry::make('complete.rek_bengkel')
+                                    ->label('No. Rekening Bengkel'),
                                 Components\TextEntry::make('complete.nominal_tf_bengkel')
                                     ->label('Nominal Transfer Bengkel'),
                                 Components\TextEntry::make('complete.selisih_tf')
@@ -832,11 +833,7 @@ class PengajuanResource extends Resource
                             ]),
                         ViewEntry::make('finance.bukti_transaksi')
                             ->label('Bukti Transaksi')
-                            ->view('filament.components.bukti_transaksi')
-                            ->columnSpan([
-                                'default' => 4,
-                                'md' => 3,
-                            ]),
+                            ->view('filament.components.bukti_transaksi'),
                     ])
                     ->columns([
                         'default' => 4,
