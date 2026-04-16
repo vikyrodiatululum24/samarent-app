@@ -115,6 +115,17 @@ class BosJoulmerApprovedResource extends Resource
                         'Selesai' => 'success',
                         default => 'gray',
                     }),
+                Tables\Columns\TextColumn::make('is_approved')
+                    ->label('Status Review')
+                    ->badge()
+                    ->formatStateUsing(fn(string $state) => ucfirst($state))
+                    ->color(fn(string $state) => match ($state) {
+                        'pending' => 'warning',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    })
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('note')
                     ->label('Catatan')
                     ->toggleable(isToggledHiddenByDefault: true)
