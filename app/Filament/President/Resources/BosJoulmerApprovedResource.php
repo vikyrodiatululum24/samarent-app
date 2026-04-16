@@ -130,10 +130,6 @@ class BosJoulmerApprovedResource extends Resource
                     ->label('Catatan')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->limit(60),
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('Reviewer')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Tanggal Review')
                     ->dateTime('d M Y H:i')
