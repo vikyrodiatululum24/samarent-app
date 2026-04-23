@@ -405,7 +405,20 @@ class PengajuanResource extends Resource
                     ->wrap()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('project')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Project')->width('150px')->wrap(),
-                Tables\Columns\TextColumn::make('up')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->label('Unit Pelaksana')->width('120px')->wrap(),
+                Tables\Columns\TextColumn::make('up')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $query->where(function (Builder $q) use ($search) {
+                            $q->where('up', 'like', "%{$search}%")
+                                ->orWhere('up_lainnya', 'like', "%{$search}%");
+                        });
+                    })
+                    ->getStateUsing(fn($record) => $record->up === 'manual' ? ($record->up_lainnya ?: '-') : $record->up)
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Unit Pelaksana')
+                    ->width('120px')
+                    ->wrap(),
+                
                 Tables\Columns\TextColumn::make('complete.bengkel_estimasi')
                     ->sortable()
                     ->searchable()

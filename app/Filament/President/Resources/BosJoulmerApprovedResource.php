@@ -38,11 +38,28 @@ class BosJoulmerApprovedResource extends Resource
                     ->label('No. Pengajuan')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('pengajuan.project')
-                    ->label('Project')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    Tables\Columns\TextColumn::make('pengajuan.up')
+                        ->label('UP')
+                        ->sortable()
+                        ->searchable(query: function (Builder $query, string $search) {
+                            $query->whereHas('pengajuan', function (Builder $q) use ($search) {
+                                $q->where('up', 'like', "%{$search}%");
+                            });
+                        })
+                        ->getStateUsing(function (BosJoulmer $record) {
+                            if ($record->pengajuan?->up === 'manual') {
+                                return $record->pengajuan->up_lainnya ?? '-';
+                            } else{
+                                return $record->pengajuan?->up ?? '-';
+                            }
+                        })
+                        ->label('Unit Pelaksana')
+                        ->toggleable(isToggledHiddenByDefault: true),
+                    Tables\Columns\TextColumn::make('pengajuan.project')
+                        ->label('Project')
+                        ->sortable()
+                        ->searchable()
+                        ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('nopol')
                     ->label('No. Polisi')
                     ->getStateUsing(function (BosJoulmer $record) {
@@ -144,62 +161,14 @@ class BosJoulmerApprovedResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
-    // public static function infolist(Infolist $infolist): Infolist
-    // {
-    //     return $infolist
-    //         ->schema([
-    //             Components\Section::make('Data Pengajuan')
-    //                 ->schema([
-    //                     Components\TextEntry::make('pengajuan.no_pengajuan')->label('No. Pengajuan'),
-    //                     Components\TextEntry::make('pengajuan.nama')->label('Nama PIC'),
-    //                     Components\TextEntry::make('pengajuan.project')->label('Project'),
-    //                     Components\TextEntry::make('pengajuan.keterangan')->label('Keterangan'),
-    //                     Components\TextEntry::make('pengajuan.keterangan_proses')
-    //                         ->label('Status Pengajuan')
-    //                         ->badge()
-    //                         ->getStateUsing(function (BosJoulmer $record) {
-    //                             return match ($record->pengajuan?->keterangan_proses) {
-    //                                 'cs' => 'Customer Service',
-    //                                 'checker' => 'Verifikasi',
-    //                                 'pengajuan atasan' => 'Pengajuan Atasan',
-    //                                 'pengajuan finance' => 'Pengajuan Finance',
-    //                                 'finance' => 'Input Finance',
-    //                                 'otorisasi' => 'Otorisasi',
-    //                                 'done' => 'Selesai',
-    //                                 default => 'Tidak Diketahui',
-    //                             };
-    //                         })
-    //                         ->color(fn(string $state) => match ($state) {
-    //                             'Customer Service' => 'black',
-    //                             'Verifikasi' => 'danger',
-    //                             'Pengajuan Atasan' => 'info',
-    //                             'Pengajuan Finance' => 'primary',
-    //                             'Input Finance' => 'brown',
-    //                             'Otorisasi' => 'yellow',
-    //                             'Selesai' => 'success',
-    //                             default => 'gray',
-    //                         }),
-    //                 ])
-    //                 ->columns(2),
-    //             Components\Section::make('Review Bos (Approved)')
-    //                 ->schema([
-    //                     Components\TextEntry::make('note')
-    //                         ->label('Catatan')
-    //                         ->placeholder('-'),
-    //                     Components\TextEntry::make('user.name')
-    //                         ->label('Reviewer'),
-    //                     Components\TextEntry::make('updated_at')
-    //                         ->label('Waktu Review')
-    //                         ->dateTime('d M Y H:i'),
-    //                 ])
-    //                 ->columns(2),
-    //         ]);
-    // }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
             ->where('is_approved', 'approved')
+            ->whereHas('pengajuan', function (Builder $q) {
+                $q->where('keterangan_proses', 'pengajuan atasan');
+            })
             ->with(['pengajuan.service_unit.unit', 'user']);
     }
 
@@ -238,6 +207,8 @@ class BosJoulmerApprovedResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::$model::where('is_approved', 'approved')->count();
+        return (string) static::$model::where('is_approved', 'approved')->whereHas('pengajuan', function (Builder $q) {
+            $q->where('keterangan_proses', 'pengajuan atasan');
+        })->count();
     }
 }

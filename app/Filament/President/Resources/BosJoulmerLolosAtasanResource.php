@@ -2,33 +2,29 @@
 
 namespace App\Filament\President\Resources;
 
-use App\Filament\President\Resources\BosJoulmerResource\Pages;
+use App\Filament\President\Resources\BosJoulmerLolosAtasanResource\Pages;
 use App\Models\BosJoulmer;
 use Filament\Facades\Filament;
-use Filament\Infolists\Components;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
-class BosJoulmerResource extends Resource
+class BosJoulmerLolosAtasanResource extends Resource
 {
     protected static ?string $model = BosJoulmer::class;
 
     protected static ?string $navigationGroup = 'Pengajuan';
 
-    protected static ?string $navigationLabel = 'Review Atasan';
+    protected static ?string $navigationLabel = 'Lolos Pengajuan Atasan';
 
-    protected static ?string $label = 'Review Atasan';
+    protected static ?string $label = 'Lolos Pengajuan Atasan';
 
-    protected static ?string $pluralLabel = 'Review Atasan';
+    protected static ?string $pluralLabel = 'Lolos Pengajuan Atasan';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
-    protected static ?string $slug = 'review-atasan';
+    protected static ?string $slug = 'lolos-pengajuan-atasan';
 
     public static function table(Table $table): Table
     {
@@ -49,9 +45,9 @@ class BosJoulmerResource extends Resource
                     ->getStateUsing(function (BosJoulmer $record) {
                         if ($record->pengajuan?->up === 'manual') {
                             return $record->pengajuan->up_lainnya ?? '-';
-                        } else {
-                            return $record->pengajuan?->up ?? '-';
                         }
+
+                        return $record->pengajuan?->up ?? '-';
                     })
                     ->label('Unit Pelaksana')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -147,29 +143,26 @@ class BosJoulmerResource extends Resource
                     ->label('Catatan')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->limit(60),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Tanggal Review')
+                    ->dateTime('d M Y H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                SelectFilter::make('is_approved')
-                    ->label('Status Review')
-                    ->options([
-                        'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
-                    ]),
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([])
-            ->defaultSort('id', 'desc');
+            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->whereIn('is_approved', ['pending', 'rejected'])
+            ->where('is_approved', 'approved')
             ->whereHas('pengajuan', function (Builder $q) {
-                $q->where('keterangan_proses', 'pengajuan atasan');
+                $q->whereIn('keterangan_proses', ['pengajuan finance', 'finance', 'otorisasi', 'done']);
             })
             ->with(['pengajuan.service_unit.unit', 'user']);
     }
@@ -194,30 +187,23 @@ class BosJoulmerResource extends Resource
         return false;
     }
 
+    public static function canEdit($record): bool
+    {
+        return false;
+    }
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBosJoulmers::route('/'),
-            'view' => Pages\ViewBosJoulmer::route('/{record}'),
+            'index' => Pages\ListBosJoulmersLolosAtasan::route('/'),
+            'view' => Pages\ViewBosJoulmerLolosAtasan::route('/{record}'),
         ];
     }
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::$model::where('is_approved', 'pending')
-        ->whereHas('pengajuan', function (Builder $q) {
-            $q->where('keterangan_proses', 'pengajuan atasan');
-        })
-        ->count();
-    }
-
-    protected static function canReview(BosJoulmer $record): bool
-    {
-        return $record->is_approved === 'pending';
-    }
-
-    public static function canReviewRecord(BosJoulmer $record): bool
-    {
-        return static::canReview($record);
+        return (string) static::$model::where('is_approved', 'approved')->whereHas('pengajuan', function (Builder $q) {
+            $q->whereIn('keterangan_proses', ['pengajuan finance', 'finance', 'otorisasi', 'done']);
+        })->count();
     }
 }

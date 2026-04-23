@@ -166,7 +166,7 @@ class ViewBosJoulmer extends EditRecord
                         ->success()
                         ->send();
 
-                    $this->redirect(static::getResource()::getUrl('view', ['record' => $record]));
+                    $this->redirect(static::getResource()::getUrl('index', ['record' => $record]));
                 }),
             Actions\Action::make('reject')
                 ->label('Tolak')
@@ -189,7 +189,7 @@ class ViewBosJoulmer extends EditRecord
                         ->success()
                         ->send();
 
-                    $this->redirect(static::getResource()::getUrl('view', ['record' => $record]));
+                    $this->redirect(static::getResource()::getUrl('index', ['record' => $record]));
                 }),
             Actions\Action::make('kembali')
                 ->label('Kembali')

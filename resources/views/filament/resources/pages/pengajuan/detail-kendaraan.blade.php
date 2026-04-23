@@ -65,6 +65,12 @@
         @endphp
         @include('filament.components.foto-kondisi', ['getState' => fn() => $fotoKondisi])
     </div>
+    <div class="mt-6">
+        @php
+            $fotoTambahan = is_array($serviceUnit->foto_tambahan ?? null) ? $serviceUnit->foto_tambahan : [];
+        @endphp
+        @include('filament.components.foto-tambahan', ['getState' => fn() => $fotoTambahan])
+    </div>
 @empty
     <p>Tidak ada data unit yang terhubung.</p>
 @endforelse

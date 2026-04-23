@@ -1,7 +1,5 @@
 @php
-    $serviceUnits = \App\Models\ServiceUnit::with('unit')
-        ->where('pengajuan_id', $pengajuanId)
-        ->get();
+    $serviceUnits = \App\Models\ServiceUnit::with('unit')->where('pengajuan_id', $pengajuanId)->get();
 @endphp
 
 <div class="space-y-4">
@@ -16,7 +14,8 @@
                 <div><span class="font-medium">Jenis Kendaraan:</span> {{ $serviceUnit->unit?->jenis ?? '-' }}</div>
                 <div><span class="font-medium">Tipe Unit:</span> {{ $serviceUnit->unit?->type ?? '-' }}</div>
                 <div><span class="font-medium">Odometer:</span> {{ $serviceUnit->odometer ?? '-' }}</div>
-                <div class="md:col-span-2"><span class="font-medium">Jenis Permintaan Service:</span> {{ $serviceUnit->service ?? '-' }}</div>
+                <div class="md:col-span-2"><span class="font-medium">Jenis Permintaan Service:</span>
+                    {{ $serviceUnit->service ?? '-' }}</div>
             </div>
 
             <div class="mt-4 flex flex-wrap gap-4">
@@ -49,6 +48,12 @@
                     $fotoKondisi = is_array($serviceUnit->foto_kondisi ?? null) ? $serviceUnit->foto_kondisi : [];
                 @endphp
                 @include('filament.components.foto-kondisi', ['getState' => fn() => $fotoKondisi])
+            </div>
+            <div class="mt-6">
+                @php
+                    $fotoTambahan = is_array($serviceUnit->foto_tambahan ?? null) ? $serviceUnit->foto_tambahan : [];
+                @endphp
+                @include('filament.components.foto-tambahan', ['getState' => fn() => $fotoTambahan])
             </div>
         </div>
     @empty
