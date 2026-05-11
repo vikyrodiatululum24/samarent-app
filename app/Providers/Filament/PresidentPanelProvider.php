@@ -5,7 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\DetailHistori;
 use App\Filament\Pages\HistoriPengajuan;
 use App\Filament\Pages\Mount;
-use App\Filament\Resources\BbmResource;
+use App\Filament\Resources\Bbms\BbmResource;
 use App\Filament\Resources\BengkelResource;
 use App\Filament\Resources\DataUnitResource;
 use App\Filament\Resources\FormTugasResource;
@@ -25,7 +25,7 @@ use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -178,7 +178,8 @@ class PresidentPanelProvider extends PanelProvider
                         'centralakun@samarent.com',
                     ])),
             ])
-            ->maxContentWidth(MaxWidth::Full)
-            ->topNavigation();
+            ->maxContentWidth(Width::Full)
+            ->topNavigation()
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

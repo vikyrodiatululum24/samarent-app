@@ -2,20 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Proses;
-use App\Models\Complete;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Storage;
-use Filament\Tables\Actions\ExportAction;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\ServiceUnitExporter;
 use App\Filament\Resources\ProsesResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ProsesResource\RelationManagers;
+use App\Models\Complete;
+use App\Models\Proses;
+use Filament\Forms;
+
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
 
 class ProsesResource extends Resource
 {
@@ -25,11 +29,11 @@ class ProsesResource extends Resource
 
     protected static ?string $navigationLabel = 'Customer Service';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\Fieldset::make('Informasi Bengkel')
+                Fieldset::make('Informasi Bengkel')
                     ->schema([
                         Forms\Components\Hidden::make('user_id')
                             ->default(\Illuminate\Support\Facades\Auth::user()->id),
@@ -48,7 +52,7 @@ class ProsesResource extends Resource
                             ->default(fn($record) => $record->complete?->nominal_estimasi),
                     ])
                     ->columns(2),
-                Forms\Components\Fieldset::make('Informasi Pengajuan')
+                Fieldset::make('Informasi Pengajuan')
                     ->schema([
                         Forms\Components\Select::make('kode')
                             ->label('Kode')
@@ -66,7 +70,7 @@ class ProsesResource extends Resource
                             ->default(fn($record) => $record->complete?->tanggal_masuk_finance),
                     ])
                     ->columns(1),
-                Forms\Components\Fieldset::make('Informasi Finance')
+                Fieldset::make('Informasi Finance')
                     ->schema([
                         Forms\Components\DatePicker::make('tanggal_tf_finance')
                             ->label('Tanggal Transfer Finance')
@@ -105,7 +109,7 @@ class ProsesResource extends Resource
                             ->default(fn($record) => $record->complete?->status_finance ?? 'unpaid'),
                     ])
                     ->columns(2),
-                Forms\Components\Fieldset::make('Transfer Bengkel')
+                Fieldset::make('Transfer Bengkel')
                     ->schema([
                         Forms\Components\TextInput::make('nominal_tf_bengkel')
                             ->label('Nominal Transfer Bengkel')
@@ -117,7 +121,7 @@ class ProsesResource extends Resource
                             ->numeric()
                             ->default(fn($record) => $record->complete?->selisih_tf ?? 0)
                             ->reactive()
-                            ->afterStateUpdated(fn(callable $set, $state, callable $get) => $set('selisih_tf', $get('nominal_tf_finance') - $get('nominal_tf_bengkel'))),
+                            ->afterStateUpdated(fn(Set $set, $state, Get $get) => $set('selisih_tf', $get('nominal_tf_finance') - $get('nominal_tf_bengkel'))),
                         Forms\Components\DatePicker::make('tanggal_tf_bengkel')
                             ->label('Tanggal Transfer Bengkel')
                             ->nullable()
@@ -128,7 +132,7 @@ class ProsesResource extends Resource
                             ->default(fn($record) => $record->complete?->tanggal_pengerjaan),
                     ])
                     ->columns(2),
-                Forms\Components\Fieldset::make('Dokumentasi')
+                Fieldset::make('Dokumentasi')
                     ->schema([
                         Forms\Components\FileUpload::make('foto_nota')
                             ->label('Foto Nota')
@@ -151,7 +155,7 @@ class ProsesResource extends Resource
                             ->nullable()
                             ->default(fn($record) => $record->complete?->foto_tambahan)
                             ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
+                            ->afterStateUpdated(function ($state, Set $set, Get $get, $livewire) {
                                 if (count($state) > 3) {
                                     $set('foto_tambahan', array_slice($state, 0, 3));
                                 }

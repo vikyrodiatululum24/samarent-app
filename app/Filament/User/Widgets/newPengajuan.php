@@ -2,12 +2,13 @@
 
 namespace App\Filament\User\Widgets;
 
-use Filament\Tables;
-use App\Models\Pengajuan;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Widgets\TableWidget as BaseWidget;
 use App\Filament\User\Resources\PengajuanResource;
+use App\Models\Pengajuan;
+use Filament\Actions\Action;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database\Eloquent\Builder;
 
 class newPengajuan extends BaseWidget
 {
@@ -77,6 +78,7 @@ class newPengajuan extends BaseWidget
                     ->color(fn(string $state) => match (true) {
                         str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'black',
                         str_contains(strtoupper($state), 'VERIFIKASI') => 'danger',
+                        str_contains(strtoupper($state), 'PENGAJUAN ATASAN') => 'info',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
                         str_contains(strtoupper($state), 'INPUT FINANCE') => 'brown',
                         str_contains(strtoupper($state), 'OTORISASI') => 'yellow',
@@ -84,19 +86,37 @@ class newPengajuan extends BaseWidget
                         default => 'gray',
                     })
                     ->getStateUsing(function ($record) {
-                        return match ($record->keterangan_proses) {
+                        $prosesPengajuan = $record->keterangan_proses ?? '';
+                        $statusBos = $record->bos_joulmer?->is_approved;
+
+                        $prosesText = match ($prosesPengajuan) {
                             'cs' => 'Customer Service',
                             'checker' => 'Verifikasi',
+                            'pengajuan atasan' => 'Pengajuan Atasan',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
-                    }),
+
+                        if ($prosesPengajuan === 'pengajuan atasan') {
+                            $bosText = match ($statusBos) {
+                                'approved' => 'Disetujui',
+                                'rejected' => 'Ditolak',
+                                'pending' => 'Pending',
+                                default => 'Tidak Diketahui',
+                            };
+                            return "{$prosesText} - {$bosText}";
+                        }
+
+                        return $prosesText;
+                    })
+                    ->width('150px')
+                    ->wrap(),
             ])
             ->actions([
-                Tables\Actions\Action::make('open')
+                Action::make('open')
                     ->url(fn(Pengajuan $record): string => PengajuanResource::getUrl('view', ['record' => $record])),
             ]);
     }

@@ -6,7 +6,6 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Barryvdh\DomPDF\PDF;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
@@ -39,7 +38,11 @@ class UploadImage extends Component
         $urls = [];
 
         foreach ($this->images as $image) {
-            $urls[] = $image->temporaryUrl();
+            try {
+                $urls[] = $image->temporaryUrl();
+            } catch (\Throwable $exception) {
+                continue;
+            }
         }
 
         return $urls;

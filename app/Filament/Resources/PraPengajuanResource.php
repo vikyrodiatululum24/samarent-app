@@ -7,25 +7,33 @@ use App\Models\PraPengajuan;
 use App\Models\Project;
 use App\Models\Unit;
 use Filament\Forms;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components;
 use Filament\Infolists\Components\ViewEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class PraPengajuanResource extends Resource
 {
     protected static ?string $model = PraPengajuan::class;
-    protected static ?string $navigationGroup = 'Pengajuan';
+    protected static string | \UnitEnum | null $navigationGroup = 'Pengajuan';
     protected static ?string $navigationLabel = 'Pra Pengajuan';
     protected static ?string $pluralLabel = 'Pra Pengajuan';
 
@@ -53,16 +61,16 @@ class PraPengajuanResource extends Resource
         'lainnya' => 'Lainnya',
     ];
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Wizard::make([
                     Step::make('Pengajuan')
                         ->schema([
-                            Forms\Components\Fieldset::make('Informasi Umum')
+                            Fieldset::make('Informasi Umum')
                                 ->schema([
-                                    Forms\Components\Group::make()
+                                    Group::make()
                                         ->schema([
                                             Forms\Components\TextInput::make('nama_pic')
                                                 ->label('Nama PIC')
@@ -74,7 +82,7 @@ class PraPengajuanResource extends Resource
                                                 ->numeric()
                                                 ->maxLength(255),
                                         ]),
-                                    Forms\Components\Group::make()
+                                    Group::make()
                                         ->schema([
                                             Forms\Components\Select::make('project')
                                                 ->label('Project')
@@ -107,11 +115,11 @@ class PraPengajuanResource extends Resource
                                                     'manual' => 'Lainnya',
                                                 ])
                                                 ->reactive()
-                                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
+                                                ->afterStateUpdated(fn(Set $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
                                             Forms\Components\TextInput::make('up_lainnya')
                                                 ->label('Unit Pelaksana Lainnya')
-                                                ->required(fn(callable $get) => $get('up') === 'manual')
-                                                ->visible(fn(callable $get) => $get('up') === 'manual')
+                                                ->required(fn(Get $get) => $get('up') === 'manual')
+                                                ->visible(fn(Get $get) => $get('up') === 'manual')
                                                 ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
                                         ]),
                                     Forms\Components\TextInput::make('provinsi')
@@ -128,13 +136,13 @@ class PraPengajuanResource extends Resource
                                 ->columns(2)
                                 ->columnSpan('full')
                                 ->extraAttributes(['class' => 'mb-4']),
-                            ]),
+                        ]),
                     Step::make('Data Service')
                         ->schema([
                             Forms\Components\Repeater::make('service_units')
                                 ->relationship() // penting: ini untuk relasi hasMany
                                 ->schema([
-                                    Forms\Components\Grid::make(2)
+                                    Grid::make(2)
                                         ->schema([
                                             Forms\Components\Select::make('unit_id')
                                                 ->label('Unit')
@@ -151,9 +159,9 @@ class PraPengajuanResource extends Resource
                                     Forms\Components\TextInput::make('service')
                                         ->label('Jenis Permintaan Service')
                                         ->required(),
-                                    Forms\Components\Grid::make(2)
+                                    Grid::make(2)
                                         ->schema([
-                                            Forms\Components\Grid::make(3)
+                                            Grid::make(3)
                                                 ->schema([
                                                     Forms\Components\FileUpload::make('foto_unit')
                                                         ->label('Foto Unit')
@@ -193,7 +201,7 @@ class PraPengajuanResource extends Resource
                         ])
 
                 ])
-                ->columnSpan('full')
+                    ->columnSpan('full')
 
             ]);
     }
@@ -300,13 +308,13 @@ class PraPengajuanResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('ajukan')
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    BulkAction::make('ajukan')
                         ->label('Ajukan')
                         ->icon('heroicon-o-arrow-up')
                         ->action(function ($records) {
@@ -329,11 +337,11 @@ class PraPengajuanResource extends Resource
             ->defaultSort('id', 'desc');
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Components\Section::make('Informasi Pra Pengajuan')
+                Section::make('Informasi Pra Pengajuan')
                     ->schema([
                         Components\TextEntry::make('nama_pic')->label('Nama PIC'),
                         Components\TextEntry::make('no_wa')->label('No. WhatsApp'),
@@ -344,17 +352,18 @@ class PraPengajuanResource extends Resource
                         Components\TextEntry::make('kota')->label('Kota'),
                         Components\TextEntry::make('tanggal')->label('Tanggal')->date('d/m/Y'),
                         Components\TextEntry::make('status')->label('Status')->badge(),
-                        Components\Section::make('Detail Kendaraan')
-                            ->schema([
-                                ViewEntry::make('service_units.pra_pengajuan_id')
-                                    ->label('Detail Kendaraan')
-                                    ->view('filament.resources.pages.pengajuan.detail-kendaraan-praPengajuan')
-                                    ->columnSpanFull(),
-                            ]),
 
                     ])
                     ->columns(2),
-            ]);
+                Section::make('Detail Kendaraan')
+                    ->schema([
+                        ViewEntry::make('service_units.pra_pengajuan_id')
+                            ->label('Detail Kendaraan')
+                            ->view('filament.resources.pages.pengajuan.detail-kendaraan-praPengajuan')
+                            ->columnSpanFull(),
+                    ]),
+            ])
+            ->columns(1);
     }
 
     public static function getRelations(): array

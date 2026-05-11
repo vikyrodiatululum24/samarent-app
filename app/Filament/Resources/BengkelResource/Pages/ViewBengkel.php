@@ -5,8 +5,10 @@ namespace App\Filament\Resources\BengkelResource\Pages;
 use App\Filament\Resources\BengkelResource;
 use Filament\Actions;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\TextSize;
 
 class ViewBengkel extends ViewRecord
 {
@@ -20,15 +22,15 @@ class ViewBengkel extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Infolists\Components\Section::make('Informasi Bengkel')
+                Section::make('Informasi Bengkel')
                     ->schema([
                         Infolists\Components\TextEntry::make('nama')
                             ->label('Nama Bengkel')
-                            ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
+                            ->size(TextSize::Large)
                             ->weight('bold'),
 
                         Infolists\Components\TextEntry::make('keterangan')
@@ -38,7 +40,7 @@ class ViewBengkel extends ViewRecord
                     ])
                     ->columns(2),
 
-                Infolists\Components\Section::make('Alamat Lengkap')
+                Section::make('Alamat Lengkap')
                     ->schema([
                         Infolists\Components\TextEntry::make('provinsi')
                             ->label('Provinsi')
@@ -76,7 +78,7 @@ class ViewBengkel extends ViewRecord
                     ])
                     ->columns(2),
 
-                Infolists\Components\Section::make('Kontak Bengkel')
+                Section::make('Kontak Bengkel')
                     ->schema([
                         Infolists\Components\RepeatableEntry::make('kontakBengkels')
                             ->schema([
@@ -92,9 +94,8 @@ class ViewBengkel extends ViewRecord
                             ->columns(2)
                             ->columnSpanFull()
                             ->placeholder('Tidak ada kontak'),
-                    ])
-                    ->collapsed()
-                    ->collapsible(),
-            ]);
+                    ]),
+            ])
+            ->columns(1);
     }
 }

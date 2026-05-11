@@ -2,24 +2,25 @@
 
 namespace App\Filament\Absensi\Resources\KehadiranDriverResource\RelationManagers;
 
-use Filament\Forms;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables;
-use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
-use Illuminate\Support\Carbon;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\RelationManagers\RelationManager;
 
 class OvertimePayRelationManager extends RelationManager
 {
     protected static string $relationship = 'OvertimePay';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             // Forms\Components\DatePicker::make('tanggal')->label('Tanggal')->required(),
 
             // Forms\Components\TextInput::make('hari')->label('Hari')->required(),
@@ -45,10 +46,10 @@ class OvertimePayRelationManager extends RelationManager
             // Forms\Components\TextInput::make('calculated_ot_hours')->label('Total Jam OT')->numeric()->minValue(0),
             // Forms\Components\TextInput::make('ot_amount')->label('Jumlah OT')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
             // Forms\Components\TextInput::make('transport')->label('Transport')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
-            Forms\Components\TextInput::make('monthly_allowance')->label('Tunjangan Bulanan')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
-            Forms\Components\TextInput::make('out_of_town')->label('Dinas Luar')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->maxLength(255),
-            Forms\Components\TextInput::make('overnight')->label('Menginap')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->maxLength(255),
-            Forms\Components\Textarea::make('remarks')->label('Keterangan')->columnSpanFull()->maxLength(65535),
+            TextInput::make('monthly_allowance')->label('Tunjangan Bulanan')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
+            TextInput::make('out_of_town')->label('Dinas Luar')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->maxLength(255),
+            TextInput::make('overnight')->label('Menginap')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->maxLength(255),
+            Textarea::make('remarks')->label('Keterangan')->columnSpanFull()->maxLength(65535),
         ]);
     }
 
@@ -83,14 +84,14 @@ class OvertimePayRelationManager extends RelationManager
                 //
             ])
             ->actions([
-    Tables\Actions\Action::make('edit')
+    Action::make('edit')
         ->label('Edit')
         ->icon('heroicon-o-pencil')
         ->form([
-                        Forms\Components\TextInput::make('monthly_allowance')->label('Tunjangan Bulanan')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
-            Forms\Components\TextInput::make('out_of_town')->label('Dinas Luar')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
-            Forms\Components\TextInput::make('overnight')->label('Menginap')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
-            Forms\Components\Textarea::make('remarks')->label('Keterangan')->columnSpanFull()->maxLength(65535),
+                        TextInput::make('monthly_allowance')->label('Tunjangan Bulanan')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
+            TextInput::make('out_of_town')->label('Dinas Luar')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
+            TextInput::make('overnight')->label('Menginap')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
+            Textarea::make('remarks')->label('Keterangan')->columnSpanFull()->maxLength(65535),
         ])
         ->fillForm(fn ($record) => $record->toArray())
         ->action(function ($record, array $data) {
@@ -101,6 +102,6 @@ class OvertimePayRelationManager extends RelationManager
                 ->send();
         }),
 ])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([])]);
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 }

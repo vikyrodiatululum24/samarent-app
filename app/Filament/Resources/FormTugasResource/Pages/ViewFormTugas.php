@@ -5,11 +5,12 @@ namespace App\Filament\Resources\FormTugasResource\Pages;
 use App\Filament\Resources\FormTugasResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Enums\TextSize;
 
 class ViewFormTugas extends ViewRecord
 {
@@ -40,9 +41,9 @@ class ViewFormTugas extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
                 Section::make('Informasi Form Tugas')
                     ->icon('heroicon-o-document-text')
@@ -52,7 +53,7 @@ class ViewFormTugas extends ViewRecord
                             ->weight(FontWeight::Bold)
                             ->copyable()
                             ->color('primary')
-                            ->size(TextEntry\TextEntrySize::Large),
+                            ->size(TextSize::Large),
 
                         // TextEntry::make('user.name')
                         //     ->label('User')
@@ -97,7 +98,6 @@ class ViewFormTugas extends ViewRecord
                                 if ($record->tanggal_mulai && $record->tanggal_selesai) {
                                     $diff = $record->tanggal_mulai->diffInDays($record->tanggal_selesai) + 1;
                                     $hours = $record->tanggal_mulai->diffInHours($record->tanggal_selesai) % 24;
-
                                     $result = '';
                                     if ($diff > 0) {
                                         $result .= $diff . ' hari';
@@ -121,7 +121,6 @@ class ViewFormTugas extends ViewRecord
 
                         TextEntry::make('deskripsi')
                             ->label('Deskripsi Tugas')
-                            ->markdown()
                             ->columnSpanFull(),
                     ])
                     ->columns(3)
@@ -134,7 +133,7 @@ class ViewFormTugas extends ViewRecord
                             ->label('Nomor Polisi')
                             ->badge()
                             ->color('warning')
-                            ->size(TextEntry\TextEntrySize::Large)
+                            ->size(TextSize::Large)
                             ->weight(FontWeight::Bold),
 
                         TextEntry::make('unit.merk')
@@ -183,7 +182,7 @@ class ViewFormTugas extends ViewRecord
                             ->label('Total Biaya')
                             ->money('IDR')
                             ->weight(FontWeight::Bold)
-                            ->size(TextEntry\TextEntrySize::Large)
+                            ->size(TextSize::Large)
                             ->color('danger'),
                     ])
                     ->columns(3)
@@ -220,6 +219,7 @@ class ViewFormTugas extends ViewRecord
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-            ]);
+            ])
+            ->columns(1);
     }
 }

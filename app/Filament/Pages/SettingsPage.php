@@ -4,24 +4,24 @@ namespace App\Filament\Pages;
 
 use App\Models\Settings;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 
 class SettingsPage extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static string $view = 'filament.pages.settings-page';
+    protected string $view = 'filament.pages.settings-page';
 
     protected static ?string $navigationLabel = 'Pengaturan Tanda Tangan';
 
     protected static ?string $title = 'Pengaturan Tanda Tangan Digital';
 
-    protected static ?string $navigationGroup = 'Pengaturan';
+    protected static string | \UnitEnum | null $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = 999;
 
@@ -41,9 +41,9 @@ class SettingsPage extends Page implements HasForms
         ]);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make('Tanda Tangan Digital')
                     ->description('Upload foto tanda tangan digital untuk berbagai keperluan persetujuan dokumen')
@@ -70,7 +70,6 @@ class SettingsPage extends Page implements HasForms
                                     ->placeholder('Masukkan nama penandatangan')
                                     ->columnSpanFull(),
                             ])
-                            ->columnSpanFull()
                             ->collapsible(),
 
                         Section::make('Diperiksa')
@@ -95,7 +94,6 @@ class SettingsPage extends Page implements HasForms
                                     ->placeholder('Masukkan nama penandatangan')
                                     ->columnSpanFull(),
                             ])
-                            ->columnSpanFull()
                             ->collapsible(),
 
                         Section::make('Disetujui')
@@ -120,7 +118,6 @@ class SettingsPage extends Page implements HasForms
                                     ->placeholder('Masukkan nama penandatangan')
                                     ->columnSpanFull(),
                             ])
-                            ->columnSpanFull()
                             ->collapsible(),
 
                         Section::make('Dibukukan')
@@ -145,10 +142,12 @@ class SettingsPage extends Page implements HasForms
                                     ->placeholder('Masukkan nama penandatangan')
                                     ->columnSpanFull(),
                             ])
-                            ->columnSpanFull()
                             ->collapsible(),
                     ])
-                    ->columns(1),
+                    ->columns([
+                        'sm' => 2,
+                        'lg' => 4,
+                    ]),
             ])
             ->statePath('data');
     }

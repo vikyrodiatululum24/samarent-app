@@ -25,6 +25,10 @@ class Driver extends Model
         'photo',
     ];
 
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+    ];
+
     public function getPhotoUrlAttribute()
     {
         if ($this->photo) {

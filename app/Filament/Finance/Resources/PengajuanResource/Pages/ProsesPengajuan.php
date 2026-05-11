@@ -6,10 +6,13 @@ use App\Filament\Finance\Resources\PengajuanResource;
 use App\Models\Pengajuan;
 use Filament\Forms;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Auth;
 
 class ProsesPengajuan extends EditRecord
@@ -20,9 +23,9 @@ class ProsesPengajuan extends EditRecord
 
     public ?array $data = [];
 
-    public function getMaxContentWidth(): MaxWidth
+    public function getMaxContentWidth(): Width
     {
-        return MaxWidth::SevenExtraLarge;
+        return Width::SevenExtraLarge;
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -47,15 +50,14 @@ class ProsesPengajuan extends EditRecord
         return $data;
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Informasi Finance')
+        return $schema->components([
+                Section::make('Informasi Finance')
                     ->schema([
                         Hidden::make('finance.user_id')
                             ->default(Auth::user()->id),
-                        Forms\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Forms\Components\Select::make('complete.payment_2')
                                     ->label('Nama Rekening')
@@ -65,7 +67,7 @@ class ProsesPengajuan extends EditRecord
                                     ->searchable()
                                     ->nullable()
                                     ->live()
-                                    ->afterStateUpdated(function ($component, $state, callable $set) {
+                                    ->afterStateUpdated(function ($component, $state, Set $set) {
                                         $component->state(strtoupper($state));
                                         $norek = \App\Models\Norek::where('name', $state)->first();
                                         $set('complete.norek_2', $norek?->norek);
@@ -128,7 +130,7 @@ class ProsesPengajuan extends EditRecord
                                     ->maxLength(255)
                                     ->readOnly(),
                             ]),
-                            Forms\Components\Grid::make(2)
+                            Grid::make(2)
                             ->schema([
                                 Forms\Components\DatePicker::make('complete.tanggal_input_bank')
                                     ->label('Tanggal Input Bank')
@@ -159,9 +161,9 @@ class ProsesPengajuan extends EditRecord
                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                             ->disk('public')
                             ->directory('bukti_transaksi'),
-                    ])
-                    ->columns(1),
-            ]);
+                    ]),
+            ])
+            ->columns(1);
     }
 
     protected function mutateFormDataBeforeSave(array $data): array

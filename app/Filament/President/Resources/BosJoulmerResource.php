@@ -4,21 +4,19 @@ namespace App\Filament\President\Resources;
 
 use App\Filament\President\Resources\BosJoulmerResource\Pages;
 use App\Models\BosJoulmer;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
-use Filament\Infolists\Components;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class BosJoulmerResource extends Resource
 {
     protected static ?string $model = BosJoulmer::class;
 
-    protected static ?string $navigationGroup = 'Pengajuan';
+    protected static string | \UnitEnum | null $navigationGroup = 'Pengajuan';
 
     protected static ?string $navigationLabel = 'Review Atasan';
 
@@ -158,7 +156,7 @@ class BosJoulmerResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([])
             ->defaultSort('id', 'desc');

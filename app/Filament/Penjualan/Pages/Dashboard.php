@@ -2,12 +2,13 @@
 
 namespace App\Filament\Penjualan\Pages;
 
+use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 use App\Filament\Penjualan\Resources\PenawarResource\Widgets\Penawar;
 
 class Dashboard extends BaseDashboard
 {
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     public function getWidgets(): array
     {
@@ -16,7 +17,7 @@ class Dashboard extends BaseDashboard
         ];
     }
 
-    public function getColumns(): int | string | array
+    public function getColumns(): array|int
     {
         return 1;
     }

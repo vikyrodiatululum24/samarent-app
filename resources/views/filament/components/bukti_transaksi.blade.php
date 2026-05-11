@@ -6,14 +6,14 @@
     @endphp
 
     @if ($extension === 'pdf')
-        <embed src="{{ asset('storage/' . $file) }}" type="application/pdf" width="300px" height="200px" class="rounded shadow" />
+        <embed src="{{ asset('storage/' . $file) }}" type="application/pdf" width="300px" height="200px" class="rounded-sm shadow-sm" />
 
     @else
-        <img src="{{ asset('storage/' . $file) }}" class="object-cover rounded shadow"
+        <img src="{{ asset('storage/' . $file) }}" class="object-cover rounded-sm shadow-sm"
             style="max-width: 300px; max-height: 200px;" alt="Foto Bukti Transaksi">
     @endif
     <a href="{{ asset('storage/' . $getState()) }}" download
-        class="px-3 py-1 bg-blue-600 text-gray-800 dark:text-white text-sm rounded hover:bg-blue-700 transition">
+        class="px-3 py-1 bg-blue-600 text-gray-800 dark:text-white text-sm rounded-sm hover:bg-blue-700 transition">
         Download
     </a>
 @else

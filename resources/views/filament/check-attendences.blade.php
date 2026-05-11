@@ -19,7 +19,7 @@
                 <div class="text-sm text-gray-500">
                     ({{ $item->location }})
                 </div>
-                <img src="{{ asset($item->photo) }}" alt="Foto Check" class="mt-2 w-32 h-auto rounded">
+                <img src="{{ asset($item->photo) }}" alt="Foto Check" class="mt-2 w-32 h-auto rounded-sm">
             </div>
         @endforeach
     </div>

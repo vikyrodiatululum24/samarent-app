@@ -7,7 +7,7 @@ use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Facades\Filament;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Navigation\NavigationItem;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Http\Middleware\EnsurePenjualanRole;
@@ -157,7 +157,8 @@ class PenjualanPanelProvider extends PanelProvider
                         'centralakun@samarent.com',
                     ])),
             ])
-            ->maxContentWidth(MaxWidth::Full)
-            ->topNavigation();
+            ->maxContentWidth(Width::Full)
+            ->topNavigation()
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

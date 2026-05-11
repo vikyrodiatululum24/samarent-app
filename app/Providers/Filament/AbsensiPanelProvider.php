@@ -4,7 +4,6 @@ namespace App\Providers\Filament;
 
 use App\Http\Middleware\EnsureAbsensiRole;
 use Filament\Facades\Filament;
-use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -12,14 +11,14 @@ use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AbsensiPanelProvider extends PanelProvider
@@ -73,9 +72,9 @@ class AbsensiPanelProvider extends PanelProvider
                     ->url('/admin', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(1)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentPanel()?->getId() !== 'admin'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                         // tambahkan email lain yang diizinkan
                     ])),
@@ -84,9 +83,9 @@ class AbsensiPanelProvider extends PanelProvider
                     ->url('/user', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(2)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentPanel()?->getId() !== 'user'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
 
@@ -94,9 +93,9 @@ class AbsensiPanelProvider extends PanelProvider
                     ->url('/manager', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(3)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentPanel()?->getId() !== 'manager'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
 
@@ -104,9 +103,9 @@ class AbsensiPanelProvider extends PanelProvider
                     ->url('/finance', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(4)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentPanel()?->getId() !== 'finance'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
 
@@ -114,9 +113,9 @@ class AbsensiPanelProvider extends PanelProvider
                     ->url('/asuransi', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(5)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentPanel()?->getId() !== 'asuransi'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                         ])),
 
@@ -124,9 +123,9 @@ class AbsensiPanelProvider extends PanelProvider
                             ->url('/penjualan', shouldOpenInNewTab: false)
                             ->group('Panels')
                             ->sort(6)
-                            ->visible(fn () => auth()->check()
+                            ->visible(fn () => Auth::check()
                                 && Filament::getCurrentPanel()?->getId() !== 'penjualan'
-                                && in_array(auth()->user()->email, [
+                                && in_array(Auth::user()?->email, [
                                 'centralakun@samarent.com',
                             ])),
 
@@ -134,31 +133,32 @@ class AbsensiPanelProvider extends PanelProvider
                     ->url('https://driver.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
                     ->sort(7)
-                    ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
+                    ->visible(fn () => Auth::check() && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
                 NavigationItem::make('President Panel')
                     ->url('/president', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(8)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentPanel()?->getId() !== 'president'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                             'centralakun@samarent.com',
                         ])),
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
                     ->sort(9)
-                    ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
+                    ->visible(fn () => Auth::check() && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
             ])
             ->databaseNotifications()
-            ->maxContentWidth(MaxWidth::Full)
+            ->maxContentWidth(Width::Full)
             ->topNavigation()
             ->authMiddleware([
                 EnsureAbsensiRole::class,
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

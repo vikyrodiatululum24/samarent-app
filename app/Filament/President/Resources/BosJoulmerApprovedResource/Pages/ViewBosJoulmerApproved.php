@@ -5,10 +5,13 @@ namespace App\Filament\President\Resources\BosJoulmerApprovedResource\Pages;
 use App\Filament\President\Resources\BosJoulmerApprovedResource;
 use App\Models\BosJoulmer;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Form;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
 
 class ViewBosJoulmerApproved extends ViewRecord
 {
@@ -16,11 +19,10 @@ class ViewBosJoulmerApproved extends ViewRecord
 
     protected static ?string $title = 'Detail Pengajuan Disetujui';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Informasi Umum')
+        return $schema->components([
+                Section::make('Informasi Umum')
                     ->schema([
                         Placeholder::make('no_pengajuan')
                             ->label('No. Pengajuan')
@@ -71,7 +73,7 @@ class ViewBosJoulmerApproved extends ViewRecord
                             }),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Pembayaran')
+                Section::make('Pembayaran')
                     ->schema([
                         Placeholder::make('payment_1')
                             ->label('Nama Rekening')
@@ -84,15 +86,15 @@ class ViewBosJoulmerApproved extends ViewRecord
                             ->content(fn () => $this->record->pengajuan?->norek_1 ?? '-'),
                     ])
                     ->columns(3),
-                Forms\Components\Section::make('Detail Kendaraan')
+                Section::make('Detail Kendaraan')
                     ->schema([
-                        Forms\Components\View::make('filament.resources.pages.bos-joulmer.detail-kendaraan')
+                        View::make('filament.resources.pages.bos-joulmer.detail-kendaraan')
                             ->viewData([
                                 'pengajuanId' => $this->record->pengajuan_id,
                             ])
                             ->columnSpanFull(),
                     ]),
-                Forms\Components\Section::make('Informasi Complete')
+                Section::make('Informasi Complete')
                     ->schema([
                         Placeholder::make('complete_bengkel_estimasi')
                             ->label('Bengkel Estimasi')
@@ -124,7 +126,7 @@ class ViewBosJoulmerApproved extends ViewRecord
                     ])
                     ->columns(3)
                     ->visible(fn () => filled($this->record->pengajuan?->complete)),
-                Forms\Components\Section::make('Review Atasan')
+                Section::make('Review Atasan')
                     ->schema([
                         Placeholder::make('note')
                             ->label('Catatan')
@@ -133,13 +135,14 @@ class ViewBosJoulmerApproved extends ViewRecord
                             ->label('Waktu Review')
                             ->content(fn () => $this->record->updated_at?->format('d M Y H:i') ?? '-'),
                     ]),
-            ]);
+            ])
+            ->columns(1);
     }
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('kembali')
+            Action::make('kembali')
                 ->label('Kembali')
                 ->icon('heroicon-o-arrow-left')
                 ->url(static::getResource()::getUrl('index')),

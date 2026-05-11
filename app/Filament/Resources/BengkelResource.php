@@ -3,19 +3,23 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BengkelResource\Pages;
-use App\Filament\Resources\BengkelResource\RelationManagers;
 use App\Models\Bengkel;
 use App\Models\Wilayah;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Schemas\Components\Utilities\Get as SchemaGet;
+use Filament\Schemas\Components\Utilities\Set as SchemaSet;
 
 class BengkelResource extends Resource
 {
@@ -27,7 +31,7 @@ class BengkelResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Bengkel';
 
-    protected static ?string $navigationGroup = 'Master Data';
+    protected static string | \UnitEnum | null $navigationGroup = 'Master Data';
 
     protected static ?int $navigationSort = 3;
 
@@ -47,11 +51,11 @@ class BengkelResource extends Resource
         return parent::canViewAny();
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\Section::make('Informasi Bengkel')
+                Section::make('Informasi Bengkel')
                     ->description('Data umum bengkel')
                     ->schema([
                         Forms\Components\TextInput::make('nama')
@@ -70,7 +74,7 @@ class BengkelResource extends Resource
                     ->columns(2)
                     ->collapsible(),
 
-                Forms\Components\Section::make('Alamat Lengkap')
+                Section::make('Alamat Lengkap')
                     ->description('Pilih alamat secara bertahap dari provinsi hingga desa')
                     ->schema([
                         Forms\Components\Select::make('provinsi')
@@ -83,7 +87,7 @@ class BengkelResource extends Resource
                                     ->pluck('nama', 'nama');
                             })
                             ->reactive()
-                            ->afterStateUpdated(function (Set $set) {
+                            ->afterStateUpdated(function (SchemaSet $set) {
                                 $set('kab_kota', null);
                                 $set('kecamatan', null);
                                 $set('desa', null);
@@ -94,7 +98,7 @@ class BengkelResource extends Resource
                             ->label('Kabupaten/Kota')
                             ->searchable()
                             ->required()
-                            ->options(function (Get $get) {
+                            ->options(function (SchemaGet $get) {
                                 $provinsiNama = $get('provinsi');
                                 if (!$provinsiNama) {
                                     return [];
@@ -113,18 +117,18 @@ class BengkelResource extends Resource
                                     ->pluck('nama', 'nama');
                             })
                             ->reactive()
-                            ->afterStateUpdated(function (Set $set) {
+                            ->afterStateUpdated(function (SchemaSet $set) {
                                 $set('kecamatan', null);
                                 $set('desa', null);
                             })
-                            ->disabled(fn (Get $get): bool => !$get('provinsi'))
+                            ->disabled(fn (SchemaGet $get): bool => !$get('provinsi'))
                             ->placeholder('Pilih kabupaten/kota'),
 
                         Forms\Components\Select::make('kecamatan')
                             ->label('Kecamatan')
                             ->searchable()
                             ->required()
-                            ->options(function (Get $get) {
+                            ->options(function (SchemaGet $get) {
                                 $kabKotaNama = $get('kab_kota');
                                 if (!$kabKotaNama) {
                                     return [];
@@ -143,17 +147,17 @@ class BengkelResource extends Resource
                                     ->pluck('nama', 'nama');
                             })
                             ->reactive()
-                            ->afterStateUpdated(function (Set $set) {
+                            ->afterStateUpdated(function (SchemaSet $set) {
                                 $set('desa', null);
                             })
-                            ->disabled(fn (Get $get): bool => !$get('kab_kota'))
+                            ->disabled(fn (SchemaGet $get): bool => !$get('kab_kota'))
                             ->placeholder('Pilih kecamatan'),
 
                         Forms\Components\Select::make('desa')
                             ->label('Desa/Kelurahan')
                             ->searchable()
                             ->required()
-                            ->options(function (Get $get) {
+                            ->options(function (SchemaGet $get) {
                                 $kecamatanNama = $get('kecamatan');
                                 if (!$kecamatanNama) {
                                     return [];
@@ -171,7 +175,7 @@ class BengkelResource extends Resource
                                     ->orderBy('nama')
                                     ->pluck('nama', 'nama');
                             })
-                            ->disabled(fn (Get $get): bool => !$get('kecamatan'))
+                            ->disabled(fn (SchemaGet $get): bool => !$get('kecamatan'))
                             ->placeholder('Pilih desa/kelurahan'),
 
                         Forms\Components\Textarea::make('alamat')
@@ -192,7 +196,7 @@ class BengkelResource extends Resource
                     ->columns(2)
                     ->collapsible(),
 
-                Forms\Components\Section::make('Kontak Bengkel')
+                Section::make('Kontak Bengkel')
                     ->description('Tambahkan kontak person bengkel')
                     ->schema([
                         Forms\Components\Repeater::make('kontakBengkels')
@@ -318,20 +322,20 @@ class BengkelResource extends Resource
                     ->searchable(),
             ])
             ->actions([
-                Tables\Actions\Action::make('open_maps')
+                Action::make('open_maps')
                     ->label('Buka Maps')
                     ->icon('heroicon-o-map-pin')
                     ->color('success')
                     ->url(fn (Bengkel $record): ?string => $record->g_maps)
                     ->openUrlInNewTab()
                     ->visible(fn (Bengkel $record): bool => !empty($record->g_maps)),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

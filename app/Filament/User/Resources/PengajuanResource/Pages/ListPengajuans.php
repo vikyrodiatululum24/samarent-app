@@ -3,7 +3,8 @@
 namespace App\Filament\User\Resources\PengajuanResource\Pages;
 
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\User\Resources\PengajuanResource;
 
@@ -18,14 +19,30 @@ class ListPengajuans extends ListRecords
         ];
     }
 
-    public function getTabs(): array
-    {
-        return [
-            null => Tab::make('All'),
-            'OP' => Tab::make()->query(fn ($query) => $query->whereHas('complete', fn ($q) => $q->where('kode', 'op'))),
-            'SC' => Tab::make()->query(fn ($query) => $query->whereHas('complete', fn ($q) => $q->where('kode', 'sc'))),
-            'SP' => Tab::make()->query(fn ($query) => $query->whereHas('complete', fn ($q) => $q->where('kode', 'sp'))),
-            'STNK' => Tab::make()->query(fn ($query) => $query->whereHas('complete', fn ($q) => $q->where('kode', 'stnk'))),
-        ];
-    }
+public function getTabs(): array
+{
+    return [
+        'all' => Tab::make('All'),
+
+        'OP' => Tab::make('OP')
+            ->modifyQueryUsing(fn ($query) =>
+                $query->whereHas('complete', fn ($q) => $q->where('kode', 'op'))
+            ),
+
+        'SC' => Tab::make('SC')
+            ->modifyQueryUsing(fn ($query) =>
+                $query->whereHas('complete', fn ($q) => $q->where('kode', 'sc'))
+            ),
+
+        'SP' => Tab::make('SP')
+            ->modifyQueryUsing(fn ($query) =>
+                $query->whereHas('complete', fn ($q) => $q->where('kode', 'sp'))
+            ),
+
+        'STNK' => Tab::make('STNK')
+            ->modifyQueryUsing(fn ($query) =>
+                $query->whereHas('complete', fn ($q) => $q->where('kode', 'stnk'))
+            ),
+    ];
+}
 }

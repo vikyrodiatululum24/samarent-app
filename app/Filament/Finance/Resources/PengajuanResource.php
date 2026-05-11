@@ -5,23 +5,28 @@ namespace App\Filament\Finance\Resources;
 use App\Filament\Finance\Resources\PengajuanResource\Pages;
 use App\Filament\Finance\Resources\PengajuanResource\RelationManagers;
 use App\Models\Pengajuan;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Forms\Components\Hidden;
+use Filament\Infolists;
+use Filament\Infolists\Components;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Notifications\Notification;
+use Filament\Pages\SubNavigationPosition;
+use Filament\Resources\Pages\Page;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components;
-use Filament\Infolists\Components\ViewEntry;
-use Filament\Pages\SubNavigationPosition;
-use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\Storage;
-use Filament\Tables\Filters\SelectFilter;
 
 class PengajuanResource extends Resource
 {
@@ -169,96 +174,155 @@ class PengajuanResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\Action::make('Proses')
+                Action::make('Proses')
                     ->label(fn($record) => 'Proses' . ($record->keterangan_proses === 'finance' ? ' (Otorisasi)' : ''))
                     ->icon('heroicon-o-pencil')
                     ->url(fn(Pengajuan $record): string => static::getUrl('proses', ['record' => $record])),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+return $schema
             ->schema([
-                Components\Section::make('Informasi Umum')
+                Section::make('Informasi Umum')
                     ->schema([
-                        Components\Grid::make(2)
-                            ->schema([
-                                Components\Group::make([
-                                    Components\TextEntry::make('nama'),
-                                    Components\TextEntry::make('no_wa'),
-                                ]),
-                                Components\Group::make([
-                                    Components\TextEntry::make('keterangan_proses')
-                                        ->label('Status Proses')
-                                        ->badge()
-                                        ->getStateUsing(function ($record) {
-                                            return match ($record->keterangan_proses) {
-                                                'cs' => 'Customer Service',
-                                                'checker' => 'Verifikasi',
-                                                'pengajuan atasan' => 'Pengajuan Atasan',
-                                                'pengajuan finance' => 'Pengajuan Finance',
-                                                'finance' => 'Input Finance',
-                                                'otorisasi' => 'Otorisasi',
-                                                'done' => 'Selesai',
-                                                default => 'Tidak Diketahui',
-                                            };
-                                        })
-                                        ->color(fn(string $state) => match ($state) {
-                                            'Customer Service' => 'black',
-                                            'Verifikasi' => 'danger',
-                                            'Pengajuan Atasan' => 'info',
-                                            'Pengajuan Finance' => 'primary',
-                                            'Input Finance' => 'brown',
-                                            'Otorisasi' => 'yellow',
-                                            'Selesai' => 'success',
-                                            default => 'gray',
-                                        }),
-                                    Components\TextEntry::make('created_at')
-                                        ->label('Tanggal Pengajuan')
-                                        ->dateTime()
-                                        ->getStateUsing(fn($record) => $record->created_at->format('d M Y H:i:s')),
-                                ]),
-                                Components\Group::make([
-                                    Components\TextEntry::make('project'),
-                                    Components\TextEntry::make('keterangan'),
-                                    Components\TextEntry::make('up'),
-                                    Components\TextEntry::make('provinsi'),
-                                    Components\TextEntry::make('kota'),
-                                ]),
-                            ])
-                    ]),
-                Components\Section::make('Pembayaran')
+                        Components\TextEntry::make('nama')
+                            ->label('Nama PIC')
+                            ->getStateUsing(fn($record) => strtoupper($record->nama)),
+                        Components\TextEntry::make('no_wa')
+                            ->label('Nomor WhatsApp')
+                            ->getStateUsing(fn($record) => strtoupper($record->no_wa)),
+                        Components\TextEntry::make('project')
+                            ->label('Project')
+                            ->getStateUsing(fn($record) => strtoupper($record->project)),
+                        Components\TextEntry::make('keterangan')
+                            ->label('Keterangan')
+                            ->getStateUsing(fn($record) => strtoupper($record->keterangan)),
+                        Components\TextEntry::make('up')
+                            ->label('Unit Pelaksana')
+                            ->getStateUsing(function ($record) {
+                                if ($record->up === 'manual') {
+                                    return $record->up_lainnya ?? 'Lainnya';
+                                }
+                                return $record->up;
+                            })
+                            ->badge()
+                            ->formatStateUsing(fn($state) => strtoupper($state)),
+                        Components\TextEntry::make('provinsi')
+                            ->label('Provinsi')
+                            ->getStateUsing(fn($record) => strtoupper($record->provinsi)),
+                        Components\TextEntry::make('kota')
+                            ->label('Kota')
+                            ->getStateUsing(fn($record) => strtoupper($record->kota)),
+                        Components\TextEntry::make('keterangan_proses')
+                            ->label('Status Proses')
+                            ->badge()
+                            ->getStateUsing(function ($record) {
+                                return match ($record->keterangan_proses) {
+                                    'cs' => 'Customer Service',
+                                    'checker' => 'Verifikasi',
+                                    'pengajuan atasan' => 'Pengajuan Atasan',
+                                    'pengajuan finance' => 'Pengajuan Finance',
+                                    'finance' => 'Input Finance',
+                                    'otorisasi' => 'Otorisasi',
+                                    'done' => 'Selesai',
+                                    default => 'Tidak Diketahui',
+                                };
+                            })
+                            ->color(fn(string $state) => match ($state) {
+                                'Customer Service' => 'black',
+                                'Verifikasi' => 'danger',
+                                'Pengajuan Atasan' => 'info',
+                                'Pengajuan Finance' => 'primary',
+                                'Input Finance' => 'brown',
+                                'Otorisasi' => 'yellow',
+                                'Selesai' => 'success',
+                                default => 'gray',
+                            }),
+                        Components\TextEntry::make('created_at')
+                            ->label('Tanggal Pengajuan')
+                            ->dateTime()
+                            ->getStateUsing(fn($record) => $record->created_at->format('d M Y H:i:s')),
+
+                        Components\TextEntry::make('logUpdateStatus')
+                            ->label('History Update Status')
+                            ->getStateUsing(
+                                fn($record) =>
+                                $record->logUpdateStatusPengajuans()
+                                    ->orderBy('created_at', 'desc')
+                                    ->get()
+                                    ->map(fn($log) => "{$log->status_baru} - " . $log->created_at->format('d M Y H:i:s'))
+                                    ->implode('<br>')
+                            )
+                            ->html(),
+                        Components\TextEntry::make('Status atasan')
+                            ->label('Status di Atasan')
+                            ->visible(fn($record) => $record->bos_joulmer !== null)
+                            ->getStateUsing(fn($record) => match ($record->bos_joulmer?->is_approved) {
+                                'pending' => 'Menunggu Approval',
+                                'approved' => 'Disetujui',
+                                'rejected' => 'Ditolak',
+                                default => '-',
+                            })
+                            ->badge()
+                            ->color(fn(string $state) => match ($state) {
+                                'Menunggu Approval' => 'info',
+                                'Disetujui' => 'success',
+                                'Ditolak' => 'danger',
+                            }),
+                        Components\TextEntry::make('bos_joulmer.note')
+                            ->label('Catatan Atasan')
+                            ->getStateUsing(fn($record) => $record->bos_joulmer?->note ?: '-')
+                            ->columnSpanFull()
+                            ->visible(fn($record) => in_array($record->bos_joulmer?->is_approved, ['approved', 'rejected'], true)),
+                    ])
+                    ->columns(2),
+                Section::make('Pembayaran')
                     ->schema([
-                        Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Components\TextEntry::make('payment_1'),
-                                Components\TextEntry::make('bank_1'),
-                                Components\TextEntry::make('norek_1'),
+                                Components\TextEntry::make('payment_1')
+                                    ->label('Nama Rekening')
+                                    ->getStateUsing(fn($record) => strtoupper($record->payment_1)),
+                                Components\TextEntry::make('bank_1')
+                                    ->label('Nama Bank')
+                                    ->getStateUsing(fn($record) => strtoupper($record->bank_1)),
+                                Components\TextEntry::make('norek_1')
+                                    ->label('Nomor Rekening')
+                                    ->getStateUsing(fn($record) => strtoupper($record->norek_1)),
                             ]),
                     ]),
-                Components\Section::make('Detail Kendaraan')
+                Section::make('Detail Kendaraan')
                     ->schema([
                         ViewEntry::make('service_unit.pengajuan_id')
                             ->label('Detail Kendaraan')
                             ->view('filament.resources.pages.pengajuan.detail-kendaraan')
                             ->columnSpanFull(),
                     ]),
-                Components\Section::make('Informasi Complete')
+                Section::make('Informasi Complete')
                     ->schema([
-                        Components\Grid::make(1)
+                        Grid::make(3)
                             ->schema([
-                                Components\Group::make([
+                                Group::make([
                                     Components\TextEntry::make('complete.kode')
-                                        ->label('Kode'),
+                                        ->label('Kode')
+                                        ->visible(fn($record) => !empty($record->complete?->kode))
+                                        ->badge()
+                                        ->formatStateUsing(fn($state) => strtoupper($state)),
                                 ]),
+                                Components\TextEntry::make('complete.bengkel_invoice')
+                                    ->label('Bengkel Invoice')
+                                    ->visible(fn($record) => !empty($record->complete?->bengkel_invoice))
+                                    ->columnSpan(2),
+
                             ]),
-                        Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bengkel_estimasi')
                                     ->label('Bengkel Estimasi'),
@@ -267,24 +331,23 @@ class PengajuanResource extends Resource
                                 Components\TextEntry::make('complete.nominal_estimasi')
                                     ->label('Nominal Estimasi')
                                     ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
-                            ])
-                            ->label('Informasi Bengkel'),
-                        Components\Grid::make(3)
+                            ]),
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.tanggal_masuk_finance')
                                     ->label('Tanggal Masuk Finance')
-                                    ->dateTime(),
+                                    ->date(),
                                 Components\TextEntry::make('complete.tanggal_tf_finance')
                                     ->label('Tanggal Transfer Finance')
-                                    ->dateTime(),
+                                    ->date(),
                                 Components\TextEntry::make('complete.nominal_tf_finance')
                                     ->label('Nominal Transfer Finance')
                                     ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
                             ]),
                         Components\TextEntry::make('complete.tanggal_input_bank')
-                            ->label('Tanggal Input Bank')
-                            ->date(),
-                        Components\Grid::make(3)
+                                    ->label('Tanggal Input Bank')
+                                    ->date(),
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bank_2')
                                     ->label('Bank'),
@@ -293,7 +356,7 @@ class PengajuanResource extends Resource
                                 Components\TextEntry::make('complete.norek_2')
                                     ->label('No. Rekening'),
                             ]),
-                        Components\Grid::make(1)
+                        Grid::make(1)
                             ->schema([
                                 Components\TextEntry::make('complete.status_finance')
                                     ->label('Status Finance')
@@ -312,9 +375,9 @@ class PengajuanResource extends Resource
                             ]),
                     ])
                     ->visible(fn($record) => !empty($record->complete)), // Only show when complete data is filled
-                Components\Section::make('Informasi Bengkel')
+                Section::make('Informasi Bengkel')
                     ->schema([
-                        Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bank_bengkel')
                                     ->label('Bank Bengkel')
@@ -323,8 +386,7 @@ class PengajuanResource extends Resource
                                     ->label('Nama Rekening Bengkel')
                                     ->getStateUsing(fn($record) => strtoupper($record->complete?->nama_rek_bengkel)),
                                 Components\TextEntry::make('complete.rek_bengkel')
-                                    ->label('No. Rekening Bengkel')
-                                    ->formatStateUsing(fn($state) => $state !== null ? $state : '-'),
+                                    ->label('No. Rekening Bengkel'),
                                 Components\TextEntry::make('complete.nominal_tf_bengkel')
                                     ->label('Nominal Transfer Bengkel')
                                     ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
@@ -340,7 +402,7 @@ class PengajuanResource extends Resource
                             ]),
                     ])
                     ->visible(fn($record) => !empty($record->complete)),
-                Components\Section::make('Dokumentasi Complete')
+                Section::make('Dokumentasi Complete')
                     ->schema([
                         ViewEntry::make('complete.foto_nota')
                             ->label('Foto Nota')
@@ -351,18 +413,15 @@ class PengajuanResource extends Resource
                             ]),
                         ViewEntry::make('finance.bukti_transaksi')
                             ->label('Bukti Transaksi')
-                            ->view('filament.components.bukti_transaksi')
-                            ->columnSpan([
-                                'default' => 4,
-                                'md' => 3,
-                            ]),
+                            ->view('filament.components.bukti_transaksi'),
                     ])
                     ->columns([
                         'default' => 4,
                         'md' => 3,
                     ])
                     ->visible(fn($record) => !empty($record->complete)),
-            ]);
+            ])
+            ->columns(1);
     }
 
     // public static function getRecordSubNavigation(Page $page): array

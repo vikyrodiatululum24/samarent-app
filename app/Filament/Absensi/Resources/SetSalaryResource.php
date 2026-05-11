@@ -4,15 +4,15 @@ namespace App\Filament\Absensi\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
 use App\Models\SetSalary;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Filament\Resources\Resource;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Absensi\Resources\SetSalaryResource\Pages;
-use App\Filament\Absensi\Resources\SetSalaryResource\RelationManagers;
 
 class SetSalaryResource extends Resource
 {
@@ -22,9 +22,9 @@ class SetSalaryResource extends Resource
 
     protected static ?string $pluralLabel = 'Set Salaries';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('project_id')
                     ->required()
@@ -104,11 +104,11 @@ class SetSalaryResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -2,22 +2,25 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\EditProfile;
+use App\Filament\Resources\Bbms\BbmResource;
+use App\Filament\Resources\BengkelResource;
+use App\Filament\Resources\FormTugasResource;
+use Filament\Facades\Filament;
+use Filament\Http\Middleware\AuthenticateSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Facades\Filament;
-use Filament\Support\Enums\MaxWidth;
-use Filament\Navigation\NavigationItem;
-use App\Filament\Pages\Auth\EditProfile;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Filament\Http\Middleware\AuthenticateSession;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Filament\Support\Enums\Width;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class UserPanelProvider extends PanelProvider
 {
@@ -40,8 +43,11 @@ class UserPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')            ->resources([
                 \App\Filament\Resources\ReimbursementResource::class,
-            ])            ->resources([
-                \App\Filament\Resources\BengkelResource::class,
+            ])
+            ->resources([
+                BengkelResource::class,
+                FormTugasResource::class,
+                BbmResource::class,
             ])
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->profile(EditProfile::class, false)
@@ -153,7 +159,8 @@ class UserPanelProvider extends PanelProvider
                         'centralakun@samarent.com',
                     ])),
             ])
-            ->maxContentWidth(MaxWidth::Full)
-            ->topNavigation();
+            ->maxContentWidth(Width::Full)
+            ->topNavigation()
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

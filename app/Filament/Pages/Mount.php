@@ -11,12 +11,12 @@ use Filament\Tables\Concerns\InteractsWithTable;
 class Mount extends Page implements HasTable
 {
     use InteractsWithTable;
-    protected static string $view = 'filament.pages.mount';
+    protected string $view = 'filament.pages.mount';
 
     protected static ?string $title = 'Histori Perbulan';
     protected static ?string $navigationLabel = 'Histori Perbulan';
     protected static ?string $slug = 'mount';
-    protected static ?string $navigationGroup = 'Unit';
+    protected static string | \UnitEnum | null $navigationGroup = 'Unit';
 
     public ?array $data = [];
 

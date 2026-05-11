@@ -7,27 +7,28 @@ use App\Models\Unit;
 use Filament\Tables;
 use Filament\Infolists;
 use App\Models\UnitJual;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Infolists\Components\GalleryEntry;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use App\Filament\Resources\UnitJualResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\UnitJualResource\RelationManagers;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Illuminate\Support\Facades\Auth;
 
 class UnitJualResource extends Resource
 {
     protected static ?string $model = UnitJual::class;
-    protected static ?string $navigationGroup = 'Unit';
+    protected static string | \UnitEnum | null $navigationGroup = 'Unit';
     protected static ?string $pluralLabel = 'Jual Unit';
     protected static ?string $navigationLabel = 'Jual Unit';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('unit_id')
                     ->required()
@@ -242,20 +243,20 @@ class UnitJualResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->components([
-                Infolists\Components\Section::make('Detail Kendaraan')
+                \Filament\Schemas\Components\Section::make('Detail Kendaraan')
                     ->schema([
                         Infolists\Components\TextEntry::make('unit.type')
                             ->label('Unit')
@@ -289,7 +290,7 @@ class UnitJualResource extends Resource
                             ->suffix('%'),
                     ])
                     ->columns(2),
-                Infolists\Components\Section::make('Informasi Harga')
+                \Filament\Schemas\Components\Section::make('Informasi Harga')
                     ->schema([
                         Infolists\Components\TextEntry::make('harga_jual')
                             ->label('Open Price')
@@ -310,7 +311,7 @@ class UnitJualResource extends Resource
                             ]),
                     ])
                     ->columns(2),
-                Infolists\Components\Grid::make(3)
+                \Filament\Schemas\Components\Grid::make(3)
                     ->schema([
                         Infolists\Components\ImageEntry::make('foto_depan')
                             ->label('Foto Depan')
@@ -337,12 +338,12 @@ class UnitJualResource extends Resource
                             ->disk('public')
                             ->height(200),
                     ]),
-                Infolists\Components\Section::make('Data Penawar')
+                \Filament\Schemas\Components\Section::make('Data Penawar')
                     ->schema([
                         Infolists\Components\RepeatableEntry::make('penawars')
                             ->label('')
                             ->schema([
-                                Infolists\Components\Grid::make([
+                                Grid::make([
                                     'sm' => 2,
                                     'md' => 3,
                                     'lg' => 6
@@ -370,7 +371,7 @@ class UnitJualResource extends Resource
                     ])
                     ->collapsible()
                     ->collapsed(false),
-                Infolists\Components\Section::make('Bukti Pembayaran')
+                Section::make('Bukti Pembayaran')
                     ->schema([
                         Infolists\Components\TextEntry::make('harga_terjual')
                             ->label('Harga Terjual')
@@ -394,27 +395,27 @@ class UnitJualResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->email === 'centralakun@samarent.com' || auth()->user()?->email === 'president@samarent.com';
+        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function canView($record): bool
     {
-        return auth()->user()?->email === 'centralakun@samarent.com' || auth()->user()?->email === 'president@samarent.com';
+        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->email === 'centralakun@samarent.com' || auth()->user()?->email === 'president@samarent.com';
+        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function canEdit($record): bool
     {
-        return auth()->user()?->email === 'centralakun@samarent.com' || auth()->user()?->email === 'president@samarent.com';
+        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function canDelete($record): bool
     {
-        return auth()->user()?->email === 'centralakun@samarent.com' || auth()->user()?->email === 'president@samarent.com';
+        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function getPages(): array

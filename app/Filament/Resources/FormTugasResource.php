@@ -3,22 +3,20 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FormTugasResource\Pages;
-use App\Filament\Resources\FormTugasResource\RelationManagers;
 use App\Models\FormTugas;
 use App\Models\Unit;
-use App\Models\User;
+use Filament\Actions;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Support\Enums\FontWeight;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 
 class FormTugasResource extends Resource
 {
@@ -26,7 +24,7 @@ class FormTugasResource extends Resource
 
     protected static ?string $navigationLabel = 'Form Tugas Keluar';
 
-    protected static ?string $navigationGroup = 'Master Data';
+    protected static string | \UnitEnum | null $navigationGroup = 'Master Data';
 
     protected static ?string $modelLabel = 'Form Tugas';
 
@@ -34,9 +32,9 @@ class FormTugasResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make('Informasi Utama')
                     ->description('Detail informasi form tugas')
@@ -53,7 +51,7 @@ class FormTugasResource extends Resource
                             ->columnSpan(1),
 
                         Forms\Components\Hidden::make('user_id')
-                            ->default(auth()->id()),
+                            ->default(fn () => \Illuminate\Support\Facades\Auth::id()),
 
                         Forms\Components\TextInput::make('nama_atasan')
                             ->label('Nama Atasan')
@@ -153,7 +151,7 @@ class FormTugasResource extends Resource
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, callable $set, callable $get) => self::updateTotal($set, $get))
+                            ->afterStateUpdated(fn ($state, Set $set, Get $get) => self::updateTotal($set, $get))
                             ->placeholder('0')
                             ->columnSpan(1),
 
@@ -163,7 +161,7 @@ class FormTugasResource extends Resource
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, callable $set, callable $get) => self::updateTotal($set, $get))
+                            ->afterStateUpdated(fn ($state, Set $set, Get $get) => self::updateTotal($set, $get))
                             ->placeholder('0')
                             ->columnSpan(1),
 
@@ -173,7 +171,7 @@ class FormTugasResource extends Resource
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, callable $set, callable $get) => self::updateTotal($set, $get))
+                            ->afterStateUpdated(fn ($state, Set $set, Get $get) => self::updateTotal($set, $get))
                             ->placeholder('0')
                             ->columnSpan(1),
 
@@ -183,7 +181,7 @@ class FormTugasResource extends Resource
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, callable $set, callable $get) => self::updateTotal($set, $get))
+                            ->afterStateUpdated(fn ($state, Set $set, Get $get) => self::updateTotal($set, $get))
                             ->placeholder('0')
                             ->columnSpan(1),
 
@@ -193,7 +191,7 @@ class FormTugasResource extends Resource
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, callable $set, callable $get) => self::updateTotal($set, $get))
+                            ->afterStateUpdated(fn ($state, Set $set, Get $get) => self::updateTotal($set, $get))
                             ->placeholder('0')
                             ->columnSpan(1),
 
@@ -273,7 +271,7 @@ class FormTugasResource extends Resource
             ]);
     }
 
-    protected static function updateTotal(callable $set, callable $get): void
+    protected static function updateTotal(Set $set, Get $get): void
     {
         $bbm = (float) ($get('bbm') ?? 0);
         $toll = (float) ($get('toll') ?? 0);
@@ -394,15 +392,15 @@ class FormTugasResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
+                Actions\ViewAction::make()
                     ->color('info'),
-                Tables\Actions\EditAction::make()
+                Actions\EditAction::make()
                     ->color('warning'),
-                Tables\Actions\DeleteAction::make(),
+                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

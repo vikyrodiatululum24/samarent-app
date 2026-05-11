@@ -4,21 +4,18 @@ namespace App\Filament\President\Resources;
 
 use App\Filament\President\Resources\BosJoulmerApprovedResource\Pages;
 use App\Models\BosJoulmer;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
-use Filament\Infolists\Components;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class BosJoulmerApprovedResource extends Resource
 {
     protected static ?string $model = BosJoulmer::class;
 
-    protected static ?string $navigationGroup = 'Pengajuan';
+    protected static string | \UnitEnum | null $navigationGroup = 'Pengajuan';
 
     protected static ?string $navigationLabel = 'Pengajuan Disetujui';
 
@@ -47,11 +44,11 @@ class BosJoulmerApprovedResource extends Resource
                             });
                         })
                         ->getStateUsing(function (BosJoulmer $record) {
-                            if ($record->pengajuan?->up === 'manual') {
-                                return $record->pengajuan->up_lainnya ?? '-';
-                            } else{
-                                return $record->pengajuan?->up ?? '-';
+                            if ($record->pengajuan?->up_lainnya) {
+                                return $record->pengajuan->up_lainnya;
                             }
+
+                            return $record->pengajuan?->up ?? '-';
                         })
                         ->label('Unit Pelaksana')
                         ->toggleable(isToggledHiddenByDefault: true),
@@ -155,7 +152,7 @@ class BosJoulmerApprovedResource extends Resource
             ])
             ->filters([])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([])
             ->defaultSort('updated_at', 'desc');

@@ -3,26 +3,33 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReimbursementResource\Pages;
-use App\Filament\Resources\ReimbursementResource\RelationManagers;
 use App\Models\Reimbursement;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\HtmlString;
+use Filament\Schemas\Components\Utilities\Get;
 
 class ReimbursementResource extends Resource
 {
     protected static ?string $model = Reimbursement::class;
-    protected static ?string $navigationGroup = 'Keuangan';
+    protected static string | \UnitEnum | null $navigationGroup = 'Keuangan';
     protected static ?string $pluralLabel = 'Reimbursement';
     protected static ?string $navigationLabel = 'Reimbursement';
 
@@ -39,15 +46,15 @@ class ReimbursementResource extends Resource
         ]);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\Hidden::make('user_id')
+                Hidden::make('user_id')
                     ->default(Auth::id())
                     ->required(),
 
-                Forms\Components\Select::make('type')
+                Select::make('type')
                     ->label('Tipe Reimbursement')
                     ->options([
                         'bbm' => 'BBM',
@@ -60,16 +67,16 @@ class ReimbursementResource extends Resource
                     ->columnSpanFull()
                     ->placeholder('Pilih tipe reimbursement'),
 
-                Forms\Components\Section::make('Data Odometer Awal')
+                Section::make('Data Odometer Awal')
                     ->schema([
-                        Forms\Components\TextInput::make('km_awal')
+                        TextInput::make('km_awal')
                             ->label('KM Awal')
                             ->numeric()
                             ->minValue(0)
                             ->suffix('KM')
                             ->placeholder('Masukkan KM awal'),
 
-                        Forms\Components\FileUpload::make('foto_odometer_awal')
+                        FileUpload::make('foto_odometer_awal')
                             ->label('Foto Odometer Awal')
                             ->image()
                             ->resize(50)
@@ -81,11 +88,11 @@ class ReimbursementResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
-                    ->visible(fn (Forms\Get $get) => $get('type') === 'bbm'),
+                    ->visible(fn (Get $get) => $get('type') === 'bbm'),
 
-                Forms\Components\Section::make('Data Odometer Akhir')
+                Section::make('Data Odometer Akhir')
                     ->schema([
-                        Forms\Components\TextInput::make('km_akhir')
+                        TextInput::make('km_akhir')
                             ->label('KM Akhir')
                             ->numeric()
                             ->minValue(0)
@@ -93,7 +100,7 @@ class ReimbursementResource extends Resource
                             ->placeholder('Masukkan KM akhir')
                             ->gt('km_awal'),
 
-                        Forms\Components\FileUpload::make('foto_odometer_akhir')
+                        FileUpload::make('foto_odometer_akhir')
                             ->label('Foto Odometer Akhir')
                             ->image()
                             ->imageEditor()
@@ -106,17 +113,17 @@ class ReimbursementResource extends Resource
                     ])
                     ->columns(2)
                     ->collapsible()
-                    ->visible(fn (Forms\Get $get) => $get('type') === 'bbm'),
+                    ->visible(fn (Get $get) => $get('type') === 'bbm'),
 
-                Forms\Components\Section::make('Detail Perjalanan')
+                Section::make('Detail Perjalanan')
                     ->schema([
-                        Forms\Components\TextInput::make('tujuan_perjalanan')
+                        TextInput::make('tujuan_perjalanan')
                             ->label('Tujuan Perjalanan')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Contoh: Bandung'),
 
-                        Forms\Components\Textarea::make('keterangan')
+                        Textarea::make('keterangan')
                             ->label('Keterangan')
                             ->required()
                             ->rows(3)
@@ -127,9 +134,9 @@ class ReimbursementResource extends Resource
                     ->columns(2)
                     ->collapsible(),
 
-                Forms\Components\Section::make('Nota Pembayaran')
+                Section::make('Nota Pembayaran')
                     ->schema([
-                        Forms\Components\FileUpload::make('nota')
+                        FileUpload::make('nota')
                             ->label('Foto Nota')
                             ->required()
                             ->image()
@@ -143,16 +150,16 @@ class ReimbursementResource extends Resource
                     ])
                     ->collapsible(),
 
-                Forms\Components\Section::make('Dana')
+                Section::make('Dana')
                     ->schema([
-                        Forms\Components\TextInput::make('dana_masuk')
+                        TextInput::make('dana_masuk')
                             ->label('Dana Masuk')
                             ->numeric()
                             ->prefix('Rp')
                             ->placeholder('0')
                             ->minValue(0),
 
-                        Forms\Components\TextInput::make('dana_keluar')
+                        TextInput::make('dana_keluar')
                             ->label('Dana Keluar')
                             ->numeric()
                             ->prefix('Rp')
@@ -256,10 +263,10 @@ class ReimbursementResource extends Resource
             ->filters([
                 Tables\Filters\Filter::make('created_at')
                     ->form([
-                        Forms\Components\DatePicker::make('dari')
+                        DatePicker::make('dari')
                             ->label('Dari Tanggal')
                             ->native(false),
-                        Forms\Components\DatePicker::make('sampai')
+                        DatePicker::make('sampai')
                             ->label('Sampai Tanggal')
                             ->native(false),
                     ])
@@ -286,11 +293,11 @@ class ReimbursementResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkAction::make('export')
+                BulkAction::make('export')
                     ->label('Export Selected')
                     ->icon('heroicon-o-printer')
                     ->color('success')
@@ -299,6 +306,9 @@ class ReimbursementResource extends Resource
                         return redirect()->route('reimbursement.print-pdf', ['ids' => implode(',', $ids)]);
                     })
                     ->openUrlInNewTab(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

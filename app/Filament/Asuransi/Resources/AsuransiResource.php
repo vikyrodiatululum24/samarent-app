@@ -5,11 +5,20 @@ namespace App\Filament\Asuransi\Resources;
 use App\Filament\Asuransi\Resources\AsuransiResource\Pages;
 use App\Models\Asuransi;
 use App\Models\Unit;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -19,11 +28,11 @@ class AsuransiResource extends Resource
     protected static ?string $navigationLabel = 'Data Asuransi';
     protected static ?string $label = 'Data Asuransi';
     protected static ?string $pluralLabel = 'Data Asuransi';
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\Section::make('Informasi Umum')
+                Section::make('Informasi Umum')
                     ->schema([
                         Forms\Components\Select::make('unit_id')
                             ->label('Unit')
@@ -54,11 +63,11 @@ class AsuransiResource extends Resource
                                 'manual' => 'Lainnya',
                             ])
                             ->reactive()
-                            ->afterStateUpdated(fn(callable $set, $state) => $set('uplainnya', $state === 'manual' ? '' : null)),
+                            ->afterStateUpdated(fn(Set $set, $state) => $set('uplainnya', $state === 'manual' ? '' : null)),
                         Forms\Components\TextInput::make('uplainnya')
                             ->label('Unit Pelaksana Lainnya')
-                            ->required(fn(callable $get) => $get('up') === 'manual')
-                            ->visible(fn(callable $get) => $get('up') === 'manual')
+                            ->required(fn(Get $get) => $get('up') === 'manual')
+                            ->visible(fn(Get $get) => $get('up') === 'manual')
                             ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
                         Forms\Components\Textarea::make('lokasi')
                             ->label('Lokasi')
@@ -79,7 +88,7 @@ class AsuransiResource extends Resource
                     ->columns([
                         'sm' => 2,
                     ]),
-                Forms\Components\Section::make('Detail Asuransi')
+                Section::make('Detail Asuransi')
                     ->schema([
                         Forms\Components\TextInput::make('nama')
                             ->label('Nama Asuransi')
@@ -90,7 +99,7 @@ class AsuransiResource extends Resource
                                 'TLO' => 'TLO (Total Lost Only)',
                                 'All Risk' => 'All Risk',
                             ]),
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 Forms\Components\DatePicker::make('periode_mulai')
                                     ->label('Periode Mulai'),
@@ -113,7 +122,7 @@ class AsuransiResource extends Resource
                         'sm' => 2,
                     ]),
 
-                Forms\Components\Section::make('Keterangan')
+                Section::make('Keterangan')
                     ->schema([
                         Forms\Components\DatePicker::make('tanggal_kejadian')
                             ->label('Tanggal Kejadian'),
@@ -126,7 +135,7 @@ class AsuransiResource extends Resource
                     ])
                     ->columns(1),
 
-                Forms\Components\Section::make('Dokumen Pendukung')
+                Section::make('Dokumen Pendukung')
                     ->schema([
                         Forms\Components\FileUpload::make('foto_ktp')
                             ->label('Foto KTP')
@@ -435,25 +444,25 @@ class AsuransiResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Infolists\Components\Section::make('Informasi Umum')
+                Section::make('Informasi Umum')
                     ->schema([
-                        Infolists\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 Infolists\Components\TextEntry::make('unit.nopol')
                                     ->label('No. Polisi Unit')
@@ -491,9 +500,9 @@ class AsuransiResource extends Resource
                             ]),
                     ]),
 
-                Infolists\Components\Section::make('Detail Asuransi')
+                Section::make('Detail Asuransi')
                     ->schema([
-                        Infolists\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Infolists\Components\TextEntry::make('nama')
                                     ->label('Nama Asuransi')
@@ -509,8 +518,7 @@ class AsuransiResource extends Resource
                                         default => 'gray',
                                     }),
 
-
-                                Infolists\Components\Group::make([
+                                Group::make([
                                     Infolists\Components\TextEntry::make('periode_mulai')
                                         ->label('Periode Mulai')
                                         ->color('gray'),
@@ -518,7 +526,6 @@ class AsuransiResource extends Resource
                                         ->label('Periode Selesai')
                                         ->color('gray'),
                                 ])
-                                    ->label('Periode Asuransi')
                                     ->columns(2),
 
                                 Infolists\Components\TextEntry::make('nominal')
@@ -536,7 +543,7 @@ class AsuransiResource extends Resource
                             ]),
                     ]),
 
-                Infolists\Components\Section::make('Keterangan')
+                Section::make('Keterangan')
                     ->schema([
                         Infolists\Components\TextEntry::make('tanggal_kejadian')
                             ->label('Tanggal Kejadian')
@@ -554,9 +561,9 @@ class AsuransiResource extends Resource
                     ])
                     ->columns(1),
 
-                Infolists\Components\Section::make('Dokumen Pendukung')
+                Section::make('Dokumen Pendukung')
                     ->schema([
-                        Infolists\Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Infolists\Components\ImageEntry::make('foto_ktp')
                                     ->label('Foto KTP')
@@ -617,7 +624,8 @@ class AsuransiResource extends Resource
                                     ->visible(fn($record) => !empty($record->foto_unit) && is_array($record->foto_unit) && count($record->foto_unit) > 0),
                             ]),
                     ]),
-            ]);
+            ])
+            ->columns(1);
     }
 
     public static function getRelations(): array

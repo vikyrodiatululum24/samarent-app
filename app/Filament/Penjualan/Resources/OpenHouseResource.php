@@ -6,7 +6,7 @@ use App\Filament\Penjualan\Resources\OpenHouseResource\Pages;
 use App\Filament\Penjualan\Resources\OpenHouseResource\RelationManagers;
 use App\Models\OpenHouse;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -21,10 +21,9 @@ class OpenHouseResource extends Resource
 
     protected static ?string $navigationLabel = 'Open House Events';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->components([
                 Forms\Components\TextInput::make('nama_event')
                     ->label('Nama Event')
                     ->required()

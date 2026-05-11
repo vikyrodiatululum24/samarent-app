@@ -3,15 +3,15 @@
 namespace App\Filament\Absensi\Resources;
 
 use App\Filament\Absensi\Resources\EndUserResource\Pages;
-use App\Filament\Absensi\Resources\EndUserResource\RelationManagers;
 use App\Models\EndUser;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EndUserResource extends Resource
 {
@@ -19,9 +19,9 @@ class EndUserResource extends Resource
 
     protected static ?string $pluralModelLabel = 'End User';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('project_id')
                     ->relationship('project', 'name')
@@ -65,11 +65,11 @@ class EndUserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

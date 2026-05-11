@@ -10,5 +10,5 @@ class PrintDocument extends Page
     protected static ?string $navigationLabel = 'Print Documentations';
     protected static ?string $slug = 'print-documentations';
 
-    protected static string $view = 'filament.pages.print-documentations';
+    protected string $view = 'filament.pages.print-documentations';
 }

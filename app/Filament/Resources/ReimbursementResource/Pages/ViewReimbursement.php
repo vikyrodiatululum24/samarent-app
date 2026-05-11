@@ -6,8 +6,9 @@ use App\Filament\Resources\ReimbursementResource;
 use App\Models\Reimbursement;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components;
+use Filament\Schemas\Schema;
 
 class ViewReimbursement extends ViewRecord
 {
@@ -20,11 +21,11 @@ class ViewReimbursement extends ViewRecord
         ];
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Components\Section::make('Informasi User')
+                Section::make('Informasi User')
                     ->schema([
                         Components\TextEntry::make('user.name')
                             ->label('Nama User')
@@ -37,7 +38,7 @@ class ViewReimbursement extends ViewRecord
                     ])
                     ->columns(2),
 
-                Components\Section::make('Data Odometer Awal')
+                Section::make('Data Odometer Awal')
                     ->schema([
                         Components\TextEntry::make('km_awal')
                             ->label('KM Awal')
@@ -57,7 +58,7 @@ class ViewReimbursement extends ViewRecord
                     ])
                     ->columns(2),
 
-                Components\Section::make('Data Odometer Akhir')
+                Section::make('Data Odometer Akhir')
                     ->schema([
                         Components\TextEntry::make('km_akhir')
                             ->label('KM Akhir')
@@ -91,7 +92,7 @@ class ViewReimbursement extends ViewRecord
                     ->columns(2)
                     ->collapsible(),
 
-                Components\Section::make('Detail Perjalanan')
+                Section::make('Detail Perjalanan')
                     ->schema([
                         Components\TextEntry::make('tujuan_perjalanan')
                             ->label('Tujuan Perjalanan')
@@ -115,7 +116,7 @@ class ViewReimbursement extends ViewRecord
                     ->columns(2)
                     ->collapsible(),
 
-                Components\Section::make('Informasi Dana')
+                Section::make('Informasi Dana')
                     ->schema([
                         Components\TextEntry::make('dana_masuk')
                             ->label('Dana Masuk')
@@ -148,7 +149,7 @@ class ViewReimbursement extends ViewRecord
                     ->columns(3)
                     ->collapsible(),
 
-                Components\Section::make('Informasi Tambahan')
+                Section::make('Informasi Tambahan')
                     ->schema([
                         Components\TextEntry::make('created_at')
                             ->label('Dibuat Pada')
@@ -160,6 +161,7 @@ class ViewReimbursement extends ViewRecord
                     ])
                     ->columns(2)
                     ->collapsed(),
-            ]);
+            ])
+            ->columns(1);
     }
 }

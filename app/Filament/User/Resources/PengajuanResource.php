@@ -6,23 +6,28 @@ use Filament\Forms;
 use App\Models\Unit;
 use Filament\Tables;
 use App\Models\Project;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use App\Models\Pengajuan;
 use Filament\Tables\Table;
 use Filament\Facades\Filament;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Infolists\Components;
 use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Wizard;
-use Filament\Pages\SubNavigationPosition;
+use Filament\Schemas\Components\Wizard;
+use Filament\Pages\Enums\SubNavigationPosition;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Grid;
+use Filament\Actions;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Infolists\Components\Section;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard\Step;
 use Filament\Infolists\Components\ViewEntry;
 use App\Filament\User\Resources\PengajuanResource\Pages;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class PengajuanResource extends Resource
 {
@@ -32,18 +37,18 @@ class PengajuanResource extends Resource
 
     protected static ?string $navigationLabel = 'Pengajuan';
 
-    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Wizard::make([
                     Step::make('Pengajuan')
                         ->schema([
-                            Forms\Components\Fieldset::make('Informasi Umum')
+                            Fieldset::make('Informasi Umum')
                                 ->schema([
-                                    Forms\Components\Group::make()
+                                    Group::make()
                                         ->schema([
                                             Hidden::make('user_id')
                                                 ->default(\Illuminate\Support\Facades\Auth::user()->id),
@@ -58,7 +63,7 @@ class PengajuanResource extends Resource
                                                 ->numeric()
                                                 ->maxLength(255),
                                         ]),
-                                    Forms\Components\Group::make()
+                                    Group::make()
                                         ->schema([
                                             Forms\Components\Select::make('project')
                                                 ->label('Project')
@@ -91,11 +96,11 @@ class PengajuanResource extends Resource
                                                     'manual' => 'Lainnya',
                                                 ])
                                                 ->reactive()
-                                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
+                                                ->afterStateUpdated(fn(Set $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
                                             Forms\Components\TextInput::make('up_lainnya')
                                                 ->label('Unit Pelaksana Lainnya')
-                                                ->required(fn(callable $get) => $get('up') === 'manual')
-                                                ->visible(fn(callable $get) => $get('up') === 'manual')
+                                                ->required(fn(Get $get) => $get('up') === 'manual')
+                                                ->visible(fn(Get $get) => $get('up') === 'manual')
                                                 ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
                                         ]),
                                     Forms\Components\TextInput::make('provinsi')
@@ -114,7 +119,7 @@ class PengajuanResource extends Resource
                                 ->columns(2)
                                 ->columnSpan('full')
                                 ->extraAttributes(['class' => 'mb-4']),
-                            Forms\Components\Fieldset::make('Pembayaran')
+                            Fieldset::make('Pembayaran')
                                 ->schema([
                                     Forms\Components\Select::make('keterangan')
                                         ->required()
@@ -134,7 +139,7 @@ class PengajuanResource extends Resource
                                         ->searchable()
                                         ->nullable()
                                         ->reactive()
-                                        ->afterStateUpdated(function ($component, $state, callable $set) {
+                                        ->afterStateUpdated(function ($component, $state, Set $set) {
                                             $component->state(strtoupper($state));
                                             $norek = \App\Models\Norek::where('name', $state)->first();
                                             $set('norek_1', $norek?->norek);
@@ -190,14 +195,14 @@ class PengajuanResource extends Resource
                                         ->nullable()
                                         ->label('Bank')
                                         ->readOnly()
-                                        ->default(function (callable $get) {
+                                        ->default(function (Get $get) {
                                             $nama = $get('payment_1');
                                             if (!$nama) return null;
                                             $norek = \App\Models\Norek::where('name', $nama)->first();
                                             return $norek?->bank;
                                         })
                                         ->reactive()
-                                        ->afterStateHydrated(function ($component, $state, callable $get) {
+                                        ->afterStateHydrated(function ($component, $state, Get $get) {
                                             $nama = $get('payment_1');
                                             if ($nama) {
                                                 $norek = \App\Models\Norek::where('name', $nama)->first();
@@ -211,14 +216,14 @@ class PengajuanResource extends Resource
                                         ->numeric()
                                         ->maxLength(255)
                                         ->readOnly()
-                                        ->default(function (callable $get) {
+                                        ->default(function (Get $get) {
                                             $nama = $get('payment_1');
                                             if (!$nama) return null;
                                             $norek = \App\Models\Norek::where('name', $nama)->first();
                                             return $norek?->norek;
                                         })
                                         ->reactive()
-                                        ->afterStateHydrated(function ($component, $state, callable $get) {
+                                        ->afterStateHydrated(function ($component, $state, Get $get) {
                                             $nama = $get('payment_1');
                                             if ($nama) {
                                                 $norek = \App\Models\Norek::where('name', $nama)->first();
@@ -235,7 +240,7 @@ class PengajuanResource extends Resource
                             Forms\Components\Repeater::make('service_unit')
                                 ->relationship() // penting: ini untuk relasi hasMany
                                 ->schema([
-                                    Forms\Components\Grid::make(2)
+                                    Grid::make(2)
                                         ->schema([
                                             Forms\Components\Select::make('unit_id')
                                                 ->label('Unit')
@@ -253,7 +258,7 @@ class PengajuanResource extends Resource
                                     Forms\Components\TextInput::make('service')
                                         ->label('Jenis Permintaan Service')
                                         ->required(),
-                                    Forms\Components\Grid::make(3)
+                                    Grid::make(3)
                                         ->schema([
                                             Forms\Components\FileUpload::make('foto_unit')
                                                 ->label('Foto Unit')
@@ -408,6 +413,7 @@ class PengajuanResource extends Resource
                     ->color(fn(string $state) => match (true) {
                         str_contains(strtoupper($state), 'CUSTOMER SERVICE') => 'black',
                         str_contains(strtoupper($state), 'VERIFIKASI') => 'danger',
+                        str_contains(strtoupper($state), 'PENGAJUAN ATASAN') => 'info',
                         str_contains(strtoupper($state), 'PENGAJUAN FINANCE') => 'primary',
                         str_contains(strtoupper($state), 'INPUT FINANCE') => 'brown',
                         str_contains(strtoupper($state), 'OTORISASI') => 'yellow',
@@ -415,15 +421,31 @@ class PengajuanResource extends Resource
                         default => 'gray',
                     })
                     ->getStateUsing(function ($record) {
-                        return match ($record->keterangan_proses) {
+                        $prosesPengajuan = $record->keterangan_proses ?? '';
+                        $statusBos = $record->bos_joulmer?->is_approved;
+
+                        $prosesText = match ($prosesPengajuan) {
                             'cs' => 'Customer Service',
                             'checker' => 'Verifikasi',
+                            'pengajuan atasan' => 'Pengajuan Atasan',
                             'pengajuan finance' => 'Pengajuan Finance',
                             'finance' => 'Input Finance',
                             'otorisasi' => 'Otorisasi',
                             'done' => 'Selesai',
                             default => 'Tidak Diketahui',
                         };
+
+                        if ($prosesPengajuan === 'pengajuan atasan') {
+                            $bosText = match ($statusBos) {
+                                'approved' => 'Disetujui',
+                                'rejected' => 'Ditolak',
+                                'pending' => 'Pending',
+                                default => 'Tidak Diketahui',
+                            };
+                            return "{$prosesText} - {$bosText}";
+                        }
+
+                        return $prosesText;
                     })
                     ->width('150px')
                     ->wrap(),
@@ -448,19 +470,19 @@ class PengajuanResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+                Actions\ViewAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
                 Section::make('Informasi Umum')
                     ->schema([
@@ -499,6 +521,7 @@ class PengajuanResource extends Resource
                                 return match ($record->keterangan_proses) {
                                     'cs' => 'Customer Service',
                                     'checker' => 'Verifikasi',
+                                    'pengajuan atasan' => 'Pengajuan Atasan',
                                     'pengajuan finance' => 'Pengajuan Finance',
                                     'finance' => 'Input Finance',
                                     'otorisasi' => 'Otorisasi',
@@ -509,6 +532,7 @@ class PengajuanResource extends Resource
                             ->color(fn(string $state) => match ($state) {
                                 'Customer Service' => 'black',
                                 'Verifikasi' => 'danger',
+                                'Pengajuan Atasan' => 'info',
                                 'Pengajuan Finance' => 'primary',
                                 'Input Finance' => 'brown',
                                 'Otorisasi' => 'yellow',
@@ -534,7 +558,7 @@ class PengajuanResource extends Resource
                     ->columns(2),
                 Section::make('Pembayaran')
                     ->schema([
-                        Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('payment_1')
                                     ->label('Nama Rekening')
@@ -554,7 +578,8 @@ class PengajuanResource extends Resource
                             ->view('filament.resources.pages.pengajuan.detail-kendaraan')
                             ->columnSpanFull(),
                     ]),
-            ]);
+            ])
+            ->columns(1);
     }
 
     public static function getRecordSubNavigation(Page $page): array

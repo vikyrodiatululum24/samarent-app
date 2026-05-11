@@ -4,12 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LaporanKeuanganServiceResource\Pages;
 use App\Models\KeuanganService;
-use Filament\Forms\Form;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-use PDF;
 
 class LaporanKeuanganServiceResource extends Resource
 {
@@ -17,7 +20,7 @@ class LaporanKeuanganServiceResource extends Resource
 
     protected static ?string $navigationLabel = 'Laporan Keuangan Service';
 
-    protected static ?string $navigationGroup = 'Keuangan';
+    protected static string | \UnitEnum | null $navigationGroup = 'Keuangan';
 
     protected static ?string $label = 'Laporan Keuangan Service';
 
@@ -34,9 +37,9 @@ class LaporanKeuanganServiceResource extends Resource
         return $totals;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 \Filament\Forms\Components\Select::make('pengajuan_id')
                     ->label('No Pengajuan')
@@ -161,7 +164,7 @@ class LaporanKeuanganServiceResource extends Resource
                     }),
             ])
             ->headerActions([
-                \Filament\Tables\Actions\Action::make('export_excel')
+                Action::make('export_excel')
                     ->label('Export Excel')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->action(function ($livewire) {
@@ -174,7 +177,7 @@ class LaporanKeuanganServiceResource extends Resource
                             echo self::generateExcel($data, $filters);
                         }, 'laporan_keuangan_service_' . date('Y-m-d') . '.xlsx');
                     }),
-                \Filament\Tables\Actions\Action::make('export_pdf')
+                Action::make('export_pdf')
                     ->label('Export PDF')
                     ->icon('heroicon-o-document-text')
                     ->url(fn ($livewire) => route('laporan-keuangan-service.export-pdf', [
@@ -184,11 +187,11 @@ class LaporanKeuanganServiceResource extends Resource
                     ->openUrlInNewTab(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

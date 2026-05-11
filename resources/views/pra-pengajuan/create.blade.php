@@ -12,7 +12,7 @@
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -115,7 +115,7 @@
 <body class="bg-slate-100">
     <div class="min-h-screen py-8 px-4">
         <div class="max-w-3xl mx-auto">
-            <div class="bg-white rounded-xl shadow mb-6">
+            <div class="bg-white rounded-xl shadow-sm mb-6">
                 <img src="{{ asset('images/header_samarent.jpg') }}" alt="header samarent" width="100%"
                     style="border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">
                 <div class="pb-6">
@@ -142,7 +142,7 @@
                 </div>
             @endif
 
-            <div class="bg-white rounded-xl shadow p-6">
+            <div class="bg-white rounded-xl shadow-sm p-6">
                 <form action="{{ route('public.pra-pengajuan.store') }}" method="POST" class="space-y-5"
                     enctype="multipart/form-data">
                     @csrf
@@ -216,7 +216,7 @@
                     <div id="service-units-wrapper">
 
                         <!-- ITEM 1 -->
-                        <div class="service-unit-item border p-4 rounded mb-3">
+                        <div class="service-unit-item border p-4 rounded-sm mb-3">
 
                             <div class="mb-3">
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Unit</label>
@@ -270,10 +270,10 @@
                                     <label for="service_lainnya"
                                         class="block text-sm font-medium text-slate-700 mb-1">Service Lainnya</label>
                                     <div class="flex gap-2">
-                                        <input type="text" class="service-lainnya-input border rounded p-2 w-full"
+                                        <input type="text" class="service-lainnya-input border rounded-sm p-2 w-full"
                                             placeholder="Tulis service lainnya">
                                         <button type="button"
-                                            class="btn-add-service bg-gray-700 text-white px-3 rounded">
+                                            class="btn-add-service bg-gray-700 text-white px-3 rounded-sm">
                                             Tambah
                                         </button>
                                     </div>
@@ -319,7 +319,7 @@
                     </div>
 
                     <button type="button" id="add-service-unit"
-                        class="bg-gray-700 text-white px-4 py-2 rounded mb-4">
+                        class="bg-gray-700 text-white px-4 py-2 rounded-sm mb-4">
                         + Tambah Unit
                     </button>
 
@@ -423,7 +423,7 @@
             $('#add-service-unit').on('click', function() {
 
                 let html = `
-                        <div class="service-unit-item border p-4 rounded mb-3">
+                        <div class="service-unit-item border p-4 rounded-sm mb-3">
 
                             <div class="mb-3">
                                 <label>Unit</label>
@@ -475,10 +475,10 @@
                                     <label for="service_lainnya"
                                         class="block text-sm font-medium text-slate-700 mb-1">Service Lainnya</label>
                                     <div class="flex gap-2">
-                                        <input type="text" class="service-lainnya-input border rounded p-2 w-full"
+                                        <input type="text" class="service-lainnya-input border rounded-sm p-2 w-full"
                                             placeholder="Tulis service lainnya">
                                         <button type="button"
-                                            class="btn-add-service bg-gray-700 text-white px-3 rounded">
+                                            class="btn-add-service bg-gray-700 text-white px-3 rounded-sm">
                                             Tambah
                                         </button>
                                     </div>
@@ -618,7 +618,7 @@
                     reader.onload = function(e) {
                         preview.html(`
                 <img src="${e.target.result}"
-                    class="w-32 h-32 object-cover rounded border">
+                    class="w-32 h-32 object-cover rounded-sm border">
             `);
                     }
 
@@ -642,7 +642,7 @@
                     reader.onload = function(e) {
                         preview.html(`
                 <img src="${e.target.result}"
-                    class="w-32 h-32 object-cover rounded border">
+                    class="w-32 h-32 object-cover rounded-sm border">
             `);
                     }
 
@@ -670,7 +670,7 @@
                             preview.append(`
                     <div class="relative">
                         <img src="${e.target.result}"
-                            class="w-24 h-24 object-cover rounded border">
+                            class="w-24 h-24 object-cover rounded-sm border">
                     </div>
                 `);
                         }

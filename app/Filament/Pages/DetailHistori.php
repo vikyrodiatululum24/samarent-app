@@ -15,23 +15,43 @@ class DetailHistori extends Page implements HasTable
 
     protected static ?string $title = 'Detail Histori';
     protected static ?string $slug = 'detail-histori'; // Menambahkan parameter unit di slug
-    protected static string $view = 'filament.pages.detail-histori';
+    protected string $view = 'filament.pages.detail-histori';
     protected static bool $shouldRegisterNavigation = false; // Agar tidak tampil di menu navbar
 
     public ?Unit $unit = null;
+    public ?string $tahun = null;
+    public ?string $started_at = null;
+    public ?string $ended_at = null;
 
     public function mount(): void
     {
         $unitId = request()->query('unit');
         $this->unit = Unit::findOrFail($unitId);
+        $this->tahun = request()->query('tahun');
+        $this->started_at = request()->query('started_at');
+        $this->ended_at = request()->query('ended_at');
     }
 
 
     public function getTableQuery()
     {
-        return ServiceUnit::query()
+        $query = ServiceUnit::query()
             ->with(['pengajuan'])
             ->where('unit_id', $this->unit->id);
+
+        if (! empty($this->started_at)) {
+            $query->whereDate('created_at', '>=', $this->started_at);
+        }
+
+        if (! empty($this->ended_at)) {
+            $query->whereDate('created_at', '<=', $this->ended_at);
+        }
+
+        if (! empty($this->tahun)) {
+            $query->whereYear('created_at', $this->tahun);
+        }
+
+        return $query;
     }
 
     public function getTableColumns(): array

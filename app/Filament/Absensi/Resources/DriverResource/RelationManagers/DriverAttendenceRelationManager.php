@@ -5,7 +5,7 @@ namespace App\Filament\Absensi\Resources\DriverResource\RelationManagers;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Actions;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Support\Carbon;
 use App\Helpers\PayrollHelpers;
@@ -17,9 +17,9 @@ class DriverAttendenceRelationManager extends RelationManager
 {
     protected static string $relationship = 'driverAttendences';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\DatePicker::make('date')
                     ->label('Tanggal')
@@ -172,8 +172,8 @@ class DriverAttendenceRelationManager extends RelationManager
             ])
             ->headerActions([
                 // Tables\Actions\CreateAction::make(),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('priviewPdf')
+                Actions\ActionGroup::make([
+                    Actions\Action::make('priviewPdf')
                         ->label('Preview PDF')
                         ->icon('heroicon-o-eye')
                         ->action(function ($livewire) {
@@ -197,7 +197,7 @@ class DriverAttendenceRelationManager extends RelationManager
 
                             $this->js("window.open('{$url}', '_blank')");
                         }),
-                    Tables\Actions\Action::make('printPdf')
+                    Actions\Action::make('printPdf')
                         ->label('Print PDF')
                         ->icon('heroicon-o-printer')
                         ->badge(function($livewire) {
@@ -227,7 +227,7 @@ class DriverAttendenceRelationManager extends RelationManager
                             $this->js("window.open('{$url}', '_blank')");
                         }),
 
-                    Tables\Actions\Action::make('exportExcel')
+                    Actions\Action::make('exportExcel')
                         ->label('Export to Excel')
                         ->icon('heroicon-o-document-plus')
                         ->action(function ($livewire) {
@@ -256,18 +256,18 @@ class DriverAttendenceRelationManager extends RelationManager
                 ->icon('heroicon-o-arrow-down-tray'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                Actions\EditAction::make()
                 ->after(function ($record) {
                     if (!$record->is_complete) {
                         return;
                     }
                     PayrollHelpers::calculateOvertimePay($record);
                 }),
-                Tables\Actions\DeleteAction::make(),
+                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -12,7 +12,7 @@ class PrintDocumentations extends Page
     protected static ?string $title = 'Print Documentations';
     protected static ?string $navigationLabel = 'Print Documentations';
     protected static ?string $slug = 'print-documentations';
-    protected static ?string $navigationGroup = 'Unit';
+    protected static string | \UnitEnum | null $navigationGroup = 'Unit';
 
-    protected static string $view = 'filament.pages.print-documentations';
+    protected string $view = 'filament.pages.print-documentations';
 }

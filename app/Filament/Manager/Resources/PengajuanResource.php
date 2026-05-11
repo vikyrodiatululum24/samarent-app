@@ -3,17 +3,11 @@
 namespace App\Filament\Manager\Resources;
 
 use App\Filament\Manager\Resources\PengajuanResource\Pages;
-use App\Filament\Manager\Resources\PengajuanResource\RelationManagers;
 use App\Models\Pengajuan;
-use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components; // Added this line to fix undefined Components
-use Filament\Infolists\Components\ViewEntry; // Added this line to fix undefined ViewEntry
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -21,9 +15,9 @@ class PengajuanResource extends Resource
 {
     protected static ?string $model = Pengajuan::class;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 //
             ]);
@@ -151,7 +145,7 @@ class PengajuanResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $user = auth()->user();
+        $user = \Illuminate\Support\Facades\Auth::user();
 
         // Ambil data manager terkait user
         $manager = $user->manager;

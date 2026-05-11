@@ -2,12 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Pages\Dashboard;
+use App\Http\Middleware\EnsureAdminRole;
+use Filament\Support\Enums\Width;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationItem;
-use Filament\Support\Enums\MaxWidth;
 use App\Filament\Pages\Auth\EditProfile;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -45,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->profile(EditProfile::class, false)
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
@@ -64,7 +66,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                \App\Http\Middleware\EnsureAdminRole::class,
+                EnsureAdminRole::class,
             ])
             ->navigationItems([
                 NavigationItem::make('Admin Panel')
@@ -72,7 +74,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Panels')
                     ->sort(1)
                     ->visible(fn () => auth()->check()
-                        && Filament::getCurrentPanel()?->getId() !== 'admin'
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'admin'
                         && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                         // tambahkan email lain yang diizinkan
@@ -84,7 +86,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Panels')
                     ->sort(1)
                     ->visible(fn () => auth()->check()
-                        && Filament::getCurrentPanel()?->getId() !== 'user'
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'user'
                         && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                         // tambahkan email lain yang diizinkan
@@ -95,7 +97,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Panels')
                     ->sort(2)
                     ->visible(fn () => auth()->check()
-                        && Filament::getCurrentPanel()?->getId() !== 'user'
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'user'
                         && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),
@@ -105,7 +107,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Panels')
                     ->sort(2)
                     ->visible(fn () => auth()->check()
-                        && Filament::getCurrentPanel()?->getId() !== 'manager'
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'manager'
                         && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),
@@ -115,7 +117,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Panels')
                     ->sort(2)
                     ->visible(fn () => auth()->check()
-                        && Filament::getCurrentPanel()?->getId() !== 'finance'
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'finance'
                         && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                     ])),
@@ -125,7 +127,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Panels')
                     ->sort(2)
                     ->visible(fn () => auth()->check()
-                        && Filament::getCurrentPanel()?->getId() !== 'asuransi'
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'asuransi'
                         && in_array(auth()->user()->email, [
                         'centralakun@samarent.com',
                         ])),
@@ -135,7 +137,7 @@ class AdminPanelProvider extends PanelProvider
                             ->group('Panels')
                             ->sort(2)
                             ->visible(fn () => auth()->check()
-                                && Filament::getCurrentPanel()?->getId() !== 'absensi'
+                                && Filament::getCurrentOrDefaultPanel()?->getId() !== 'absensi'
                                 && in_array(auth()->user()->email, [
                                 'centralakun@samarent.com',
                             ])),
@@ -145,7 +147,7 @@ class AdminPanelProvider extends PanelProvider
                             ->group('Panels')
                             ->sort(2)
                             ->visible(fn () => auth()->check()
-                                && Filament::getCurrentPanel()?->getId() !== 'penjualan'
+                                && Filament::getCurrentOrDefaultPanel()?->getId() !== 'penjualan'
                                 && in_array(auth()->user()->email, [
                                 'centralakun@samarent.com',
                             ])),
@@ -162,7 +164,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Panels')
                     ->sort(4)
                     ->visible(fn () => auth()->check()
-                        && Filament::getCurrentPanel()?->getId() !== 'president'
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'president'
                         && in_array(auth()->user()->email, [
                             'centralakun@samarent.com',
                         ])),
@@ -175,8 +177,10 @@ class AdminPanelProvider extends PanelProvider
                     ])),
             ])
             ->databaseNotifications()
-            ->maxContentWidth(MaxWidth::Full)
-            ->topNavigation();
+            ->maxContentWidth(Width::Full)
+            ->topNavigation()
+            ->viteTheme('resources/css/filament/admin/theme.css');
+
 
         // ->logoutRedirectUrl(route('admin.logout'));
     }

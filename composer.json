@@ -8,9 +8,9 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
-        "filament/filament": "^3.3",
-        "filament/widgets": "^3.3",
-        "joshembling/image-optimizer": "^1.6",
+        "danihidayatx/image-optimizer": "^2.2",
+        "filament/filament": "~5.0",
+        "filament/widgets": "~5.0",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
@@ -18,6 +18,7 @@
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "filament/upgrade": "5.0",
         "laravel/breeze": "^2.3",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.13",

@@ -11,7 +11,7 @@
         default => 'bg-gray-400 text-white',
     };
 @endphp
-<span class="px-2 py-1 rounded text-xs font-semibold {{ $badgeClass }}">
+<span class="px-2 py-1 rounded-sm text-xs font-semibold {{ $badgeClass }}">
     {{ match ($status) {
         'cs' => 'Customer Service',
         'checker' => 'Checker',

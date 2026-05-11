@@ -7,12 +7,12 @@ use App\Models\Unit;
 use Filament\Tables;
 use App\Models\JualUnit;
 use App\Models\UnitJual;
-use Filament\Forms\Form;
+
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Penjualan\Resources\JualUnitResource\Pages;
@@ -24,10 +24,9 @@ class JualUnitResource extends Resource
     protected static ?string $pluralLabel = 'Jual Unit';
     protected static ?string $navigationLabel = 'Jual Unit';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->components([
                 Forms\Components\Select::make('unit_id')
                     ->required()
                     ->relationship('unit', 'nopol')
@@ -250,9 +249,9 @@ class JualUnitResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->components([
                 Infolists\Components\Section::make('Detail Kendaraan')
                     ->schema([

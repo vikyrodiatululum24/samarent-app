@@ -6,33 +6,42 @@ use Filament\Forms;
 use App\Models\Unit;
 use Filament\Tables;
 use App\Models\Project;
-use Filament\Forms\Form;
 use App\Models\Pengajuan;
 use Filament\Tables\Table;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Infolists\Components;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Wizard;
 use Filament\Notifications\Notification;
-use Filament\Pages\SubNavigationPosition;
-use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Wizard\Step;
 use App\Filament\Imports\PengajuanImporter;
 use Filament\Infolists\Components\ViewEntry;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ImportAction;
+use Filament\Pages\Enums\SubNavigationPosition;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 use App\Models\BosJoulmer;
 use App\Filament\Resources\PengajuanResource\Pages;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 
 class PengajuanResource extends Resource
 {
     protected static ?string $model = Pengajuan::class;
 
-    protected static ?string $navigationGroup = 'Pengajuan';
+    protected static string | \UnitEnum | null $navigationGroup = 'Pengajuan';
 
     protected static ?string $slug = 'pengajuan';
 
@@ -40,18 +49,18 @@ class PengajuanResource extends Resource
 
     protected static ?int $navigationSort = 0;
 
-    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Wizard::make([
                     Step::make('Pengajuan')
                         ->schema([
-                            Forms\Components\Fieldset::make('Informasi Umum')
+                            Fieldset::make('Informasi Umum')
                                 ->schema([
-                                    Forms\Components\Group::make()
+                                    Group::make()
                                         ->schema([
                                             Hidden::make('user_id')
                                                 ->default(Auth::user()->id),
@@ -66,7 +75,7 @@ class PengajuanResource extends Resource
                                                 ->numeric()
                                                 ->maxLength(255),
                                         ]),
-                                    Forms\Components\Group::make()
+                                    Group::make()
                                         ->schema([
                                             Forms\Components\Select::make('project')
                                                 ->label('Project')
@@ -99,11 +108,11 @@ class PengajuanResource extends Resource
                                                     'manual' => 'Lainnya',
                                                 ])
                                                 ->reactive()
-                                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
+                                                ->afterStateUpdated(fn(Set $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null)),
                                             Forms\Components\TextInput::make('up_lainnya')
                                                 ->label('Unit Pelaksana Lainnya')
-                                                ->required(fn(callable $get) => $get('up') === 'manual')
-                                                ->visible(fn(callable $get) => $get('up') === 'manual')
+                                                ->required(fn(Get $get) => $get('up') === 'manual')
+                                                ->visible(fn(Get $get) => $get('up') === 'manual')
                                                 ->afterStateUpdated(fn($component, $state) => $component->state(strtoupper($state))),
                                         ]),
                                     Forms\Components\TextInput::make('provinsi')
@@ -120,7 +129,7 @@ class PengajuanResource extends Resource
                                 ->columns(2)
                                 ->columnSpan('full')
                                 ->extraAttributes(['class' => 'mb-4']),
-                            Forms\Components\Fieldset::make('Pembayaran')
+                            Fieldset::make('Pembayaran')
                                 ->schema([
                                     Forms\Components\Select::make('keterangan')
                                         ->required()
@@ -139,7 +148,7 @@ class PengajuanResource extends Resource
                                         ->searchable()
                                         ->nullable()
                                         ->reactive()
-                                        ->afterStateUpdated(function ($component, $state, callable $set) {
+                                        ->afterStateUpdated(function ($component, $state, Set $set) {
                                             $component->state(strtoupper($state));
                                             $norek = \App\Models\Norek::where('name', $state)->first();
                                             $set('norek_1', $norek?->norek);
@@ -195,14 +204,14 @@ class PengajuanResource extends Resource
                                         ->nullable()
                                         ->label('Bank')
                                         ->readOnly()
-                                        ->default(function (callable $get) {
+                                        ->default(function (Get $get) {
                                             $nama = $get('payment_1');
                                             if (!$nama) return null;
                                             $norek = \App\Models\Norek::where('name', $nama)->first();
                                             return $norek?->bank;
                                         })
                                         ->reactive()
-                                        ->afterStateHydrated(function ($component, $state, callable $get) {
+                                        ->afterStateHydrated(function ($component, $state, Get $get) {
                                             $nama = $get('payment_1');
                                             if ($nama) {
                                                 $norek = \App\Models\Norek::where('name', $nama)->first();
@@ -216,14 +225,14 @@ class PengajuanResource extends Resource
                                         ->numeric()
                                         ->maxLength(255)
                                         ->readOnly()
-                                        ->default(function (callable $get) {
+                                        ->default(function (Get $get) {
                                             $nama = $get('payment_1');
                                             if (!$nama) return null;
                                             $norek = \App\Models\Norek::where('name', $nama)->first();
                                             return $norek?->norek;
                                         })
                                         ->reactive()
-                                        ->afterStateHydrated(function ($component, $state, callable $get) {
+                                        ->afterStateHydrated(function ($component, $state, Get $get) {
                                             $nama = $get('payment_1');
                                             if ($nama) {
                                                 $norek = \App\Models\Norek::where('name', $nama)->first();
@@ -240,7 +249,7 @@ class PengajuanResource extends Resource
                             Forms\Components\Repeater::make('service_unit')
                                 ->relationship() // penting: ini untuk relasi hasMany
                                 ->schema([
-                                    Forms\Components\Grid::make(2)
+                                    Grid::make(2)
                                         ->schema([
                                             Forms\Components\Select::make('unit_id')
                                                 ->label('Unit')
@@ -257,9 +266,9 @@ class PengajuanResource extends Resource
                                     Forms\Components\TextInput::make('service')
                                         ->label('Jenis Permintaan Service')
                                         ->required(),
-                                    Forms\Components\Grid::make(2)
+                                    Grid::make(2)
                                         ->schema([
-                                            Forms\Components\Grid::make(3)
+                                            Grid::make(3)
                                                 ->schema([
                                                     Forms\Components\FileUpload::make('foto_unit')
                                                         ->label('Foto Unit')
@@ -418,7 +427,7 @@ class PengajuanResource extends Resource
                     ->label('Unit Pelaksana')
                     ->width('120px')
                     ->wrap(),
-                
+
                 Tables\Columns\TextColumn::make('complete.bengkel_estimasi')
                     ->sortable()
                     ->searchable()
@@ -530,21 +539,21 @@ class PengajuanResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\Action::make('Edit')
+                Action::make('Edit')
                     ->label('Edit')
                     ->icon('heroicon-o-pencil')
                     ->color('warning')
                     ->url(fn($record) => PengajuanResource::getUrl('edit-complete', ['record' => $record])),
-                Tables\Actions\Action::make('Proses')
+                Action::make('Proses')
                     ->label('Proses')
                     ->icon('heroicon-o-clipboard-document-list')
                     ->url(fn($record) => PengajuanResource::getUrl('proses-complete', ['record' => $record])),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                     // ExportBulkAction::make()->exporter(ServiceUnitExporter::class),
-                    Tables\Actions\BulkAction::make('check')
+                    BulkAction::make('check')
                         ->label('Verifikasi')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -562,7 +571,7 @@ class PengajuanResource extends Resource
                         ->modalHeading('Konfirmasi Pengajuan Finance')
                         ->modalSubheading('Apakah Anda yakin ingin mengubah status semua pengajuan yang dipilih menjadi "Pengajuan Finance"?')
                         ->modalButton('Ya, Ubah Status'),
-                    Tables\Actions\BulkAction::make('submit_to_bos')
+                    BulkAction::make('submit_to_bos')
                         ->label('Ajukan Keatasan')
                         ->icon('heroicon-o-paper-airplane')
                         ->color('info')
@@ -615,11 +624,11 @@ class PengajuanResource extends Resource
             ->defaultSort('id', 'desc'); // Optional: Add default sorting
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Components\Section::make('Informasi Umum')
+                Section::make('Informasi Umum')
                     ->schema([
                         Components\TextEntry::make('nama')
                             ->label('Nama PIC')
@@ -712,9 +721,9 @@ class PengajuanResource extends Resource
                             ->visible(fn($record) => in_array($record->bos_joulmer?->is_approved, ['approved', 'rejected'], true)),
                     ])
                     ->columns(2),
-                Components\Section::make('Pembayaran')
+                Section::make('Pembayaran')
                     ->schema([
-                        Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('payment_1')
                                     ->label('Nama Rekening')
@@ -727,18 +736,18 @@ class PengajuanResource extends Resource
                                     ->getStateUsing(fn($record) => strtoupper($record->norek_1)),
                             ]),
                     ]),
-                Components\Section::make('Detail Kendaraan')
+                Section::make('Detail Kendaraan')
                     ->schema([
                         ViewEntry::make('service_unit.pengajuan_id')
                             ->label('Detail Kendaraan')
                             ->view('filament.resources.pages.pengajuan.detail-kendaraan')
                             ->columnSpanFull(),
                     ]),
-                Components\Section::make('Informasi Complete')
+                Section::make('Informasi Complete')
                     ->schema([
-                        Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
-                                Components\Group::make([
+                                Group::make([
                                     Components\TextEntry::make('complete.kode')
                                         ->label('Kode')
                                         ->visible(fn($record) => !empty($record->complete?->kode))
@@ -751,7 +760,7 @@ class PengajuanResource extends Resource
                                     ->columnSpan(2),
 
                             ]),
-                        Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bengkel_estimasi')
                                     ->label('Bengkel Estimasi'),
@@ -760,9 +769,8 @@ class PengajuanResource extends Resource
                                 Components\TextEntry::make('complete.nominal_estimasi')
                                     ->label('Nominal Estimasi')
                                     ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
-                            ])
-                            ->label('Informasi Bengkel'),
-                        Components\Grid::make(3)
+                            ]),
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.tanggal_masuk_finance')
                                     ->label('Tanggal Masuk Finance')
@@ -777,7 +785,7 @@ class PengajuanResource extends Resource
                         Components\TextEntry::make('complete.tanggal_input_bank')
                                     ->label('Tanggal Input Bank')
                                     ->date(),
-                        Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bank_2')
                                     ->label('Bank'),
@@ -786,7 +794,7 @@ class PengajuanResource extends Resource
                                 Components\TextEntry::make('complete.norek_2')
                                     ->label('No. Rekening'),
                             ]),
-                        Components\Grid::make(1)
+                        Grid::make(1)
                             ->schema([
                                 Components\TextEntry::make('complete.status_finance')
                                     ->label('Status Finance')
@@ -805,9 +813,9 @@ class PengajuanResource extends Resource
                             ]),
                     ])
                     ->visible(fn($record) => !empty($record->complete)), // Only show when complete data is filled
-                Components\Section::make('Informasi Bengkel')
+                Section::make('Informasi Bengkel')
                     ->schema([
-                        Components\Grid::make(3)
+                        Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bank_bengkel')
                                     ->label('Bank Bengkel')
@@ -832,7 +840,7 @@ class PengajuanResource extends Resource
                             ]),
                     ])
                     ->visible(fn($record) => !empty($record->complete)),
-                Components\Section::make('Dokumentasi Complete')
+                Section::make('Dokumentasi Complete')
                     ->schema([
                         ViewEntry::make('complete.foto_nota')
                             ->label('Foto Nota')
@@ -850,7 +858,8 @@ class PengajuanResource extends Resource
                         'md' => 3,
                     ])
                     ->visible(fn($record) => !empty($record->complete)),
-            ]);
+            ])
+            ->columns(1);
     }
 
     public static function getRecordSubNavigation(Page $page): array

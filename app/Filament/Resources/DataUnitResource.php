@@ -5,30 +5,29 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use App\Models\Unit;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables;
-use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Carbon;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Actions\ExportAction;
 use App\Filament\Exports\UnitExporter;
-use Illuminate\Validation\Rules\Unique;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Actions\ExportBulkAction;
+use Filament\Actions\ExportBulkAction;
 use App\Filament\Resources\DataUnitResource\Pages;
-use App\Filament\Resources\DataUnitResource\RelationManagers;
 
 class DataUnitResource extends Resource
 {
     protected static ?string $model = Unit::class;
 
     // protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
-    protected static ?string $navigationGroup = 'Unit';
+    protected static string | \UnitEnum | null $navigationGroup = 'Unit';
     protected static ?string $navigationLabel = 'Data Unit';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\TextInput::make('no_rks')->label('No. RKS'),
                 Forms\Components\TextInput::make('penyerahan_unit')->label('Penyerahan Unit'),
@@ -145,11 +144,11 @@ class DataUnitResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                     ExportBulkAction::make('export_units')
                         ->label('Export Unit')
                         ->exporter(UnitExporter::class),

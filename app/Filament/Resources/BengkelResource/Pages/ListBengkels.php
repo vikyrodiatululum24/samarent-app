@@ -6,7 +6,7 @@ use App\Filament\Resources\BengkelResource;
 use App\Models\Bengkel;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Components\Tab;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListBengkels extends ListRecords

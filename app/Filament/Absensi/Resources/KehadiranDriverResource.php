@@ -7,14 +7,17 @@ use App\Filament\Absensi\Resources\KehadiranDriverResource\RelationManagers\Over
 use App\Models\DriverAttendence;
 use App\Services\GeocodingService;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
-use Filament\Infolists\Infolist;
-use Filament\Pages\SubNavigationPosition;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Pages\Enums\SubNavigationPosition;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -28,9 +31,9 @@ class KehadiranDriverResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kehadiran Driver';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\DatePicker::make('date')->label('Tanggal')->required(),
             Forms\Components\DateTimePicker::make('time_in')->label('Waktu Masuk')->required(),
             Forms\Components\DateTimePicker::make('time_out')->label('Waktu Keluar')->required(),
@@ -45,14 +48,15 @@ class KehadiranDriverResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\ViewAction::make()])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
+            ->actions([EditAction::make(), ViewAction::make()])
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
-            Section::make('Detail Kehadiran Driver')
+        return $schema
+            ->schema([
+                Section::make('Detail Kehadiran Driver')
                 ->columns(2)
                 ->schema([
                     Group::make()
@@ -143,10 +147,11 @@ class KehadiranDriverResource extends Resource
                     ])
                     ->columns(2)
                     ->visible(fn($record) => !empty($record->time_out)),
-            ]);
+            ])
+            ->columns(1);
     }
 
-    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
     public static function getRecordSubNavigation(Page $page): array
     {
         return $page->generateNavigationItems([Pages\ViewKehadiranDriver::class, Pages\EditKehadiranDriver::class]);

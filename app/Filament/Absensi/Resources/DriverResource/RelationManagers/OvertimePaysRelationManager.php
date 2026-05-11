@@ -4,7 +4,8 @@ namespace App\Filament\Absensi\Resources\DriverResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Forms\Form;
+use Filament\Actions;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Illuminate\Support\Carbon;
@@ -16,9 +17,9 @@ class OvertimePaysRelationManager extends RelationManager
 {
     protected static string $relationship = 'overtimePay';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\DatePicker::make('tanggal')->label('Tanggal')->required(),
 
             Forms\Components\TextInput::make('hari')->label('Hari')->required(),
@@ -94,8 +95,8 @@ class OvertimePaysRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(), 
-                Tables\Actions\Action::make('export')
+                Actions\CreateAction::make(),
+                Actions\Action::make('export')
                     ->label('Export Excel')
                     ->icon('heroicon-o-document-plus')
                     ->action(function ($livewire) {
@@ -110,13 +111,13 @@ class OvertimePaysRelationManager extends RelationManager
                                 ->send();
                             return null;
                         }
-                        
+
                         $url = route('export-overtime-excel', ['driver_id' => $driverId, 'month' => $month]);
 
                         $this->js("window.open('{$url}', '_blank')");
                     })
             ])
-            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
+            ->actions([Actions\EditAction::make(), Actions\DeleteAction::make()])
+            ->bulkActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
     }
 }

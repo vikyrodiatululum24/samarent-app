@@ -6,7 +6,7 @@ use Filament\Forms;
 use App\Models\Unit;
 use Filament\Tables;
 use App\Models\DataUnit;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -16,10 +16,9 @@ class ServiceUnitRelationManager extends RelationManager
 {
     protected static string $relationship = 'service_unit';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->components([
                 Forms\Components\Select::make('unit_id')
                     ->label('Unit')
                     ->relationship('unit', 'nopol') // Relasi dari model ini ke model Unit

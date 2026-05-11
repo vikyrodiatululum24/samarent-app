@@ -2,7 +2,9 @@
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
+
 class Dashboard extends \Filament\Pages\Dashboard
 {
-  protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-circle-stack';
 }

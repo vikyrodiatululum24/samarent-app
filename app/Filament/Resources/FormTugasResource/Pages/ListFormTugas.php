@@ -5,7 +5,7 @@ namespace App\Filament\Resources\FormTugasResource\Pages;
 use App\Filament\Resources\FormTugasResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Components\Tab;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListFormTugas extends ListRecords

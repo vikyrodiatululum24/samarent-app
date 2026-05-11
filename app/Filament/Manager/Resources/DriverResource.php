@@ -8,11 +8,10 @@ use App\Filament\Manager\Resources\DriverResource\RelationManagers\DriverAttende
 use App\Filament\Manager\Resources\DriverResource\RelationManagers\ReimbursementsRelationManager;
 use App\Models\Driver;
 use App\Models\Project;
-use App\Models\User;
-use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,9 +22,9 @@ class DriverResource extends Resource
     protected static ?string $model = Driver::class;
     protected static ?string $pluralModelLabel = 'Driver';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 //
             ]);
@@ -50,7 +49,7 @@ class DriverResource extends Resource
                     ->square()
                     ->label('Foto Driver')
                     ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo)),
-                    
+
             ])
             ->filters([
                 //
@@ -59,17 +58,17 @@ class DriverResource extends Resource
                 //
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Infolists\Components\Section::make('Akun')
+                \Filament\Schemas\Components\Section::make('Akun')
                     ->schema([
                         Infolists\Components\TextEntry::make('user.name')->label('Nama Driver')
                             ->formatStateUsing(fn($state) => $state ?? '-')
@@ -80,7 +79,7 @@ class DriverResource extends Resource
                     ])
                     ->columns(2)
                     ->inlineLabel(),
-                Infolists\Components\Section::make('Identitas')
+                \Filament\Schemas\Components\Section::make('Identitas')
                     ->columns(2)
                     ->inlineLabel()
                     ->schema([
@@ -93,7 +92,7 @@ class DriverResource extends Resource
                         Infolists\Components\TextEntry::make('agama')->label('Agama')->formatStateUsing(fn($state) => $state ?? '-')->getStateUsing(fn($record) => strtoupper($record->agama)),
                         Infolists\Components\ImageEntry::make('photo')->label('Foto Driver')->hiddenLabel(),
                     ]),
-                Infolists\Components\Section::make('Alamat')
+                \Filament\Schemas\Components\Section::make('Alamat')
                     ->schema([
                         Infolists\Components\TextEntry::make('alamat')->label('Alamat')->formatStateUsing(fn($state) => $state ?? '-')->getStateUsing(fn($record) => strtoupper($record->alamat)),
                         Infolists\Components\TextEntry::make('rt')->label('RT')->formatStateUsing(fn($state) => $state ?? '-')->getStateUsing(fn($record) => strtoupper($record->rt)),
@@ -103,7 +102,8 @@ class DriverResource extends Resource
                     ])
                     ->inlineLabel()
                     ->columns(2),
-            ]);
+            ])
+            ->columns(1);
     }
 
 
@@ -149,7 +149,7 @@ class DriverResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $user = auth()->user();
+        $user = \Illuminate\Support\Facades\Auth::user();
 
         // Ambil data manager terkait user
         $manager = $user->manager;

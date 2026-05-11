@@ -5,11 +5,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PenggunaResource\Pages;
 use App\Models\Project;
 use App\Models\User;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
+use Filament\Schemas\Components\Utilities\Set;
 
 class PenggunaResource extends Resource
 {
@@ -17,13 +21,13 @@ class PenggunaResource extends Resource
 
     protected static ?string $navigationLabel = 'Pengguna';
 
-    protected static ?string $navigationGroup = 'Pengaturan';
+    protected static string | \UnitEnum | null $navigationGroup = 'Pengaturan';
 
     // protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -97,8 +101,8 @@ class PenggunaResource extends Resource
                     )),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('manager')
+                EditAction::make(),
+                Action::make('manager')
                     ->icon('heroicon-o-cog')
                     ->label('')
                     ->visible(fn($record) => $record->role === 'manager')
@@ -121,7 +125,7 @@ class PenggunaResource extends Resource
                                     'manual' => 'Lainnya',
                                 ])
                                 ->reactive()
-                                ->afterStateUpdated(fn(callable $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null))
+                                ->afterStateUpdated(fn(Set $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null))
                                 ->default($manager?->up),
 
                             Forms\Components\Select::make('perusahaan')
@@ -182,22 +186,22 @@ class PenggunaResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->email === 'centralakun@samarent.com';
+        return Auth::user()?->email === 'centralakun@samarent.com';
     }
 
     public static function canView($record): bool
     {
-        return auth()->user()?->email === 'centralakun@samarent.com';
+        return Auth::user()?->email === 'centralakun@samarent.com';
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->email === 'centralakun@samarent.com';
+        return Auth::user()?->email === 'centralakun@samarent.com';
     }
 
     public static function canEdit($record): bool
     {
-        return auth()->user()?->email === 'centralakun@samarent.com';
+        return Auth::user()?->email === 'centralakun@samarent.com';
     }
 
     public static function getPages(): array

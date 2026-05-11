@@ -2,12 +2,13 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Tables;
-use App\Models\Pengajuan;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PengajuanResource;
+use App\Models\Pengajuan;
+use Filament\Actions\Action;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database\Eloquent\Builder;
 
 class newPengajuan extends BaseWidget
 {
@@ -98,7 +99,7 @@ class newPengajuan extends BaseWidget
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('open')
+                Action::make('open')
                     ->url(fn(Pengajuan $record): string => PengajuanResource::getUrl('view', ['record' => $record])),
             ]);
     }

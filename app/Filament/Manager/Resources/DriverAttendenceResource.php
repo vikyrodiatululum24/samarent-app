@@ -5,21 +5,24 @@ namespace App\Filament\Manager\Resources;
 use App\Filament\Manager\Resources\DriverAttendenceResource\Pages;
 use App\Models\DriverAttendence;
 use App\Services\GeocodingService;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Infolists;
+use Filament\Actions\ViewAction;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
-use Filament\Infolists\Infolist;
+use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Log;
+
 
 class DriverAttendenceResource extends Resource
 {
     protected static ?string $model = DriverAttendence::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
     protected static ?string $navigationLabel = 'Absensi Driver';
 
@@ -27,16 +30,17 @@ class DriverAttendenceResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Absensi Driver';
 
-    protected static ?string $navigationGroup = 'Driver Management';
+    protected static string | \UnitEnum | null $navigationGroup = 'Driver Management';
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public static function form(Form $form): Form
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                //
-            ]);
+        return $schema->schema([
+            //
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -63,106 +67,96 @@ class DriverAttendenceResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([
                 //
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Infolists\Components\Section::make('Informasi Umum')
+                Section::make('Informasi Umum')
                     ->schema([
-                        Infolists\Components\TextEntry::make('date')
-                            ->label('Tanggal')
-                            ->date(),
-                        Infolists\Components\TextEntry::make('driver.user.name')
-                            ->label('Nama Driver'),
-                        Infolists\Components\TextEntry::make('project.name')
-                            ->label('Project'),
-                        Infolists\Components\Group::make([
-                        Infolists\Components\TextEntry::make('endUser.name')
-                            ->label('End User'),
-                            Infolists\Components\TextEntry::make('endUserOut.name')
+                        TextEntry::make('date')->label('Tanggal')->date(),
+                        TextEntry::make('driver.user.name')->label('Nama Driver'),
+                        TextEntry::make('project.name')->label('Project'),
+                        Group::make([
+                            TextEntry::make('endUser.name')->label('End User'),
+                            TextEntry::make('endUserOut.name')
                                 ->label('End User Keluar')
-                                ->visible(fn($record) => !empty($record->endUserOut)),
+                                ->visible(fn ($record) => ! empty($record->endUserOut)),
                         ])
-                        ->label('End User')
-                        ->columns(2),
-                        Infolists\Components\TextEntry::make('unit.type')
-                            ->label('Unit'),
-                        Infolists\Components\TextEntry::make('note')
-                            ->label('Catatan')
-                            ->columnSpanFull(),
-                        Infolists\Components\Group::make([
-                            Infolists\Components\Group::make([
-                                Infolists\Components\TextEntry::make('endUserOut.email')
-                                    ->label('Email End User')
-                                    ->copyable(),
-                                Infolists\Components\TextEntry::make('logMails.latest.status')
+                            ->columns(2),
+                        TextEntry::make('unit.type')->label('Unit'),
+                        TextEntry::make('note')->label('Catatan')->columnSpanFull(),
+                        Group::make([
+                            Group::make([
+                                TextEntry::make('endUserOut.email')->label('Email End User')->copyable(),
+                                TextEntry::make('logMails.latest.status')
                                     ->label('Status Pengiriman')
                                     ->getStateUsing(function ($record) {
                                         $logMail = $record->logMails()->latest()->first();
+
                                         return $logMail ? ucfirst($logMail->status) : 'Belum Dikirim';
                                     }),
-                                Infolists\Components\TextEntry::make('logMails.latest.error_message')
+                                TextEntry::make('logMails.latest.error_message')
                                     ->label('Error')
                                     ->getStateUsing(function ($record) {
                                         $logMail = $record->logMails()->latest()->first();
-                                        return $logMail && $logMail->status === 'failed' ? $logMail->error_message : '-';
+
+                                        return ($logMail && $logMail->status === 'failed') ? $logMail->error_message : '-';
                                     })
                                     ->color('danger')
-                                    ->visible(fn($record) => $record->logMails()->latest()->first()?->status === 'failed'),
-                            ])
-                            ->columns(3),
-                        Infolists\Components\IconEntry::make('approved')
-                            ->label('Status Approved')
-                            ->getStateUsing(function ($record) {
-                                if ($record->confirmation()->where('status', 'approved')->exists()) {
-                                    return 'heroicon-o-check-circle';
-                                } elseif ($record->confirmation()->where('status', 'rejected')->exists()) {
-                                    return 'heroicon-o-x-circle';
-                                }  else {
+                                    ->visible(fn ($record) => $record->logMails()->latest()->first()?->status === 'failed'),
+                            ])->columns(3),
+                            \Filament\Infolists\Components\IconEntry::make('approved')
+                                ->label('Status Approved')
+                                ->getStateUsing(function ($record) {
+                                    if ($record->confirmation()->where('status', 'approved')->exists()) {
+                                        return 'heroicon-o-check-circle';
+                                    }
+
+                                    if ($record->confirmation()->where('status', 'rejected')->exists()) {
+                                        return 'heroicon-o-x-circle';
+                                    }
+
                                     return 'heroicon-o-clock';
-                                }
-                            })
-                            ->icon(fn($state) => $state)
-                            ->visible(fn($record) => $record->confirmation()->exists()),
-                        ])
-                        ->label('Status'),
+                                })
+                                ->icon(fn ($state) => $state)
+                                ->visible(fn ($record) => $record->confirmation()->exists()),
+                        ]),
                     ])
                     ->columns(3),
 
-                Infolists\Components\Section::make('Absensi Masuk')
+                Section::make('Absensi Masuk')
                     ->schema([
-                        Infolists\Components\TextEntry::make('time_in')
-                            ->label('Waktu Masuk'),
-                        Infolists\Components\TextEntry::make('start_km')
-                            ->label('KM Awal'),
-                        Infolists\Components\TextEntry::make('location_in')
+                        TextEntry::make('time_in')->label('Waktu Masuk'),
+                        TextEntry::make('start_km')->label('KM Awal'),
+                        TextEntry::make('location_in')
                             ->label('Lokasi Masuk')
                             ->formatStateUsing(function ($state) {
-
-                                if (!$state) return '-';
+                                if (! $state) {
+                                    return '-';
+                                }
 
                                 [$lat, $lng] = explode(',', $state);
 
-                                return app(GeocodingService::class)
-                                    ->getAddressFromCoordinates($lat, $lng);
+                                return app(GeocodingService::class)->getAddressFromCoordinates($lat, $lng);
                             })
                             ->columnSpanFull(),
-                        Infolists\Components\ImageEntry::make('photo_in')
+                        ImageEntry::make('photo_in')
                             ->label('Foto Masuk')
                             ->disk('public')
-                            ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in))
+                            ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_in))
                             ->size(300)
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-                Infolists\Components\Section::make('Absensi Check')
+
+                Section::make('Absensi Check')
                     ->schema([
                         ViewEntry::make('checks.attendance_id')
                             ->label('Absensi Check')
@@ -170,41 +164,33 @@ class DriverAttendenceResource extends Resource
                     ])
                     ->columns(2),
 
-                Infolists\Components\Section::make('Absensi Keluar')
+                Section::make('Absensi Keluar')
                     ->schema([
-                        Infolists\Components\TextEntry::make('time_out')
-                            ->label('Waktu Keluar'),
-                        Infolists\Components\TextEntry::make('end_km')
-                            ->label('KM Akhir'),
-                        Infolists\Components\TextEntry::make('location_out')
+                        TextEntry::make('time_out')->label('Waktu Keluar'),
+                        TextEntry::make('end_km')->label('KM Akhir'),
+                        TextEntry::make('location_out')
                             ->label('Lokasi Keluar')
                             ->formatStateUsing(function ($state) {
-
-                                if (!$state) return '-';
+                                if (! $state) {
+                                    return '-';
+                                }
 
                                 [$lat, $lng] = explode(',', $state);
 
-                                return app(GeocodingService::class)
-                                    ->getAddressFromCoordinates($lat, $lng);
+                                return app(GeocodingService::class)->getAddressFromCoordinates($lat, $lng);
                             })
                             ->columnSpanFull(),
-                        Infolists\Components\ImageEntry::make('photo_out')
+                        ImageEntry::make('photo_out')
                             ->label('Foto Keluar')
                             ->disk('public')
-                            ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_out))
+                            ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_out))
                             ->size(300)
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
-                    ->visible(fn($record) => !empty($record->time_out)),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+                    ->visible(fn ($record) => ! empty($record->time_out)),
+            ])
+            ->columns(1);
     }
 
     public static function getPages(): array

@@ -7,16 +7,18 @@ use Filament\Actions;
 use Filament\Infolists\Components;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class ViewPengajuan extends ViewRecord
 {
     protected static string $resource = PengajuanResource::class;
 
-    public function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Components\Section::make('Informasi Umum')
+                Section::make('Informasi Umum')
                     ->schema([
                         Components\TextEntry::make('nama')
                             ->label('Nama PIC')
@@ -87,13 +89,14 @@ class ViewPengajuan extends ViewRecord
                     ])
                     ->columns(2),
 
-                Components\Section::make('Detail Kendaraan')
+                Section::make('Detail Kendaraan')
                     ->schema([
                         ViewEntry::make('service_unit.pengajuan_id')
                             ->label('Detail Kendaraan')
                             ->view('filament.resources.pages.pengajuan.detail-kendaraan')
                             ->columnSpanFull(),
                     ]),
-            ]);
+            ])
+            ->columns(1);
     }
 }

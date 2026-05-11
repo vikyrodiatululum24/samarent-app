@@ -8,7 +8,7 @@ use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Facades\Filament;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Navigation\NavigationItem;
 use App\Filament\Pages\Auth\EditProfile;
 use Filament\Http\Middleware\Authenticate;
@@ -158,10 +158,11 @@ class AsuransiPanelProvider extends PanelProvider
                     ])),
             ])
             ->databaseNotifications()
-            ->maxContentWidth(MaxWidth::Full)
+            ->maxContentWidth(Width::Full)
             ->topNavigation()
             ->authMiddleware([
                 \App\Http\Middleware\EnsureAsuransiRole::class,
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

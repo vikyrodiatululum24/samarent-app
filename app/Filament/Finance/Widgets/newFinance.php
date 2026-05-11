@@ -96,7 +96,7 @@ class newFinance extends BaseWidget
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('open')
+                Actions\Action::make('open')
                     ->url(fn(Pengajuan $record): string => PengajuanResource::getUrl('view', ['record' => $record])),
             ]);
     }

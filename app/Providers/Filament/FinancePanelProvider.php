@@ -7,7 +7,7 @@ use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Facades\Filament;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Navigation\NavigationItem;
 use App\Filament\Pages\Auth\EditProfile;
 use Filament\Http\Middleware\Authenticate;
@@ -156,7 +156,8 @@ class FinancePanelProvider extends PanelProvider
                         'centralakun@samarent.com',
                     ])),
             ])
-            ->maxContentWidth(MaxWidth::Full)
-            ->topNavigation();
+            ->maxContentWidth(Width::Full)
+            ->topNavigation()
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

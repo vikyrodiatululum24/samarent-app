@@ -6,9 +6,14 @@ use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
 use App\Models\Driver;
-use Filament\Forms\Form;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Schemas\Components\Image;
+use Filament\Schemas\Components\Section;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use App\Filament\Absensi\Resources\DriverResource\Pages;
@@ -19,9 +24,9 @@ class DriverResource extends Resource
     protected static ?string $model = Driver::class;
     protected static ?string $pluralModelLabel = 'Driver';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\TextInput::make('user.name')
                     ->label('Nama Driver')
@@ -196,51 +201,72 @@ class DriverResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
+                EditAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                Infolists\Components\Section::make('Akun')
+                Section::make('Akun')
                     ->schema([
-                        Infolists\Components\TextEntry::make('user.name')->label('Nama Driver'),
-                        Infolists\Components\TextEntry::make('user.email')->label('Email'),
-                        Infolists\Components\TextEntry::make('password')->label('Password'),
+                        TextEntry::make('name_driver')
+                            ->label('Nama Driver')
+                            ->getStateUsing(fn ($record) => $record?->user?->name ?? '-'),
+                        TextEntry::make('email_driver')
+                            ->label('Email')
+                            ->getStateUsing(fn ($record) => $record?->user?->email ?? '-'),
+                        TextEntry::make('password')
+                            ->label('Password')
+                            ->getStateUsing(fn ($record) => filled($record?->user?->password) ? '********' : '-'),
                     ])
                     ->columns(3),
-                Infolists\Components\Section::make('Identitas')
+                Section::make('Identitas')
                     ->columns(2)
-                    ->inlineLabel()
                     ->schema([
-                        Infolists\Components\TextEntry::make('no_wa')->label('No. WhatsApp')->placeholder('Untitled'),
-                        Infolists\Components\TextEntry::make('nik')->label('NIK'),
-                        Infolists\Components\TextEntry::make('sim')->label('SIM'),
-                        Infolists\Components\TextEntry::make('jenis_kelamin')->label('Jenis Kelamin'),
-                        Infolists\Components\TextEntry::make('tempat')->label('Tempat Lahir'),
-                        Infolists\Components\TextEntry::make('tanggal_lahir')->label('Tanggal Lahir')->date(),
-                        Infolists\Components\TextEntry::make('agama')->label('Agama'),
-                        Infolists\Components\ImageEntry::make('photo')->label('Foto Driver')->hiddenLabel(),
+                        TextEntry::make('no_wa')
+                            ->label('No. WhatsApp'),
+                        TextEntry::make('nik')
+                            ->label('NIK'),
+                        TextEntry::make('sim')
+                            ->label('SIM'),
+                        TextEntry::make('jenis_kelamin')
+                            ->label('Jenis Kelamin'),
+                        TextEntry::make('tempat')
+                            ->label('Tempat Lahir'),
+                        TextEntry::make('tanggal_lahir')
+                            ->label('Tanggal Lahir')
+                            ->getStateUsing(fn ($record) => filled($record?->tanggal_lahir) ? $record->tanggal_lahir->format('d m Y') : '-'),
+                        TextEntry::make('agama')
+                            ->label('Agama'),
+                        Image::make(
+                            fn ($record) => filled($record?->photo) ? asset('storage/' . ltrim($record->photo, '/')) : asset('images/placeholder.png'),
+                            'Foto Driver'
+                        ),
                     ]),
-                Infolists\Components\Section::make('Alamat')
+                Section::make('Alamat')
                     ->schema([
-                        Infolists\Components\TextEntry::make('alamat')->label('Alamat'),
-                        Infolists\Components\TextEntry::make('rt')->label('RT'),
-                        Infolists\Components\TextEntry::make('rw')->label('RW'),
-                        Infolists\Components\TextEntry::make('kelurahan')->label('Kelurahan/Desa'),
-                        Infolists\Components\TextEntry::make('kecamatan')->label('Kecamatan'),
+                        TextEntry::make('alamat')
+                            ->label('Alamat'),
+                        TextEntry::make('rt')
+                            ->label('RT'),
+                        TextEntry::make('rw')
+                            ->label('RW'),
+                        TextEntry::make('kelurahan')
+                            ->label('Kelurahan/Desa'),
+                        TextEntry::make('kecamatan')
+                            ->label('Kecamatan'),
                     ])
-                    ->inlineLabel()
                     ->columns(2),
-            ]);
+            ])
+            ->columns(1);
     }
 
     public static function getRelations(): array

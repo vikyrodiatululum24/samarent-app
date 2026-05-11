@@ -7,9 +7,11 @@ use App\Models\BosJoulmer;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 
 class ViewBosJoulmer extends EditRecord
@@ -18,11 +20,10 @@ class ViewBosJoulmer extends EditRecord
 
     protected static ?string $title = 'Review Pengajuan';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Informasi Umum')
+        return $schema->components([
+                Section::make('Informasi Umum')
                     ->schema([
                         Placeholder::make('no_pengajuan')
                             ->label('No. Pengajuan')
@@ -73,7 +74,7 @@ class ViewBosJoulmer extends EditRecord
                             }),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Pembayaran')
+                Section::make('Pembayaran')
                     ->schema([
                         Placeholder::make('payment_1')
                             ->label('Nama Rekening')
@@ -86,15 +87,15 @@ class ViewBosJoulmer extends EditRecord
                             ->content(fn() => $this->record->pengajuan?->norek_1 ?? '-'),
                     ])
                     ->columns(3),
-                Forms\Components\Section::make('Detail Kendaraan')
+                Section::make('Detail Kendaraan')
                     ->schema([
-                        Forms\Components\View::make('filament.resources.pages.bos-joulmer.detail-kendaraan')
+                        View::make('filament.resources.pages.bos-joulmer.detail-kendaraan')
                             ->viewData([
                                 'pengajuanId' => $this->record->pengajuan_id,
                             ])
                             ->columnSpanFull(),
                     ]),
-                Forms\Components\Section::make('Informasi Complete')
+                Section::make('Informasi Complete')
                     ->schema([
                         Placeholder::make('complete_bengkel_estimasi')
                             ->label('Bengkel Estimasi')
@@ -126,7 +127,7 @@ class ViewBosJoulmer extends EditRecord
                     ])
                     ->columns(3)
                     ->visible(fn() => filled($this->record->pengajuan?->complete)),
-                Forms\Components\Section::make('Keputusan Review')
+                Section::make('Keputusan Review')
                     ->schema([
                         Forms\Components\Textarea::make('note')
                             ->label('Catatan (Opsional)')
@@ -134,7 +135,8 @@ class ViewBosJoulmer extends EditRecord
                             ->nullable()
                             ->rows(4),
                     ]),
-            ]);
+            ])
+            ->columns(1);
     }
 
     protected function getHeaderActions(): array

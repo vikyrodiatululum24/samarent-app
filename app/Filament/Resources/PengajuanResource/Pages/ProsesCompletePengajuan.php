@@ -7,11 +7,20 @@ use App\Services\LogUpdateStatusPengajuanService;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Form;
+
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class ProsesCompletePengajuan extends EditRecord
 {
@@ -19,13 +28,15 @@ class ProsesCompletePengajuan extends EditRecord
 
     protected static ?string $title = 'Proses Data Pengajuan';
 
+    protected static ?string $navigationLabel = 'Proses Pengajuan';
+
     protected array $completeData = [];
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\Fieldset::make('Informasi Bengkel')
+                Fieldset::make('Informasi Bengkel')
                     ->schema([
                         Hidden::make('user_id')
                             ->default(Auth::user()->id),
@@ -41,7 +52,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->required(),
                     ])
                     ->columns(2),
-                Forms\Components\Fieldset::make('Informasi Pengajuan')
+                Fieldset::make('Informasi Pengajuan')
                     ->schema([
                         Forms\Components\Select::make('complete.kode')
                             ->label('Kode')
@@ -67,7 +78,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->default('pengambilan_ba'),
                     ])
                     ->columns(2),
-                Forms\Components\Fieldset::make('Informasi Finance')
+                Fieldset::make('Informasi Finance')
                     ->schema([
                         Forms\Components\DatePicker::make('complete.tanggal_tf_finance')
                             ->label('Tanggal Transfer Finance')
@@ -91,7 +102,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->readOnly(),
                     ])
                     ->columns(2),
-                Forms\Components\Fieldset::make('Transfer Bengkel')
+                Fieldset::make('Transfer Bengkel')
                     ->schema([
                         Forms\Components\Select::make('complete.nama_rek_bengkel')
                             ->label('Nama Rekening Bengkel')
@@ -101,7 +112,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->searchable()
                             ->nullable()
                             ->reactive()
-                            ->afterStateUpdated(function ($component, $state, callable $set) {
+                            ->afterStateUpdated(function ($component, $state, Set $set) {
                                 $component->state(strtoupper($state));
                                 $norek = \App\Models\Norek::where('name', $state)->first();
                                 $set('complete.rek_bengkel', $norek?->norek);
@@ -169,7 +180,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->live(onBlur: true)
                             ->required(fn($record) => $record->complete?->status_finance === 'paid')
                             ->nullable()
-                            ->afterStateUpdated(function (callable $set, callable $get) {
+                            ->afterStateUpdated(function (Set $set, Get $get) {
                                 $nominalFinance = (float) ($get('complete.nominal_tf_finance') ?? 0);
                                 $nominalBengkel = (float) ($get('complete.nominal_tf_bengkel') ?? 0);
                                 $set('complete.selisih_tf', $nominalFinance - $nominalBengkel);
@@ -182,14 +193,14 @@ class ProsesCompletePengajuan extends EditRecord
                         Forms\Components\DatePicker::make('complete.tanggal_tf_bengkel')
                             ->label('Tanggal Transfer Bengkel')
                             ->nullable()
-                            ->required(fn(callable $get) => !empty($get('complete.nominal_tf_bengkel'))),
+                            ->required(fn(Get $get) => !empty($get('complete.nominal_tf_bengkel'))),
                         Forms\Components\DatePicker::make('complete.tanggal_pengerjaan')
                             ->label('Tanggal Pengerjaan')
                             ->nullable()
-                            ->required(fn(callable $get) => !empty($get('complete.nominal_tf_bengkel'))),
+                            ->required(fn(Get $get) => !empty($get('complete.nominal_tf_bengkel'))),
                     ])
                     ->columns(2),
-                Forms\Components\Fieldset::make('Dokumentasi')
+                Fieldset::make('Dokumentasi')
                     ->schema([
                         Forms\Components\TextInput::make('complete.bengkel_invoice')
                             ->label('Bengkel Invoice'),
@@ -203,7 +214,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->maxFiles(3)
                             ->nullable()
                             ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get, $livewire) {
+                            ->afterStateUpdated(function ($state, Set $set, Get $get, $livewire) {
                                 if (is_array($state) && count($state) > 3) {
                                     $set('complete.foto_nota', array_slice($state, 0, 3));
                                 }
@@ -219,7 +230,8 @@ class ProsesCompletePengajuan extends EditRecord
                             }),
                     ])
                     ->columns(2),
-            ]);
+            ])
+            ->columns(1);
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -270,7 +282,6 @@ class ProsesCompletePengajuan extends EditRecord
                     $this->record->update(['keterangan_proses' => 'checker']);
                 }
             }
-
         }
 
         Notification::make()

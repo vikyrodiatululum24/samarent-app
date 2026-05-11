@@ -5,22 +5,22 @@ namespace App\Filament\Pages\Auth;
 use App\Models\Admin;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Storage;
-use Filament\Forms\Form;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Pages\Auth\EditProfile as BaseEditProfile;
 use Filament\Notifications\Notification;
+use Filament\Auth\Pages\EditProfile as BaseEditProfile;
+use Filament\Schemas\Components\DatePicker;
+use Filament\Schemas\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Textarea;
+use Filament\Schemas\Schema;
 
 class EditProfile extends BaseEditProfile
 {
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Informasi Profil')
                     ->description('Update informasi profil dan akun Anda')
                     ->schema([

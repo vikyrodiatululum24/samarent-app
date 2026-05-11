@@ -5,13 +5,14 @@ namespace App\Filament\Finance\Resources;
 use App\Filament\Finance\Resources\NorekResource\Pages;
 use App\Filament\Finance\Resources\NorekResource\RelationManagers;
 use App\Models\Norek;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class NorekResource extends Resource
 {
@@ -20,10 +21,9 @@ class NorekResource extends Resource
     protected static ?string $navigationLabel = 'Data Rekening';
     protected static ?string $label = 'Data Rekening';
     protected static ?string $pluralLabel = 'Data Rekening';
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->components([
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->label('Nama Rekening')
@@ -77,11 +77,11 @@ class NorekResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

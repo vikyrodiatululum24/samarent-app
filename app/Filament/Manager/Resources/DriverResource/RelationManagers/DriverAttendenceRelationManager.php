@@ -3,11 +3,13 @@
 namespace App\Filament\Manager\Resources\DriverResource\RelationManagers;
 
 use App\Filament\Manager\Resources\DriverAttendenceResource;
-use App\Helpers\PayrollHelpers;
-use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,10 +19,9 @@ class DriverAttendenceRelationManager extends RelationManager
 {
     protected static string $relationship = 'driverAttendences';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->components([
                 //
             ]);
     }
@@ -95,8 +96,8 @@ class DriverAttendenceRelationManager extends RelationManager
             ])
             ->headerActions([
                 // Tables\Actions\CreateAction::make(),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('priviewPdf')
+                ActionGroup::make([
+                    Action::make('priviewPdf')
                         ->label('Preview PDF')
                         ->icon('heroicon-o-eye')
                         ->action(function ($livewire) {
@@ -120,7 +121,7 @@ class DriverAttendenceRelationManager extends RelationManager
 
                             $this->js("window.open('{$url}', '_blank')");
                         }),
-                    Tables\Actions\Action::make('printPdf')
+                    Action::make('printPdf')
                         ->label('Print PDF')
                         ->icon('heroicon-o-printer')
                         ->badge(function($livewire) {
@@ -150,7 +151,7 @@ class DriverAttendenceRelationManager extends RelationManager
                             $this->js("window.open('{$url}', '_blank')");
                         }),
 
-                    Tables\Actions\Action::make('exportExcel')
+                    Action::make('exportExcel')
                         ->label('Export to Excel')
                         ->icon('heroicon-o-document-plus')
                         ->action(function ($livewire) {
@@ -179,22 +180,14 @@ class DriverAttendenceRelationManager extends RelationManager
                 ->icon('heroicon-o-arrow-down-tray'),
             ])
             ->actions([
-                Tables\Actions\Action::make('view')
+                Action::make('view')
                     ->label('Lihat Detail')
                     ->icon('heroicon-o-eye')
                     ->url(fn ($record) => DriverAttendenceResource::getUrl('view', ['record' => $record])),
-                Tables\Actions\EditAction::make()
-                ->after(function ($record) {
-                    if (!$record->is_complete) {
-                        return;
-                    }
-                    PayrollHelpers::calculateOvertimePay($record);
-                }),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

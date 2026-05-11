@@ -2,10 +2,16 @@
 
 namespace App\Filament\Manager\Resources\DriverResource\RelationManagers;
 
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,10 +22,9 @@ class OvertimePaysRelationManager extends RelationManager
 {
     protected static string $relationship = 'overtimePay';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->components([
                 //
             ]);
     }
@@ -67,8 +72,8 @@ class OvertimePaysRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
-                Tables\Actions\Action::make('export')
+                CreateAction::make(),
+                Action::make('export')
                     ->label('Export Excel')
                     ->icon('heroicon-o-document-plus')
                     ->action(function ($livewire) {
@@ -88,7 +93,7 @@ class OvertimePaysRelationManager extends RelationManager
                         $this->js("window.open('{$url}', '_blank')");
                     })
             ])
-            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
+            ->actions([EditAction::make(), DeleteAction::make()])
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 }

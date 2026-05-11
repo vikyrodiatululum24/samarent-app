@@ -3,9 +3,13 @@
 namespace App\Filament\Manager\Resources\DriverResource\RelationManagers;
 
 use App\Models\Reimbursement;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,10 +22,9 @@ class ReimbursementsRelationManager extends RelationManager
 {
     protected static string $relationship = 'reimbursements';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema->components([
                 //
             ]);
     }
@@ -152,7 +155,7 @@ class ReimbursementsRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('export')
+                Action::make('export')
                     ->label('Export PDF')
                     ->icon('heroicon-o-printer')
                     ->color('success')
@@ -170,11 +173,11 @@ class ReimbursementsRelationManager extends RelationManager
                     ->openUrlInNewTab(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkAction::make('export')
+                BulkAction::make('export')
                     ->label('Export Selected')
                     ->icon('heroicon-o-printer')
                     ->color('success')
