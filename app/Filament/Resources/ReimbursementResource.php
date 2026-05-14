@@ -87,7 +87,6 @@ class ReimbursementResource extends Resource
                             ->acceptedFileTypes(['image/jpeg', 'image/png'])
                             ->columnSpanFull(),
                     ])
-                    ->columns(2)
                     ->visible(fn (Get $get) => $get('type') === 'bbm'),
 
                 Section::make('Data Odometer Akhir')
@@ -111,7 +110,6 @@ class ReimbursementResource extends Resource
                             ->acceptedFileTypes(['image/jpeg', 'image/png'])
                             ->columnSpanFull(),
                     ])
-                    ->columns(2)
                     ->collapsible()
                     ->visible(fn (Get $get) => $get('type') === 'bbm'),
 
@@ -131,11 +129,18 @@ class ReimbursementResource extends Resource
                             ->placeholder('Contoh: Pengisian bahan bakar untuk perjalanan dinas')
                             ->columnSpanFull(),
                     ])
-                    ->columns(2)
                     ->collapsible(),
 
-                Section::make('Nota Pembayaran')
+                Section::make('Pembayaran')
                     ->schema([
+                        Select::make('metode_pembayaran')
+                            ->label('Metode Pembayaran')
+                            ->options([
+                                'cash' => 'Cash',
+                                'fleet_card' => 'Fleet Card',
+                            ])
+                            ->required()
+                            ->placeholder('Pilih metode pembayaran'),
                         FileUpload::make('nota')
                             ->label('Foto Nota')
                             ->required()
@@ -167,6 +172,7 @@ class ReimbursementResource extends Resource
                             ->minValue(0),
                     ])
                     ->columns(2)
+                    ->columnSpanFull()
                     ->collapsible(),
             ]);
     }
@@ -242,6 +248,11 @@ class ReimbursementResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->placeholder('-'),
 
+                Tables\Columns\TextColumn::make('metode_pembayaran')
+                    ->label('Metode Pembayaran')
+                    ->searchable()
+                    ->placeholder('-'),
+
                 Tables\Columns\TextColumn::make('dana_masuk')
                     ->label('Dana Masuk')
                     ->money('IDR')
@@ -253,6 +264,8 @@ class ReimbursementResource extends Resource
                     ->money('IDR')
                     ->sortable()
                     ->placeholder('-'),
+
+
 
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Terakhir Diupdate')

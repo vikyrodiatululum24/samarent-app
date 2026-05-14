@@ -57,7 +57,13 @@ class PayrollHelpers
             throw new \Exception("Driver ID tidak ditemukan untuk absen ID {$absen->id}");
         }
         $tanggal = $absen->date;
-        $shift = self::cekHari($tanggal);
+        if ($absen->shift) {
+            $shift = $absen->shift;
+        } else {
+            $shift = self::cekHari($tanggal);
+            $absen->shift = $shift;
+            $absen->save();
+        }
         $project_id = $absen->project_id;
         $hoursWorked = $startTime->diffInMinutes($endTime) / 60;
 

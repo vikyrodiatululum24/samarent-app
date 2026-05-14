@@ -2,16 +2,21 @@
 
 namespace App\Filament\Absensi\Resources\DriverResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Actions;
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Illuminate\Support\Carbon;
 use App\Helpers\PayrollHelpers;
+use Filament\Actions;
+use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class DriverAttendenceRelationManager extends RelationManager
 {
@@ -103,6 +108,11 @@ class DriverAttendenceRelationManager extends RelationManager
             ->recordTitleAttribute('id')
             ->columns([
                 Tables\Columns\TextColumn::make('date'),
+                Tables\Columns\TextColumn::make('shift')
+                    ->label('Shift')
+                    ->color(function ($state) {
+                        return $state === 'Holiday' ? 'danger' : 'success';
+                    }),
                 Tables\Columns\TextColumn::make('project.name')->label('Project'),
                 Tables\Columns\TextColumn::make('endUser.name')->label('End User'),
                 Tables\Columns\TextColumn::make('unit.type')->label('Unit'),
@@ -256,13 +266,65 @@ class DriverAttendenceRelationManager extends RelationManager
                 ->icon('heroicon-o-arrow-down-tray'),
             ])
             ->actions([
-                Actions\EditAction::make()
-                ->after(function ($record) {
-                    if (!$record->is_complete) {
-                        return;
-                    }
-                    PayrollHelpers::calculateOvertimePay($record);
-                }),
+                Actions\Action::make('addNote')
+                    ->label('Catatan Admin')
+                    ->icon('heroicon-o-pencil-square')
+                    ->form([
+                        Textarea::make('note_admin')
+                            ->label('Catatan Admin')
+                            ->rows(4)
+                            ->maxLength(65535),
+                    ])
+                    ->fillForm(fn ($record) => ['note_admin' => $record->note_admin])
+                    ->action(function ($record, array $data) {
+                        $record->update([
+                            'note_admin' => $data['note_admin'] ?? null,
+                        ]);
+
+                        Notification::make()
+                            ->title('Catatan admin disimpan')
+                            ->success()
+                            ->send();
+                    }),
+
+                Actions\Action::make('edit')
+                    ->label('Edit Ringkas')
+                    ->icon('heroicon-o-pencil')
+                    ->form([
+                        DateTimePicker::make('time_in')->label('Waktu Masuk'),
+                        DateTimePicker::make('time_out')->label('Waktu Keluar'),
+                        Toggle::make('is_complete')->label('Selesai'),
+                        Select::make('shift')
+                            ->label('Shift')
+                            ->options([
+                                'Weekday' => 'Weekday',
+                                'Holiday' => 'Holiday',
+                            ]),
+                    ])
+                    ->fillForm(fn ($record) => [
+                        'time_in' => $record->time_in,
+                        'time_out' => $record->time_out,
+                        'is_complete' => (bool) $record->is_complete,
+                        'shift' => $record->shift,
+                    ])
+                    ->action(function ($record, array $data) {
+                        $record->update([
+                            'time_in' => $data['time_in'] ?? $record->time_in,
+                            'time_out' => $data['time_out'] ?? $record->time_out,
+                            'is_complete' => $data['is_complete'] ?? 0,
+                            'shift' => $data['shift'] ?? $record->shift,
+                        ]);
+
+                        if ($record->is_complete) {
+                            PayrollHelpers::calculateOvertimePay($record);
+                        }
+
+                        Notification::make()
+                            ->title('Absensi diperbarui')
+                            ->success()
+                            ->send();
+                    }),
+
                 Actions\DeleteAction::make(),
             ])
             ->bulkActions([

@@ -73,9 +73,6 @@ class DriverResource extends Resource
                     ])
                     ->maxLength(14)
                     ->minLength(12),
-                Forms\Components\TextInput::make('alamat')
-                    ->required()
-                    ->maxLength(255),
                 Forms\Components\TextInput::make('no_wa')
                     ->required()
                     ->label('No. WhatsApp')
@@ -86,22 +83,9 @@ class DriverResource extends Resource
                     ])
                     ->maxLength(13)
                     ->minLength(11),
-                Forms\Components\TextInput::make('tempat')
-                    ->maxLength(255)
-                    ->label('Tempat Lahir')
-                    ->default(null),
-                Forms\Components\DatePicker::make('tanggal_lahir')
-                    ->default(null)
+                Forms\Components\TextInput::make('alamat')
                     ->required()
-                    ->label('Tanggal Lahir'),
-                Forms\Components\Select::make('jenis_kelamin')
-                    ->required()
-                    ->label('Jenis Kelamin')
-                    ->options([
-                        'laki-laki' => 'Laki-laki',
-                        'perempuan' => 'Perempuan',
-                    ])
-                    ->default(null),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('rt')
                     ->maxLength(3)
                     ->label('RT')
@@ -128,12 +112,33 @@ class DriverResource extends Resource
                         'Buddha' => 'Buddha',
                         'Konghucu' => 'Konghucu',
                     ])
+                    ->default(null)
+                    ->required(),
+                Forms\Components\TextInput::make('tempat')
+                    ->maxLength(255)
+                    ->label('Tempat Lahir')
+                    ->default(null),
+                Forms\Components\DatePicker::make('tanggal_lahir')
+                    ->default(null)
+                    ->required()
+                    ->label('Tanggal Lahir'),
+                Forms\Components\Select::make('jenis_kelamin')
+                    ->required()
+                    ->label('Jenis Kelamin')
+                    ->options([
+                        'laki-laki' => 'Laki-laki',
+                        'perempuan' => 'Perempuan',
+                    ])
                     ->default(null),
                 Forms\Components\Select::make('project_id')
                     ->label('Penempatan')
                     ->relationship('project', 'name')
                     ->searchable()
-                    ->default(null),
+                    ->default(null)
+                    ->required(),
+                Forms\Components\TextInput::make('pic')
+                    ->label('PIC')
+                    ->required(),
                 Forms\Components\FileUpload::make('photo')
                     ->image()
                     ->label('Foto Driver')
@@ -146,7 +151,8 @@ class DriverResource extends Resource
                     ->resize(50)
                     ->default(null)
                     ->helperText('Maksimal ukuran file 1MB. Disarankan ukuran foto 1:1 (persegi).'),
-            ]);
+            ])
+            ->columns(2);
     }
 
 
@@ -188,6 +194,9 @@ class DriverResource extends Resource
                     ->searchable()
                     ->label('Penempatan')
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('pic')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -219,13 +228,13 @@ class DriverResource extends Resource
                     ->schema([
                         TextEntry::make('name_driver')
                             ->label('Nama Driver')
-                            ->getStateUsing(fn ($record) => $record?->user?->name ?? '-'),
+                            ->getStateUsing(fn($record) => $record?->user?->name ?? '-'),
                         TextEntry::make('email_driver')
                             ->label('Email')
-                            ->getStateUsing(fn ($record) => $record?->user?->email ?? '-'),
+                            ->getStateUsing(fn($record) => $record?->user?->email ?? '-'),
                         TextEntry::make('password')
                             ->label('Password')
-                            ->getStateUsing(fn ($record) => filled($record?->user?->password) ? '********' : '-'),
+                            ->getStateUsing(fn($record) => filled($record?->user?->password) ? '********' : '-'),
                     ])
                     ->columns(3),
                 Section::make('Identitas')
@@ -243,11 +252,11 @@ class DriverResource extends Resource
                             ->label('Tempat Lahir'),
                         TextEntry::make('tanggal_lahir')
                             ->label('Tanggal Lahir')
-                            ->getStateUsing(fn ($record) => filled($record?->tanggal_lahir) ? $record->tanggal_lahir->format('d m Y') : '-'),
+                            ->getStateUsing(fn($record) => filled($record?->tanggal_lahir) ? $record->tanggal_lahir->format('d m Y') : '-'),
                         TextEntry::make('agama')
                             ->label('Agama'),
                         Image::make(
-                            fn ($record) => filled($record?->photo) ? asset('storage/' . ltrim($record->photo, '/')) : asset('images/placeholder.png'),
+                            fn($record) => filled($record?->photo) ? asset('storage/' . ltrim($record->photo, '/')) : asset('images/placeholder.png'),
                             'Foto Driver'
                         ),
                     ]),

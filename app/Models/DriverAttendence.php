@@ -27,6 +27,8 @@ class DriverAttendence extends Model
         'is_approved_out', // masuk
         'end_user_out', // keluar
         'is_complete',
+        'shift', // masuk
+        'note_admin', // masuk
     ];
 
     public function user()
@@ -69,6 +71,4 @@ class DriverAttendence extends Model
     {
         return $this->hasMany(LogMail::class, 'attendence_id');
     }
-
-
 }

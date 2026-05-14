@@ -121,7 +121,7 @@ class AbsenController extends Controller
             'end_km' => 'required|numeric',
             'location_out' => 'required|string',
             'photo_out' => 'required|string',
-            'end_user_out' => 'nullable|exists:end_users,id',
+            'end_user_out' => 'required|exists:end_users,id',
             'send_notification' => 'sometimes|boolean',
         ]);
 

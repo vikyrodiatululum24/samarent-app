@@ -34,9 +34,20 @@ class KehadiranDriverResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
+
             Forms\Components\DatePicker::make('date')->label('Tanggal')->required(),
             Forms\Components\DateTimePicker::make('time_in')->label('Waktu Masuk')->required(),
             Forms\Components\DateTimePicker::make('time_out')->label('Waktu Keluar')->required(),
+            Forms\Components\Select::make('end_user_id')
+                ->label('End User')
+                ->relationship('endUser', 'name')
+                ->required()
+                ->searchable(),
+            Forms\Components\Select::make('end_user_out')
+                ->label('End User')
+                ->relationship('endUserOut', 'name')
+                ->required()
+                ->searchable(),
             Forms\Components\Checkbox::make('is_complete')->label('Selesai')->default(false)
         ]);
     }
@@ -44,7 +55,44 @@ class KehadiranDriverResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([Tables\Columns\TextColumn::make('user.name')->label('Driver')->searchable()->sortable(), Tables\Columns\TextColumn::make('project.name')->label('Project')->searchable()->sortable(), Tables\Columns\TextColumn::make('endUser.name')->label('End User')->searchable()->sortable(), Tables\Columns\TextColumn::make('unit.nopol')->label('Unit')->searchable()->sortable(), Tables\Columns\TextColumn::make('date')->date()->label('Tanggal')->sortable(), Tables\Columns\TextColumn::make('time_in')->label('Waktu Masuk')->sortable(), Tables\Columns\TextColumn::make('time_check')->label('Waktu Check')->sortable(), Tables\Columns\TextColumn::make('time_out')->label('Waktu Keluar')->sortable(), Tables\Columns\BooleanColumn::make('is_complete')->label('Selesai')->sortable()])
+            ->columns([
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Driver')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('project.name')
+                    ->label('Project')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('endUser.name')
+                    ->label('User In')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('endUserOut.name')
+                    ->label('User Out')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('unit.nopol')
+                    ->label('Unit')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('date')
+                    ->date()
+                    ->label('Tanggal')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('time_in')
+                    ->label('Waktu Masuk')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('time_check')
+                    ->label('Waktu Check')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('time_out')
+                    ->label('Waktu Keluar')
+                    ->sortable(),
+                Tables\Columns\BooleanColumn::make('is_complete')
+                    ->label('Selesai')
+                    ->sortable()
+            ])
             ->filters([
                 //
             ])
@@ -57,35 +105,35 @@ class KehadiranDriverResource extends Resource
         return $schema
             ->schema([
                 Section::make('Detail Kehadiran Driver')
-                ->columns(2)
-                ->schema([
-                    Group::make()
-                        ->schema([
-                            TextEntry::make('user.name')
-                                ->label('Driver'),
-                            TextEntry::make('unit.type')
-                                ->label('Unit'),
-                            TextEntry::make('unit.nopol')
-                                ->label('Nopol'),
-                            TextEntry::make('date')
-                                ->label('Tanggal'),
-                            TextEntry::make('note')
-                                ->label('Catatan'),
-                        ]),
-                    Group::make()
-                        ->schema([
-                            TextEntry::make('project.name')
-                                ->label('Project'),
-                            TextEntry::make('endUser.name')
-                                ->label('End User 1'),
-                            TextEntry::make('endUserOut.name')
-                                ->label('End User 2'),
-                            TextEntry::make('is_complete')
-                                ->label('Approval')
-                                ->badge(fn($state) => $state ? 'success' : 'warning')
-                                ->formatStateUsing(fn($state) => $state ? 'Selesai' : 'Belum Selesai')
-                        ])
-                ]),
+                    ->columns(2)
+                    ->schema([
+                        Group::make()
+                            ->schema([
+                                TextEntry::make('user.name')
+                                    ->label('Driver'),
+                                TextEntry::make('unit.type')
+                                    ->label('Unit'),
+                                TextEntry::make('unit.nopol')
+                                    ->label('Nopol'),
+                                TextEntry::make('date')
+                                    ->label('Tanggal'),
+                                TextEntry::make('note')
+                                    ->label('Catatan'),
+                            ]),
+                        Group::make()
+                            ->schema([
+                                TextEntry::make('project.name')
+                                    ->label('Project'),
+                                TextEntry::make('endUser.name')
+                                    ->label('End User 1'),
+                                TextEntry::make('endUserOut.name')
+                                    ->label('End User 2'),
+                                TextEntry::make('is_complete')
+                                    ->label('Approval')
+                                    ->badge(fn($state) => $state ? 'success' : 'warning')
+                                    ->formatStateUsing(fn($state) => $state ? 'Selesai' : 'Belum Selesai')
+                            ])
+                    ]),
                 Section::make('Absensi Masuk')
                     ->schema([
                         TextEntry::make('time_in')

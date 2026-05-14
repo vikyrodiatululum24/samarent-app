@@ -4,9 +4,8 @@ namespace App\Filament\Resources\ReimbursementResource\Pages;
 
 use App\Filament\Resources\ReimbursementResource;
 use Filament\Actions;
-use Filament\Notifications\Collection;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
-use Illuminate\Support\Facades\Log;
 
 class ListReimbursements extends ListRecords
 {
@@ -19,8 +18,18 @@ class ListReimbursements extends ListRecords
                 ->label('Export PDF')
                 ->icon('heroicon-o-printer')
                 ->color('success')
-                ->url(function (): string {
-                    $filters = $this->tableFilters;
+                ->action(function (): void {
+                    $filters = $this->tableFilters ?? [];
+
+                    if (empty($filters['created_at']['dari']) || empty($filters['created_at']['sampai'])) {
+                        Notification::make()
+                            ->title('Filter Diperlukan')
+                            ->body('Harap isi filter tanggal terlebih dahulu sebelum melakukan export.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
                     $dari = $filters['created_at']['dari'] ?? null;
                     $sampai = $filters['created_at']['sampai'] ?? null;
 
@@ -28,9 +37,8 @@ class ListReimbursements extends ListRecords
                     if ($dari) $params['dari'] = $dari;
                     if ($sampai) $params['sampai'] = $sampai;
 
-                    return route('reimbursement.print-pdf', $params);
-                })
-                ->openUrlInNewTab(),
+                    redirect(route('reimbursement.print-pdf', $params));
+                }),
             Actions\CreateAction::make(),
         ];
     }

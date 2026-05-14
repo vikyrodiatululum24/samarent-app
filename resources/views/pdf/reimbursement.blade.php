@@ -174,25 +174,47 @@
                         <th width="5%" class="text-center">No</th>
                         <th width="10%">Tanggal</th>
                         <th width="45%" class="text-right">Keterangan</th>
-                        <th width="20%" class="text-right">Dana Masuk</th>
-                        <th width="20%" class="text-right">Dana Keluar</th>
+                        <th width="10%" class="text-right">Metode Pembayaran</th>
+                        <th width="10%" class="text-right">Dana Masuk</th>
+                        <th width="10%" class="text-right">Dana Keluar</th>
                     </tr>
                 </thead>
                 <tbody>
                     @php
                         $totalMasuk = 0;
                         $totalKeluar = 0;
+                        $cashMasuk = 0;
+                        $cashKeluar = 0;
+                        $cashSaldo = 0;
+                        $fleetCardMasuk = 0;
+                        $fleetCardKeluar = 0;
+                        $fleetCardSaldo = 0;
                     @endphp
                     @foreach ($reimbursements as $index => $item)
                         @php
                             $totalMasuk += $item->dana_masuk ?? 0;
                             $totalKeluar += $item->dana_keluar ?? 0;
+                            $metodePembayaran = strtolower((string) ($item->metode_pembayaran ?? ''));
+
+                            if ($metodePembayaran === 'cash') {
+                                $cashMasuk += $item->dana_masuk ?? 0;
+                                $cashKeluar += $item->dana_keluar ?? 0;
+                                $cashSaldo = $cashMasuk - $cashKeluar;
+                            }
+
+                            if ($metodePembayaran === 'fleet card' || $metodePembayaran === 'fleet_card') {
+                                $fleetCardMasuk += $item->dana_masuk ?? 0;
+                                $fleetCardKeluar += $item->dana_keluar ?? 0;
+                                $fleetCardSaldo = $fleetCardMasuk - $fleetCardKeluar;
+                            }
+
                             $saldo = $totalMasuk - $totalKeluar;
                         @endphp
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d-M-Y') }}</td>
                             <td>{{ $item->keterangan ?? '-' }}</td>
+                            <td>{{ $item->metode_pembayaran ? ($item->metode_pembayaran === 'cash' ? 'Cash' : 'Fleet Card') : '-' }}</td>
                             <td class="text-right">
                                 {{ $item->dana_masuk ? number_format($item->dana_masuk, 0, ',', '.') : '-' }}</td>
                             <td class="text-right">
@@ -200,17 +222,47 @@
                         </tr>
                     @endforeach
                     <tr style="font-weight: bold;">
-                        <td colspan="3" style="border-top: none; height: 5px;">Total Dana Masuk</td>
+                        <td colspan="4" style="border-top: none; height: 5px;">Total Dana Masuk Cash</td>
+                        <td colspan="2" class="text-right" style="border-top: none; height: 5px;">
+                            {{ number_format($cashMasuk, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr style="font-weight: bold;">
+                        <td colspan="4" style="border-top: none; height: 5px;">Total Dana Keluar Cash</td>
+                        <td colspan="2" class="text-right" style="border-top: none; height: 5px;">
+                            {{ number_format($cashKeluar, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr style="font-weight: bold;">
+                        <td colspan="4" style="border-top: none; height: 5px;">Saldo Cash</td>
+                        <td colspan="2" class="text-right" style="border-top: none; height: 5px;">
+                            {{ number_format($cashSaldo, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr style="font-weight: bold;">
+                        <td colspan="4" style="border-top: none; height: 5px;">Total Dana Masuk Fleet Card</td>
+                        <td colspan="2" class="text-right" style="border-top: none; height: 5px;">
+                            {{ number_format($fleetCardMasuk, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr style="font-weight: bold;">
+                        <td colspan="4" style="border-top: none; height: 5px;">Total Dana Keluar Fleet Card</td>
+                        <td colspan="2" class="text-right" style="border-top: none; height: 5px;">
+                            {{ number_format($fleetCardKeluar, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr style="font-weight: bold;">
+                        <td colspan="4" style="border-top: none; height: 5px;">Saldo Fleet Card</td>
+                        <td colspan="2" class="text-right" style="border-top: none; height: 5px;">
+                            {{ number_format($fleetCardSaldo, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr style="font-weight: bold;">
+                        <td colspan="4" style="border-top: none; height: 5px;">Total Dana Masuk</td>
                         <td colspan="2" class="text-right" style="border-top: none; height: 5px;">
                             {{ number_format($totalMasuk, 0, ',', '.') }}</td>
                     </tr>
                     <tr style="font-weight: bold;">
-                        <td colspan="3" style="border-top: none; height: 5px;">Total Dana Keluar</td>
+                        <td colspan="4" style="border-top: none; height: 5px;">Total Dana Keluar</td>
                         <td colspan="2" class="text-right" style="border-top: none; height: 5px;">
                             {{ number_format($totalKeluar, 0, ',', '.') }}</td>
                     </tr>
                     <tr style="font-weight: bold;">
-                        <td colspan="3" style="border-top: none; height: 5px;">Saldo Akhir</td>
+                        <td colspan="4" style="border-top: none; height: 5px;">Saldo Akhir</td>
                         <td colspan="2" class="text-right" style="border-top: none; height: 5px;">
                             {{ number_format($saldo, 0, ',', '.') }}</td>
                     </tr>

@@ -35,13 +35,13 @@ class OvertimePaysRelationManager extends RelationManager
             Forms\Components\TimePicker::make('to_time')->label('Sampai Jam')->required(),
 
             Forms\Components\TimePicker::make('ot_hours_time')->label('Jam OT')->required(),
-            Forms\Components\TextInput::make('ot_1x')->label('OT 1x')->numeric()->minValue(0),
+            Forms\Components\TextInput::make('ot_1x')->label('OT 1')->numeric()->minValue(0),
 
-            Forms\Components\TextInput::make('ot_2x')->label('OT 2x')->numeric()->minValue(0),
+            Forms\Components\TextInput::make('ot_2x')->label('OT 2')->numeric()->minValue(0),
 
-            Forms\Components\TextInput::make('ot_3x')->label('OT 3x')->numeric()->minValue(0),
+            Forms\Components\TextInput::make('ot_3x')->label('OT 3')->numeric()->minValue(0),
 
-            Forms\Components\TextInput::make('ot_4x')->label('OT 4x')->numeric()->minValue(0),
+            Forms\Components\TextInput::make('ot_4x')->label('OT 4')->numeric()->minValue(0),
             Forms\Components\TextInput::make('calculated_ot_hours')->label('Total Jam OT')->numeric()->minValue(0),
             Forms\Components\TextInput::make('ot_amount')->label('Jumlah OT')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
             Forms\Components\TextInput::make('transport')->label('Transport')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
@@ -63,10 +63,10 @@ class OvertimePaysRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable(),
                 Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable(),
                 Tables\Columns\TextColumn::make('ot_hours_time')->label('Jam OT')->sortable(),
-                Tables\Columns\TextColumn::make('ot_1x')->label('OT 1.5x')->sortable(),
-                Tables\Columns\TextColumn::make('ot_2x')->label('OT 2x')->sortable(),
-                Tables\Columns\TextColumn::make('ot_3x')->label('OT 3x')->sortable(),
-                Tables\Columns\TextColumn::make('ot_4x')->label('OT 4x')->sortable(),
+                Tables\Columns\TextColumn::make('ot_1x')->label('OT 1')->sortable(),
+                Tables\Columns\TextColumn::make('ot_2x')->label('OT 2')->sortable(),
+                Tables\Columns\TextColumn::make('ot_3x')->label('OT 3')->sortable(),
+                Tables\Columns\TextColumn::make('ot_4x')->label('OT 4')->sortable(),
                 Tables\Columns\TextColumn::make('calculated_ot_hours')->label('Total Jam OT')->sortable(),
                 Tables\Columns\TextColumn::make('amount_per_hour')->label('Amount/Hour')->money('idr', true)->sortable(),
                 Tables\Columns\TextColumn::make('ot_amount')->label('Jumlah OT')->money('idr', true)->sortable(),

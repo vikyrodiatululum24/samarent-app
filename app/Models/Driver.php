@@ -23,6 +23,7 @@ class Driver extends Model
         'kecamatan',
         'agama',
         'photo',
+        'pic',
     ];
 
     protected $casts = [

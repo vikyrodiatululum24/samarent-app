@@ -23,8 +23,8 @@ class ReimbursementPdfController extends Controller
             $dari = $query->min('created_at');
             $sampai = $query->max('created_at');
         } else {
-            $dari = $request->get('start_date');
-            $sampai = $request->get('end_date');
+            $dari = $request->get('dari');
+            $sampai = $request->get('sampai');
 
             if ($dari) {
                 $query->whereDate('created_at', '>=', $dari);
@@ -36,7 +36,7 @@ class ReimbursementPdfController extends Controller
 
             if (!$dari && !$sampai) {
                 // Jika tidak ada filter tanggal, batasi ke 30 hari terakhir
-                $dari = now()->subDays(30)->toDateString();
+                $dari = now()->subDays(31)->toDateString();
                 $sampai = now()->toDateString();
                 $query->whereDate('created_at', '>=', $dari)
                     ->whereDate('created_at', '<=', $sampai);
@@ -123,8 +123,8 @@ class ReimbursementPdfController extends Controller
 
 
                 if (!$dari && !$sampai) {
-                    // Jika tidak ada filter tanggal, batasi ke 30 hari terakhir
-                    $dari = now()->subDays(30)->toDateString();
+                    // Jika tidak ada filter tanggal, batasi ke 31 hari terakhir
+                    $dari = now()->subDays(31)->toDateString();
                     $sampai = now()->toDateString();
                     $reimbursements = Reimbursement::where('user_id', $userId)
                         ->whereDate('created_at', '>=', $dari)

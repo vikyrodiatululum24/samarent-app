@@ -19,8 +19,23 @@ class Reimbursement extends Model
         'keterangan',
         'dana_masuk',
         'dana_keluar',
+        'metode_pembayaran',
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function (self $reimbursement) {
+            if ($reimbursement->dana_masuk === null || $reimbursement->dana_masuk === '') {
+                $reimbursement->dana_masuk = 0;
+            }
+
+            if ($reimbursement->dana_keluar === null || $reimbursement->dana_keluar === '') {
+                $reimbursement->dana_keluar = 0;
+            }
+        });
+    }
+
+    
     public function getFotoOdometerAwalUrlAttribute()
     {
         return $this->foto_odometer_awal ? asset('storage/' . $this->foto_odometer_awal) : null;
