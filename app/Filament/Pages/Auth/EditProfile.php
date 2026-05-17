@@ -4,16 +4,16 @@ namespace App\Filament\Pages\Auth;
 
 use App\Models\Admin;
 use App\Models\Profile;
-use Illuminate\Support\Facades\Storage;
-use Filament\Notifications\Notification;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
-use Filament\Schemas\Components\DatePicker;
-use Filament\Schemas\Components\FileUpload;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Textarea;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class EditProfile extends BaseEditProfile
 {
@@ -148,7 +148,7 @@ class EditProfile extends BaseEditProfile
                             ])
                             ->columnSpan(1),
                     ])
-                    ->columns(2)
+                    ->columns(1),
             ]);
     }
 
