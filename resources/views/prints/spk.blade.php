@@ -708,7 +708,7 @@
                 </td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl : {{ $pengajuan->bos_joulmer?->approved_at->format('d F Y') ?? '' }}</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl : {{ $pengajuan->bos_joulmer?->approved_at?->format('d F Y') ?? ' ' }}</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
             </tr>
             <tr>

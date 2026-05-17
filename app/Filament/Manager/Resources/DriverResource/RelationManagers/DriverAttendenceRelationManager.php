@@ -37,7 +37,10 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->color(function ($state) {
                         return $state === 'Holiday' ? 'danger' : 'success';
                     }),
-                Tables\Columns\TextColumn::make('project.name')->label('Project'),
+                Tables\Columns\TextColumn::make('project.name')
+                ->toogleable(isToggledHiddenByDefault: true)
+                ->label('Project'),
+
                 Tables\Columns\TextColumn::make('endUser.name')->label('Start User'),
                 Tables\Columns\TextColumn::make('endUserOut.name')->label('End User'),
                 Tables\Columns\TextColumn::make('unit.type')->label('Unit'),

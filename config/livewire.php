@@ -11,6 +11,7 @@ return [
         'layouts' => resource_path('views/layouts'),
         'pages' => resource_path('views/pages'),
     ],
+    'asset_url' => env('LIVEWIRE_ASSET_URL', null),
 
     'component_layout' => 'layouts::app',
 

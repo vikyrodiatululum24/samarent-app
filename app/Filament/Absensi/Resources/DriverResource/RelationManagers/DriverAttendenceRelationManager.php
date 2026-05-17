@@ -108,55 +108,74 @@ class DriverAttendenceRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('id')
             ->columns([
-                Tables\Columns\TextColumn::make('date'),
+                Tables\Columns\TextColumn::make('date')
+                ->toggleable(isToggledHiddenByDefault: false)
+                ->label('Tanggal'),
                 Tables\Columns\TextColumn::make('shift')
                     ->label('Shift')
                     ->color(function ($state) {
                         return $state === 'Holiday' ? 'danger' : 'success';
-                    }),
-                Tables\Columns\TextColumn::make('project.name')->label('Project'),
-                Tables\Columns\TextColumn::make('endUser.name')->label('Start User'),
-                Tables\Columns\TextColumn::make('endUserOut.name')->label('End User'),
-                Tables\Columns\TextColumn::make('unit.type')->label('Unit'),
-                Tables\Columns\TextColumn::make('start_km'),
-                Tables\Columns\TextColumn::make('location_in')->label('Lokasi Masuk'),
-                Tables\Columns\TextColumn::make('time_in'),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('project.name')->label('Project')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('endUser.name')->label('Start User')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('endUserOut.name')->label('End User')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('unit.type')->label('Unit')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('start_km')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('location_in')->label('Lokasi Masuk')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('time_in')
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\ImageColumn::make('photo_in')
                     ->disk('public')
                     ->square()
                     ->label('Foto Masuk')
-                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in)),
+                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in))
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\ImageColumn::make('photo_in')
                     ->disk('public')
                     ->square()
                     ->label('Foto Masuk')
-                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in)),
+                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in))
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('time_chek')
                     ->label('Jam Cek')
                     ->getStateUsing(function ($record) {
                         $check = $record->checks()->latest()->first();
                         return $check ? $check->created_at->format('H:i:s') : '-';
-                    }),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('location_chek')
                     ->label('Lokasi Cek')
                     ->getStateUsing(function ($record) {
                         $check = $record->checks()->latest()->first();
                         return $check ? $check->location : '-';
-                    }),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\ImageColumn::make('photo_chek')
                     ->label('Foto Cek')
                     ->getStateUsing(function ($record) {
                         $check = $record->checks()->latest()->first();
                         return $check ? str_replace('storage/', '', $check->photo) : null;
-                    }),
-                Tables\Columns\TextColumn::make('end_km'),
-                Tables\Columns\TextColumn::make('time_out'),
-                Tables\Columns\TextColumn::make('location_out')->label('Lokasi Keluar'),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('end_km')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('time_out')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('location_out')->label('Lokasi Keluar')
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\ImageColumn::make('photo_out')
                     ->disk('public')
                     ->square()
                     ->label('Foto Keluar')
-                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_out)),
+                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_out))
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('note')
                     ->limit(50)
                     ->wrap()
