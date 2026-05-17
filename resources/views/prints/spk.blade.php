@@ -582,17 +582,23 @@
                 <th style="width: 10%; padding: 2px; text-align: left;">
                     <p style="margin: 0;">Terbilang</p>
                 </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
+                <td style="width: 30%; padding: 2px; font-size: 12px">
                     <p style="margin: 0; text-transform: uppercase;">:
                         ({{ ucwords(terbilang($pengajuan->complete->nominal_estimasi)) }}
                         Rupiah) </p>
+                </td>
+                <td rowspan="2" style="width: 20%; padding: 2px; text-align: center;">
+                    @if ($pengajuan->bos_joulmer)
+                        <p style="margin: 0; text-transform: uppercase;">{{ $pengajuan->bos_joulmer->note }}</p>
+                    @endif
+
                 </td>
             </tr>
             <tr style="vertical-align: top; font-size: 12px">
                 <th style="width: 10%; padding: 2px; text-align: left;">
                     <p style="margin: 0;">Untuk Keperluan</p>
                 </th>
-                <td style="width: 30%; padding: 2px; font-size: 12px" colspan="2">
+                <td style="width: 30%; padding: 2px; font-size: 12px">
                     @if ($pengajuan->service_unit->count() === 1)
                         @foreach ($pengajuan->service_unit as $serviceUnit)
                             <p style="margin: 0; text-transform: uppercase">
@@ -702,7 +708,7 @@
                 </td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
-                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
+                <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl : {{ $pengajuan->bos_joulmer?->approved_at->format('d F Y') ?? '' }}</td>
                 <td style="height: 28px; font-size: 12px; border: 1px solid black;">Tgl :</td>
             </tr>
             <tr>

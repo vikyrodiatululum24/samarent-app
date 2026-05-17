@@ -84,10 +84,9 @@ class DriverAttendenceResource extends Resource
                         TextEntry::make('driver.user.name')->label('Nama Driver'),
                         TextEntry::make('project.name')->label('Project'),
                         Group::make([
-                            TextEntry::make('endUser.name')->label('End User'),
+                            TextEntry::make('endUser.name')->label('Start User'),
                             TextEntry::make('endUserOut.name')
-                                ->label('End User Keluar')
-                                ->visible(fn ($record) => ! empty($record->endUserOut)),
+                                ->label('End User'),
                         ])
                             ->columns(2),
                         TextEntry::make('unit.type')->label('Unit'),

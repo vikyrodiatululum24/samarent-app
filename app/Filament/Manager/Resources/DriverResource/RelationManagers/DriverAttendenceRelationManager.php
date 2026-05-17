@@ -22,8 +22,8 @@ class DriverAttendenceRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-                //
-            ]);
+            //
+        ]);
     }
 
     public function table(Table $table): Table
@@ -32,8 +32,14 @@ class DriverAttendenceRelationManager extends RelationManager
             ->recordTitleAttribute('id')
             ->columns([
                 Tables\Columns\TextColumn::make('date'),
+                Tables\Columns\TextColumn::make('shift')
+                    ->label('Shift')
+                    ->color(function ($state) {
+                        return $state === 'Holiday' ? 'danger' : 'success';
+                    }),
                 Tables\Columns\TextColumn::make('project.name')->label('Project'),
-                Tables\Columns\TextColumn::make('endUser.name')->label('End User'),
+                Tables\Columns\TextColumn::make('endUser.name')->label('Start User'),
+                Tables\Columns\TextColumn::make('endUserOut.name')->label('End User'),
                 Tables\Columns\TextColumn::make('unit.type')->label('Unit'),
                 Tables\Columns\TextColumn::make('start_km'),
                 Tables\Columns\TextColumn::make('location_in')->label('Lokasi Masuk'),
@@ -42,7 +48,7 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->disk('public')
                     ->square()
                     ->label('Foto Masuk')
-                    ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_in)),
+                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in)),
                 Tables\Columns\TextColumn::make('time_chek')
                     ->label('Jam Cek')
                     ->getStateUsing(function ($record) {
@@ -68,7 +74,7 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->disk('public')
                     ->square()
                     ->label('Foto Keluar')
-                    ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_out)),
+                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_out)),
                 Tables\Columns\TextColumn::make('note')
                     ->limit(50)
                     ->wrap()
@@ -78,21 +84,21 @@ class DriverAttendenceRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('month')
                     ->options(function () {
-                            $months = [];
-                            for ($i = 0; $i < 12; $i++) {
-                                $date = Carbon::now()->subMonths($i);
-                                $months[$date->format('Y-m')] = $date->translatedFormat('F Y');
-                            }
-                            return array_reverse($months, true); // urut dari lama ke baru
-                        })
-                        ->default(date('Y-m'))
-                        ->query(function (Builder $query, array $data): Builder {
-                            // Get the selected value
-                            $selectedMonth = $data['value'] ?? date('Y-m');
+                        $months = [];
+                        for ($i = 0; $i < 12; $i++) {
+                            $date = Carbon::now()->subMonths($i);
+                            $months[$date->format('Y-m')] = $date->translatedFormat('F Y');
+                        }
+                        return array_reverse($months, true); // urut dari lama ke baru
+                    })
+                    ->default(date('Y-m'))
+                    ->query(function (Builder $query, array $data): Builder {
+                        // Get the selected value
+                        $selectedMonth = $data['value'] ?? date('Y-m');
 
-                            return $selectedMonth ? $query->whereMonth('date', substr($selectedMonth, 5, 2))
-                                ->whereYear('date', substr($selectedMonth, 0, 4)) : $query;
-                        })
+                        return $selectedMonth ? $query->whereMonth('date', substr($selectedMonth, 5, 2))
+                            ->whereYear('date', substr($selectedMonth, 0, 4)) : $query;
+                    })
             ])
             ->headerActions([
                 // Tables\Actions\CreateAction::make(),
@@ -124,7 +130,7 @@ class DriverAttendenceRelationManager extends RelationManager
                     Action::make('printPdf')
                         ->label('Print PDF')
                         ->icon('heroicon-o-printer')
-                        ->badge(function($livewire) {
+                        ->badge(function ($livewire) {
                             $filters = $livewire->tableFilters;
                             $cetak = \App\Models\Cetak::where('driver_id', $this->ownerRecord->id)->where('periode', $filters['month']['value'] ?? null)->first();
                             return $cetak ? 'sudah di print' : null;
@@ -176,14 +182,14 @@ class DriverAttendenceRelationManager extends RelationManager
                             $this->js("window.open('{$url}', '_blank')");
                         }),
                 ])
-                ->label('Export')
-                ->icon('heroicon-o-arrow-down-tray'),
+                    ->label('Export')
+                    ->icon('heroicon-o-arrow-down-tray'),
             ])
             ->actions([
                 Action::make('view')
                     ->label('Lihat Detail')
                     ->icon('heroicon-o-eye')
-                    ->url(fn ($record) => DriverAttendenceResource::getUrl('view', ['record' => $record])),
+                    ->url(fn($record) => DriverAttendenceResource::getUrl('view', ['record' => $record])),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

@@ -4,42 +4,79 @@ namespace App\Helpers;
 
 use App\Models\OvertimePay;
 use App\Models\SetSalary;
-use Illuminate\Container\Attributes\Log;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PayrollHelpers
 {
     /**
      * Cek apakah tanggal adalah weekday, weekend, atau libur nasional.
      */
-    public static function cekHari($tanggal): string
+    public static function cekHari($tanggal, $projectId): string
     {
-        $tanggal = $tanggal instanceof Carbon ? $tanggal : Carbon::parse($tanggal);
-        $hari = $tanggal->translatedFormat('l');
+        $tanggal = $tanggal instanceof Carbon
+            ? $tanggal
+            : Carbon::parse($tanggal);
 
-        if (in_array($hari, ['Saturday', 'Sunday'])) {
+        // monday, tuesday, dst
+        $hari = strtolower($tanggal->format('l'));
+
+        $workDays = SetSalary::where('project_id', $projectId)
+            ->pluck('workdays')
+            ->flatten()
+            ->map(fn($day) => strtolower($day))
+            ->unique()
+            ->toArray();
+
+        // cek hari kerja project
+        if (!in_array($hari, $workDays)) {
             return 'Holiday';
         }
 
         try {
-            $response = Http::timeout(5)->get('https://api-harilibur.vercel.app/api', [
-                'year' => $tanggal->year,
-            ]);
 
-            https: //api-harilibur.vercel.app/api/?year=2024
+            $cacheKey = 'holidays_' . $tanggal->year;
 
-            if ($response->successful()) {
-                $holidays = collect($response->json());
-                $isHoliday = $holidays->firstWhere('holiday_date', $tanggal->toDateString());
+            $holidays = Cache::remember(
+                $cacheKey,
+                now()->addDays(30),
+                function () use ($tanggal) {
 
-                if ($isHoliday) {
-                    return 'Holiday';
+                    $response = Http::timeout(5)->get(
+                        "https://libur.deno.dev/api?tahun={$tanggal->year}"
+                    );
+
+                    if ($response->successful()) {
+                        return collect(
+                            json_decode($response->body(), true)
+                        );
+                    }
+
+                    return collect();
                 }
+            );
+
+            Log::info('data holidays', $holidays->toArray());
+
+            $isHoliday = $holidays->firstWhere(
+                'date',
+                $tanggal->toDateString()
+            );
+
+            Log::info('Is holiday for ' . $tanggal->toDateString(), ['is_holiday' => !!$isHoliday]);
+
+            if ($isHoliday) {
+                return 'Holiday';
             }
         } catch (\Exception $e) {
+
+            report($e);
+
             return 'Weekday';
         }
+
         return 'Weekday';
     }
 
@@ -52,6 +89,13 @@ class PayrollHelpers
     {
         $startTime = Carbon::parse($absen->time_in);
         $endTime = Carbon::parse($absen->time_out);
+
+        Log::info('Calculating overtime pay', [
+            'absen_id' => $absen->id,
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+        ]);
+
         $driver_id = $absen->user->driver->id ?? null;
         if (!$driver_id) {
             throw new \Exception("Driver ID tidak ditemukan untuk absen ID {$absen->id}");
@@ -60,12 +104,13 @@ class PayrollHelpers
         if ($absen->shift) {
             $shift = $absen->shift;
         } else {
-            $shift = self::cekHari($tanggal);
+            $shift = self::cekHari($tanggal, $absen->project_id);
             $absen->shift = $shift;
             $absen->save();
         }
         $project_id = $absen->project_id;
         $hoursWorked = $startTime->diffInMinutes($endTime) / 60;
+        Log::info('Hours worked calculated', ['hours_worked' => $hoursWorked]);
 
         $setSalary = SetSalary::whereIn('project_id', [$project_id, 33])
             ->orderByRaw('project_id != ? asc', [$project_id])
@@ -96,13 +141,15 @@ class PayrollHelpers
 
         $overtimePay = 0;
         $overtimeHours = 0;
+        $workingDays = $setSalary->workhours ?? 0; // jam kerja normal per hari
 
-        if ($shift === 'Weekday' && $hoursWorked > 9) {
-            $overtimeHours = $hoursWorked - 9;
+        if ($shift === 'Weekday' && $hoursWorked > $workingDays) {
+            $overtimeHours = $hoursWorked - $workingDays;
+            Log::info('Overtime hours calculated', ['overtime_hours' => $overtimeHours, 'from ' => ['hours_worked' => $hoursWorked, 'working_days' => $workingDays]]);
             if ($overtimeHours >= 1) {
-                // Jam lembur dihitung mulai dari jam ke-10
+                // Jam lembur pertama → rate overtime_1
                 $ot_1x = 1 * $overtimeRates['overtime_1'];
-                // Jam ke-11 dst → rate overtime_2
+                // Jam lembur kedua dan seterusnya → rate overtime_2
                 $ot_2x = ($overtimeHours - 1) * $overtimeRates['overtime_2'];
                 // Total gaji lembur dalam rupiah
                 $totalOvertime = $ot_1x + $ot_2x;
@@ -165,7 +212,7 @@ class PayrollHelpers
                 'shift' => $shift,
                 'from_time' => $startTime->format('H:i:s'),
                 'to_time' => $endTime->format('H:i:s'),
-                'ot_hours_time' => $overtimeHours ? gmdate('H:i:s', (int) ($overtimeHours * 3600)) : null,
+                'ot_hours_time' => self::formatOvertimeHours($overtimeHours),
                 'ot_1x' => $ot_1x ?? 0,
                 'ot_2x' => $ot_2x ?? 0,
                 'ot_3x' => $ot_3x ?? 0,
@@ -177,6 +224,18 @@ class PayrollHelpers
             ],
         );
 
+        Log::info('Overtime pay record created/updated', ['result' => $result]);
+
         return $result;
+    }
+
+    public static function formatOvertimeHours($hours)
+    {
+        $overtimeSeconds = $hours * 3600;
+        $hours = floor($overtimeSeconds / 3600);
+        $minutes = floor(($overtimeSeconds % 3600) / 60);
+        $seconds = $overtimeSeconds % 60;
+
+        return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
     }
 }

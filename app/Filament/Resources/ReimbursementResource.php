@@ -180,7 +180,9 @@ class ReimbursementResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('user_id', Auth::id()))
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query->where('user_id', Auth::id());
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal')
@@ -194,12 +196,6 @@ class ReimbursementResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->searchable(),
-
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('User')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('km_awal')
                     ->label('KM Awal')
@@ -264,8 +260,6 @@ class ReimbursementResource extends Resource
                     ->money('IDR')
                     ->sortable()
                     ->placeholder('-'),
-
-
 
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Terakhir Diupdate')

@@ -60,6 +60,7 @@ class PublicReimbursementController extends Controller
             'nota' => 'nullable|image|max:10240',
             'tujuan_perjalanan' => 'required|string|max:500',
             'keterangan' => 'nullable|string',
+            'metode_pembayaran' => 'required|string|in:fleet_card,cash',
             'dana_masuk' => 'nullable|numeric|min:0',
             'dana_keluar' => 'nullable|numeric|min:0',
         ]);
@@ -111,6 +112,7 @@ class PublicReimbursementController extends Controller
                 'keterangan' => $request->keterangan,
                 'dana_masuk' => $request->dana_masuk ?? 0,
                 'dana_keluar' => $request->dana_keluar ?? 0,
+                'metode_pembayaran' => $request->metode_pembayaran,
             ]);
 
             return redirect()

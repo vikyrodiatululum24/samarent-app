@@ -12,6 +12,7 @@ use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -114,7 +115,8 @@ class DriverAttendenceRelationManager extends RelationManager
                         return $state === 'Holiday' ? 'danger' : 'success';
                     }),
                 Tables\Columns\TextColumn::make('project.name')->label('Project'),
-                Tables\Columns\TextColumn::make('endUser.name')->label('End User'),
+                Tables\Columns\TextColumn::make('endUser.name')->label('Start User'),
+                Tables\Columns\TextColumn::make('endUserOut.name')->label('End User'),
                 Tables\Columns\TextColumn::make('unit.type')->label('Unit'),
                 Tables\Columns\TextColumn::make('start_km'),
                 Tables\Columns\TextColumn::make('location_in')->label('Lokasi Masuk'),
@@ -123,12 +125,12 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->disk('public')
                     ->square()
                     ->label('Foto Masuk')
-                    ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_in)),
+                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in)),
                 Tables\Columns\ImageColumn::make('photo_in')
                     ->disk('public')
                     ->square()
                     ->label('Foto Masuk')
-                    ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_in)),
+                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in)),
                 Tables\Columns\TextColumn::make('time_chek')
                     ->label('Jam Cek')
                     ->getStateUsing(function ($record) {
@@ -154,7 +156,7 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->disk('public')
                     ->square()
                     ->label('Foto Keluar')
-                    ->getStateUsing(fn ($record) => str_replace('storage/', '', $record->photo_out)),
+                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_out)),
                 Tables\Columns\TextColumn::make('note')
                     ->limit(50)
                     ->wrap()
@@ -164,21 +166,21 @@ class DriverAttendenceRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('month')
                     ->options(function () {
-                            $months = [];
-                            for ($i = 0; $i < 12; $i++) {
-                                $date = Carbon::now()->subMonths($i);
-                                $months[$date->format('Y-m')] = $date->translatedFormat('F Y');
-                            }
-                            return array_reverse($months, true); // urut dari lama ke baru
-                        })
-                        ->default(date('Y-m'))
-                        ->query(function (Builder $query, array $data): Builder {
-                            // Get the selected value
-                            $selectedMonth = $data['value'] ?? date('Y-m');
+                        $months = [];
+                        for ($i = 0; $i < 12; $i++) {
+                            $date = Carbon::now()->subMonths($i);
+                            $months[$date->format('Y-m')] = $date->translatedFormat('F Y');
+                        }
+                        return array_reverse($months, true); // urut dari lama ke baru
+                    })
+                    ->default(date('Y-m'))
+                    ->query(function (Builder $query, array $data): Builder {
+                        // Get the selected value
+                        $selectedMonth = $data['value'] ?? date('Y-m');
 
-                            return $selectedMonth ? $query->whereMonth('date', substr($selectedMonth, 5, 2))
-                                ->whereYear('date', substr($selectedMonth, 0, 4)) : $query;
-                        })
+                        return $selectedMonth ? $query->whereMonth('date', substr($selectedMonth, 5, 2))
+                            ->whereYear('date', substr($selectedMonth, 0, 4)) : $query;
+                    })
             ])
             ->headerActions([
                 // Tables\Actions\CreateAction::make(),
@@ -210,7 +212,7 @@ class DriverAttendenceRelationManager extends RelationManager
                     Actions\Action::make('printPdf')
                         ->label('Print PDF')
                         ->icon('heroicon-o-printer')
-                        ->badge(function($livewire) {
+                        ->badge(function ($livewire) {
                             $filters = $livewire->tableFilters;
                             $cetak = \App\Models\Cetak::where('driver_id', $this->ownerRecord->id)->where('periode', $filters['month']['value'] ?? null)->first();
                             return $cetak ? 'sudah di print' : null;
@@ -262,8 +264,8 @@ class DriverAttendenceRelationManager extends RelationManager
                             $this->js("window.open('{$url}', '_blank')");
                         }),
                 ])
-                ->label('Export')
-                ->icon('heroicon-o-arrow-down-tray'),
+                    ->label('Export')
+                    ->icon('heroicon-o-arrow-down-tray'),
             ])
             ->actions([
                 Actions\Action::make('addNote')
@@ -275,7 +277,7 @@ class DriverAttendenceRelationManager extends RelationManager
                             ->rows(4)
                             ->maxLength(65535),
                     ])
-                    ->fillForm(fn ($record) => ['note_admin' => $record->note_admin])
+                    ->fillForm(fn($record) => ['note_admin' => $record->note_admin])
                     ->action(function ($record, array $data) {
                         $record->update([
                             'note_admin' => $data['note_admin'] ?? null,
@@ -288,20 +290,37 @@ class DriverAttendenceRelationManager extends RelationManager
                     }),
 
                 Actions\Action::make('edit')
-                    ->label('Edit Ringkas')
+                    ->label('Edit Absensi')
                     ->icon('heroicon-o-pencil')
                     ->form([
-                        DateTimePicker::make('time_in')->label('Waktu Masuk'),
-                        DateTimePicker::make('time_out')->label('Waktu Keluar'),
-                        Toggle::make('is_complete')->label('Selesai'),
-                        Select::make('shift')
-                            ->label('Shift')
-                            ->options([
-                                'Weekday' => 'Weekday',
-                                'Holiday' => 'Holiday',
-                            ]),
+                        Section::make('Informasi Absensi')
+                            ->schema([
+                                DateTimePicker::make('time_in')->label('Waktu Masuk'),
+                                DateTimePicker::make('time_out')->label('Waktu Keluar'),
+                                Select::make('project_id')
+                                    ->relationship('project', 'name')
+                                    ->searchable()
+                                    ->columnSpan(2)
+                                    ->label('Project'),
+                                Select::make('enduser_id')
+                                    ->relationship('endUser', 'name')
+                                    ->searchable()
+                                    ->label('Start User'),
+                                Select::make('endUserOut_id')
+                                    ->relationship('endUserOut', 'name')
+                                    ->searchable()
+                                    ->label('End User'),
+                                Select::make('shift')
+                                    ->label('Shift')
+                                    ->options([
+                                        'Weekday' => 'Weekday',
+                                        'Holiday' => 'Holiday',
+                                    ]),
+                                Toggle::make('is_complete')->label('Selesai'),
+                            ])
+                            ->columns(2),
                     ])
-                    ->fillForm(fn ($record) => [
+                    ->fillForm(fn($record) => [
                         'time_in' => $record->time_in,
                         'time_out' => $record->time_out,
                         'is_complete' => (bool) $record->is_complete,

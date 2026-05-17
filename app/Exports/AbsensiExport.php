@@ -36,9 +36,9 @@ class AbsensiExport implements FromView, WithStyles
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        $sheet->getStyle('A1:K3')->getFont()->setBold(true);
+        $sheet->getStyle('A1:L3')->getFont()->setBold(true);
 
-        $sheet->getStyle('A5:K5')->applyFromArray([
+        $sheet->getStyle('A5:L5')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'color' => ['rgb' => 'FFFFFF'],
@@ -60,7 +60,7 @@ class AbsensiExport implements FromView, WithStyles
         ]);
 
         $lastRow = 5 + $this->attendences->count();
-        $sheet->getStyle("A6:K{$lastRow}")->applyFromArray([
+        $sheet->getStyle("A6:L{$lastRow}")->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,

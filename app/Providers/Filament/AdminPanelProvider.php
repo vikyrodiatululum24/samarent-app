@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use Filament\Pages\Dashboard;
 use App\Http\Middleware\EnsureAdminRole;
+use Illuminate\Support\Facades\Auth;
 use Filament\Support\Enums\Width;
 use Filament\Pages;
 use Filament\Panel;
@@ -44,6 +45,9 @@ class AdminPanelProvider extends PanelProvider
                 'yellow' => '#FBBF24', // ganti warna peringatan
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->resources([
+                \App\Filament\Admin\Resources\ReimbursementMonitorResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->profile(EditProfile::class, false)
             ->pages([
@@ -73,9 +77,9 @@ class AdminPanelProvider extends PanelProvider
                     ->url('/admin', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(1)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'admin'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                         // tambahkan email lain yang diizinkan
                     ])),
@@ -85,9 +89,9 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-users')
                     ->group('Panels')
                     ->sort(1)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'user'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                         // tambahkan email lain yang diizinkan
                     ])),
@@ -96,9 +100,9 @@ class AdminPanelProvider extends PanelProvider
                     ->url('/user', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(2)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'user'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
 
@@ -106,9 +110,9 @@ class AdminPanelProvider extends PanelProvider
                     ->url('/manager', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(2)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'manager'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
 
@@ -116,9 +120,9 @@ class AdminPanelProvider extends PanelProvider
                     ->url('/finance', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(2)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'finance'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
 
@@ -126,9 +130,9 @@ class AdminPanelProvider extends PanelProvider
                     ->url('/asuransi', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(2)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'asuransi'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                         ])),
 
@@ -136,9 +140,9 @@ class AdminPanelProvider extends PanelProvider
                             ->url('/absensi', shouldOpenInNewTab: false)
                             ->group('Panels')
                             ->sort(2)
-                            ->visible(fn () => auth()->check()
+                            ->visible(fn () => Auth::check()
                                 && Filament::getCurrentOrDefaultPanel()?->getId() !== 'absensi'
-                                && in_array(auth()->user()->email, [
+                                && in_array(Auth::user()?->email, [
                                 'centralakun@samarent.com',
                             ])),
 
@@ -146,9 +150,9 @@ class AdminPanelProvider extends PanelProvider
                             ->url('/penjualan', shouldOpenInNewTab: false)
                             ->group('Panels')
                             ->sort(2)
-                            ->visible(fn () => auth()->check()
+                            ->visible(fn () => Auth::check()
                                 && Filament::getCurrentOrDefaultPanel()?->getId() !== 'penjualan'
-                                && in_array(auth()->user()->email, [
+                                && in_array(Auth::user()?->email, [
                                 'centralakun@samarent.com',
                             ])),
 
@@ -156,23 +160,23 @@ class AdminPanelProvider extends PanelProvider
                     ->url('https://driver.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
                     ->sort(3)
-                    ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
+                    ->visible(fn () => Auth::check() && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
                 NavigationItem::make('President Panel')
                     ->url('/president', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(4)
-                    ->visible(fn () => auth()->check()
+                    ->visible(fn () => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'president'
-                        && in_array(auth()->user()->email, [
+                        && in_array(Auth::user()?->email, [
                             'centralakun@samarent.com',
                         ])),
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
                     ->sort(5)
-                    ->visible(fn () => auth()->check() && in_array(auth()->user()->email, [
+                    ->visible(fn () => Auth::check() && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
             ])

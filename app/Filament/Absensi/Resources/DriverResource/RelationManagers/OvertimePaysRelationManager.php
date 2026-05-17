@@ -2,16 +2,17 @@
 
 namespace App\Filament\Absensi\Resources\DriverResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Tables;
+use App\Models\SetSalary;
 use Filament\Actions;
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Support\RawJs;
-use Illuminate\Support\Carbon;
+use Filament\Forms;
 use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class OvertimePaysRelationManager extends RelationManager
 {
@@ -59,14 +60,42 @@ class OvertimePaysRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('tanggal')->date()->label('Tanggal')->sortable(),
                 Tables\Columns\TextColumn::make('hari')->label('Hari')->sortable(),
-                Tables\Columns\TextColumn::make('shift')->label('Shift')->sortable(),
+                Tables\Columns\TextColumn::make('shift')
+                    ->label('Shift')
+                    ->color(function ($state) {
+                        return $state === 'Holiday' ? 'danger' : 'success';
+                    }),
                 Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable(),
                 Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable(),
                 Tables\Columns\TextColumn::make('ot_hours_time')->label('Jam OT')->sortable(),
-                Tables\Columns\TextColumn::make('ot_1x')->label('OT 1')->sortable(),
-                Tables\Columns\TextColumn::make('ot_2x')->label('OT 2')->sortable(),
-                Tables\Columns\TextColumn::make('ot_3x')->label('OT 3')->sortable(),
-                Tables\Columns\TextColumn::make('ot_4x')->label('OT 4')->sortable(),
+                Tables\Columns\TextColumn::make('ot_1x')
+                    ->label(function ($record) {
+                        $projectId = $this->getOwnerRecord()->project_id;
+                        $overtimeRate = SetSalary::where('project_id', $projectId)->value('overtime1') ?? 0;
+                        return "OT 1 ({$overtimeRate}x)";
+                    })
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('ot_2x')
+                    ->label(function ($record) {
+                        $projectId = $this->getOwnerRecord()->project_id;
+                        $overtimeRate = SetSalary::where('project_id', $projectId)->value('overtime2') ?? 0;
+                        return "OT 2 ({$overtimeRate}x)";
+                    })
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('ot_3x')
+                    ->label(function ($record) {
+                        $projectId = $this->getOwnerRecord()->project_id;
+                        $overtimeRate = SetSalary::where('project_id', $projectId)->value('overtime3') ?? 0;
+                        return "OT 3 ({$overtimeRate}x)";
+                    })
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('ot_4x')
+                    ->label(function ($record) {
+                        $projectId = $this->getOwnerRecord()->project_id;
+                        $overtimeRate = SetSalary::where('project_id', $projectId)->value('overtime4') ?? 0;
+                        return "OT 4 ({$overtimeRate}x)";
+                    })
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('calculated_ot_hours')->label('Total Jam OT')->sortable(),
                 Tables\Columns\TextColumn::make('amount_per_hour')->label('Amount/Hour')->money('idr', true)->sortable(),
                 Tables\Columns\TextColumn::make('ot_amount')->label('Jumlah OT')->money('idr', true)->sortable(),
@@ -76,6 +105,7 @@ class OvertimePaysRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('overnight')->label('Menginap')->money('idr', true)->sortable(),
                 Tables\Columns\TextColumn::make('remarks')->label('Keterangan')->sortable(),
             ])
+            ->defaultSort('tanggal', 'asc')
             ->filters([
                 Tables\Filters\SelectFilter::make('month')
                     ->options(function () {

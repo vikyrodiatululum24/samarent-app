@@ -25,8 +25,8 @@ class OvertimePaysRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-                //
-            ]);
+            //
+        ]);
     }
 
     public function table(Table $table): Table
@@ -36,7 +36,11 @@ class OvertimePaysRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('tanggal')->date()->label('Tanggal')->sortable(),
                 Tables\Columns\TextColumn::make('hari')->label('Hari')->sortable(),
-                Tables\Columns\TextColumn::make('shift')->label('Shift')->sortable(),
+                Tables\Columns\TextColumn::make('shift')
+                    ->label('Shift')
+                    ->color(function ($state) {
+                        return $state === 'Holiday' ? 'danger' : 'success';
+                    }),
                 Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable(),
                 Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable(),
                 Tables\Columns\TextColumn::make('ot_hours_time')->label('Jam OT')->sortable(),

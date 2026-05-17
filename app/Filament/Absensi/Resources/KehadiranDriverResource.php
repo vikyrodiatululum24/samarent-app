@@ -93,6 +93,7 @@ class KehadiranDriverResource extends Resource
                     ->label('Selesai')
                     ->sortable()
             ])
+            ->defaultSort('id', 'desc')
             ->filters([
                 //
             ])

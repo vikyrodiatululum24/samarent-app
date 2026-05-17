@@ -327,37 +327,29 @@
                         </div>
                     </div>
 
-                    {{-- foto Nota --}}
-                    <div class="mb-8">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">
-                            Foto Nota Pembayaran
-                        </h2>
-
-                        <div class="mb-4">
-                            <label for="nota" class="block text-sm font-medium text-gray-700 mb-2">
-                                Upload Foto Nota <span class="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="file"
-                                name="nota"
-                                id="nota"
-                                accept="image/*"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                onchange="previewImage(this, 'preview_nota')"
-                                required>
-                            <p class="text-sm text-gray-500 mt-1">Format: JPG, JPEG, PNG. Maksimal 10MB</p>
-                            <img id="preview_nota" class="preview-image hidden rounded-lg border-2 border-gray-300" alt="Preview">
-                            @error('nota')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-
                     <!-- Dana Section -->
                     <div class="mb-8">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">
                             Informasi Dana
                         </h2>
+
+                        <div class="mb-4">
+                            <label for="metode_pembayaran" class="block text-sm font-medium text-gray-700 mb-2">
+                                Metode Pembayaran <span class="text-red-500">*</span>
+                            </label>
+                            <select
+                                name="metode_pembayaran"
+                                id="metode_pembayaran"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                required>
+                                <option value="">-- Pilih Metode --</option>
+                                <option value="fleet_card" {{ old('metode_pembayaran') == 'fleet_card' ? 'selected' : '' }}>Fleet Card</option>
+                                <option value="cash" {{ old('metode_pembayaran') == 'cash' ? 'selected' : '' }}>Cash</option>
+                            </select>
+                            @error('metode_pembayaran')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -395,6 +387,32 @@
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
+                        </div>
+                    </div>
+
+                     {{-- foto Nota --}}
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">
+                            Foto Nota Pembayaran
+                        </h2>
+
+                        <div class="mb-4">
+                            <label for="nota" class="block text-sm font-medium text-gray-700 mb-2">
+                                Upload Foto Nota <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="file"
+                                name="nota"
+                                id="nota"
+                                accept="image/*"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                onchange="previewImage(this, 'preview_nota')"
+                                required>
+                            <p class="text-sm text-gray-500 mt-1">Format: JPG, JPEG, PNG. Maksimal 10MB</p>
+                            <img id="preview_nota" class="preview-image hidden rounded-lg border-2 border-gray-300" alt="Preview">
+                            @error('nota')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 

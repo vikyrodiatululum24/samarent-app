@@ -9,6 +9,7 @@ use App\Services\CompressImage;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ReimbursementController extends Controller
 {
@@ -16,6 +17,29 @@ class ReimbursementController extends Controller
     public function __construct(CompressImage $compressImage)
     {
         $this->compressImage = $compressImage;
+    }
+
+    private function reimbursementRules(bool $isUpdate = false): array
+    {
+        return [
+            'user_id' => 'required|exists:users,id',
+            'type' => 'required|in:bbm,tol,parkir,lainnya',
+            'km_awal' => 'nullable|numeric|min:0',
+            'foto_odometer_awal' => 'nullable|image|max:10240',
+            'km_akhir' => 'nullable|numeric|min:0|gt:km_awal',
+            'foto_odometer_akhir' => 'nullable|image|max:10240',
+            'nota' => $isUpdate ? 'nullable|image|max:10240' : 'required|image|max:10240',
+            'tujuan_perjalanan' => 'required|string|max:500',
+            'keterangan' => 'nullable|string',
+            'metode_pembayaran' => 'required|string|in:fleet_card,cash',
+            'dana_masuk' => 'nullable|numeric|min:0',
+            'dana_keluar' => 'nullable|numeric|min:0',
+        ];
+    }
+
+    private function validateReimbursement(Request $request, bool $isUpdate = false)
+    {
+        return Validator::make($request->all(), $this->reimbursementRules($isUpdate));
     }
 
     public function index()
@@ -31,19 +55,7 @@ class ReimbursementController extends Controller
 
     public function submitReimbursement(Request $request)
     {
-        $validator = validator($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'type' => 'required|in:bbm,tol,parkir,lainnya',
-            'km_awal' => 'nullable|numeric|min:0',
-            'foto_odometer_awal' => 'nullable|image|max:10240',
-            'km_akhir' => 'nullable|numeric|min:0|gt:km_awal',
-            'foto_odometer_akhir' => 'nullable|image|max:10240',
-            'nota' => 'nullable|image|max:10240',
-            'tujuan_perjalanan' => 'required|string|max:500',
-            'keterangan' => 'nullable|string',
-            'dana_masuk' => 'nullable|numeric|min:0',
-            'dana_keluar' => 'nullable|numeric|min:0',
-        ]);
+        $validator = $this->validateReimbursement($request);
 
         if ($validator->fails()) {
             return response()->json([
@@ -85,6 +97,7 @@ class ReimbursementController extends Controller
                 'km_akhir' => $request->km_akhir,
                 'tujuan_perjalanan' => $request->tujuan_perjalanan,
                 'keterangan' => $request->keterangan,
+                'metode_pembayaran' => $request->metode_pembayaran,
                 'dana_masuk' => $request->dana_masuk ?? 0,
                 'dana_keluar' => $request->dana_keluar ?? 0,
             ], [
@@ -136,8 +149,18 @@ class ReimbursementController extends Controller
             ], 404);
         }
 
-        if ($request->type !== 'bbm') {
-            // Delete old files if they exist
+        $validator = $this->validateReimbursement($request, true);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $effectiveType = $request->input('type', $reimbursement->type);
+
+        if ($effectiveType !== 'bbm') {
             if ($reimbursement->foto_odometer_awal) {
                 Storage::disk('public')->delete($reimbursement->foto_odometer_awal);
             }
@@ -148,10 +171,8 @@ class ReimbursementController extends Controller
             $reimbursement->km_akhir = null;
             $reimbursement->foto_odometer_awal = null;
             $reimbursement->foto_odometer_akhir = null;
-
         }
 
-        // For simplicity, only allowing update of certain fields
         $reimbursement->update($request->only([
             'type',
             'km_awal',
@@ -160,26 +181,23 @@ class ReimbursementController extends Controller
             'keterangan',
             'dana_masuk',
             'dana_keluar',
+            'metode_pembayaran'
         ]));
 
-        if ($request->hasFile('foto_odometer_awal')) {
-            // Delete old file
+        if ($effectiveType === 'bbm' && $request->hasFile('foto_odometer_awal')) {
             if ($reimbursement->foto_odometer_awal) {
                 Storage::disk('public')->delete($reimbursement->foto_odometer_awal);
             }
-            // Upload new file
             $reimbursement->foto_odometer_awal = $this->compressImage->compressAndStore(
                 $request->file('foto_odometer_awal'),
                 'reimbursement/odometer-awal'
             );
         }
 
-        if ($request->hasFile('foto_odometer_akhir')) {
-            // Delete old file
+        if ($effectiveType === 'bbm' && $request->hasFile('foto_odometer_akhir')) {
             if ($reimbursement->foto_odometer_akhir) {
                 Storage::disk('public')->delete($reimbursement->foto_odometer_akhir);
             }
-            // Upload new file
             $reimbursement->foto_odometer_akhir = $this->compressImage->compressAndStore(
                 $request->file('foto_odometer_akhir'),
                 'reimbursement/odometer-akhir'
@@ -187,11 +205,9 @@ class ReimbursementController extends Controller
         }
 
         if ($request->hasFile('nota')) {
-            // Delete old file
             if ($reimbursement->nota) {
                 Storage::disk('public')->delete($reimbursement->nota);
             }
-            // Upload new file
             $reimbursement->nota = $this->compressImage->compressAndStore(
                 $request->file('nota'),
                 'reimbursement/nota'

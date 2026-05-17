@@ -8,6 +8,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -25,8 +26,8 @@ class ReimbursementsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-                //
-            ]);
+            //
+        ]);
     }
 
     public function table(Table $table): Table
@@ -48,7 +49,7 @@ class ReimbursementsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('type')
                     ->label('Tipe')
-                    ->formatStateUsing(fn (string $state): string => strtoupper($state))
+                    ->formatStateUsing(fn(string $state): string => strtoupper($state))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
 
@@ -69,7 +70,7 @@ class ReimbursementsRelationManager extends RelationManager
                     ->circular()
                     ->size(60)
                     ->extraImgAttributes(['loading' => 'lazy'])
-                    ->url(fn (Reimbursement $record) => $record->foto_odometer_awal ? Storage::url($record->foto_odometer_awal) : null)
+                    ->url(fn(Reimbursement $record) => $record->foto_odometer_awal ? Storage::url($record->foto_odometer_awal) : null)
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('km_akhir')
                     ->label('KM Akhir')
@@ -83,7 +84,7 @@ class ReimbursementsRelationManager extends RelationManager
                     ->circular()
                     ->size(60)
                     ->extraImgAttributes(['loading' => 'lazy'])
-                    ->url(fn (Reimbursement $record) => $record->foto_odometer_akhir ? Storage::url($record->foto_odometer_akhir) : null)
+                    ->url(fn(Reimbursement $record) => $record->foto_odometer_akhir ? Storage::url($record->foto_odometer_akhir) : null)
                     ->openUrlInNewTab()
                     ->placeholder('-'),
 
@@ -99,9 +100,14 @@ class ReimbursementsRelationManager extends RelationManager
                     ->circular()
                     ->size(60)
                     ->extraImgAttributes(['loading' => 'lazy'])
-                    ->url(fn (Reimbursement $record) => $record->nota ? Storage::url($record->nota) : null)
+                    ->url(fn(Reimbursement $record) => $record->nota ? Storage::url($record->nota) : null)
                     ->openUrlInNewTab()
                     ->toggleable(isToggledHiddenByDefault: false)
+                    ->placeholder('-'),
+
+                Tables\Columns\TextColumn::make('metode_pembayaran')
+                    ->label('Metode Pembayaran')
+                    ->searchable()
                     ->placeholder('-'),
 
                 Tables\Columns\TextColumn::make('dana_masuk')
@@ -136,11 +142,11 @@ class ReimbursementsRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['dari'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['sampai'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
                     ->indicateUsing(function (array $data): array {
@@ -159,8 +165,17 @@ class ReimbursementsRelationManager extends RelationManager
                     ->label('Export PDF')
                     ->icon('heroicon-o-printer')
                     ->color('success')
-                    ->action(function (Collection $records) {
+                    ->action(function () {
                         $filters = $this->tableFilters;
+                        if (empty($filters['created_at']['dari']) || empty($filters['created_at']['sampai'])) {
+                            // Jika filter tanggal belum lengkap, tampilkan notifikasi error
+                            Notification::make()
+                                ->title('Filter Diperlukan')
+                                ->body('Harap isi filter tanggal terlebih dahulu sebelum melakukan export.')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
                         $dari = $filters['created_at']['dari'] ?? null;
                         $sampai = $filters['created_at']['sampai'] ?? null;
                         $userId = $this->ownerRecord->user_id;

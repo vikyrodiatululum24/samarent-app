@@ -3,19 +3,12 @@
 namespace App\Filament\Finance\Resources;
 
 use App\Filament\Finance\Resources\PengajuanResource\Pages;
-use App\Filament\Finance\Resources\PengajuanResource\RelationManagers;
 use App\Models\Pengajuan;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms;
-use Filament\Forms\Components\Hidden;
-use Filament\Infolists;
 use Filament\Infolists\Components;
 use Filament\Infolists\Components\ViewEntry;
-use Filament\Notifications\Notification;
-use Filament\Pages\SubNavigationPosition;
-use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
@@ -25,8 +18,6 @@ use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Storage;
 
 class PengajuanResource extends Resource
 {
@@ -188,7 +179,7 @@ class PengajuanResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-return $schema
+        return $schema
             ->schema([
                 Section::make('Informasi Umum')
                     ->schema([
@@ -264,17 +255,27 @@ return $schema
                         Components\TextEntry::make('Status atasan')
                             ->label('Status di Atasan')
                             ->visible(fn($record) => $record->bos_joulmer !== null)
-                            ->getStateUsing(fn($record) => match ($record->bos_joulmer?->is_approved) {
-                                'pending' => 'Menunggu Approval',
-                                'approved' => 'Disetujui',
-                                'rejected' => 'Ditolak',
-                                default => '-',
+                            ->getStateUsing(function ($record) {
+                                $status = match ($record->bos_joulmer->is_approved) {
+                                    'pending' => 'Menunggu Approval',
+                                    'approved' => 'Disetujui',
+                                    'rejected' => 'Ditolak',
+                                    default => 'Tidak Diketahui',
+                                };
+
+                                if ($record->bos_joulmer->approved_at) {
+                                    $approvedTime = $record->bos_joulmer->approved_at->format('d M Y H:i:s');
+                                    return "{$status} - {$approvedTime}";
+                                }
+
+                                return $status;
                             })
                             ->badge()
-                            ->color(fn(string $state) => match ($state) {
-                                'Menunggu Approval' => 'info',
-                                'Disetujui' => 'success',
-                                'Ditolak' => 'danger',
+                            ->color(fn(string $state) => match (true) {
+                                str_contains($state, 'Menunggu Approval') => 'info',
+                                str_contains($state, 'Disetujui') => 'success',
+                                str_contains($state, 'Ditolak') => 'danger',
+                                default => 'gray',
                             }),
                         Components\TextEntry::make('bos_joulmer.note')
                             ->label('Catatan Atasan')
@@ -345,8 +346,8 @@ return $schema
                                     ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
                             ]),
                         Components\TextEntry::make('complete.tanggal_input_bank')
-                                    ->label('Tanggal Input Bank')
-                                    ->date(),
+                            ->label('Tanggal Input Bank')
+                            ->date(),
                         Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bank_2')
@@ -423,15 +424,6 @@ return $schema
             ])
             ->columns(1);
     }
-
-    // public static function getRecordSubNavigation(Page $page): array
-    // {
-    //     return $page->generateNavigationItems([
-    //         Pages\ViewPengajuan::class,
-    //         // Pages\EditPengajuan::class,
-    //         // Pages\ProsesPengajuans::class,
-    //     ]);
-    // }
 
     public static function getRelations(): array
     {

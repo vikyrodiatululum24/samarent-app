@@ -702,17 +702,27 @@ class PengajuanResource extends Resource
                         Components\TextEntry::make('Status atasan')
                             ->label('Status di Atasan')
                             ->visible(fn($record) => $record->bos_joulmer !== null)
-                            ->getStateUsing(fn($record) => match ($record->bos_joulmer?->is_approved) {
-                                'pending' => 'Menunggu Approval',
-                                'approved' => 'Disetujui',
-                                'rejected' => 'Ditolak',
-                                default => '-',
+                            ->getStateUsing(function ($record) {
+                                $status = match ($record->bos_joulmer->is_approved) {
+                                    'pending' => 'Menunggu Approval',
+                                    'approved' => 'Disetujui',
+                                    'rejected' => 'Ditolak',
+                                    default => 'Tidak Diketahui',
+                                };
+
+                                if ($record->bos_joulmer->approved_at) {
+                                    $approvedTime = $record->bos_joulmer->approved_at->format('d M Y H:i:s');
+                                    return "{$status} - {$approvedTime}";
+                                }
+
+                                return $status;
                             })
                             ->badge()
-                            ->color(fn(string $state) => match ($state) {
-                                'Menunggu Approval' => 'info',
-                                'Disetujui' => 'success',
-                                'Ditolak' => 'danger',
+                            ->color(fn(string $state) => match (true) {
+                                str_contains($state, 'Menunggu Approval') => 'info',
+                                str_contains($state, 'Disetujui') => 'success',
+                                str_contains($state, 'Ditolak') => 'danger',
+                                default => 'gray',
                             }),
                         Components\TextEntry::make('bos_joulmer.note')
                             ->label('Catatan Atasan')

@@ -116,6 +116,7 @@
                     <th>Jam Cek</th>
                     <th>Jam Keluar</th>
                     <th>Pelanggan</th>
+                    <th>Start User</th>
                     <th>End User</th>
                     <th>Approved</th>
                 </tr>
@@ -139,6 +140,7 @@
                         </td>
                         <td>{{ $attendance->project->name ?? '-' }}</td>
                         <td>{{ $attendance->endUser->name ?? '-' }}</td>
+                        <td>{{ $attendance->endUserOut->name ?? '-' }}</td>
                         <td>{{ $attendance->is_complete ? 'Selesai' : 'Belum' }}</td>
                     </tr>
                 @endforeach

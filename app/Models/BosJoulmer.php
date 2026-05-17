@@ -11,7 +11,29 @@ class BosJoulmer extends Model
         'pengajuan_id',
         'is_approved',
         'note',
+        'approved_at',
     ];
+
+    protected $casts = [
+        'approved_at' => 'datetime',
+    ];
+
+    protected static function booted()
+    {
+        static::creating(function ($bosJoulmer) {
+            if ($bosJoulmer->is_approved === 'approved') {
+                $bosJoulmer->approved_at = now();
+            }
+        });
+
+        static::updating(function ($bosJoulmer) {
+            if ($bosJoulmer->is_approved === 'approved' && !$bosJoulmer->approved_at) {
+                $bosJoulmer->approved_at = now();
+            } elseif ($bosJoulmer->is_approved !== 'approved') {
+                $bosJoulmer->approved_at = null;
+            }
+        });
+    }
 
     public function pengajuan()
     {

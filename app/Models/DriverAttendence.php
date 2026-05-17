@@ -12,6 +12,7 @@ class DriverAttendence extends Model
         'driver_id', // masuk
         'project_id', // masuk
         'end_user_id', // masuk
+        'end_user_out', // keluar
         'unit_id', // masuk
         'date', // masuk
         'time_in', // masuk
@@ -25,7 +26,6 @@ class DriverAttendence extends Model
         'photo_in', // masuk
         'is_approved_in', // masuk
         'is_approved_out', // masuk
-        'end_user_out', // keluar
         'is_complete',
         'shift', // masuk
         'note_admin', // masuk

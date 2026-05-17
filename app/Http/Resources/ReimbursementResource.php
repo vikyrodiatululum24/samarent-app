@@ -28,6 +28,7 @@ class ReimbursementResource extends JsonResource
             'type' => $this->type,
             'tujuan_perjalanan' => $this->tujuan_perjalanan,
             'keterangan' => $this->keterangan,
+            'metode_pembayaran' => $this->metode_pembayaran,
             'dana_masuk' => $this->dana_masuk,
             'dana_keluar' => $this->dana_keluar,
             'created_at' => $this->created_at,

@@ -76,7 +76,6 @@ class DriverResource extends Resource
                 Forms\Components\TextInput::make('no_wa')
                     ->required()
                     ->label('No. WhatsApp')
-                    ->numeric()
                     ->rules(['regex:/^08[0-9]{8,11}$/'])
                     ->validationMessages([
                         'regex' => 'Nomor WhatsApp harus diawali dengan "08" dan terdiri dari 10 hingga 13 digit angka.',
@@ -195,7 +194,6 @@ class DriverResource extends Resource
                     ->label('Penempatan')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('pic')
-                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -234,7 +232,7 @@ class DriverResource extends Resource
                             ->getStateUsing(fn($record) => $record?->user?->email ?? '-'),
                         TextEntry::make('password')
                             ->label('Password')
-                            ->getStateUsing(fn($record) => filled($record?->user?->password) ? '********' : '-'),
+                            ->copyable()
                     ])
                     ->columns(3),
                 Section::make('Identitas')
@@ -259,9 +257,6 @@ class DriverResource extends Resource
                             fn($record) => filled($record?->photo) ? asset('storage/' . ltrim($record->photo, '/')) : asset('images/placeholder.png'),
                             'Foto Driver'
                         ),
-                    ]),
-                Section::make('Alamat')
-                    ->schema([
                         TextEntry::make('alamat')
                             ->label('Alamat'),
                         TextEntry::make('rt')
@@ -272,6 +267,13 @@ class DriverResource extends Resource
                             ->label('Kelurahan/Desa'),
                         TextEntry::make('kecamatan')
                             ->label('Kecamatan'),
+                    ]),
+                    Section::make('Informasi Penempatan')
+                    ->schema([
+                        TextEntry::make('project.name')
+                            ->label('Penempatan'),
+                        TextEntry::make('pic')
+                            ->label('PIC'),
                     ])
                     ->columns(2),
             ])
