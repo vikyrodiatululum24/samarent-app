@@ -138,10 +138,10 @@ class PengajuanResource extends Resource
                                     Forms\Components\Select::make('keterangan')
                                         ->required()
                                         ->options([
-                                            'reimburse' => 'REIMBURSE',
-                                            'cash advance' => 'CASH ADVANCE',
-                                            'invoice' => 'INVOICE',
-                                            'free' => 'FREE',
+                                            'REIMBURSE' => 'REIMBURSE',
+                                            'CASH ADVANCE' => 'CASH ADVANCE',
+                                            'INVOICE' => 'INVOICE',
+                                            'FREE' => 'FREE',
                                         ])
                                         ->reactive(),
                                     Forms\Components\Select::make('payment_1')

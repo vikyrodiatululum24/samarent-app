@@ -129,10 +129,10 @@ class PengajuanResource extends Resource
                                         ->required()
                                         ->label('Jenis Pengajuan')
                                         ->options([
-                                            'reimburse' => 'REIMBURSE',
-                                            'cash advance' => 'CASH ADVANCE',
-                                            'invoice' => 'INVOICE',
-                                            'free' => 'FREE',
+                                            'REIMBURSE' => 'REIMBURSE',
+                                            'CASH ADVANCE' => 'CASH ADVANCE',
+                                            'INVOICE' => 'INVOICE',
+                                            'FREE' => 'FREE',
                                         ])
                                         ->reactive(),
                                     Forms\Components\Select::make('payment_1')
