@@ -36,19 +36,67 @@ class OvertimePaysRelationManager extends RelationManager
             Forms\Components\TimePicker::make('to_time')->label('Sampai Jam')->required(),
 
             Forms\Components\TimePicker::make('ot_hours_time')->label('Jam OT')->required(),
-            Forms\Components\TextInput::make('ot_1x')->label('OT 1')->numeric()->minValue(0),
+            Forms\Components\TextInput::make('ot_1x')->label('OT 1')
+            ->inputMode('numeric')
+            ->rules(['regex:/^[0-9]+$/'])
+            ->validationMessages([
+                'regex' => 'OT 1 harus berupa angka.',
+            ])
+            ->minValue(0),
 
-            Forms\Components\TextInput::make('ot_2x')->label('OT 2')->numeric()->minValue(0),
+            Forms\Components\TextInput::make('ot_2x')->label('OT 2')
+            ->inputMode('numeric')
+            ->rules(['regex:/^[0-9]+$/'])
+            ->validationMessages([
+                'regex' => 'OT 2 harus berupa angka.',
+            ])
+            ->minValue(0),
 
-            Forms\Components\TextInput::make('ot_3x')->label('OT 3')->numeric()->minValue(0),
+            Forms\Components\TextInput::make('ot_3x')->label('OT 3')
+            ->inputMode('numeric')
+            ->rules(['regex:/^[0-9]+$/'])
+            ->validationMessages([
+                'regex' => 'OT 3 harus berupa angka.',
+            ])
+            ->minValue(0),
 
-            Forms\Components\TextInput::make('ot_4x')->label('OT 4')->numeric()->minValue(0),
-            Forms\Components\TextInput::make('calculated_ot_hours')->label('Total Jam OT')->numeric()->minValue(0),
-            Forms\Components\TextInput::make('ot_amount')->label('Jumlah OT')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
-            Forms\Components\TextInput::make('transport')->label('Transport')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
-            Forms\Components\TextInput::make('monthly_allowance')->label('Tunjangan Bulanan')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->minValue(0),
-            Forms\Components\TextInput::make('out_of_town')->label('Dinas Luar')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->maxLength(255),
-            Forms\Components\TextInput::make('overnight')->label('Menginap')->numeric()->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->maxLength(255),
+            Forms\Components\TextInput::make('ot_4x')->label('OT 4')
+            ->inputMode('numeric')
+            ->rules(['regex:/^[0-9]+$/'])
+            ->validationMessages([
+                'regex' => 'OT 4 harus berupa angka.',
+            ])
+            ->minValue(0),
+            Forms\Components\TextInput::make('calculated_ot_hours')->label('Total Jam OT')
+            ->inputMode('numeric')
+            ->rules(['regex:/^[0-9]+$/'])
+            ->validationMessages([
+                'regex' => 'Total Jam OT harus berupa angka.',
+            ])
+            ->minValue(0),
+            Forms\Components\TextInput::make('ot_amount')->label('Jumlah OT')
+            ->inputMode('numeric')->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')
+            ->minValue(0),
+            Forms\Components\TextInput::make('transport')->label('Transport')
+            ->inputMode('numeric')->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')
+            ->minValue(0),
+            Forms\Components\TextInput::make('monthly_allowance')->label('Tunjangan Bulanan')
+            ->inputMode('numeric')->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')
+            ->minValue(0),
+            Forms\Components\TextInput::make('out_of_town')->label('Dinas Luar')
+            ->inputMode('numeric')
+            ->rules(['regex:/^[0-9]+$/'])
+            ->validationMessages([
+                'regex' => 'Dinas Luar harus berupa angka.',
+            ])
+            ->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->maxLength(255),
+            Forms\Components\TextInput::make('overnight')->label('Menginap')
+            ->inputMode('numeric')
+            ->rules(['regex:/^[0-9]+$/'])
+            ->validationMessages([
+                'regex' => 'Menginap harus berupa angka.',
+            ])
+            ->minValue(0)->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->maxLength(255),
             Forms\Components\Textarea::make('remarks')->label('Keterangan')->columnSpanFull()->maxLength(65535),
         ]);
     }

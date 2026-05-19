@@ -31,7 +31,12 @@ class ServiceUnitRelationManager extends RelationManager
                     ->preload() // Optional, preload semua data untuk menghindari query saat ketik
                     ->required(),
                 Forms\Components\TextInput::make('odometer')
-                    ->numeric()
+                    ->label('Odometer')
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'Odometer harus berupa angka.',
+                    ])
                     ->required(),
                 Forms\Components\TextInput::make('service')
                     ->label('Jenis Permintaan Service')

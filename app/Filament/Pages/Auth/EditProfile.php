@@ -108,7 +108,11 @@ class EditProfile extends BaseEditProfile
 
                                 TextInput::make('norek')
                                     ->label('Nomor Rekening')
-                                    ->numeric()
+                                    ->inputMode('numeric')
+                                    ->rules(['regex:/^[0-9]+$/'])
+                                    ->validationMessages([
+                                        'regex' => 'Nomor Rekening harus berupa angka.',
+                                    ])
                                     ->maxLength(30),
                             ])
                             ->columnSpan(1)

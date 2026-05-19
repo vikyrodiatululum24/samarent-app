@@ -36,6 +36,10 @@ class EndUserResource extends Resource
                     ->default(null),
                 Forms\Components\TextInput::make('no_wa')
                     ->maxLength(255)
+                    ->rules(['regex:/^08[0-9]{8,11}$/'])
+                    ->validationMessages([
+                        'regex' => 'Nomor WhatsApp harus diawali dengan "08" dan terdiri dari 10 hingga 13 digit angka.',
+                    ])
                     ->default(null),
             ]);
     }

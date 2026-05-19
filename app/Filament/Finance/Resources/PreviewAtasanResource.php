@@ -4,6 +4,7 @@ namespace App\Filament\Finance\Resources;
 
 use App\Filament\Finance\Resources\PreviewAtasanResource\Pages;
 use Illuminate\Database\Eloquent\Builder;
+use Override;
 
 class PreviewAtasanResource extends PengajuanResource
 {
@@ -31,6 +32,11 @@ class PreviewAtasanResource extends PengajuanResource
             'view' => Pages\ViewPreviewAtasan::route('/{record}'),
             'proses' => Pages\ProsesPreviewAtasan::route('/{record}/proses'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 
     public static function getModelLabel(): string

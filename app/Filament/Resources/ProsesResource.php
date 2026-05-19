@@ -47,7 +47,12 @@ class ProsesResource extends Resource
                             ->default(fn($record) => $record->complete?->no_telp_bengkel),
                         Forms\Components\TextInput::make('nominal_estimasi')
                             ->label('Nominal Estimasi')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Estimasi harus berupa angka.',
+                            ])
+                             ->prefix('Rp')
                             ->required()
                             ->default(fn($record) => $record->complete?->nominal_estimasi),
                     ])
@@ -79,7 +84,12 @@ class ProsesResource extends Resource
                             ->default(fn($record) => $record->complete?->tanggal_tf_finance),
                         Forms\Components\TextInput::make('nominal_tf_finance')
                             ->label('Nominal Transfer Finance')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Transfer Finance harus berupa angka.',
+                            ])
+                             ->prefix('Rp')
                             // ->required()
                             ->readOnly()
                             ->default(fn($record) => $record->complete?->nominal_tf_finance),
@@ -113,12 +123,21 @@ class ProsesResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nominal_tf_bengkel')
                             ->label('Nominal Transfer Bengkel')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Transfer Bengkel harus berupa angka.',
+                            ])
+                            ->prefix('Rp')
                             ->nullable()
                             ->default(fn($record) => $record->complete?->nominal_tf_bengkel),
                         Forms\Components\TextInput::make('selisih_tf')
                             ->label('Selisih Transfer')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Selisih Transfer harus berupa angka.',
+                            ])
                             ->default(fn($record) => $record->complete?->selisih_tf ?? 0)
                             ->reactive()
                             ->afterStateUpdated(fn(Set $set, $state, Get $get) => $set('selisih_tf', $get('nominal_tf_finance') - $get('nominal_tf_bengkel'))),

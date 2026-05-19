@@ -44,21 +44,33 @@ class UnitJualResource extends Resource
                         ->label('Odometer (km)')
                         ->required()
                         ->suffix('km')
-                        ->numeric(),
+                        ->inputMode('numeric')
+                        ->rules(['regex:/^[0-9]+$/'])
+                        ->validationMessages([
+                            'regex' => 'Odometer harus berupa angka.',
+                        ]),
                 Forms\Components\TextInput::make('harga_jual')
                     ->label('Open Price')
                     ->required()
                     ->prefix('Rp ')
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
-                    ->numeric(),
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'Harga Jual harus berupa angka.',
+                    ]),
                 Forms\Components\TextInput::make('harga_netto')
                     ->label('Harga Target')
                     ->required()
                     ->prefix('Rp ')
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
-                    ->numeric(),
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'Harga Target harus berupa angka.',
+                    ]),
                 Forms\Components\Select::make('rateBody')
                     ->label('Rate Body')
                     ->options([
@@ -152,7 +164,11 @@ class UnitJualResource extends Resource
                     ->prefix('Rp ')
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
-                    ->numeric(),
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'Harga Terjual harus berupa angka.',
+                    ]),
                 Forms\Components\Select::make('status')
                     ->label('Status Unit')
                     ->options([
@@ -193,11 +209,11 @@ class UnitJualResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_jual')
                     ->label('Open Price')
-                    ->numeric()
+                    ->money('IDR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_netto')
                     ->label('Harga Target')
-                    ->numeric()
+                    ->money('IDR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rateBody')
                     ->label('Rate Body')
@@ -219,7 +235,7 @@ class UnitJualResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('harga_terjual')
                     ->label('Harga Terjual')
-                    ->numeric()
+                    ->money('IDR')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),

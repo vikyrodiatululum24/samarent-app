@@ -3,7 +3,6 @@
 namespace App\Filament\President\Resources\BosJoulmerLolosAtasanResource\Pages;
 
 use App\Filament\President\Resources\BosJoulmerLolosAtasanResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListBosJoulmersLolosAtasan extends ListRecords
@@ -12,10 +11,6 @@ class ListBosJoulmersLolosAtasan extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\Action::make('info')
-                ->label('Pengajuan Melewati Atasan')
-                ->disabled(),
-        ];
+        return [];
     }
 }

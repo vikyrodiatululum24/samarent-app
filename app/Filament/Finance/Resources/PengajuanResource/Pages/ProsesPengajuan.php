@@ -82,7 +82,11 @@ class ProsesPengajuan extends EditRecord
                                         Forms\Components\TextInput::make('norek')
                                             ->label('No. Rekening')
                                             ->required()
-                                            ->numeric()
+                                            ->inputMode('numeric')
+                                            ->rules(['regex:/^[0-9]+$/'])
+                                            ->validationMessages([
+                                                'regex' => 'No. Rekening harus berupa angka.',
+                                            ])
                                             ->maxLength(255),
                                         Forms\Components\Select::make('bank')
                                             ->label('Bank')
@@ -126,7 +130,11 @@ class ProsesPengajuan extends EditRecord
                                 Forms\Components\TextInput::make('complete.norek_2')
                                     ->nullable()
                                     ->label('No. Rekening')
-                                    ->numeric()
+                                    ->inputMode('numeric')
+                                    ->rules(['regex:/^[0-9]+$/'])
+                                    ->validationMessages([
+                                        'regex' => 'No. Rekening harus berupa angka.',
+                                    ])
                                     ->maxLength(255)
                                     ->readOnly(),
                             ]),
@@ -141,7 +149,11 @@ class ProsesPengajuan extends EditRecord
 
                                 Forms\Components\TextInput::make('complete.nominal_tf_finance')
                                     ->label('Nominal Transfer')
-                                    ->numeric()
+                                    ->inputMode('numeric')
+                                    ->rules(['regex:/^[0-9]+$/'])
+                                    ->validationMessages([
+                                        'regex' => 'Nominal harus berupa angka.',
+                                    ])
                                     ->required(fn($get) => $get('complete.status_finance') === 'paid'),
 
                                 Forms\Components\Select::make('complete.status_finance')

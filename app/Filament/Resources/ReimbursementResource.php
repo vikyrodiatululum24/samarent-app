@@ -71,7 +71,11 @@ class ReimbursementResource extends Resource
                     ->schema([
                         TextInput::make('km_awal')
                             ->label('KM Awal')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'KM Awal harus berupa angka.',
+                            ])
                             ->minValue(0)
                             ->suffix('KM')
                             ->placeholder('Masukkan KM awal'),
@@ -93,7 +97,11 @@ class ReimbursementResource extends Resource
                     ->schema([
                         TextInput::make('km_akhir')
                             ->label('KM Akhir')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'KM Akhir harus berupa angka.',
+                            ])
                             ->minValue(0)
                             ->suffix('KM')
                             ->placeholder('Masukkan KM akhir')
@@ -159,14 +167,22 @@ class ReimbursementResource extends Resource
                     ->schema([
                         TextInput::make('dana_masuk')
                             ->label('Dana Masuk')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Dana Masuk harus berupa angka.',
+                            ])
                             ->prefix('Rp')
                             ->placeholder('0')
                             ->minValue(0),
 
                         TextInput::make('dana_keluar')
                             ->label('Dana Keluar')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Dana Keluar harus berupa angka.',
+                            ])
                             ->prefix('Rp')
                             ->placeholder('0')
                             ->minValue(0),

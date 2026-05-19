@@ -36,7 +36,6 @@ class DriverResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
                     ->label('Nama Driver')
                     ->searchable()
                     ->sortable(),

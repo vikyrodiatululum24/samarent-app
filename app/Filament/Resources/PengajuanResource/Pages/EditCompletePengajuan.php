@@ -2,24 +2,24 @@
 
 namespace App\Filament\Resources\PengajuanResource\Pages;
 
-use Filament\Forms;
-
-use Filament\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Hidden;
 use App\Filament\Resources\PengajuanResource;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\Action;
+use Filament\Forms;
+use Filament\Forms\Components\Hidden;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Storage;
+use Filament\Resources\Pages\EditRecord;
 use Filament\Schemas\Components\Fieldset;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
+use Filament\Support\RawJs;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class EditCompletePengajuan extends EditRecord
 {
@@ -47,7 +47,14 @@ class EditCompletePengajuan extends EditRecord
                             ->required(),
                         Forms\Components\TextInput::make('complete.nominal_estimasi')
                             ->label('Nominal Estimasi')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Estimasi harus berupa angka.',
+                            ])
+                            ->prefix('Rp ')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->required(),
                     ])
                     ->columns(2),
@@ -84,7 +91,14 @@ class EditCompletePengajuan extends EditRecord
                             ->readOnly(),
                         Forms\Components\TextInput::make('complete.nominal_tf_finance')
                             ->label('Nominal Transfer Finance')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Transfer Finance harus berupa angka.',
+                            ])
+                            ->prefix('Rp ')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->readOnly(),
                         Forms\Components\TextInput::make('complete.payment_2')
                             ->label('Rekening Atas Nama')
@@ -125,7 +139,11 @@ class EditCompletePengajuan extends EditRecord
                                 Forms\Components\TextInput::make('norek')
                                     ->label('No. Rekening')
                                     ->required()
-                                    ->numeric()
+                                    ->inputMode('numeric')
+                                    ->rules(['regex:/^[0-9]+$/'])
+                                    ->validationMessages([
+                                        'regex' => 'No. Rekening harus berupa angka.',
+                                    ])
                                     ->maxLength(255),
                                 Forms\Components\Select::make('bank')
                                     ->label('Bank')
@@ -167,7 +185,11 @@ class EditCompletePengajuan extends EditRecord
                             ->label('No. Rekening Bengkel')
                             ->readOnly()
                             ->maxLength(255)
-                            ->numeric(),
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'No. Rekening Bengkel harus berupa angka.',
+                            ]),
                         Forms\Components\TextInput::make('complete.bank_bengkel')
                             ->nullable()
                             ->label('Bank')
@@ -175,13 +197,28 @@ class EditCompletePengajuan extends EditRecord
                             ->readOnly(),
                         Forms\Components\TextInput::make('complete.nominal_tf_bengkel')
                             ->label('Nominal Transfer Bengkel')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Transfer Bengkel harus berupa angka.',
+                            ])
+                            ->prefix('Rp ')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->reactive()
                             ->required(fn($record) => $record->complete?->status_finance === 'paid')
                             ->nullable(),
                         Forms\Components\TextInput::make('complete.selisih_tf')
                             ->label('Selisih Transfer')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Selisih Transfer harus berupa angka.',
+                            ])
+                            ->prefix('Rp ')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
+                            ->readOnly()
                             ->required(fn($record) => $record->complete?->status_finance === 'paid')
                             ->reactive()
                             ->afterStateUpdated(fn(Set $set, $state, Get $get) => $set(
@@ -231,7 +268,8 @@ class EditCompletePengajuan extends EditRecord
                             }),
                     ])
                     ->columns(2),
-            ]);
+            ])
+            ->columns(1);
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

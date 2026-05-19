@@ -53,7 +53,11 @@ class SetSalaryResource extends Resource
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('workhours')
                             ->required()
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Workhours harus berupa angka.',
+                            ])
                             ->default(0)
                             ->label('Workhours'),
                         Forms\Components\TextInput::make('amount')
@@ -61,7 +65,11 @@ class SetSalaryResource extends Resource
                             ->prefix('Rp ')
                             ->mask(RawJs::make('$money($input)'))
                             ->stripCharacters(',')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Amount harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->default(0)
                             ->label('Amount/Hour')
                             ->helperText('Masukan nilai sesuai dengan nominal gaji per jam'),
@@ -73,22 +81,38 @@ class SetSalaryResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('overtime1')
                             ->required()
-                            ->numeric()
+                            ->inputMode('decimal')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Overtime 1 harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->default(0)
                             ->label('Overtime 1'),
                         Forms\Components\TextInput::make('overtime2')
                             ->required()
-                            ->numeric()
+                            ->inputMode('decimal')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Overtime 2 harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->default(0)
                             ->label('Overtime 2'),
                         Forms\Components\TextInput::make('overtime3')
                             ->required()
-                            ->numeric()
+                            ->inputMode('decimal')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Overtime 3 harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->default(0)
                             ->label('Overtime 3'),
                         Forms\Components\TextInput::make('overtime4')
                             ->required()
-                            ->numeric()
+                            ->inputMode('decimal')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Overtime 4 harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->default(0)
                             ->label('Overtime 4'),
                         Forms\Components\TextInput::make('transport')
@@ -96,7 +120,11 @@ class SetSalaryResource extends Resource
                             ->prefix('Rp ')
                             ->mask(RawJs::make('$money($input)'))
                             ->stripCharacters(',')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Masukan nominal berupa angka dan dapat memiliki desimal'
+                            ])
                             ->default(0)
                             ->label('Transport Allowance')
                             ->columnSpanFull(),
@@ -115,7 +143,6 @@ class SetSalaryResource extends Resource
                 Tables\Columns\TextColumn::make('project_id')
                     ->label('Project')
                     ->getStateUsing(fn(SetSalary $record) => $record->project ? $record->project->name : '-')
-                    ->numeric()
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('workdays')
@@ -125,28 +152,32 @@ class SetSalaryResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('workhours')
                     ->label('Workhours')
-                    ->numeric()
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->numeric()
+                    ->money('idr', true)
                     ->label('Amount/Hour')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('overtime1')
                     ->numeric()
+                     ->label('Overtime 1')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('overtime2')
                     ->numeric()
+                    ->label('Overtime 2')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('overtime3')
                     ->numeric()
+                     ->label('Overtime 3')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('overtime4')
                     ->numeric()
+                    ->label('Overtime 4')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('transport')
-                    ->numeric()
+                    ->money('idr', true)
+                    ->label('Transport Allowance')
                     ->sortable(),
             ])
             ->filters([

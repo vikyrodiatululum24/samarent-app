@@ -60,7 +60,11 @@ class PengajuanResource extends Resource
                                             Forms\Components\TextInput::make('no_wa')
                                                 ->label('No. WhatsApp')
                                                 ->required()
-                                                ->numeric()
+                                                ->inputMode('numeric')
+                                                ->rules(['regex:/^[0-9]{10,15}$/'])
+                                                ->validationMessages([
+                                                    'regex' => 'No. WhatsApp harus berupa angka.',
+                                                ])
                                                 ->maxLength(255),
                                         ]),
                                     Group::make()
@@ -153,7 +157,11 @@ class PengajuanResource extends Resource
                                             Forms\Components\TextInput::make('norek')
                                                 ->label('No. Rekening')
                                                 ->required()
-                                                ->numeric()
+                                                ->inputMode('numeric')
+                                                ->rules(['regex:/^[0-9]+$/'])
+                                                ->validationMessages([
+                                                    'regex' => 'No. Rekening harus berupa angka.',
+                                                ])
                                                 ->maxLength(255),
                                             Forms\Components\Select::make('bank')
                                                 ->label('Bank')
@@ -213,7 +221,11 @@ class PengajuanResource extends Resource
                                     Forms\Components\TextInput::make('norek_1')
                                         ->nullable()
                                         ->label('No. Rekening')
-                                        ->numeric()
+                                        ->inputMode('numeric')
+                                        ->rules(['regex:/^[0-9]+$/'])
+                                        ->validationMessages([
+                                            'regex' => 'No. Rekening harus berupa angka.',
+                                        ])
                                         ->maxLength(255)
                                         ->readOnly()
                                         ->default(function (Get $get) {
@@ -252,7 +264,11 @@ class PengajuanResource extends Resource
                                                 ->preload()
                                                 ->required(),
                                             Forms\Components\TextInput::make('odometer')
-                                                ->numeric()
+                                                ->inputMode('numeric')
+                                                ->rules(['regex:/^[0-9]+$/'])
+                                                ->validationMessages([
+                                                    'regex' => 'Odometer harus berupa angka.',
+                                                ])
                                                 ->required(),
                                         ]),
                                     Forms\Components\TextInput::make('service')
@@ -392,6 +408,7 @@ class PengajuanResource extends Resource
                 Tables\Columns\TextColumn::make('complete.nominal_tf_bengkel')
                     ->sortable()
                     ->searchable()
+                    ->money('idr', true)
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Nominal Transfer')
                     ->width('150px')
@@ -399,9 +416,9 @@ class PengajuanResource extends Resource
                 Tables\Columns\TextColumn::make('complete.nominal_estimasi')
                     ->sortable()
                     ->searchable()
+                    ->money('idr', true)
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Nominal Estimasi')
-                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-')
                     ->width('150px')
                     ->wrap(),
                 Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true)->width('150px')->wrap(),

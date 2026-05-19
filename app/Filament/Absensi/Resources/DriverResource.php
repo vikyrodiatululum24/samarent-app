@@ -52,19 +52,16 @@ class DriverResource extends Resource
                 Forms\Components\TextInput::make('nik')
                     ->label('NIK')
                     ->required()
-                    ->numeric()
                     ->unique(Driver::class, 'nik', ignoreRecord: true)
                     ->maxLength(16)
                     ->minLength(16)
+                    ->rules(['regex:/^[0-9]{16}$/'])
                     ->validationMessages([
                         'regex' => 'Nomor NIK harus terdiri dari 16 digit angka.',
                         'unique' => 'Nomor NIK sudah terdaftar.',
-                    ])
-                    ->rules(['regex:/^[0-9]{16}$/']),
+                    ]),
                 Forms\Components\TextInput::make('sim')
                     ->label('SIM')
-                    ->required()
-                    ->numeric()
                     ->unique(Driver::class, 'sim', ignoreRecord: true)
                     ->rules(['regex:/^[0-9]{12,14}$/'])
                     ->validationMessages([
@@ -88,12 +85,18 @@ class DriverResource extends Resource
                 Forms\Components\TextInput::make('rt')
                     ->maxLength(3)
                     ->label('RT')
-                    ->numeric()
+                    ->rules(['regex:/^[0-9]{1,3}$/'])
+                    ->validationMessages([
+                        'regex' => 'RT harus berupa angka dan maksimal 3 digit.',
+                    ])
                     ->default(null),
                 Forms\Components\TextInput::make('rw')
                     ->maxLength(3)
                     ->label('RW')
-                    ->numeric()
+                    ->rules(['regex:/^[0-9]{1,3}$/'])
+                    ->validationMessages([
+                        'regex' => 'RW harus berupa angka dan maksimal 3 digit.',
+                    ])
                     ->default(null),
                 Forms\Components\TextInput::make('kelurahan')
                     ->maxLength(255)
@@ -160,7 +163,6 @@ class DriverResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
                     ->label('Nama Driver')
                     ->searchable()
                     ->sortable(),

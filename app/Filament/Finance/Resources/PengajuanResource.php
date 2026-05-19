@@ -27,6 +27,7 @@ class PengajuanResource extends Resource
 
     protected static ?string $label = 'Pengajuan Finance';
     protected static ?string $pluralLabel = 'Pengajuan Finance';
+    
     public static function table(Table $table): Table
     {
         return $table
@@ -70,14 +71,15 @@ class PengajuanResource extends Resource
                 Tables\Columns\TextColumn::make('complete.nominal_tf_bengkel')
                     ->sortable()
                     ->searchable()
+                    ->money('idr', true)
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Nominal Transfer'),
                 Tables\Columns\TextColumn::make('complete.nominal_estimasi')
                     ->sortable()
                     ->searchable()
+                    ->money('idr', true)
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Nominal Estimasi')
-                    ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
+                    ->label('Nominal Estimasi'),
                 Tables\Columns\TextColumn::make('keterangan')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')

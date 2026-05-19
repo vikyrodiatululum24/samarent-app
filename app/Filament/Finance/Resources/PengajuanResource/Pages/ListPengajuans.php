@@ -5,7 +5,6 @@ namespace App\Filament\Finance\Resources\PengajuanResource\Pages;
 use Filament\Actions\CreateAction;
 use Filament\Actions\Action;
 use Maatwebsite\Excel\Facades\Excel;
-// use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Pages\ListRecords;
@@ -18,7 +17,6 @@ class ListPengajuans extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
             Action::make('exportFiltered')
             ->label('Export Data Pengajuan')
             ->form([

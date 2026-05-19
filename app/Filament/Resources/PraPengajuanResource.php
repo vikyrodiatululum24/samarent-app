@@ -79,7 +79,11 @@ class PraPengajuanResource extends Resource
                                             Forms\Components\TextInput::make('no_wa')
                                                 ->label('No. WhatsApp')
                                                 ->required()
-                                                ->numeric()
+                                                ->inputMode('numeric')
+                                                ->rules(['regex:/^\d{10,15}$/'])
+                                                ->validationMessages([
+                                                    'regex' => 'No. WhatsApp harus berupa angka dan memiliki panjang antara 10 hingga 15 digit.',
+                                                ])
                                                 ->maxLength(255),
                                         ]),
                                     Group::make()

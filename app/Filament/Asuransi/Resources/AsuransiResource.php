@@ -108,7 +108,12 @@ class AsuransiResource extends Resource
                             ]),
                         Forms\Components\TextInput::make('nominal')
                             ->label('Nominal')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal harus berupa angka dan dapat memiliki desimal.',
+                            ])
+                             ->maxLength(255)
                             ->prefix('Rp'),
                         Forms\Components\TextInput::make('kategori')
                             ->label('Kategori'),
@@ -312,7 +317,8 @@ class AsuransiResource extends Resource
                             ->directory('asuransi/unit'),
                     ])
                     ->columns(3),
-            ]);
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table

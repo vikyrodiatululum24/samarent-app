@@ -51,7 +51,11 @@ class DriverAttendenceRelationManager extends RelationManager
 
                 Forms\Components\TextInput::make('start_km')
                     ->label('Start KM')
-                    ->numeric()
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'Start KM harus berupa angka.',
+                    ])
                     ->required(),
 
                 Forms\Components\TextInput::make('location_in')
@@ -82,7 +86,11 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->maxFiles(1),
                 Forms\Components\TextInput::make('end_km')
                     ->label('End KM')
-                    ->numeric(),
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'End KM harus berupa angka.',
+                    ]),
                 Forms\Components\TimePicker::make('time_out')
                     ->label('Waktu Keluar'),
                 Forms\Components\TextInput::make('location_out')

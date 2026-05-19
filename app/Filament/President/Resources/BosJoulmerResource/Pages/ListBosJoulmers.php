@@ -3,7 +3,6 @@
 namespace App\Filament\President\Resources\BosJoulmerResource\Pages;
 
 use App\Filament\President\Resources\BosJoulmerResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListBosJoulmers extends ListRecords
@@ -12,10 +11,6 @@ class ListBosJoulmers extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\Action::make('info')
-                ->label('Review Pengajuan')
-                ->disabled(),
-        ];
+        return [];
     }
 }

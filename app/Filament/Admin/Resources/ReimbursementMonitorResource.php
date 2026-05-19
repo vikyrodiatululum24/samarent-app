@@ -71,13 +71,21 @@ class ReimbursementMonitorResource extends Resource
 
                 Tables\Columns\TextColumn::make('km_awal')
                     ->label('KM Awal')
-                    ->numeric()
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'KM Awal harus berupa angka.',
+                     ])
                     ->sortable()
                     ->suffix(' KM'),
 
                 Tables\Columns\TextColumn::make('km_akhir')
                     ->label('KM Akhir')
-                    ->numeric()
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'KM Akhir harus berupa angka.',
+                     ])
                     ->sortable()
                     ->suffix(' KM')
                     ->placeholder('-'),

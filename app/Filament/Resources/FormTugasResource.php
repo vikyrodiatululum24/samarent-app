@@ -147,7 +147,11 @@ class FormTugasResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('bbm')
                             ->label('BBM')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'BBM harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
@@ -157,7 +161,11 @@ class FormTugasResource extends Resource
 
                         Forms\Components\TextInput::make('toll')
                             ->label('Toll')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Toll harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
@@ -167,7 +175,11 @@ class FormTugasResource extends Resource
 
                         Forms\Components\TextInput::make('penginapan')
                             ->label('Penginapan')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Penginapan harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
@@ -177,7 +189,11 @@ class FormTugasResource extends Resource
 
                         Forms\Components\TextInput::make('uang_dinas')
                             ->label('Uang Dinas')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Uang Dinas harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
@@ -187,7 +203,11 @@ class FormTugasResource extends Resource
 
                         Forms\Components\TextInput::make('entertaint_customer')
                             ->label('Entertaint Customer')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Entertaint Customer harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->prefix('Rp')
                             ->default(0)
                             ->live(onBlur: true)
@@ -197,7 +217,11 @@ class FormTugasResource extends Resource
 
                         Forms\Components\TextInput::make('total')
                             ->label('Total Biaya')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                            ->validationMessages([
+                                'regex' => 'Total Biaya harus berupa angka dan dapat memiliki desimal.',
+                            ])
                             ->prefix('Rp')
                             ->disabled()
                             ->dehydrated()

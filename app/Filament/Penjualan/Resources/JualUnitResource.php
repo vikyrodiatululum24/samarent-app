@@ -2,21 +2,25 @@
 
 namespace App\Filament\Penjualan\Resources;
 
-use Filament\Forms;
-use App\Models\Unit;
-use Filament\Tables;
-use App\Models\JualUnit;
-use App\Models\UnitJual;
-
-use Filament\Tables\Table;
-use Filament\Support\RawJs;
-use Filament\Infolists;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Penjualan\Resources\JualUnitResource\Pages;
 use App\Filament\Penjualan\Resources\JualUnitResource\RelationManagers;
+use App\Models\JualUnit;
+use App\Models\Unit;
+use App\Models\UnitJual;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Infolists;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class JualUnitResource extends Resource
 {
@@ -41,21 +45,33 @@ class JualUnitResource extends Resource
                         ->label('Odometer (km)')
                         ->required()
                         ->suffix('km')
-                        ->numeric(),
+                        ->inputMode('numeric')
+                        ->rules(['regex:/^[0-9]+$/'])
+                        ->validationMessages([
+                            'regex' => 'Odometer harus berupa angka.',
+                        ]),
                 Forms\Components\TextInput::make('harga_jual')
                     ->label('Open Price')
                     ->required()
                     ->prefix('Rp ')
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
-                    ->numeric(),
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                    ->validationMessages([
+                        'regex' => 'Harga jual harus berupa angka dan dapat memiliki desimal.',
+                    ]),
                 Forms\Components\TextInput::make('harga_netto')
                     ->label('Harga Target')
                     ->required()
                     ->prefix('Rp ')
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
-                    ->numeric(),
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                    ->validationMessages([
+                        'regex' => 'Harga netto harus berupa angka dan dapat memiliki desimal.',
+                    ]),
                 Forms\Components\Select::make('rateBody')
                     ->label('Rate Body')
                     ->options([
@@ -149,7 +165,12 @@ class JualUnitResource extends Resource
                     ->prefix('Rp ')
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
-                    ->numeric(),
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+(\.[0-9]+)?$/'])
+                    ->validationMessages([
+                        'regex' => 'Harga terjual harus berupa angka dan dapat memiliki desimal.',
+                    ])
+                    ->nullable(),
                 Forms\Components\Select::make('status')
                     ->label('Status Unit')
                     ->options([
@@ -190,11 +211,11 @@ class JualUnitResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_jual')
                     ->label('Open Price')
-                    ->numeric()
+                    ->money('IDR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('harga_netto')
                     ->label('Harga Target')
-                    ->numeric()
+                    ->money('IDR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rateBody')
                     ->label('Rate Body')
@@ -216,7 +237,7 @@ class JualUnitResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('harga_terjual')
                     ->label('Harga Terjual')
-                    ->numeric()
+                    ->money('IDR')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -240,11 +261,11 @@ class JualUnitResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -253,7 +274,7 @@ class JualUnitResource extends Resource
     {
         return $schema
             ->components([
-                Infolists\Components\Section::make('Detail Kendaraan')
+                Section::make('Detail Kendaraan')
                     ->schema([
                         Infolists\Components\TextEntry::make('unit.type')
                             ->label('Unit')
@@ -287,7 +308,7 @@ class JualUnitResource extends Resource
                             ->suffix('%'),
                     ])
                     ->columns(2),
-                Infolists\Components\Section::make('Informasi Harga')
+                Section::make('Informasi Harga')
                     ->schema([
                         Infolists\Components\TextEntry::make('harga_jual')
                             ->label('Open Price')
@@ -308,7 +329,7 @@ class JualUnitResource extends Resource
                             ]),
                     ])
                     ->columns(2),
-                Infolists\Components\Grid::make(3)
+                Section::make('Foto Kendaraan')
                     ->schema([
                         Infolists\Components\ImageEntry::make('foto_depan')
                             ->label('Foto Depan')
@@ -335,12 +356,12 @@ class JualUnitResource extends Resource
                             ->disk('public')
                             ->height(200),
                     ]),
-                Infolists\Components\Section::make('Data Penawar')
+                Section::make('Data Penawar')
                     ->schema([
                         Infolists\Components\RepeatableEntry::make('penawars')
                             ->label('')
                             ->schema([
-                                Infolists\Components\Grid::make([
+                                Grid::make([
                                     'sm' => 2,
                                     'md' => 3,
                                     'lg' => 6
@@ -368,7 +389,7 @@ class JualUnitResource extends Resource
                     ])
                     ->collapsible()
                     ->collapsed(false),
-                Infolists\Components\Section::make('Bukti Pembayaran')
+                Section::make('Bukti Pembayaran')
                     ->schema([
                         Infolists\Components\TextEntry::make('harga_terjual')
                             ->label('Harga Terjual')

@@ -2,15 +2,20 @@
 
 namespace App\Filament\Resources\User\PengajuanResource\RelationManagers;
 
-use Filament\Forms;
-use App\Models\Unit;
-use Filament\Tables;
 use App\Models\DataUnit;
+use App\Models\Unit;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Resources\RelationManagers\RelationManager;
 
 class ServiceUnitRelationManager extends RelationManager
 {
@@ -29,7 +34,12 @@ class ServiceUnitRelationManager extends RelationManager
                     ->preload() // Optional, preload semua data untuk menghindari query saat ketik
                     ->required(),
                 Forms\Components\TextInput::make('odometer')
-                    ->numeric()
+                    ->label('Odometer')
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'Odometer harus berupa angka.',
+                    ])
                     ->required(),
                 Forms\Components\TextInput::make('service')
                     ->label('Jenis Permintaan Service')
@@ -74,15 +84,15 @@ class ServiceUnitRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

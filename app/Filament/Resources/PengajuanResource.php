@@ -72,7 +72,11 @@ class PengajuanResource extends Resource
                                             Forms\Components\TextInput::make('no_wa')
                                                 ->label('No. WhatsApp')
                                                 ->required()
-                                                ->numeric()
+                                                ->inputMode('numeric')
+                                                ->rules(['regex:/^\d{10,15}$/'])
+                                                ->validationMessages([
+                                                    'regex' => 'No. WhatsApp harus berupa angka dan memiliki panjang antara 10 hingga 15 digit.',
+                                                ])
                                                 ->maxLength(255),
                                         ]),
                                     Group::make()
@@ -162,7 +166,11 @@ class PengajuanResource extends Resource
                                             Forms\Components\TextInput::make('norek')
                                                 ->label('No. Rekening')
                                                 ->required()
-                                                ->numeric()
+                                                ->inputMode('numeric')
+                                                ->rules(['regex:/^\d{10,20}$/'])
+                                                ->validationMessages([
+                                                    'regex' => 'No. Rekening harus berupa angka dan memiliki panjang antara 10 hingga 20 digit.',
+                                                ])
                                                 ->maxLength(255),
                                             Forms\Components\Select::make('bank')
                                                 ->label('Bank')
@@ -222,7 +230,11 @@ class PengajuanResource extends Resource
                                     Forms\Components\TextInput::make('norek_1')
                                         ->nullable()
                                         ->label('No. Rekening')
-                                        ->numeric()
+                                        ->inputMode('numeric')
+                                        ->rules(['regex:/^\d{10,20}$/'])
+                                        ->validationMessages([
+                                            'regex' => 'No. Rekening harus berupa angka dan memiliki panjang antara 10 hingga 20 digit.',
+                                        ])
                                         ->maxLength(255)
                                         ->readOnly()
                                         ->default(function (Get $get) {
