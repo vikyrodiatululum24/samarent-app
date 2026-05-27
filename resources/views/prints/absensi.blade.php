@@ -8,19 +8,22 @@
             font-family: Arial, sans-serif;
         }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+ .table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
 
-        .table th,
-        .table td {
-            border: 1px solid #ddd;
-            padding: 2px;
-            text-align: left;
-            font-size: 11px;
-        }
+    .table th,
+    .table td {
+        border: 1px solid #000;
+        padding: 3px;
+        font-size: 9px;
+        text-align: left;
+        vertical-align: middle;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
 
         .table th {
             background-color: #f4f4f4;
@@ -72,6 +75,16 @@
 </head>
 
 <body>
+    @php
+        $monthLabel = 'N/A';
+        if (!empty($month)) {
+            if (is_string($month) && preg_match('/^\d{4}-\d{2}$/', $month)) {
+                $monthLabel = \Carbon\Carbon::createFromFormat('Y-m', $month)->locale('id')->translatedFormat('F Y');
+            } else {
+                $monthLabel = $month;
+            }
+        }
+    @endphp
     <div class="watermark">
         <img src="{{ public_path('images/icon.png') }}" alt="Watermark">
     </div>
@@ -99,7 +112,7 @@
                 <tr>
                     <td><strong>Bulan/Month</strong>
                     </td>
-                    <td>: {{ $month ?? 'N/A' }}</td>
+                    <td>: {{ $monthLabel }}</td>
                 </tr>
             </table>
         </div>
@@ -107,36 +120,39 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Hari</th>
-                    <th>Tanggal</th>
-                    <th>No. Polisi</th>
-                    <th>KM. Awal</th>
-                    <th>KM. Akhir</th>
-                    <th>Jam Masuk</th>
-                    <th>Jam Cek</th>
-                    <th>Jam Keluar</th>
-                    <th>Pelanggan</th>
-                    <th>Start User</th>
-                    <th>End User</th>
-                    <th>Approved</th>
+                    <th style="text-align: center; width: 8%;">Hari</th>
+                    <th style="text-align: center; width: 8%;">Tanggal</th>
+                    <th style="text-align: center; width: 8%;">No. Polisi</th>
+                    <th style="text-align: center; width: 6%;">KM. Awal</th>
+                    <th style="text-align: center; width: 6%;">KM. Akhir</th>
+                    <th style="text-align: center; width: 6%;">Jam Masuk</th>
+                    <th style="text-align: center; width: 8%;">Jam Cek</th>
+                    <th style="text-align: center; width: 6%;">Jam Keluar</th>
+                    <th style="text-align: center; width: 16%;">Pelanggan</th>
+                    <th style="text-align: center; width: 10%;">Start User</th>
+                    <th style="text-align: center; width: 10%;">End User</th>
+                    <th style="text-align: center; width: 8%;">Approved</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($attendences as $attendance)
                     <tr>
-                        <td>{{ \Carbon\Carbon::parse($attendance->date)->locale('id')->isoFormat('dddd') }}</td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($attendance->date)->locale('id')->isoFormat('dddd') }}</td>
                         <td>{{ \Carbon\Carbon::parse($attendance->date)->format('d-m-Y') }}</td>
                         <td>{{ $attendance->unit ? $attendance->unit->nopol : '-' }}</td>
                         <td>{{ $attendance->start_km ?? '-' }}</td>
                         <td>{{ $attendance->end_km ?? '-' }}</td>
-                        <td>{{ $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i') : '-' }}
+                        <td>
+                            {{ $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i') : '-' }}
                         </td>
                         <td>
                             @foreach ($attendance->checks as $check)
                                 {{ \Carbon\Carbon::parse($check->created_at)->format('H:i') }}<br>
                             @endforeach
                         </td>
-                        <td>{{ $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('H:i') : '-' }}
+                        <td>
+                            {{ $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('H:i') : '-' }}
                         </td>
                         <td>{{ $attendance->project->name ?? '-' }}</td>
                         <td>{{ $attendance->endUser->name ?? '-' }}</td>
@@ -226,13 +242,13 @@
                             <td class="text-center">
                                 @foreach ($attendance->checks as $check)
                                     @if ($check->photo)
-                                    <div style="display: inline-flex; vertical-align: top;">
-                                        <div style="font-size: 10px;">
-                                            <img src="{{ public_path($check->photo) }}"
-                                                style="max-width: 100px; display: block; margin: 0 auto;"><br>
-                                            <small>{{ $check->created_at ? \Carbon\Carbon::parse($check->created_at)->format('H:i') : '-' }}</small>
+                                        <div style="display: inline-flex; vertical-align: top;">
+                                            <div style="font-size: 10px;">
+                                                <img src="{{ public_path($check->photo) }}"
+                                                    style="max-width: 100px; display: block; margin: 0 auto;"><br>
+                                                <small>{{ $check->created_at ? \Carbon\Carbon::parse($check->created_at)->format('H:i') : '-' }}</small>
+                                            </div>
                                         </div>
-                                    </div>
                                     @else
                                         <p>Tidak ada foto</p>
                                     @endif
@@ -254,7 +270,7 @@
         </table>
     </div>
 
-<script type="text/php">
+    <script type="text/php">
 if (isset($pdf)) {
     $pdf->page_script('
         $font = $fontMetrics->get_font("Helvetica", "normal");
@@ -266,8 +282,6 @@ if (isset($pdf)) {
         $pdf->text($x, $y, $text, $font, $size, [0, 0, 0]); // tambahkan argumen warna RGB
     ');
 }
-</script>
-
 </script>
 
 </body>

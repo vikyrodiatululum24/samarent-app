@@ -5,25 +5,32 @@ namespace App\Filament\Absensi\Resources;
 use App\Filament\Absensi\Resources\KehadiranDriverResource\Pages;
 use App\Filament\Absensi\Resources\KehadiranDriverResource\RelationManagers\OvertimePayRelationManager;
 use App\Models\DriverAttendence;
+use App\Models\EndUser;
 use App\Services\GeocodingService;
+use App\Services\Overtime\OvertimeCalculatorService;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkAction;
+use Filament\Notifications\Notification;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Pages\Enums\SubNavigationPosition;
-use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class KehadiranDriverResource extends Resource
 {
@@ -34,22 +41,143 @@ class KehadiranDriverResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
+            Section::make('Informasi Kehadiran Driver')
+                ->schema([
+                    Forms\Components\Hidden::make('driver_id'),
 
-            Forms\Components\DatePicker::make('date')->label('Tanggal')->required(),
-            Forms\Components\DateTimePicker::make('time_in')->label('Waktu Masuk')->required(),
-            Forms\Components\DateTimePicker::make('time_out')->label('Waktu Keluar')->required(),
-            Forms\Components\Select::make('end_user_id')
-                ->label('End User')
-                ->relationship('endUser', 'name')
-                ->required()
-                ->searchable(),
-            Forms\Components\Select::make('end_user_out')
-                ->label('End User')
-                ->relationship('endUserOut', 'name')
-                ->required()
-                ->searchable(),
-            Forms\Components\Checkbox::make('is_complete')->label('Selesai')->default(false)
-        ]);
+                    Forms\Components\DatePicker::make('date')->label('Tanggal')->required(),
+
+                    Forms\Components\Select::make('unit_id')
+                        ->label('Unit')
+                        ->relationship('unit', 'nopol')
+                        ->required()
+                        ->searchable(),
+                    Forms\Components\Select::make('project_id')
+                        ->label('Project')
+                        ->relationship('project', 'name')
+                        ->required()
+                        ->searchable()
+                        ->live()
+                        ->afterStateUpdated(function (Set $set) {
+                            $set('end_user_id', null);
+                            $set('end_user_out', null);
+                            $set('user_id', null);
+                        }),
+                    Forms\Components\Select::make('user_id')
+                        ->label('Driver')
+                        ->relationship(
+                            name: 'user',
+                            titleAttribute: 'name',
+                            modifyQueryUsing: function (Builder $query, Get $get) {
+                                if ($get('project_id')) {
+                                    $query->whereHas('driver.project', function (Builder $query) use ($get) {
+                                        $query->where('id', $get('project_id'));
+                                    });
+                                }
+                            }
+                        )
+                        ->disabled(fn(Get $get) => blank($get('project_id')))
+                        ->live()
+                        ->required()
+                        ->searchable(),
+                    Forms\Components\Select::make('shift')
+                        ->label('Shift')
+                        ->options([
+                            'Weekday' => 'Weekday',
+                            'Holiday' => 'Holiday',
+                        ]),
+                ])
+                ->columns(2),
+            Section::make('Absensi Masuk')
+                ->schema([
+                    Forms\Components\DateTimePicker::make('time_in')->label('Waktu Masuk')->required(),
+                    Forms\Components\Select::make('end_user_id')
+                        ->label('Start User')
+                        ->options(fn(Get $get) => EndUser::query()
+                            ->when($get('project_id'), fn($query, $projectId) => $query->where('project_id', $projectId))
+                            ->orderBy('name')
+                            ->pluck('name', 'id'))
+                        ->required()
+                        ->searchable()
+                        ->disabled(fn(Get $get) => blank($get('project_id')))
+                        ->live(),
+                    Forms\Components\TextInput::make('start_km')->label('KM Awal')
+                    ->rules(['regex:/^[0-9]+$/'])
+                    ->validationMessages(['regex' => 'KM Awal harus berupa angka'])
+                    ->minValue(0)
+                    ->required(),
+                    Forms\Components\TextInput::make('location_in')->label('Lokasi Masuk')->maxLength(255),
+                    Forms\Components\FileUpload::make('photo_in')
+                        ->label('Foto Masuk')
+                        ->image()
+                        ->resize(50)
+                        ->optimize('webp')
+                        ->maxWidth(1024)
+                        ->maxSize(2048) // Maksimal 2MB
+                        ->disk('public')
+                        ->directory('storage/absen/photo_in')
+                        ->columnSpanFull(),
+                ])
+                ->columns(2),
+            Section::make('Absensi Check')
+                ->schema([
+                    Forms\Components\Repeater::make('checks')
+                        ->label('Absensi Check')
+                        ->relationship('checks')
+                        ->schema([
+                            Forms\Components\TextInput::make('location')
+                                ->label('Lokasi Check'),
+                            Forms\Components\DateTimePicker::make('created_at')
+                                ->label('Waktu Check'),
+                            Forms\Components\FileUpload::make('photo')
+                                ->label('Foto Check')
+                                ->image()
+                                ->resize(50)
+                                ->optimize('webp')
+                                ->maxWidth(1024)
+                                ->maxSize(2048) // Maksimal 2MB
+                                ->disk('public')
+                                ->directory('storage/absen/photo_check')
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(2),
+                ])
+                ->columns(1),
+            Section::make('Absensi Keluar')
+                ->schema([
+                    Forms\Components\Select::make('end_user_out')
+                        ->label('End User')
+                        ->options(fn(Get $get) => EndUser::query()
+                            ->when($get('project_id'), fn($query, $projectId) => $query->where('project_id', $projectId))
+                            ->orderBy('name')
+                            ->pluck('name', 'id'))
+                        ->required()
+                        ->searchable()
+                        ->disabled(fn(Get $get) => blank($get('project_id'))),
+                    Forms\Components\DateTimePicker::make('time_out')->label('Waktu Keluar')->required(),
+                    Forms\Components\TextInput::make('end_km')->label('KM Akhir')->numeric()->minValue(0),
+                    Forms\Components\TextInput::make('location_out')->label('Lokasi Keluar')->maxLength(255),
+                    Forms\Components\FileUpload::make('photo_out')
+                        ->label('Foto Keluar')
+                        ->image()
+                        ->resize(50)
+                        ->optimize('webp')
+                        ->maxWidth(1024)
+                        ->maxSize(2048) // Maksimal 2MB
+                        ->disk('public')
+                        ->directory('storage/absen/photo_out')
+                        ->columnSpanFull(),
+                ])
+                ->columns(2),
+            Section::make('Informasi Lainnya')
+                ->schema([
+                    Forms\Components\Textarea::make('note')->label('Catatan')->maxLength(65535)->columnSpanFull(),
+                    Forms\Components\Textarea::make('note_admin')->label('Catatan Admin')->maxLength(65535)->columnSpanFull(),
+                    Forms\Components\Checkbox::make('is_complete')->label('Selesai')->default(false)
+                ])
+                ->columns(2),
+        ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -95,10 +223,102 @@ class KehadiranDriverResource extends Resource
             ])
             ->defaultSort('id', 'desc')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('project_id')
+                    ->label('Filter Project')
+                    ->relationship('project', 'name'),
+                Tables\Filters\SelectFilter::make('user_id')
+                    ->label('Filter Driver')
+                    ->relationship('user', 'name')
+                    ->query(function (Builder $query, array $data, \Filament\Tables\Contracts\HasTable $livewire): Builder {
+                        $userId = $data['value'] ?? null;
+                        $projectId = $livewire->getTableFilterState('project_id')['value'] ?? null;
+
+                        return $query
+                            ->when($userId, fn (Builder $query, $userId) => $query->where('user_id', $userId))
+                            ->when($projectId, function (Builder $query, $projectId): Builder {
+                                return $query->whereHas('user.driver', function (Builder $query) use ($projectId): Builder {
+                                    return $query->where('project_id', $projectId);
+                                });
+                            });
+                    }),
+                Tables\Filters\SelectFilter::make('is_complete')
+                    ->label('Filter Status Selesai')
+                    ->options([
+                        1 => 'Selesai',
+                        0 => 'Belum Selesai',
+                    ]),
+                Tables\Filters\SelectFilter::make('month')
+                    ->label('Filter Bulan')
+                    ->options(function () {
+                        $months = [];
+                        $attendances = DriverAttendence::selectRaw('DISTINCT YEAR(date) as year, MONTH(date) as month')
+                            ->orderBy('year', 'desc')
+                            ->orderBy('month', 'desc')
+                            ->get();
+
+                        foreach ($attendances as $attendance) {
+                            $key = $attendance->year . '-' . str_pad($attendance->month, 2, '0', STR_PAD_LEFT);
+                            $label = \Carbon\Carbon::createFromDate($attendance->year, $attendance->month, 1)->format('F Y');
+                            $months[$key] = $label;
+                        }
+
+                        return $months;
+                    })
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['value'])) {
+                            [$year, $month] = explode('-', $data['value']);
+                            $query->whereYear('date', $year)
+                                ->whereMonth('date', $month);
+                        }
+                    }),
+
             ])
             ->actions([EditAction::make(), ViewAction::make()])
-            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
+            ->bulkActions([
+                BulkActionGroup::make([
+                    BulkAction::make('complete_and_recalculate_overtime')
+                        ->label('Tandai Selesai & Hitung Ulang OT')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Hitung Ulang Overtime')
+                        ->modalSubheading('Semua absensi yang dipilih akan ditandai selesai lalu overtime dihitung ulang.')
+                        ->modalButton('Ya, Proses')
+                        ->action(function (Collection $records): void {
+                            $calculator = app(OvertimeCalculatorService::class);
+                            $successCount = 0;
+                            $failedCount = 0;
+
+                            foreach ($records as $record) {
+                                try {
+                                    $calculator->calculateAndPersist($record);
+                                    $record->forceFill(['is_complete' => true])->save();
+                                    $successCount++;
+                                } catch (\Throwable $e) {
+                                    report($e);
+                                    $failedCount++;
+                                }
+                            }
+
+                            if ($successCount > 0) {
+                                Notification::make()
+                                    ->title("{$successCount} absensi berhasil ditandai selesai dan overtime dihitung ulang.")
+                                    ->success()
+                                    ->send();
+                            }
+
+                            if ($failedCount > 0) {
+                                Notification::make()
+                                    ->title("{$failedCount} absensi gagal diproses.")
+                                    ->warning()
+                                    ->body('Periksa data tanggal, jam masuk/keluar, dan policy overtime pada record yang gagal.')
+                                    ->send();
+                            }
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 
     public static function infolist(Schema $schema): Schema
@@ -145,7 +365,7 @@ class KehadiranDriverResource extends Resource
                             ->label('Lokasi Masuk')
                             ->formatStateUsing(function ($state) {
 
-                                if (!$state) return '-';
+                                if (blank($state) || !str_contains($state, ',')) return '-';
 
                                 [$lat, $lng] = explode(',', $state);
 
@@ -179,7 +399,7 @@ class KehadiranDriverResource extends Resource
                             ->label('Lokasi Keluar')
                             ->formatStateUsing(function ($state) {
 
-                                if (!$state) return '-';
+                                if (blank($state) || !str_contains($state, ',')) return '-';
 
                                 [$lat, $lng] = explode(',', $state);
 

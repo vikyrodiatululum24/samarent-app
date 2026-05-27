@@ -3,11 +3,7 @@
 namespace App\Filament\Manager\Resources\DriverResource\RelationManagers;
 
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use Filament\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -43,19 +39,16 @@ class OvertimePaysRelationManager extends RelationManager
                     }),
                 Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable(),
                 Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable(),
-                Tables\Columns\TextColumn::make('ot_hours_time')->label('Jam OT')->sortable(),
-                Tables\Columns\TextColumn::make('ot_1x')->label('OT 1.5x')->sortable(),
-                Tables\Columns\TextColumn::make('ot_2x')->label('OT 2x')->sortable(),
-                Tables\Columns\TextColumn::make('ot_3x')->label('OT 3x')->sortable(),
-                Tables\Columns\TextColumn::make('ot_4x')->label('OT 4x')->sortable(),
+                Tables\Columns\TextColumn::make('worked_hours')->label('Jam Kerja')->sortable(),
+                Tables\Columns\TextColumn::make('normal_hours')->label('Jam Normal')->sortable(),
                 Tables\Columns\TextColumn::make('calculated_ot_hours')->label('Total Jam OT')->sortable(),
                 Tables\Columns\TextColumn::make('amount_per_hour')->label('Amount/Hour')->money('idr', true)->sortable(),
                 Tables\Columns\TextColumn::make('ot_amount')->label('Jumlah OT')->money('idr', true)->sortable(),
-                Tables\Columns\TextColumn::make('transport')->label('Transport')->money('idr', true)->sortable(),
-                Tables\Columns\TextColumn::make('monthly_allowance')->label('Tunjangan Bulanan')->money('idr', true)->sortable(),
-                Tables\Columns\TextColumn::make('out_of_town')->label('Dinas Luar')->money('idr', true)->sortable(),
-                Tables\Columns\TextColumn::make('overnight')->label('Menginap')->money('idr', true)->sortable(),
-                Tables\Columns\TextColumn::make('remarks')->label('Keterangan')->sortable(),
+                // Tables\Columns\TextColumn::make('transport')->label('Transport')->money('idr', true)->sortable(),
+                // Tables\Columns\TextColumn::make('monthly_allowance')->label('Tunjangan Bulanan')->money('idr', true)->sortable(),
+                // Tables\Columns\TextColumn::make('out_of_town')->label('Dinas Luar')->money('idr', true)->sortable(),
+                // Tables\Columns\TextColumn::make('overnight')->label('Menginap')->money('idr', true)->sortable(),
+                // Tables\Columns\TextColumn::make('remarks')->label('Keterangan')->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('month')
@@ -76,28 +69,53 @@ class OvertimePaysRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
-                CreateAction::make(),
-                Action::make('export')
-                    ->label('Export Excel')
-                    ->icon('heroicon-o-document-plus')
-                    ->action(function ($livewire) {
-                        $driverId = $this->ownerRecord->id;
-                        $filters = $livewire->tableFilters;
-                        $month = $filters['month']['value'] ?? null;
-                        if (!$month) {
-                            Notification::make()
-                                ->title('Silakan pilih bulan terlebih dahulu sebelum mengekspor data.')
-                                ->danger()
-                                ->send();
-                            return null;
-                        }
+                ActionGroup::make([
+                    Action::make('previewPdf')
+                        ->label('Preview PDF')
+                        ->icon('heroicon-o-eye')
+                        ->action(function ($livewire) {
+                            $filters = $livewire->tableFilters;
+                            $month = $filters['month']['value'] ?? null;
 
-                        $url = route('export-overtime-excel', ['driver_id' => $driverId, 'month' => $month]);
+                            if (! $month) {
+                                Notification::make()
+                                    ->title('Filter belum dipilih')
+                                    ->body('Silakan pilih bulan terlebih dahulu sebelum melihat pratinjau PDF.')
+                                    ->danger()
+                                    ->send();
 
-                        $this->js("window.open('{$url}', '_blank')");
-                    })
-            ])
-            ->actions([EditAction::make(), DeleteAction::make()])
-            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
+                                return;
+                            }
+
+                            $driverId = $this->ownerRecord->id;
+                            $url = route('preview-laporan-overtime', ['driver_id' => $driverId, 'month' => $month]);
+
+                            $this->js("window.open('{$url}', '_blank')");
+                        }),
+                    Action::make('export')
+                        ->label('Export Excel')
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->action(function ($livewire) {
+                            $driverId = $this->ownerRecord->id;
+                            $filters = $livewire->tableFilters;
+                            $month = $filters['month']['value'] ?? null;
+
+                            if (! $month) {
+                                Notification::make()
+                                    ->title('Silakan pilih bulan terlebih dahulu sebelum mengekspor data.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            $url = route('export-overtime-excel', ['driver_id' => $driverId, 'month' => $month]);
+
+                            $this->js("window.open('{$url}', '_blank')");
+                        }),
+                ])
+                    ->label('Laporan')
+                    ->icon('heroicon-o-arrow-down-tray'),
+            ]);
     }
 }

@@ -32,13 +32,13 @@ class OvertimePayExport implements FromView, WithStyles
     public function styles(Worksheet $sheet)
     {
         // mengatur lebar kolom secara otomatis
-        foreach (range('A', 'R') as $col) {
+        foreach (range('A', 'N') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        $sheet->getStyle('A1:R3')->getFont()->setBold(true);
+        $sheet->getStyle('A1:N3')->getFont()->setBold(true);
 
-        $sheet->getStyle('A5:R5')->applyFromArray([
+        $sheet->getStyle('A5:N5')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'color' => ['rgb' => 'FFFFFF'],
@@ -60,7 +60,7 @@ class OvertimePayExport implements FromView, WithStyles
         ]);
 
         $lastRow = 5 + $this->overtimePays->count();
-        $sheet->getStyle("A6:R{$lastRow}")->applyFromArray([
+        $sheet->getStyle("A6:N{$lastRow}")->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
@@ -70,7 +70,7 @@ class OvertimePayExport implements FromView, WithStyles
         ]);
 
         $fotterRow = $lastRow + 1;
-        $sheet->getStyle("A{$fotterRow}:R{$fotterRow}")->applyFromArray([
+        $sheet->getStyle("A{$fotterRow}:N{$fotterRow}")->applyFromArray([
             'borders' => [
                 'top' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,

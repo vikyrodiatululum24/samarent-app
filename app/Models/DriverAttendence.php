@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Employee;
+use Illuminate\Support\Facades\Storage;
 
 
 class DriverAttendence extends Model
@@ -29,6 +31,11 @@ class DriverAttendence extends Model
         'is_complete',
         'shift', // masuk
         'note_admin', // masuk
+    ];
+
+    protected $casts = [
+        'date' => 'date',
+        'is_complete' => 'boolean',
     ];
 
     public function user()
@@ -66,6 +73,34 @@ class DriverAttendence extends Model
     public function checks()
     {
         return $this->hasMany(DriverCheck::class, 'attendance_id');
+    }
+
+    protected static function booted()
+    {
+        static::updating(function (self $model) {
+            if ($model->isDirty('photo_in')) {
+                $old = $model->getOriginal('photo_in');
+                if (! empty($old)) {
+                    Storage::disk('public')->delete(str_replace('storage/', '', $old));
+                }
+            }
+
+            if ($model->isDirty('photo_out')) {
+                $old = $model->getOriginal('photo_out');
+                if (! empty($old)) {
+                    Storage::disk('public')->delete(str_replace('storage/', '', $old));
+                }
+            }
+        });
+
+        static::deleting(function (self $model) {
+            if (! empty($model->photo_in)) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $model->photo_in));
+            }
+            if (! empty($model->photo_out)) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $model->photo_out));
+            }
+        });
     }
     public function logMails()
     {

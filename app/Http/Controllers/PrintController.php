@@ -159,7 +159,6 @@ class PrintController extends Controller
         $month = $request->get('month', now()->format('Y-m'));
 
         $date = \Carbon\Carbon::parse($month);
-        $monthName = $date->locale('id')->isoFormat('MMMM YYYY');
 
         $driver = Driver::with([
             'user',
@@ -185,7 +184,7 @@ class PrintController extends Controller
         $pdf = PDF::loadView('prints.absensi', [
             'driver' => $driver,
             'attendences' => $attendences->load('project', 'endUser', 'unit', 'checks', 'confirmation'),
-            'month' => $monthName,
+            'month' => $month,
             'maxPages' => $maxPages,
         ])->setPaper('a4', 'portrait');
         return $pdf->stream("$namaFile.pdf");
@@ -205,11 +204,11 @@ class PrintController extends Controller
 
     public function exportAbsensiExcel(Request $request, $driver_id)
     {
-        $month = $request->get('month', date('m-Y'));
+        $month = $request->get('month', now()->format('Y-m'));
         $driver = Driver::with([
             'user',
             'driverAttendences' => function ($query) use ($month) {
-                $query->whereMonth('date', substr($month, 5, 2))->whereYear('date', substr($month, 0, 4));
+                $query->whereMonth('date', substr($month, 5, 2))->whereYear('date', substr($month, 0, 4))->orderBy('date', 'asc');
             },
         ])->findOrFail($driver_id);
 
@@ -217,24 +216,49 @@ class PrintController extends Controller
         $driverName = $driver->user->name ?? 'driver';
 
         $filename = 'Laporan-Absensi-' . str_replace(['/', '\\'], '-', $driverName) . '-Bulan-' . $month . '.xlsx';
-        $month = intval($month);
         return Excel::download(new AbsensiExport($attendences, $driverName, $month), $filename);
+    }
+
+    public function previewOvertimePdf(Request $request, $driver_id)
+    {
+        $month = $request->get('month', now()->format('Y-m'));
+
+        $date = \Carbon\Carbon::parse($month);
+        $driver = Driver::with([
+            'user',
+            'overtimePay' => function ($query) use ($date) {
+                $query->whereMonth('tanggal', $date->month)
+                    ->whereYear('tanggal', $date->year)
+                    ->orderBy('tanggal', 'asc');
+            },
+        ])->findOrFail($driver_id);
+
+        $overtimePays = $driver->overtimePay;
+        $driverName = $driver->user->name ?? 'driver';
+        $filename = 'Laporan-Overtime-' . str_replace(['/', '\\'], '-', $driverName) . '-Bulan-' . $month . '.pdf';
+
+        $pdf = PDF::loadView('exports.overtimepay', [
+            'overtimePays' => $overtimePays,
+            'driverName' => $driverName,
+            'month' => $month,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream($filename);
     }
 
     public function exportOvertimeExcel(Request $request, $driver_id)
     {
-        $month = $request->get('month', date('m-Y'));
+        $month = $request->get('month', now()->format('Y-m'));
         $driver = Driver::with([
             'user',
             'overtimePay' => function ($query) use ($month) {
-                $query->whereMonth('tanggal', substr($month, 5, 2))->whereYear('tanggal', substr($month, 0, 4));
+                $query->whereMonth('tanggal', substr($month, 5, 2))->whereYear('tanggal', substr($month, 0, 4))->orderBy('tanggal', 'asc');
             },
         ])->findOrFail($driver_id);
 
         $overtimePays = $driver->overtimePay;
         $driverName = $driver->user->name ?? 'driver';
         $filename = 'Laporan-Overtime-' . str_replace(['/', '\\'], '-', $driverName) . '-Bulan-' . $month . '.xlsx';
-        $month = intval($month);
 
         return Excel::download(new OvertimePayExport($overtimePays, $driverName, $month), $filename);
     }

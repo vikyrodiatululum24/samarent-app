@@ -118,7 +118,8 @@ class DriverAttendenceRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('date')
                 ->toggleable(isToggledHiddenByDefault: false)
-                ->label('Tanggal'),
+                ->label('Tanggal')
+                ->getStateUsing(fn($record) => Carbon::parse($record->date)->translatedFormat('d F Y')),
                 Tables\Columns\TextColumn::make('shift')
                     ->label('Shift')
                     ->color(function ($state) {
@@ -138,12 +139,6 @@ class DriverAttendenceRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('location_in')->label('Lokasi Masuk')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('time_in')
-                    ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\ImageColumn::make('photo_in')
-                    ->disk('public')
-                    ->square()
-                    ->label('Foto Masuk')
-                    ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in))
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\ImageColumn::make('photo_in')
                     ->disk('public')

@@ -38,6 +38,16 @@
 </head>
 
 <body>
+    @php
+        $monthLabel = 'N/A';
+        if (! empty($month)) {
+            if (is_string($month) && preg_match('/^\d{4}-\d{2}$/', $month)) {
+                $monthLabel = \Carbon\Carbon::createFromFormat('Y-m', $month)->locale('id')->translatedFormat('F Y');
+            } else {
+                $monthLabel = $month;
+            }
+        }
+    @endphp
     <table>
         <tr>
             <td colspan="2"><strong>TIME SHEET</strong></td>
@@ -55,7 +65,7 @@
         <tr>
             <td colspan="2"><strong>Bulan/Month</strong>
             </td>
-            <td colspan="9">: {{ $month ? \Carbon\Carbon::create()->month($month)->locale('id')->translatedFormat('F') : 'N/A' }}</td>
+            <td colspan="9">: {{ $monthLabel }}</td>
         </tr>
     </table>
 

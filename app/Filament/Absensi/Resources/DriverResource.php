@@ -2,10 +2,13 @@
 
 namespace App\Filament\Absensi\Resources;
 
-use Filament\Forms;
-use App\Models\User;
-use Filament\Tables;
+use App\Models\Branch;
+use App\Models\Division;
 use App\Models\Driver;
+use App\Models\User;
+use App\Models\SetSalary;
+use Filament\Forms;
+use Filament\Tables;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -13,6 +16,8 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Schemas\Components\Image;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -137,7 +142,45 @@ class DriverResource extends Resource
                     ->relationship('project', 'name')
                     ->searchable()
                     ->default(null)
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (Set $set) {
+                        $set('branch_id', null);
+                        $set('division_id', null);
+                    }),
+                Forms\Components\Select::make('branch_id')
+                    ->label('Branch')
+                    ->options(fn(Get $get) => Branch::query()
+                        ->when($get('project_id'), fn($query, $projectId) => $query->where('project_id', $projectId))
+                        ->orderBy('name')
+                        ->pluck('name', 'id'))
+                    ->searchable()
+                    ->disabled(fn(Get $get) => blank($get('project_id')))
+                    ->default(null)
+                    ->live()
+                    ->afterStateUpdated(fn(Set $set) => $set('division_id', null)),
+                Forms\Components\Select::make('division_id')
+                    ->label('Division')
+                    ->options(fn(Get $get) => Division::query()
+                        ->when($get('branch_id'), fn($query, $branchId) => $query->where('branch_id', $branchId))
+                        ->orderBy('name')
+                        ->pluck('name', 'id'))
+                    ->searchable()
+                    ->disabled(fn(Get $get) => blank($get('branch_id')))
+                    ->live()
+                    ->afterStateUpdated(fn(Set $set) => $set('set_salary_id', null))
+                    ->default(null),
+                Forms\Components\Select::make('set_salary_id')
+                    ->label('Set Salary')
+                    ->options(fn(Get $get) => SetSalary::query()
+                        ->when($get('division_id'), fn($query, $divisionId) => $query->where('division_id', $divisionId))
+                        ->active()
+                        ->orderBy('name')
+                        ->pluck('name', 'id'))
+                    ->searchable()
+                    ->default(null)
+                    ->helperText('Jika dipilih, ini akan menjadi override SetSalary untuk driver ini.')
+                    ->disabled(fn(Get $get) => blank($get('division_id'))),
                 Forms\Components\TextInput::make('pic')
                     ->label('PIC')
                     ->required(),
@@ -167,30 +210,57 @@ class DriverResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('nik')
+                ->label('NIK')
+                ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('sim')
+                    ->label('SIM')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('alamat')
+                    ->label('Alamat')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('no_wa')
+                    ->label('No. WhatsApp')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tempat')
+                    ->label('Tempat Lahir')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tanggal_lahir')
+                    ->date()
+                    ->label('Tanggal Lahir')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('jenis_kelamin'),
+                Tables\Columns\TextColumn::make('jenis_kelamin')
+                    ->label('Jenis Kelamin')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('rt')
+                    ->label('RT')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('rw')
+                    ->label('RW')                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('kelurahan')
+                    ->label('Kelurahan/Desa')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('kecamatan')
+                    ->label('Kecamatan')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('agama')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Agama'),
                 Tables\Columns\TextColumn::make('photo')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Photo Driver'),
                 Tables\Columns\TextColumn::make('project.name')
                     ->searchable()
                     ->label('Penempatan')
@@ -270,10 +340,17 @@ class DriverResource extends Resource
                         TextEntry::make('kecamatan')
                             ->label('Kecamatan'),
                     ]),
-                    Section::make('Informasi Penempatan')
+                Section::make('Informasi Penempatan')
                     ->schema([
                         TextEntry::make('project.name')
                             ->label('Penempatan'),
+                        TextEntry::make('branch.name')
+                            ->label('Branch'),
+                        TextEntry::make('division.name')
+                            ->label('Division'),
+                        TextEntry::make('set_salary')
+                            ->label('Set Salary')
+                            ->getStateUsing(fn($record) => $record?->currentSetSalary()?->name ?? ($record?->setSalary?->name ?? '-')),
                         TextEntry::make('pic')
                             ->label('PIC'),
                     ])

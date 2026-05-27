@@ -67,6 +67,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/laporan/absensi/{driver_id}', [PrintController::class, 'absensi'])->name('laporan-absensi');
     Route::get('/preview/absensi/{driver_id}', [PrintController::class, 'previewAbsensi'])->name('preview-laporan-absensi');
     Route::get('/export/absensi/{driver_id}/excel', [PrintController::class, 'exportAbsensiExcel'])->name('export-absensi-excel');
+    Route::get('/preview/overtime/{driver_id}', [PrintController::class, 'previewOvertimePdf'])->name('preview-laporan-overtime');
+    Route::get('/laporan/overtime/{driver_id}', [PrintController::class, 'previewOvertimePdf'])->name('laporan-overtime');
     Route::get('/export/overtime/{driver_id}/excel', [PrintController::class, 'exportOvertimeExcel'])->name('export-overtime-excel');
     Route::get('/form-tugas/{id}/preview', [PrintController::class, 'previewFormTugas'])->name('preview.form-tugas');
     Route::get('/form-tugas/{id}/print', [PrintController::class, 'printFormTugas'])->name('print.form-tugas');

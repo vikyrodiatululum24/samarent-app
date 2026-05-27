@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProjectResource\Pages;
+use App\Filament\Resources\ProjectResource\RelationManagers\BranchesRelationManager;
 use App\Models\Project;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -67,7 +68,7 @@ class ProjectResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            BranchesRelationManager::class,
         ];
     }
 

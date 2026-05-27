@@ -10,8 +10,15 @@
     <div class="space-y-3">
         @foreach ($checks as $item)
             @php
-                [$lat, $lng] = explode(',', $item->location);
-                $address = $geo->getAddressFromCoordinates($lat, $lng);
+                $address = '-';
+                if (! empty($item->location) && str_contains($item->location, ',')) {
+                    [$lat, $lng] = explode(',', $item->location);
+                    try {
+                        $address = $geo->getAddressFromCoordinates($lat, $lng);
+                    } catch (\Exception $e) {
+                        $address = '-';
+                    }
+                }
             @endphp
             <div class="p-3 border rounded-lg">
                 <div>🕒 {{ $item->created_at ? $item->created_at->format('H:i:s') : '-' }}</div>
@@ -19,7 +26,9 @@
                 <div class="text-sm text-gray-500">
                     ({{ $item->location }})
                 </div>
-                <img src="{{ asset($item->photo) }}" alt="Foto Check" class="mt-2 w-32 h-auto rounded-sm">
+                @if (! empty($item->photo))
+                    <img src="{{ asset($item->photo) }}" alt="Foto Check" class="mt-2 w-32 h-auto rounded-sm">
+                @endif
             </div>
         @endforeach
     </div>

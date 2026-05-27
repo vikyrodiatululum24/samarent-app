@@ -38,6 +38,18 @@
 </head>
 
 <body>
+    @php
+        $monthLabel = 'N/A';
+        if (! empty($month)) {
+            if (is_string($month) && preg_match('/^\d{4}-\d{2}$/', $month)) {
+                $monthLabel = \Carbon\Carbon::createFromFormat('Y-m', $month)->locale('id')->translatedFormat('F Y');
+            } elseif (is_numeric($month)) {
+                $monthLabel = \Carbon\Carbon::create()->month((int) $month)->locale('id')->translatedFormat('F');
+            } else {
+                $monthLabel = $month;
+            }
+        }
+    @endphp
     <table>
         <tr>
             <td colspan="2"><strong>OVERTIME PAY REPORT</strong></td>
@@ -55,8 +67,7 @@
         <tr>
             <td colspan="2"><strong>Bulan/Month</strong>
             </td>
-            <td colspan="9">:
-                {{ $month ? \Carbon\Carbon::create()->month($month)->locale('id')->translatedFormat('F') : 'N/A' }}</td>
+            <td colspan="9">: {{ $monthLabel }}</td>
         </tr>
     </table>
 
@@ -68,18 +79,15 @@
                 <th>Shift</th>
                 <th>From Time</th>
                 <th>To Time</th>
-                <th>OT Hours</th>
-                <th>1.5x</th>
-                <th>2x</th>
-                <th>3x</th>
-                <th>4x</th>
+                <th>Work Hours</th>
+                <th>Normal Hours</th>
                 <th>Calculated OT</th>
                 <th>Amount/H</th>
                 <th>OT Amount</th>
                 <th>Out of Town</th>
                 <th>Overnight</th>
                 <th>Transport</th>
-                <th>Monthly/Other Allowance</th>
+                <th>Monthly Allowance</th>
                 <th>Remarks</th>
             </tr>
         </thead>
@@ -91,11 +99,8 @@
                     <td>{{ $pay->shift }}</td>
                     <td>{{ $pay->from_time }}</td>
                     <td>{{ $pay->to_time }}</td>
-                    <td>{{ $pay->ot_hours_time }}</td>
-                    <td>{{ $pay->ot_1x }}</td>
-                    <td>{{ $pay->ot_2x }}</td>
-                    <td>{{ $pay->ot_3x }}</td>
-                    <td>{{ $pay->ot_4x }}</td>
+                    <td>{{ number_format($pay->worked_hours, 2) }}</td>
+                    <td>{{ number_format($pay->normal_hours, 2) }}</td>
                     <td>{{ $pay->calculated_ot_hours }}</td>
                     <td>{{ number_format($pay->amount_per_hour, 2) }}</td>
                     <td>{{ number_format($pay->ot_amount, 2) }}</td>
@@ -114,12 +119,12 @@
             <tr>
                 <td style="text-align: left;"><strong>Total Overtime Pay:</strong></td>
                 <td>
-                    <strong>{{ number_format($overtimePays->sum('ot_amount') + $overtimePays->sum('transport') + $overtimePays->sum('monthly_other_allowance'), 2) }}</strong>
+                    <strong>{{ number_format($overtimePays->sum('ot_amount') + $overtimePays->sum('out_of_town') + $overtimePays->sum('overnight') + $overtimePays->sum('transport') + $overtimePays->sum('monthly_allowance'), 2) }}</strong>
                 </td>
             </tr>
             <tr>
                 <td style="text-align: left;"><strong>Out of Town:</strong></td>
-                <td><strong>{{ number_format($overtimePays->sum('transport'), 2) }}</strong></td>
+                <td><strong>{{ number_format($overtimePays->sum('out_of_town'), 2) }}</strong></td>
             </tr>
             <tr>
                 <td style="text-align: left;"><strong>Overnight:</strong></td>

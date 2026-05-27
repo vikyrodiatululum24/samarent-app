@@ -23,6 +23,16 @@ class Project extends Model
         return $this->hasOne(SetSalary::class);
     }
 
+    public function branches()
+    {
+        return $this->hasMany(Branch::class);
+    }
+
+    public function divisions()
+    {
+        return $this->hasManyThrough(Division::class, Branch::class);
+    }
+
     public function drivers()
     {
         return $this->hasMany(Driver::class);
