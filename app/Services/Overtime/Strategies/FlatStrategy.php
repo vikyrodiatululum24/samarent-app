@@ -13,7 +13,7 @@ class FlatStrategy implements OvertimeStrategyInterface
         $rate = (float) ($context['hourly_salary'] ?? 0);
 
         $overtimeHours = (float) ($context['overtime_hours'] ?? 0);
-        $overtimePay = round($overtimeHours * $rate);
+        $overtimePay = round($overtimeHours * $rate, 2);
 
         return [
             'rate' => $rate,

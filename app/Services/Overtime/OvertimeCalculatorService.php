@@ -125,9 +125,9 @@ class OvertimeCalculatorService
             'day' => $day,
             'clock_in' => $clockIn,
             'clock_out' => $clockOut,
-            'worked_hours' => round ($workedHours, 2),
-            'normal_hours' => round ($normalHours, 2),
-            'overtime_hours' => round ($overtimeHours, 2),
+            'worked_hours' => $workedHours,
+            'normal_hours' => $normalHours,
+            'overtime_hours' => $effectiveHours,
             'is_holiday' => $isHoliday,
             'hourly_salary' => $salary,
         ];

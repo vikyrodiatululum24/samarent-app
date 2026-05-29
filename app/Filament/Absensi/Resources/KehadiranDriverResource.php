@@ -38,6 +38,15 @@ class KehadiranDriverResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kehadiran Driver';
 
+    protected static function normalizeStoragePath(?string $path): ?string
+    {
+        if (blank($path)) {
+            return null;
+        }
+
+        return str_replace('storage/', '', $path);
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
@@ -111,11 +120,13 @@ class KehadiranDriverResource extends Resource
                         ->label('Foto Masuk')
                         ->image()
                         ->resize(50)
-                        ->optimize('webp')
                         ->maxWidth(1024)
                         ->maxSize(2048) // Maksimal 2MB
                         ->disk('public')
-                        ->directory('storage/absen/photo_in')
+                        ->directory('absen/photo_in')
+                        ->afterStateHydrated(function ($component, $state) {
+                            $component->state(self::normalizeStoragePath($state));
+                        })
                         ->columnSpanFull(),
                 ])
                 ->columns(2),
@@ -133,11 +144,13 @@ class KehadiranDriverResource extends Resource
                                 ->label('Foto Check')
                                 ->image()
                                 ->resize(50)
-                                ->optimize('webp')
                                 ->maxWidth(1024)
                                 ->maxSize(2048) // Maksimal 2MB
                                 ->disk('public')
-                                ->directory('storage/absen/photo_check')
+                                ->directory('absen/photo_check')
+                                ->afterStateHydrated(function ($component, $state) {
+                                    $component->state(self::normalizeStoragePath($state));
+                                })
                                 ->columnSpanFull(),
                         ])
                         ->columns(2),
@@ -161,11 +174,13 @@ class KehadiranDriverResource extends Resource
                         ->label('Foto Keluar')
                         ->image()
                         ->resize(50)
-                        ->optimize('webp')
                         ->maxWidth(1024)
                         ->maxSize(2048) // Maksimal 2MB
                         ->disk('public')
-                        ->directory('storage/absen/photo_out')
+                        ->directory('absen/photo_out')
+                        ->afterStateHydrated(function ($component, $state) {
+                            $component->state(self::normalizeStoragePath($state));
+                        })
                         ->columnSpanFull(),
                 ])
                 ->columns(2),
@@ -376,7 +391,7 @@ class KehadiranDriverResource extends Resource
                         ImageEntry::make('photo_in')
                             ->label('Foto Masuk')
                             ->disk('public')
-                            ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_in))
+                            ->getStateUsing(fn($record) => self::normalizeStoragePath($record->photo_in))
                             ->size(300)
                             ->columnSpanFull(),
                     ])
@@ -410,7 +425,7 @@ class KehadiranDriverResource extends Resource
                         ImageEntry::make('photo_out')
                             ->label('Foto Keluar')
                             ->disk('public')
-                            ->getStateUsing(fn($record) => str_replace('storage/', '', $record->photo_out))
+                            ->getStateUsing(fn($record) => self::normalizeStoragePath($record->photo_out))
                             ->size(300)
                             ->columnSpanFull(),
                     ])

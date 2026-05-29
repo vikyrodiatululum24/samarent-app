@@ -12,6 +12,25 @@ class EditKehadiranDriver extends EditRecord
 {
     protected static string $resource = KehadiranDriverResource::class;
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        foreach (['photo_in', 'photo_out'] as $field) {
+            if (! empty($data[$field])) {
+                $data[$field] = str_replace('storage/', '', $data[$field]);
+            }
+        }
+
+        if (! empty($data['checks']) && is_array($data['checks'])) {
+            foreach ($data['checks'] as $index => $check) {
+                if (! empty($check['photo'])) {
+                    $data['checks'][$index]['photo'] = str_replace('storage/', '', $check['photo']);
+                }
+            }
+        }
+
+        return $data;
+    }
+
     protected function mutateFormDataBeforeSave(array $data): array
     {
         // When editing, the form `user_id` holds the selected driver id.

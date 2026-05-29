@@ -47,10 +47,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->resources([
                 \App\Filament\Admin\Resources\ReimbursementMonitorResource::class,
-                \App\Filament\Absensi\Resources\ProjectResource::class,
-                \App\Filament\Absensi\Resources\BranchResource::class,
-                \App\Filament\Absensi\Resources\DivisionResource::class,
-                \App\Filament\Absensi\Resources\SetSalaryResource::class,
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->profile(EditProfile::class, false)
