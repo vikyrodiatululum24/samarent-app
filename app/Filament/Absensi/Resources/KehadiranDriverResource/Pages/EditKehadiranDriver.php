@@ -33,6 +33,54 @@ class EditKehadiranDriver extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        // Helper to ensure DB values use the `storage/` prefix when appropriate
+        $ensureStoragePrefix = function (?string $path) {
+            if (blank($path)) {
+                return null;
+            }
+            $path = (string) $path;
+            if (str_starts_with($path, 'http')) {
+                return $path;
+            }
+            if (str_starts_with($path, 'storage/')) {
+                return $path;
+            }
+            return 'storage/' . ltrim($path, '/');
+        };
+
+        // photo_in
+        if (! array_key_exists('photo_in', $data) || blank($data['photo_in'])) {
+            $data['photo_in'] = $ensureStoragePrefix($this->record->photo_in ?? null);
+        } else {
+            $data['photo_in'] = $ensureStoragePrefix($data['photo_in']);
+        }
+
+        // photo_out
+        if (! array_key_exists('photo_out', $data) || blank($data['photo_out'])) {
+            $data['photo_out'] = $ensureStoragePrefix($this->record->photo_out ?? null);
+        } else {
+            $data['photo_out'] = $ensureStoragePrefix($data['photo_out']);
+        }
+
+        // checks photos
+        if (! empty($data['checks'])) {
+            foreach ($data['checks'] as $index => $check) {
+                $incoming = $check['photo'] ?? null;
+                if (blank($incoming)) {
+                    $existing = null;
+                    if (! empty($check['id'])) {
+                        $existing = $this->record->checks()->find($check['id']);
+                    }
+                    if (! $existing) {
+                        $existing = $this->record->checks->get($index);
+                    }
+                    $data['checks'][$index]['photo'] = $ensureStoragePrefix($existing->photo ?? null);
+                } else {
+                    $data['checks'][$index]['photo'] = $ensureStoragePrefix($incoming);
+                }
+            }
+        }
+
         // When editing, the form `user_id` holds the selected driver id.
         if (! empty($data['user_id'])) {
             $driver = Driver::where('user_id', $data['user_id'])->first();
