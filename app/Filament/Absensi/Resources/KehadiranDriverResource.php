@@ -450,7 +450,7 @@ class KehadiranDriverResource extends Resource
     {
         return [
             'index' => Pages\ListKehadiranDrivers::route('/'),
-            // 'create' => Pages\CreateKehadiranDriver::route('/create'),
+            'create' => Pages\CreateKehadiranDriver::route('/create'),
             'edit' => Pages\EditKehadiranDriver::route('/{record}/edit'),
             'view' => Pages\ViewKehadiranDriver::route('/{record}'),
         ];
@@ -458,7 +458,7 @@ class KehadiranDriverResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false;
+        return true;
     }
 
     public static function canEdit(Model $record): bool

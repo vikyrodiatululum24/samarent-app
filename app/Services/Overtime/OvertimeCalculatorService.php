@@ -109,7 +109,7 @@ class OvertimeCalculatorService
         }
         $overtimeHours = max(0, $isHoliday ? $workedHours : $workedHours - $normalHours);
         $effectiveHours = $this->applyBreakRule($overtimeHours, $isHoliday, (array) ($policy->rules['break'] ?? []));
-
+        
         if ($policy->policy_type === OvertimePolicyType::Government->value) {
             $salary = (float) (data_get($policy->rules['overtime'], 'hourly_salary') ?? 0);
         } else if ($policy->policy_type === OvertimePolicyType::Flat->value) {

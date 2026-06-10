@@ -24,6 +24,7 @@ class CreateKehadiranDriver extends CreateRecord
         return $data;
     }
 
+
     protected function afterCreate(): void
     {
         if ($this->record->is_complete) {
