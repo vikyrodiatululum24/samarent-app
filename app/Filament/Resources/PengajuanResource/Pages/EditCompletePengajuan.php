@@ -48,7 +48,7 @@ class EditCompletePengajuan extends EditRecord
                         Forms\Components\TextInput::make('complete.nominal_estimasi')
                             ->label('Nominal Estimasi')
                             ->inputMode('numeric')
-                            ->rules(['regex:/^[0-9]+$/'])
+                            ->rules(['regex:/^-?\d+(,\d+)*$/'])
                             ->validationMessages([
                                 'regex' => 'Nominal Estimasi harus berupa angka.',
                             ])
@@ -92,7 +92,7 @@ class EditCompletePengajuan extends EditRecord
                         Forms\Components\TextInput::make('complete.nominal_tf_finance')
                             ->label('Nominal Transfer Finance')
                             ->inputMode('numeric')
-                            ->rules(['regex:/^[0-9]+$/'])
+                            ->rules(['regex:/^-?\d+(,\d+)*$/'])
                             ->validationMessages([
                                 'regex' => 'Nominal Transfer Finance harus berupa angka.',
                             ])
@@ -140,7 +140,7 @@ class EditCompletePengajuan extends EditRecord
                                     ->label('No. Rekening')
                                     ->required()
                                     ->inputMode('numeric')
-                                    ->rules(['regex:/^[0-9]+$/'])
+                                    ->rules(['regex:/^-?\d+(,\d+)*$/'])
                                     ->validationMessages([
                                         'regex' => 'No. Rekening harus berupa angka.',
                                     ])
@@ -186,7 +186,7 @@ class EditCompletePengajuan extends EditRecord
                             ->readOnly()
                             ->maxLength(255)
                             ->inputMode('numeric')
-                            ->rules(['regex:/^[0-9]+$/'])
+                            ->rules(['regex:/^-?\d+(,\d+)*$/'])
                             ->validationMessages([
                                 'regex' => 'No. Rekening Bengkel harus berupa angka.',
                             ]),
@@ -198,20 +198,24 @@ class EditCompletePengajuan extends EditRecord
                         Forms\Components\TextInput::make('complete.nominal_tf_bengkel')
                             ->label('Nominal Transfer Bengkel')
                             ->inputMode('numeric')
-                            ->rules(['regex:/^[0-9]+$/'])
+                            ->rules(['regex:/^-?\d+(,\d+)*$/'])
                             ->validationMessages([
                                 'regex' => 'Nominal Transfer Bengkel harus berupa angka.',
                             ])
                             ->prefix('Rp ')
                             ->mask(RawJs::make('$money($input)'))
                             ->stripCharacters(',')
-                            ->reactive()
+                            ->live(debounce: 500)
+                            ->afterStateUpdated(fn(Set $set, $state, Get $get) => $set(
+                                'complete.selisih_tf',
+                                str_replace(',', '', $get('complete.nominal_tf_finance')) - $state
+                            ))
                             ->required(fn($record) => $record->complete?->status_finance === 'paid')
                             ->nullable(),
                         Forms\Components\TextInput::make('complete.selisih_tf')
                             ->label('Selisih Transfer')
                             ->inputMode('numeric')
-                            ->rules(['regex:/^[0-9]+$/'])
+                            ->rules(['regex:/^-?\d+(,\d+)*$/'])
                             ->validationMessages([
                                 'regex' => 'Selisih Transfer harus berupa angka.',
                             ])

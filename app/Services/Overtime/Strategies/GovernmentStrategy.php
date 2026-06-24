@@ -36,18 +36,18 @@ class GovernmentStrategy implements OvertimeStrategyInterface
                 ? min($remainingHours, max(0, $to - $from + 1))
                 : $remainingHours;
 
-            $calculated_hours = $multiplier * $segmentHours;
-            $calculated = $hourlySalary * $calculated_hours;
-            $overtimePay += $calculated;
-            $totalHours += $calculated_hours;
+            $calculated_hours = $multiplier * round($segmentHours, 2);
+            $calculated = $hourlySalary * round($calculated_hours, 2);
+            $overtimePay += round($calculated, 2);
+            $totalHours += round($calculated_hours, 2);
             $remainingHours -= $segmentHours;
 
             $detail[] = [
                 'from' => $from,
                 'to' => $to,
                 'multiplier' => $multiplier,
-                'hours' => round($segmentHours, 2),
-                'amount' => round($calculated),
+                'hours' => $totalHours,
+                'amount' => $overtimePay,
             ];
         }
 

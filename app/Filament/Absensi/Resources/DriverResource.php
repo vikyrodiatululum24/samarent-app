@@ -27,6 +27,9 @@ use App\Filament\Absensi\Resources\DriverResource\RelationManagers;
 class DriverResource extends Resource
 {
     protected static ?string $model = Driver::class;
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Project Management';
+
     protected static ?string $pluralModelLabel = 'Driver';
 
     public static function form(Schema $schema): Schema

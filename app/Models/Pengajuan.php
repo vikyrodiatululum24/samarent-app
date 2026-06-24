@@ -28,11 +28,19 @@ class Pengajuan extends Model
     protected static function booted()
     {
         static::creating(function ($pengajuan) {
+            if ($pengajuan->no_wa == null || $pengajuan->no_wa == '') {
+                $pengajuan->no_wa = '-';
+            }
+
             $nextId = static::max('id') + 1;
             $pengajuan->no_pengajuan = 'SPK/' . str_pad($nextId, 4, '0', STR_PAD_LEFT) . '/' . now()->format('m') . '/' . now()->format('Y');
         });
 
         static::updating(function ($pengajuan) {
+            if ($pengajuan->no_wa == null || $pengajuan->no_wa == '') {
+                $pengajuan->no_wa = '-';
+            }
+
             $oldStatus = $pengajuan->getOriginal('keterangan_proses');
             $newStatus = $pengajuan->keterangan_proses;
 

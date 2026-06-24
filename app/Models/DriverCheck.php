@@ -11,6 +11,7 @@ class DriverCheck extends Model
         'attendance_id',
         'location',
         'photo',
+        'note',
     ];
 
     public function attendance()

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReimbursementResource\Pages;
 use App\Models\Reimbursement;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -320,8 +321,9 @@ class ReimbursementResource extends Resource
                 EditAction::make(),
             ])
             ->bulkActions([
-                BulkAction::make('export')
-                    ->label('Export Selected')
+                BulkActionGroup::make([
+                    BulkAction::make('print-pdf')
+                    ->label('Cetak PDF')
                     ->icon('heroicon-o-printer')
                     ->color('success')
                     ->action(function (Collection $records) {
@@ -329,8 +331,15 @@ class ReimbursementResource extends Resource
                         return redirect()->route('reimbursement.print-pdf', ['ids' => implode(',', $ids)]);
                     })
                     ->openUrlInNewTab(),
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    BulkAction::make('export-excel')
+                    ->label('Export Excel')
+                    ->icon('heroicon-o-document-text')
+                    ->color('success')
+                    ->action(function (Collection $records) {
+                        $ids = $records->pluck('id')->toArray();
+                        return redirect()->route('reimbursement.export-excel', ['ids' => implode(',', $ids)]);
+                    })
+                    ->openUrlInNewTab(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

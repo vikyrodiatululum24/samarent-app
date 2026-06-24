@@ -12,6 +12,17 @@ class Manager extends Model
         'perusahaan',
     ];
 
+    protected $casts = [
+        'up' => 'array',
+    ];
+
+    protected static function booted()
+    {
+        static::saved(function ($model) {
+            $model->up = json_encode($model->up);
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

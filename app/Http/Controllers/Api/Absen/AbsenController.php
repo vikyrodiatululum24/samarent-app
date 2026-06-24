@@ -82,6 +82,7 @@ class AbsenController extends Controller
         $request->validate([
             'location_check' => 'required|string',
             'photo_check' => 'required|string',
+            'note' => 'nullable|string',
         ]);
 
         $auth = auth()->user() ? auth()->user()->id : null;
@@ -110,6 +111,7 @@ class AbsenController extends Controller
         $absenCheck = $absen->checks()->create([
             'location' => $request->location_check,
             'photo' => $request->photo_check,
+            'note' => $request->note ?? null,
         ]);
 
         return response()->json(['message' => 'Absen check recorded successfully', 'data' => $absenCheck], 200);

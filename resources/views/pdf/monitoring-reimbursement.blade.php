@@ -147,14 +147,6 @@
                     <td>: PT. Samana Jaya Propertindo</td>
                 </tr>
                 <tr>
-                    <td>Name</td>
-                    <td>: {{ $user->name }}</td>
-                </tr>
-                <tr>
-                    <td>No. Rekening</td>
-                    <td>: {{ $user->profile->norek ?? '-' }}</td>
-                </tr>
-                <tr>
                     <td>Periode</td>
                     <td>: {{ $dari ? \Carbon\Carbon::parse($dari)->translatedFormat('d F Y') : '-' }} s/d
                         {{ $sampai ? \Carbon\Carbon::parse($sampai)->translatedFormat('d F Y') : '-' }}</td>
@@ -277,7 +269,7 @@
                 <tr>
                     <td
                         style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
-                        {{ $user->name }}</td>
+                        &nbsp;</td>
                     <td
                         style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
                         &nbsp;</td>
@@ -315,14 +307,6 @@
                 <tr>
                     <td>Company Name</td>
                     <td>: PT. Samana Jaya Propertindo</td>
-                </tr>
-                <tr>
-                    <td>Name</td>
-                    <td>: {{ $user->name }}</td>
-                </tr>
-                <tr>
-                    <td>No. Rekening</td>
-                    <td>: {{ $user->profile->norek ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td>Periode</td>
@@ -417,14 +401,6 @@
                 <tr>
                     <td>Company Name</td>
                     <td>: PT. Samana Jaya Propertindo</td>
-                </tr>
-                <tr>
-                    <td>Name</td>
-                    <td>: {{ $user->name }}</td>
-                </tr>
-                <tr>
-                    <td>No. Rekening</td>
-                    <td>: {{ $user->profile->norek ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td>Periode</td>

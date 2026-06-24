@@ -5,8 +5,11 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Complete;
-use App\Models\ServiceUnit;
+use App\Models\DriverAttendence;
+use App\Models\DriverCheck;
 use App\Models\Finance;
+use App\Models\Reimbursement;
+use App\Models\ServiceUnit;
 
 class CleanUnusedImages extends Command
 {
@@ -14,22 +17,44 @@ class CleanUnusedImages extends Command
     protected $description = 'Hapus file gambar yang tidak ada di database';
 
     /**
-     * Definisi model dan kolom gambar yang akan dibersihkan
+     * Definisi model dan kolom gambar yang akan dibersihkan.
+     *
+     * Format setiap field:
+     *   'nama_field' => ['type' => 'string|array', 'folder' => 'nama-folder-di-storage']
+     *
+     * Jika 'folder' tidak diisi, maka folder dianggap sama dengan nama field.
      */
     private array $modelConfig = [
         Complete::class => [
-            'foto_nota' => 'array',
+            'foto_nota'    => ['type' => 'array'],
         ],
         ServiceUnit::class => [
-            'foto_unit' => 'string',
-            'foto_odometer' => 'string',
-            'foto_kondisi' => 'array',
-            'foto_pengerjaan_bengkel' => 'string',
-            'foto_tambahan' => 'array'
+            'foto_unit'                => ['type' => 'string'],
+            'foto_odometer'            => ['type' => 'string'],
+            'foto_kondisi'             => ['type' => 'array'],
+            'foto_pengerjaan_bengkel'  => ['type' => 'string'],
+            'foto_tambahan'            => ['type' => 'array'],
         ],
         Finance::class => [
-            'bukti_transaksi' => 'string'
-        ]
+            'bukti_transaksi' => ['type' => 'string'],
+        ],
+        DriverCheck::class => [
+            // Field di DB: 'photo_check', tapi folder di storage: 'absen'
+            'photo' => ['type' => 'string', 'folder' => 'absen/photo_check'],
+        ],
+
+        Reimbursement::class => [
+            'foto_odometer_awal' => ['type' => 'string', 'folder' => 'reimbursement/odometer_awal'],
+            'foto_odometer_akhir' => ['type' => 'string', 'folder' => 'reimbursement/odometer_akhir'],
+            'nota' => ['type' => 'string', 'folder' => 'reimbursement/nota'],
+        ],
+
+        DriverAttendence::class => [
+            'photo_in' => ['type' => 'string', 'folder' => 'absen/photo_in'],
+            'photo_out' => ['type' => 'string', 'folder' => 'absen/photo_out'],
+        ],
+
+        
     ];
 
     public function handle()
@@ -42,8 +67,12 @@ class CleanUnusedImages extends Command
             $this->info("\nMemproses model: " . class_basename($modelClass));
 
             // Proses setiap field foto dalam model
-            foreach ($fields as $field => $type) {
-                $deletedCount = $this->cleanupFieldFiles($modelClass, $field, $type);
+            foreach ($fields as $field => $config) {
+                $type   = $config['type'];
+                // Jika 'folder' tidak didefinisikan, gunakan nama field sebagai nama folder
+                $folder = $config['folder'] ?? $field;
+
+                $deletedCount = $this->cleanupFieldFiles($modelClass, $field, $type, $folder);
                 $totalDeleted += $deletedCount;
             }
         }
@@ -52,21 +81,26 @@ class CleanUnusedImages extends Command
     }
 
     /**
-     * Membersihkan file tidak terpakai untuk satu field
+     * Membersihkan file tidak terpakai untuk satu field.
+     *
+     * @param string $modelClass  Nama class model
+     * @param string $field       Nama kolom di database
+     * @param string $type        Tipe data: 'string' atau 'array'
+     * @param string $folder      Nama folder di storage (bisa berbeda dengan $field)
      */
-    private function cleanupFieldFiles(string $modelClass, string $field, string $type): int
+    private function cleanupFieldFiles(string $modelClass, string $field, string $type, string $folder): int
     {
-        $this->info("\nMemeriksa field: {$field}");
+        $this->info("\nMemeriksa field: {$field} (folder: {$folder})");
 
-        // 1. Dapatkan semua file dari storage
-        $allFiles = Storage::disk('public')->files($field);
+        // 1. Dapatkan semua file dari storage berdasarkan nama FOLDER
+        $allFiles = Storage::disk('public')->files($folder);
         if (empty($allFiles)) {
-            $this->info("Tidak ada file di folder {$field}");
+            $this->info("Tidak ada file di folder {$folder}");
             return 0;
         }
         $this->info("Ditemukan " . count($allFiles) . " file di storage");
 
-        // 2. Dapatkan file yang digunakan dari database
+        // 2. Dapatkan file yang digunakan dari database berdasarkan nama FIELD
         $usedFiles = [];
         $records = $modelClass::whereNotNull($field)->get([$field]);
 
@@ -101,9 +135,9 @@ class CleanUnusedImages extends Command
         }
 
         if ($deletedCount > 0) {
-            $this->info("Berhasil menghapus {$deletedCount} file tidak terpakai dari {$field}");
+            $this->info("Berhasil menghapus {$deletedCount} file tidak terpakai dari folder {$folder}");
         } else {
-            $this->info("Tidak ada file yang perlu dihapus di {$field}");
+            $this->info("Tidak ada file yang perlu dihapus di folder {$folder}");
         }
 
         return $deletedCount;

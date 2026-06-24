@@ -22,6 +22,8 @@ class ProjectDriverManagementResource extends Resource
 
     protected static ?string $navigationLabel = 'Project Driver';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Project Management';
+
     protected static ?string $pluralLabel = 'Project Driver';
 
     protected static ?string $slug = 'project-drivers';

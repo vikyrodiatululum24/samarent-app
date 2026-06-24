@@ -37,4 +37,9 @@ class Project extends Model
     {
         return $this->hasMany(Driver::class);
     }
+
+    public function groupSignatures()
+    {
+        return $this->hasMany(GroupSignatures::class);
+    }
 }

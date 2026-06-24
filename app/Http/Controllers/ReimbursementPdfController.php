@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ReimbursementExport;
+use App\Exports\MonitoringReimbursementExport;
 use App\Models\Reimbursement;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -9,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReimbursementPdfController extends Controller
 {
@@ -38,15 +41,13 @@ class ReimbursementPdfController extends Controller
                 // Jika tidak ada filter tanggal, batasi ke 30 hari terakhir
                 $dari = now()->subDays(31)->toDateString();
                 $sampai = now()->toDateString();
-                $query->whereDate('created_at', '>=', $dari)
-                    ->whereDate('created_at', '<=', $sampai);
+                $query->whereDate('created_at', '>=', $dari)->whereDate('created_at', '<=', $sampai);
             }
         }
 
-        $reimbursements = $query->orderBy('created_at', 'desc')->get();
+        $reimbursements = $query->orderBy('created_at', 'asc')->get();
         $user = Auth::user();
-        $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))
-            ->setPaper('a4', 'portrait');
+        $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))->setPaper('a4', 'portrait');
 
         $filename = 'Laporan_Reimbursement_' . $user->name . '_' . now()->format('YmdHis') . '.pdf';
 
@@ -64,28 +65,27 @@ class ReimbursementPdfController extends Controller
                 'ids' => $request->get('ids'),
             ];
 
-            $signedUrl = URL::temporarySignedRoute(
-                'driver.reimbursement.print-pdf',
-                now()->addMinutes(5),
-                $params
-            );
+            $signedUrl = URL::temporarySignedRoute('driver.reimbursement.print-pdf', now()->addMinutes(5), $params);
 
             return response()->json([
                 'success' => true,
                 'url' => $signedUrl,
                 'message' => 'Print URL generated successfully',
-                'expires_at' => '5 minutes'
+                'expires_at' => '5 minutes',
             ]);
         } catch (\Exception $e) {
             Log::error('Error generating print URL for reimbursement PDF', [
                 'user_id' => Auth::id(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Error generating print URL'
-            ], 500);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error generating print URL',
+                ],
+                500,
+            );
         }
     }
 
@@ -113,29 +113,17 @@ class ReimbursementPdfController extends Controller
 
             if ($request->query('ids')) {
                 $ids = explode(',', $request->query('ids'));
-                $reimbursements = Reimbursement::where('user_id', $userId)
-                    ->whereIn('id', $ids)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+                $reimbursements = Reimbursement::where('user_id', $userId)->whereIn('id', $ids)->orderBy('created_at', 'asc')->get();
+            } elseif ($dari && $sampai) {
+                $reimbursements = Reimbursement::where('user_id', $userId)->whereDate('created_at', '>=', $dari)->whereDate('created_at', '<=', $sampai)->orderBy('created_at', 'asc')->get();
             } else {
-                $dari = $request->get('start_date');
-                $sampai = $request->get('end_date');
-
-
-                if (!$dari && !$sampai) {
-                    // Jika tidak ada filter tanggal, batasi ke 31 hari terakhir
-                    $dari = now()->subDays(31)->toDateString();
-                    $sampai = now()->toDateString();
-                    $reimbursements = Reimbursement::where('user_id', $userId)
-                        ->whereDate('created_at', '>=', $dari)
-                        ->whereDate('created_at', '<=', $sampai)
-                        ->orderBy('created_at', 'desc')
-                        ->get();
-                }
+                // Jika tidak ada filter tanggal, batasi ke 31 hari terakhir
+                $dari = now()->subDays(31)->toDateString();
+                $sampai = now()->toDateString();
+                $reimbursements = Reimbursement::where('user_id', $userId)->whereDate('created_at', '>=', $dari)->whereDate('created_at', '<=', $sampai)->orderBy('created_at', 'asc')->get();
             }
 
-            $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))
-                ->setPaper('a4', 'portrait');
+            $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))->setPaper('a4', 'portrait');
 
             $filename = 'Laporan_Reimbursement_' . $user->name . '_' . now()->format('YmdHis') . '.pdf';
 
@@ -144,13 +132,16 @@ class ReimbursementPdfController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in driver reimbursement print: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
-                'parameters' => $request->all()
+                'parameters' => $request->all(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Error generating reimbursement PDF'
-            ], 500);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error generating reimbursement PDF',
+                ],
+                500,
+            );
         }
     }
 
@@ -174,25 +165,18 @@ class ReimbursementPdfController extends Controller
 
             if ($request->query('ids')) {
                 $ids = explode(',', $request->query('ids'));
-                $reimbursements = Reimbursement::where('user_id', $userId)
-                    ->whereIn('id', $ids)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+                $reimbursements = Reimbursement::where('user_id', $userId)->whereIn('id', $ids)->orderBy('created_at', 'asc')->get();
 
                 $dari = $reimbursements->min('created_at');
                 $sampai = $reimbursements->max('created_at');
             } else {
                 $reimbursements = Reimbursement::where('user_id', $userId)
-                    ->whereBetween('created_at', [
-                        $dari . ' 00:00:00',
-                        $sampai . ' 23:59:59'
-                    ])
-                    ->orderBy('created_at', 'desc')
+                    ->whereBetween('created_at', [$dari . ' 00:00:00', $sampai . ' 23:59:59'])
+                    ->orderBy('created_at', 'asc')
                     ->get();
             }
 
-            $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))
-                ->setPaper('a4', 'portrait');
+            $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))->setPaper('a4', 'portrait');
 
             $filename = 'Laporan_Reimbursement_' . $user->name . '_' . now()->format('YmdHis') . '.pdf';
 
@@ -201,13 +185,141 @@ class ReimbursementPdfController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in manager reimbursement print: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
-                'parameters' => $request->all()
+                'parameters' => $request->all(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Error generating reimbursement PDF'
-            ], 500);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error generating reimbursement PDF',
+                ],
+                500,
+            );
+        }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        try {
+            $userId = Auth::user()->id;
+
+            if (!$userId) {
+                abort(400, 'Missing user_id parameter');
+            }
+
+            $user = User::find($userId);
+
+            if (!$user) {
+                abort(404, 'User not found');
+            }
+            
+            if ($request->query('ids')) {
+                $ids = explode(',', $request->query('ids'));
+                $reimbursements = Reimbursement::where('user_id', $userId)->whereIn('id', $ids)->orderBy('created_at', 'asc')->get();
+                
+                $dari = $reimbursements->min('created_at');
+                $sampai = $reimbursements->max('created_at');
+            } else {
+                $dari = $request->get('dari');
+                $sampai = $request->get('sampai');
+                $reimbursements = Reimbursement::where('user_id', $userId)
+                    ->whereBetween('created_at', [$dari . ' 00:00:00', $sampai . ' 23:59:59'])
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+            }
+
+            $filename = 'Laporan_Reimbursement_' . $user->name . '_' . now()->format('YmdHis') . '.xlsx';
+
+            return Excel::download(new ReimbursementExport($reimbursements, $dari, $sampai, $user), $filename);
+        } catch (\Exception $e) {
+            Log::error('Error in manager reimbursement export: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'parameters' => $request->all(),
+            ]);
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error generating reimbursement Excel',
+                ],
+                500,
+            );
+        }
+    }
+
+    public function MonitoringReimbursementPrint(Request $request)
+    {
+        try {
+            $dari = $request->get('dari');
+            $sampai = $request->get('sampai');
+
+            if ($request->query('ids')) {
+                $ids = explode(',', $request->query('ids'));
+                $reimbursements = Reimbursement::whereIn('id', $ids)->orderBy('created_at', 'asc')->get();
+
+                $dari = $reimbursements->min('created_at');
+                $sampai = $reimbursements->max('created_at');
+            } else {
+                $reimbursements = Reimbursement::whereBetween('created_at', [$dari . ' 00:00:00', $sampai . ' 23:59:59'])
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+            }
+
+            $pdf = PDF::loadView('pdf.monitoring-reimbursement', compact('reimbursements', 'dari', 'sampai'))->setPaper('a4', 'portrait');
+
+            $filename = 'Laporan_Monitoring_Reimbursement_' . now()->format('YmdHis') . '.pdf';
+
+            // Stream PDF to browser (display inline)
+            return $pdf->stream($filename);
+        } catch (\Exception $e) {
+            Log::error('Error in monitoring reimbursement print: ' . $e->getMessage(), [
+                'parameters' => $request->all(),
+            ]);
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error generating monitoring reimbursement PDF',
+                ],
+                500,
+            );
+        }
+    }
+
+    public function MonitoringReimbursementExportExcel(Request $request)
+    {
+        try {
+            $dari = $request->get('dari');
+            $sampai = $request->get('sampai');
+
+            if ($request->query('ids')) {
+                $ids = explode(',', $request->query('ids'));
+                $reimbursements = Reimbursement::whereIn('id', $ids)->orderBy('created_at', 'asc')->get();
+
+                $dari = $reimbursements->min('created_at');
+                $sampai = $reimbursements->max('created_at');
+            } else {
+                $reimbursements = Reimbursement::whereBetween('created_at', [$dari . ' 00:00:00', $sampai . ' 23:59:59'])
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+            }
+
+            $filename = 'Laporan_Monitoring_Reimbursement_' . now()->format('YmdHis') . '.xlsx';
+
+            return Excel::download(new MonitoringReimbursementExport($reimbursements), $filename);
+        } catch (\Exception $e) {
+            Log::error('Error in monitoring reimbursement export: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'parameters' => $request->all(),
+            ]);
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Error generating reimbursement Excel',
+                ],
+                500,
+            );
         }
     }
 }

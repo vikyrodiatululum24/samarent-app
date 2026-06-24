@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\ReimbursementMonitorResource\Pages;
 use App\Models\Reimbursement;
 use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
@@ -145,15 +146,27 @@ class ReimbursementMonitorResource extends Resource
                 ViewAction::make(),
             ])
             ->bulkActions([
-                BulkAction::make('export')
-                    ->label('Export Selected')
-                    ->icon('heroicon-o-printer')
-                    ->color('success')
-                    ->action(function (Collection $records) {
+                BulkActionGroup::make([
+                    BulkAction::make('print_pdf')
+                        ->label('Cetak PDF')
+                        ->icon('heroicon-o-printer')
+                        ->color('success')
+                        ->action(function (Collection $records) {
                         $ids = $records->pluck('id')->toArray();
-                        return redirect()->route('reimbursement.print-pdf', ['ids' => implode(',', $ids)]);
+                        return redirect()->route('reimbursement.monitoring-print-pdf', ['ids' => implode(',', $ids)]);
                     })
                     ->openUrlInNewTab(),
+
+                    BulkAction::make('export_excel')
+                        ->label('Export Excel')
+                        ->icon('heroicon-o-document-text')
+                        ->color('success')
+                        ->action(function (Collection $records) {
+                        $ids = $records->pluck('id')->toArray();
+                        return redirect()->route('reimbursement.monitoring-export-excel', ['ids' => implode(',', $ids)]);
+                    })
+                    ->openUrlInNewTab(),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

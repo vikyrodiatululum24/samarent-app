@@ -18,6 +18,8 @@ class EndUserResource extends Resource
     protected static ?string $model = EndUser::class;
 
     protected static ?string $pluralModelLabel = 'End User';
+    
+    protected static string|\UnitEnum|null $navigationGroup = 'Project Management';
 
     public static function form(Schema $schema): Schema
     {

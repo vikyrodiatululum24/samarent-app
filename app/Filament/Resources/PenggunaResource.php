@@ -104,7 +104,7 @@ class PenggunaResource extends Resource
                 EditAction::make(),
                 Action::make('manager')
                     ->icon('heroicon-o-cog')
-                    ->label('')
+                    ->label('Set Project')
                     ->visible(fn($record) => $record->role === 'manager')
                     ->modalHeading('Isi Form Manager')
                     ->modalSubmitActionLabel('Simpan')
@@ -124,6 +124,7 @@ class PenggunaResource extends Resource
                                     'CUST JEPANG' => 'CUST JEPANG',
                                     'manual' => 'Lainnya',
                                 ])
+                                ->multiple()
                                 ->reactive()
                                 ->afterStateUpdated(fn(Set $set, $state) => $set('up_lainnya', $state === 'manual' ? '' : null))
                                 ->default($manager?->up),

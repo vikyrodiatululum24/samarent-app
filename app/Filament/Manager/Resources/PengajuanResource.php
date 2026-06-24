@@ -98,6 +98,7 @@ class PengajuanResource extends Resource
                         };
                     }),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 SelectFilter::make('keterangan_proses')
                     ->label('Status Proses')

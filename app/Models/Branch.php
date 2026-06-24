@@ -30,4 +30,9 @@ class Branch extends Model
     {
         return $this->hasMany(SetSalary::class);
     }
+
+    public function groupSignatures()
+    {
+        return $this->hasMany(GroupSignatures::class);
+    }
 }
