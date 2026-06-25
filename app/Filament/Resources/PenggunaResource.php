@@ -75,8 +75,9 @@ class PenggunaResource extends Resource
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('email')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('role')->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime('d/m/Y H:i')
+                Tables\Columns\TextColumn::make('manager.perusahaan')->label('Perusahaan')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('manager.up')->label('Unit Pelaksana')->searchable()
+                    ->badge()
                     ->sortable(),
             ])
             ->filters([

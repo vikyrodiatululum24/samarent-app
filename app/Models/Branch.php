@@ -33,6 +33,6 @@ class Branch extends Model
 
     public function groupSignatures()
     {
-        return $this->hasMany(GroupSignatures::class);
+        return $this->hasMany(GroupSignature::class);
     }
 }

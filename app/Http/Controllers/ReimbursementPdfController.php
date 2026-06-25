@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Exports\ReimbursementExport;
 use App\Exports\MonitoringReimbursementExport;
+use App\Models\Driver;
+use App\Models\GroupSignature;
 use App\Models\Reimbursement;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -98,6 +100,13 @@ class ReimbursementPdfController extends Controller
 
             $userId = $request->query('user_id');
 
+            $driver = Driver::where('user_id', $userId)->first();
+            $project = $driver->project_id;
+            $branch = $driver->branch_id;
+            $group_signature = GroupSignature::with([
+                'rule_signatures.signatures',
+            ])->where('branch_id', $branch)->where('project_id', $project)->first();
+
             if (!$userId) {
                 abort(400, 'Missing user_id parameter');
             }
@@ -123,7 +132,7 @@ class ReimbursementPdfController extends Controller
                 $reimbursements = Reimbursement::where('user_id', $userId)->whereDate('created_at', '>=', $dari)->whereDate('created_at', '<=', $sampai)->orderBy('created_at', 'asc')->get();
             }
 
-            $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))->setPaper('a4', 'portrait');
+            $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai', 'group_signature'))->setPaper('a4', 'portrait');
 
             $filename = 'Laporan_Reimbursement_' . $user->name . '_' . now()->format('YmdHis') . '.pdf';
 
@@ -149,6 +158,12 @@ class ReimbursementPdfController extends Controller
     {
         try {
             $userId = $request->query('user_id');
+            $driver = Driver::where('user_id', $userId)->first();
+            $project = $driver->project_id;
+            $branch = $driver->branch_id;
+            $group_signature = GroupSignature::with([
+                'rule_signatures.signatures',
+            ])->where('branch_id', $branch)->where('project_id', $project)->first();
 
             if (!$userId) {
                 abort(400, 'Missing user_id parameter');
@@ -176,7 +191,7 @@ class ReimbursementPdfController extends Controller
                     ->get();
             }
 
-            $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))->setPaper('a4', 'portrait');
+            $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai', 'group_signature'))->setPaper('a4', 'portrait');
 
             $filename = 'Laporan_Reimbursement_' . $user->name . '_' . now()->format('YmdHis') . '.pdf';
 

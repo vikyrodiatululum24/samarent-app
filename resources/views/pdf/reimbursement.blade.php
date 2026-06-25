@@ -127,7 +127,8 @@
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                 <tr>
                     <th style="width: 20%; text-align: center;">
-                        <img src="{{ public_path('images/logo_spj_samarent.jpg') }}" alt="logo samarent" style="width: 150px;">
+                        <img src="{{ public_path('images/logo_spj_samarent.jpg') }}" alt="logo samarent"
+                            style="width: 150px;">
                     </th>
                     <th style="width: 80%; text-align: center; position: relative;">
                         <div style="position: relative; text-align: center;">
@@ -249,47 +250,176 @@
             </div>
         @endif
 
-        <div class="signature">
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                <tr>
-                    <th style="border: 1px solid #ddd; padding : 0.5rem; width: 20%;">Diajukan</th>
-                    <th style="border: 1px solid #ddd; padding : 0.5rem; width: 20%;">Disetujui</th>
-                    <th style="border: 1px solid #ddd; padding : 0.5rem; width: 20%;">Diketahui</th>
-                    <th style="border: 1px solid #ddd; padding : 0.5rem; width: 20%;">Diterima</th>
-                </tr>
-                <tr>
-                    <td style="height: 78px; border: 1px solid #ddd; text-align: center; vertical-align: middle;">
-                        &nbsp;
-                    </td>
-                    <td
-                        style="height: 70px; font-size: 12px; border: 1px solid #ddd; text-align: center; vertical-align: middle;">
-                        &nbsp;
-                    </td>
-                    <td
-                        style="height: 70px; font-size: 12px; border: 1px solid #ddd; text-align: center; vertical-align: middle;">
-                        &nbsp;
-                    </td>
-                    <td
-                        style="height: 70px; font-size: 12px; border: 1px solid #ddd; text-align: center; vertical-align: middle;">
-                        &nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td
-                        style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
-                        {{ $user->name }}</td>
-                    <td
-                        style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
-                        &nbsp;</td>
-                    <td
-                        style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
-                        &nbsp;</td>
-                    <td
-                        style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
-                        &nbsp;</td>
-                </tr>
-            </table>
-        </div>
+        @if (!empty($group_signature->rule_signatures))
+            @php
+                // Hitung total kolom (total semua signatures di semua rule)
+                $totalCols = $group_signature->rule_signatures->sum(fn($r) => $r->signatures->count());
+                $colWidth = $totalCols > 0 ? round(100 / $totalCols, 4) : 25;
+            @endphp
+            @if ($group_signature->project_id == 2 && $group_signature->branch->name !== 'HO')
+                <div class="signature">
+                    <table style="width: 70%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; margin-left: auto; margin-right: auto;">
+                        {{-- Paksa lebar kolom sama rata --}}
+                        
+                        <tr>
+                            <td colspan="3"
+                                style="border: 1px solid #ddd; padding: 0.5rem; text-align: center; font-size: 12px;">
+                                HEAD OFFICE</td>
+                        </tr>
+
+                        {{-- Row 1: Header tiap rule (colspan = jumlah signatures di rule itu) --}}
+                        <tr>
+                            <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: center;">Approved By</th>
+                            <th colspan="2" style="border: 1px solid #ddd; padding: 0.5rem; text-align: center;">
+                                Checked By</th>
+                        </tr>
+
+                        {{-- Row 2: Jabatan --}}
+                        <tr>
+                            <td style="text-transform: capitalize; font-size: 11px; border: 1px solid #ddd; padding: 0.5rem; text-align: center;">Direktur</td>
+                            <td style="text-transform: capitalize; font-size: 11px; border: 1px solid #ddd; padding: 0.5rem; text-align: center;">Finance</td>
+                            <td style="text-transform: capitalize; font-size: 11px; border: 1px solid #ddd; padding: 0.5rem; text-align: center;">GA</td>
+                        </tr>
+
+                        {{-- Row 3: Gambar TTD --}}
+                        <tr>
+                            <td style="height: 70px; border: 1px solid #ddd; padding: 0.5rem; text-align: center;">
+                                &nbsp;</td>
+                            <td style="height: 70px; border: 1px solid #ddd; padding: 0.5rem; text-align: center;">
+                                &nbsp;</td>
+                            <td style="height: 70px; border: 1px solid #ddd; padding: 0.5rem; text-align: center;">
+                                &nbsp;</td>
+                        </tr>
+
+                        {{-- Row 4: Nama --}}
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 0.5rem; text-align: left;">Name :</td>
+                            <td style="border: 1px solid #ddd; padding: 0.5rem; text-align: left;">Name :</td>
+                            <td style="border: 1px solid #ddd; padding: 0.5rem; text-align: left;">Name :</td>
+                        </tr>
+                    </table>
+                </div>
+            @endif
+            <div class="signature">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed;">
+                    {{-- Paksa lebar kolom sama rata --}}
+                    <colgroup>
+                        @for ($i = 0; $i < $totalCols; $i++)
+                            <col style="width: {{ $colWidth }}%;">
+                        @endfor
+                    </colgroup>
+
+                    @if($group_signature->project_id == 2 && $group_signature->branch->name !== 'HO')
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 0.5rem; text-align: center;"
+                            colspan="{{ $totalCols }}">
+                            SITE
+                        </td>
+                    </tr>
+                    @endif
+
+                    {{-- Row 1: Header tiap rule (colspan = jumlah signatures di rule itu) --}}
+                    <tr>
+                        @foreach ($group_signature->rule_signatures as $rule_signature)
+                            <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: center; font-size: 12px;"
+                                colspan="{{ $rule_signature->signatures->count() }}" rowspan="{{ $rule_signature->signatures->first()->jabatan == '-' ? '2' : '1' }}" >
+                                {{ $rule_signature->rules }}
+                            </th>
+                        @endforeach
+                    </tr>
+
+                    {{-- Row 2: Jabatan --}}
+                    <tr>
+                        @foreach ($group_signature->rule_signatures as $rule_signature)
+                            @foreach ($rule_signature->signatures as $signature)
+                                @if ($signature->jabatan !== '-')
+                                <td
+                                    style="padding: 0.5rem; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize; font-size: 11px;">
+                                    {{ $signature->jabatan }}
+                                </td>
+                                @endif
+                            @endforeach
+                        @endforeach
+                    </tr>
+
+                    {{-- Row 3: Gambar TTD --}}
+                    <tr>
+                        @foreach ($group_signature->rule_signatures as $rule_signature)
+                            @foreach ($rule_signature->signatures as $signature)
+                                <td
+                                    style="height: 78px; border: 1px solid #ddd; text-align: center; vertical-align: middle;">
+                                    @if ($signature->ttd)
+                                        <img src="{{ public_path('storage/' . $signature->ttd) }}"
+                                            alt="{{ $signature->nama }}"
+                                            style="max-width: 90%; max-height: 70px; object-fit: contain;">
+                                    @else
+                                        &nbsp;
+                                    @endif
+                                </td>
+                            @endforeach
+                        @endforeach
+                    </tr>
+
+                    {{-- Row 4: Nama --}}
+                    <tr>
+                        @foreach ($group_signature->rule_signatures as $rule_signature)
+                            @foreach ($rule_signature->signatures as $signature)
+                                <td
+                                    style="padding: 0.5rem; border: 1px solid #ddd; text-align: left; padding-left: 0.5rem ; vertical-align: middle; text-transform: capitalize; font-size: 11px; overflow: hidden;">
+                                    @if ($signature->nama)
+                                        Name : {{ $signature->nama }}
+                                    @else
+                                        Name :
+                                    @endif
+                                </td>
+                            @endforeach
+                        @endforeach
+                    </tr>
+                </table>
+            </div>
+        @else
+            <div class="signature">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr>
+                        <th style="border: 1px solid #ddd; padding : 0.5rem; width: 20%;">Diajukan</th>
+                        <th style="border: 1px solid #ddd; padding : 0.5rem; width: 20%;">Disetujui</th>
+                        <th style="border: 1px solid #ddd; padding : 0.5rem; width: 20%;">Diketahui</th>
+                        <th style="border: 1px solid #ddd; padding : 0.5rem; width: 20%;">Diterima</th>
+                    </tr>
+                    <tr>
+                        <td style="height: 78px; border: 1px solid #ddd; text-align: center; vertical-align: middle;">
+                            &nbsp;
+                        </td>
+                        <td
+                            style="height: 70px; font-size: 12px; border: 1px solid #ddd; text-align: center; vertical-align: middle;">
+                            &nbsp;
+                        </td>
+                        <td
+                            style="height: 70px; font-size: 12px; border: 1px solid #ddd; text-align: center; vertical-align: middle;">
+                            &nbsp;
+                        </td>
+                        <td
+                            style="height: 70px; font-size: 12px; border: 1px solid #ddd; text-align: center; vertical-align: middle;">
+                            &nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td
+                            style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
+                            {{ $user->name }}</td>
+                        <td
+                            style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
+                            &nbsp;</td>
+                        <td
+                            style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
+                            &nbsp;</td>
+                        <td
+                            style="height: 38px; border: 1px solid #ddd; text-align: center; vertical-align: middle; text-transform: capitalize;">
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </div>
+        @endif
     </div>
     <div style="page-break-before: always;">
         <div class="header">
@@ -441,7 +571,8 @@
                         <tr>
                             @foreach ($row as $item)
                                 <td width="50%" style="border:1px solid #ddd; vertical-align:top;">
-                                    <div style="font-weight:bold; text-align:center; margin-bottom:10px; margin-top: 10px">
+                                    <div
+                                        style="font-weight:bold; text-align:center; margin-bottom:10px; margin-top: 10px">
                                         {{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d M Y') }}
                                     </div>
 

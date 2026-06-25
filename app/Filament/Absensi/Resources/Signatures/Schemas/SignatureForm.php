@@ -45,7 +45,6 @@ class SignatureForm
                             $set('branch_id', null);
                         }),
                         Select::make('branch_id')->required()->label('Branch')->options(fn(Get $get) => Branch::query()->when($get('project_id'), fn($query, $projectId) => $query->where('project_id', $projectId))->orderBy('name')->pluck('name', 'id'))->searchable()->disabled(fn(Get $get) => blank($get('project_id')))->live()->afterStateUpdated(fn(Set $set) => $set('division_id', null)),
-                        Toggle::make('is_active')->required(),
                 ])
                 ->columnSpanFull(),
             Section::make('Rule Signature')
@@ -57,17 +56,10 @@ class SignatureForm
                                 ->label('Rules')
                                 ->required()
                                 ->placeholder('Contoh: Approver 1'),
-                            TextInput::make('urutan')
-                                ->label('Urutan')
-                                ->required()
-                                ->numeric(),
-                            Toggle::make('is_active')
-                                ->label('Is Active')
-                                ->required(),
                         ])
                         ->label('Rule Signature')
                         ->required()
-                        ->columns(3)
+                        ->columns(1)
                         ->deleteAction(fn ($action) => $action->requiresConfirmation())
                         ->collapsible()
                         ->defaultItems(1),

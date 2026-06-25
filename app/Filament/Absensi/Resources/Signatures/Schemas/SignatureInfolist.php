@@ -32,7 +32,7 @@ class SignatureInfolist
                 ->columnSpanFull()
                 ->columns(2),
             Section::make('Info Signature')
-                ->schema([TextEntry::make('nama')->placeholder('-')->label('Jenis Laporan')->formatStateUsing(fn($state) => ucwords(strtolower($state))), IconEntry::make('is_active')->boolean()])
+                ->schema([TextEntry::make('nama')->placeholder('-')->label('Jenis Laporan')->formatStateUsing(fn($state) => ucwords(strtolower($state)))])
                 ->columns(2)
                 ->columnSpanFull(),
             Section::make('Authorization')
@@ -61,7 +61,6 @@ class SignatureInfolist
                                                     'jabatan' => $signature->jabatan,
                                                     'nip' => $signature->nip,
                                                     'ttd' => $signature->ttd ? [$signature->ttd] : [],
-                                                    'is_active' => $signature->is_active,
                                                 ],
                                             )
                                             ->toArray() ?? [],
@@ -71,7 +70,7 @@ class SignatureInfolist
                             Repeater::make('signatures')
                                 ->schema([
                                     Hidden::make('id'),
-                                    TextInput::make('nama')->required(),
+                                    TextInput::make('nama'),
                                     TextInput::make('jabatan'),
                                     TextInput::make('nip'),
                                     FileUpload::make('ttd')
@@ -84,7 +83,6 @@ class SignatureInfolist
                                         ->optimize('webp')
                                         ->maxSize(2048)
                                         ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/jpg', 'image/svg']),
-                                    Toggle::make('is_active'),
                                 ])
                                 ->reorderable(false),
                         ])
@@ -107,7 +105,7 @@ class SignatureInfolist
                                 );
 
                                 // if image change delete old image
-                                if ($signature['id'] && $signature['ttd'] !== $oldSignature->ttd) {
+                                if ($signature['id'] && $signature['ttd'] !== $oldSignature->ttd && $oldSignature->ttd !== null) {
                                     Storage::disk('public')->delete($oldSignature->ttd);
                                 }
 

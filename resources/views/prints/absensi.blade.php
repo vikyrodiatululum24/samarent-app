@@ -164,10 +164,10 @@
         </table>
 
         <div class="footer" style="font-size: 10px;">
-            <p>Dicetak pada: {{ now()->format('d-m-Y H:i:s') }}</p>
+            <p><span style="font-weight: bold; color:red">*</span>Timesite ini sudah di approved by sistem oleh user / PIC PT Kajima Indonesia.</p>
         </div>
 
-        <div style="margin-top: 30px;">
+        {{-- <div style="margin-top: 30px;">
             <table style="width: 70%; margin: 0 auto;" class="table">
                 <thead>
                     <tr>
@@ -210,7 +210,7 @@
                 </tfoot>
 
             </table>
-        </div>
+        </div> --}}
     </div>
 
     {{-- halaman baru untuk dokumentasi photo absensi --}}

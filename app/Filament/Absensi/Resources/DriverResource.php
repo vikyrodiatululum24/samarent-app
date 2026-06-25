@@ -270,7 +270,15 @@ class DriverResource extends Resource
                 Tables\Columns\TextColumn::make('project.name')
                     ->searchable()
                     ->label('Penempatan')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('branch.name')
+                    ->searchable()
+                    ->label('Branch')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('division.name')
+                    ->searchable()
+                    ->label('Divisi')
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('pic')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')

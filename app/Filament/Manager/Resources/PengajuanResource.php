@@ -72,6 +72,7 @@ class PengajuanResource extends Resource
                     }),
 
                 Tables\Columns\TextColumn::make('project')->sortable()->searchable(),
+                // Tables\Columns\TextColumn::make('up')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('keterangan_proses')
                     ->label('Status Proses')
                     ->sortable()
@@ -161,7 +162,8 @@ class PengajuanResource extends Resource
         }
 
         // Ambil UP dan project yang dimiliki user (manager)
-        $ups = array_filter([$manager->up]);
+        // $manager->up is already an array (JSON cast), use it directly to avoid nested array
+        $ups = array_filter(is_array($manager->up) ? $manager->up : [$manager->up]);
         $projects = array_filter([$manager->perusahaan]);
 
         $query = parent::getEloquentQuery();
@@ -176,6 +178,10 @@ class PengajuanResource extends Resource
         } else {
             // Tidak punya keduanya, kembalikan query kosong
             $query->whereRaw('1 = 0');
+        }
+
+        if (in_array("PT PIJAR LAJU NUSANTARA ELECTRICITY SERVICES", $projects)) {
+            $query->where('created_at', '>', '2026-06-01');
         }
 
         return $query;

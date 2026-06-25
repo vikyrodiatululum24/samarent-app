@@ -27,8 +27,6 @@ class SignaturesTable
                     ->searchable()
                     ->label('Jenis Laporan')
                     ->formatStateUsing(fn($state) => ucwords(strtolower($state))),
-                IconColumn::make('is_active')
-                    ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
