@@ -186,7 +186,8 @@ class ReimbursementPdfController extends Controller
                 $sampai = $reimbursements->max('created_at');
             } else {
                 $reimbursements = Reimbursement::where('user_id', $userId)
-                    ->whereBetween('created_at', [$dari . ' 00:00:00', $sampai . ' 23:59:59'])
+                    ->whereDate('created_at', '>=', $dari)
+                    ->whereDate('created_at', '<=', $sampai)
                     ->orderBy('created_at', 'asc')
                     ->get();
             }
@@ -238,7 +239,8 @@ class ReimbursementPdfController extends Controller
                 $dari = $request->get('dari');
                 $sampai = $request->get('sampai');
                 $reimbursements = Reimbursement::where('user_id', $userId)
-                    ->whereBetween('created_at', [$dari . ' 00:00:00', $sampai . ' 23:59:59'])
+                    ->whereDate('created_at', '>=', $dari)
+                    ->whereDate('created_at', '<=', $sampai)
                     ->orderBy('created_at', 'asc')
                     ->get();
             }
@@ -275,7 +277,8 @@ class ReimbursementPdfController extends Controller
                 $dari = $reimbursements->min('created_at');
                 $sampai = $reimbursements->max('created_at');
             } else {
-                $reimbursements = Reimbursement::whereBetween('created_at', [$dari . ' 00:00:00', $sampai . ' 23:59:59'])
+                $reimbursements = Reimbursement::whereDate('created_at', '>=', $dari)
+                    ->whereDate('created_at', '<=', $sampai)
                     ->orderBy('created_at', 'asc')
                     ->get();
             }
@@ -314,7 +317,8 @@ class ReimbursementPdfController extends Controller
                 $dari = $reimbursements->min('created_at');
                 $sampai = $reimbursements->max('created_at');
             } else {
-                $reimbursements = Reimbursement::whereBetween('created_at', [$dari . ' 00:00:00', $sampai . ' 23:59:59'])
+                $reimbursements = Reimbursement::whereDate('created_at', '>=', $dari)
+                    ->whereDate('created_at', '<=', $sampai)
                     ->orderBy('created_at', 'asc')
                     ->get();
             }
