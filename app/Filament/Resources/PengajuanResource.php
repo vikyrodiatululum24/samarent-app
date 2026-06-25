@@ -72,9 +72,9 @@ class PengajuanResource extends Resource
                                             Forms\Components\TextInput::make('no_wa')
                                                 ->label('No. WhatsApp')
                                                 ->inputMode('numeric')
-                                                ->rules(['regex:/^\d{10,15}$/'])
+                                                ->rules(['regex:/^[0-9]$/'])
                                                 ->validationMessages([
-                                                    'regex' => 'No. WhatsApp harus berupa angka dan memiliki panjang antara 10 hingga 15 digit.',
+                                                    'regex' => 'No. WhatsApp harus berupa angka.',
                                                 ])
                                                 ->maxLength(255),
                                         ]),
