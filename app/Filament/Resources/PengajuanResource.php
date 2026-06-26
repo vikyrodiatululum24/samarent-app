@@ -72,9 +72,13 @@ class PengajuanResource extends Resource
                                             Forms\Components\TextInput::make('no_wa')
                                                 ->label('No. WhatsApp')
                                                 ->inputMode('numeric')
-                                                ->rules(['regex:/^[0-9]$/'])
+                                                ->rules([
+                                                    'nullable',
+                                                    'string',
+                                                    'regex:/^\d{10,15}$/',
+                                                ])
                                                 ->validationMessages([
-                                                    'regex' => 'No. WhatsApp harus berupa angka.',
+                                                    'regex' => 'No. WhatsApp harus berupa angka dan memiliki panjang antara 10 hingga 15 digit.',
                                                 ])
                                                 ->maxLength(255),
                                         ]),
@@ -804,8 +808,8 @@ class PengajuanResource extends Resource
                                     ->formatStateUsing(fn($state) => $state !== null ? 'Rp ' . number_format($state, 0, ',', '.') : '-'),
                             ]),
                         Components\TextEntry::make('complete.tanggal_input_bank')
-                                    ->label('Tanggal Input Bank')
-                                    ->date(),
+                            ->label('Tanggal Input Bank')
+                            ->date(),
                         Grid::make(3)
                             ->schema([
                                 Components\TextEntry::make('complete.bank_2')
