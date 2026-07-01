@@ -12,7 +12,7 @@
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
-    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -109,6 +109,8 @@
             color: #1e40af;
             word-break: break-word;
         }
+
+
     </style>
 </head>
 
@@ -150,19 +152,19 @@
                     <div>
                         <label for="nama_pic" class="block text-sm font-medium text-slate-700 mb-1">Nama PIC</label>
                         <input type="text" name="nama_pic" id="nama_pic" value="{{ old('nama_pic') }}" required
-                            class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full p-2 rounded-lg border-1 border-gray-300 focus:outline-blue-500 focus:ouline-2">
                     </div>
 
                     <div>
                         <label for="no_wa" class="block text-sm font-medium text-slate-700 mb-1">No. WhatsApp</label>
                         <input type="text" name="no_wa" id="no_wa" value="{{ old('no_wa') }}" required
-                            class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full p-2 rounded-lg border-1 border-gray-300 focus:outline-blue-500 focus:ouline-2">
                     </div>
 
                     <div>
                         <label for="project" class="block text-sm font-medium text-slate-700 mb-1">Perusahaan</label>
                         <select name="project" id="project" required
-                            class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full p-2 rounded-lg border-1 border-gray-300 focus:outline-blue-500 focus:ouline-2">
                             <option value="">Pilih Perusahaan</option>
                             @foreach ($projects as $project)
                                 <option value="{{ $project->id }}"
@@ -177,7 +179,7 @@
                         <label for="up" class="block text-sm font-medium text-slate-700 mb-1">Unit
                             Pelaksana</label>
                         <select name="up" id="up" required
-                            class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full p-2 rounded-lg border-1 border-gray-300 focus:outline-blue-500 focus:ouline-2">
                             <option value="">Pilih Unit Pelaksana</option>
                             <option value="UP 1" {{ old('up') == 'UP 1' ? 'selected' : '' }}>UP 1</option>
                             <option value="UP 2" {{ old('up') == 'UP 2' ? 'selected' : '' }}>UP 2</option>
@@ -193,20 +195,20 @@
                         <label for="up_lainnya" class="block text-sm font-medium text-slate-700 mb-1">Unit Pelaksana
                             Lainnya</label>
                         <input type="text" name="up_lainnya" id="up_lainnya" value="{{ old('up_lainnya') }}"
-                            class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full p-2 rounded-lg border-1 border-gray-300 focus:outline-blue-500 focus:ouline-2">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="provinsi" class="block text-sm font-medium text-slate-700 mb-1">Provinsi</label>
                             <input type="text" name="provinsi" id="provinsi" value="{{ old('provinsi') }}" required
-                                class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                class="w-full p-2 rounded-lg border-1 border-gray-300 focus:outline-blue-500 focus:ouline-2">
                         </div>
 
                         <div>
                             <label for="kota" class="block text-sm font-medium text-slate-700 mb-1">Kota</label>
                             <input type="text" name="kota" id="kota" value="{{ old('kota') }}" required
-                                class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                class="w-full p-2 rounded-lg border-1 border-gray-300 focus:outline-blue-500 focus:ouline-2">
                         </div>
                     </div>
 
@@ -216,7 +218,7 @@
                     <div id="service-units-wrapper">
 
                         <!-- ITEM 1 -->
-                        <div class="service-unit-item border p-4 rounded-sm mb-3">
+                        <div class="service-unit-item border border-gray-300 p-4 rounded-sm mb-3">
 
                             <div class="mb-3">
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Unit</label>
@@ -234,7 +236,7 @@
                                 <label for="odometer"
                                     class="block text-sm font-medium text-slate-700 mb-1">Odometer</label>
                                 <input type="number" name="service_units[0][odometer]" id="odometer"
-                                    class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500" required>
+                                    class="w-full p-2 rounded-lg border-1 border-gray-300 focus:outline-blue-500 focus:ouline-2" required>
                             </div>
 
                             <div class="mb-3">
@@ -311,7 +313,7 @@
                             </label>
                             <div class="preview-foto-kondisi flex gap-2 flex-wrap mb-3"></div>
 
-                            <button type="button" class="remove-item text-red-500 text-sm">
+                            <button type="button" class="remove-item bg-red-500 text-white text-sm py-1 px-3 rounded">
                                 Hapus
                             </button>
                         </div>
@@ -440,7 +442,7 @@
                             <div class="mb-3">
                                 <label for="odometer" class="block text-sm font-medium text-slate-700 mb-1">Odometer</label>
                                 <input type="number" name="service_units[${index}][odometer]" id="odometer"
-                                    class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500" required>
+                                    class="w-full p-2 rounded-lg border-1 border-gray-300 focus:outline-blue-500 focus:ouline-2" required>
                             </div>
 
                             <div class="mb-3">
@@ -521,7 +523,7 @@
                                 <div class="preview-foto-kondisi flex gap-2 flex-wrap mb-3"></div>
                             </div>
 
-                            <button type="button" class="remove-item text-red-500 text-sm">
+                            <button type="button" class="remove-item bg-red-500 text-white text-sm py-1 px-3 rounded">
                                 Hapus
                             </button>
                         </div>`;

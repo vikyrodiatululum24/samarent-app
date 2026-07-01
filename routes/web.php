@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MekanikController;
 use App\Http\Controllers\PraPengajuanController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfileController;
@@ -48,6 +49,11 @@ Route::prefix('public')->name('public.')->group(function () {
     Route::get('/pra-pengajuan/create', [PublicPraPengajuanController::class, 'create'])->name('pra-pengajuan.create');
     Route::post('/pra-pengajuan/store', [PublicPraPengajuanController::class, 'store'])->middleware('throttle:10,1')->name('pra-pengajuan.store');
     Route::get('/pra-pengajuan/success', [PublicPraPengajuanController::class, 'success'])->name('pra-pengajuan.success');
+
+    Route::get('/mekanik-upload/create', [MekanikController::class, 'create'])->name('mekanik-upload.create');
+    Route::get('/mekanik-upload/{id}/pengajuan', [MekanikController::class, 'fetchPengajuan'])->name('mekanik-upload.pengajuan');
+    Route::post('/mekanik-upload/store', [MekanikController::class, 'store'])->middleware('throttle:10,1')->name('mekanik-upload.store');
+    Route::post('/mekanik-upload/{id}/update', [MekanikController::class, 'update'])->middleware('throttle:10,1')->name('mekanik-upload.update');
 });
 
 

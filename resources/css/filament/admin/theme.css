@@ -4,3 +4,6 @@
 @source '../../../../app/Filament/**/*.php';
 @source '../../../../resources/views/**/*.blade.php';
 @source '../../../../vendor/filament/**/*.blade.php';
+
+@import '../../../../vendor/saade/filament-fullcalendar/resources/css/filament-fullcalendar.css';
+@source '../../../../vendor/saade/filament-fullcalendar/resources/views/**/*.blade.php';

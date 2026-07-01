@@ -13,7 +13,7 @@
             style="max-width: 300px; max-height: 200px;" alt="Foto Bukti Transaksi">
     @endif
     <a href="{{ asset('storage/' . $getState()) }}" download
-        class="px-3 py-1 bg-blue-600 text-gray-800 dark:text-white text-sm rounded-sm hover:bg-blue-700 transition">
+        class="px-3 py-1 bg-blue-600 text-white text-sm rounded-sm hover:bg-blue-700 transition">
         Download
     </a>
 @else

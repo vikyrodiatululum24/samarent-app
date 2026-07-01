@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Penjualan\Pages;
+namespace App\Filament\Finance\Pages;
 
 use App\Filament\Widgets\CalendarWidget;
 use BackedEnum;
