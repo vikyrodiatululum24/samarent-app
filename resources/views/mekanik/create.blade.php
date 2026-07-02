@@ -169,6 +169,33 @@
 </head>
 
 <body class="bg-slate-100">
+    {{-- navbar --}}
+    <div class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="{{ asset('images/logo_samarent.png') }}" alt="Logo Samarent" class="h-10 w-auto">
+                <span class="text-lg font-semibold text-slate-800">Samarent</span>
+            </div>
+
+            {{-- tombol logout --}}
+            <form id="logout-form" action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 3H8C6.89543 3 6 3.89543 6 5V19C6 20.1046 6.89543 21 8 21H14" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M10 12H21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M18 9L21 12L18 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {{-- Form Section --}}
     <div class="min-h-screen py-8 px-4">
         <div class="max-w-3xl mx-auto">
             <div class="bg-white rounded-xl shadow-sm mb-6">
@@ -198,7 +225,7 @@
             @endif
 
             <div class="bg-white rounded-xl shadow-sm p-6">
-                <form id="mekanik-form" action="{{ route('public.mekanik-upload.store') }}" method="POST" class="space-y-5"
+                <form id="mekanik-form" action="{{ route('mekanik.store') }}" method="POST" class="space-y-5"
                     enctype="multipart/form-data">
                     @csrf
 
@@ -214,14 +241,6 @@
                                 </option>
                             @endforeach
                         </select>
-                    </div>
-
-                    <!-- SERVICE UNITS -->
-                    <h3 class="font-bold text-lg mb-2">Foto Nota</h3>
-                    <div id="complete-wrapper">
-                        <div class="border border-gray-300 rounded-lg p-4 mb-3 bg-slate-50">
-                            <p class="text-sm text-slate-500">Data nota akan tampil setelah No. SPK dipilih.</p>
-                        </div>
                     </div>
 
                     <h3 class="font-bold text-lg mb-2">Foto Unit Service</h3>
@@ -253,6 +272,27 @@
                     </div>
 
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-photo-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 px-4">
+        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold text-slate-800">Hapus foto?</h2>
+                <p class="mt-2 text-sm text-slate-600">
+                    Foto ini akan dihapus secara permanen dari daftar.
+                </p>
+            </div>
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" id="cancel-delete-photo"
+                    class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Batal
+                </button>
+                <button type="button" id="confirm-delete-photo"
+                    class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                    Hapus
+                </button>
             </div>
         </div>
     </div>
@@ -427,6 +467,55 @@
                 `;
             }
 
+            function renderUnitDetails(unit) {
+                const unitData = unit?.unit || {};
+                const details = [{
+                        label: 'Merk',
+                        value: unitData.merk
+                    },
+                    {
+                        label: 'Type',
+                        value: unitData.type
+                    },
+                    {
+                        label: 'Nopol',
+                        value: unitData.nopol
+                    },
+                ];
+
+                const hasAnyDetail = details.some((detail) => detail.value !== null && detail.value !== undefined &&
+                    detail.value !== '');
+
+                if (!hasAnyDetail) {
+                    return `
+                        <div class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Detail Unit</p>
+                            <p class="mt-2 text-sm text-slate-500">Detail unit tidak tersedia.</p>
+                        </div>
+                    `;
+                }
+
+                const items = details.map((detail) => {
+                    const value = detail.value === null || detail.value === undefined || detail.value ===
+                        '' ?
+                        '-' :
+                        escapeHtml(String(detail.value));
+
+                    return `
+                        <div>
+                            <span class="block text-xs font-medium uppercase tracking-wide text-slate-500">${escapeHtml(detail.label)}</span>
+                            <span class="block text-sm font-semibold text-slate-800">${value}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">${items}</div>
+                    </div>
+                `;
+            }
+
             function renderSelectedFilesPreview(input) {
                 let previewContainer = $(input).closest('.file-dropzone').find('.preview-selected');
 
@@ -489,11 +578,15 @@
                         if (!path || !fieldKey) return;
 
                         if (fieldKey === 'foto_kondisi') {
-                            item.prepend(`<input type="hidden" class="existing-inputs" name="service_units[${idx}][existing_foto_kondisi][]" value="${escapeHtml(path)}">`);
+                            item.prepend(
+                                `<input type="hidden" class="existing-inputs" name="service_units[${idx}][existing_foto_kondisi][]" value="${escapeHtml(path)}">`
+                                );
                         }
 
                         if (fieldKey === 'foto_tambahan') {
-                            item.prepend(`<input type="hidden" class="existing-inputs" name="service_units[${idx}][existing_foto_tambahan][]" value="${escapeHtml(path)}">`);
+                            item.prepend(
+                                `<input type="hidden" class="existing-inputs" name="service_units[${idx}][existing_foto_tambahan][]" value="${escapeHtml(path)}">`
+                                );
                         }
                     });
                 });
@@ -512,6 +605,18 @@
                 }
 
                 return true;
+            }
+
+            let deletePhotoTarget = null;
+
+            function openDeletePhotoModal(target) {
+                deletePhotoTarget = target;
+                $('#delete-photo-modal').removeClass('hidden').addClass('flex');
+            }
+
+            function closeDeletePhotoModal() {
+                deletePhotoTarget = null;
+                $('#delete-photo-modal').addClass('hidden').removeClass('flex');
             }
 
             function resetDynamicSections() {
@@ -543,9 +648,10 @@
                 let selectedId = $(this).val();
 
                 if (selectedId) {
-                    $('#mekanik-form').attr('action', `{{ route('public.mekanik-upload.update', ['id' => '__ID__']) }}`.replace('__ID__', selectedId));
+                    $('#mekanik-form').attr('action', `{{ route('mekanik.update', ['id' => '__ID__']) }}`
+                        .replace('__ID__', selectedId));
                 } else {
-                    $('#mekanik-form').attr('action', `{{ route('public.mekanik-upload.store') }}`);
+                    $('#mekanik-form').attr('action', `{{ route('mekanik.store') }}`);
                 }
 
                 if (!selectedId) {
@@ -554,44 +660,14 @@
                 }
 
                 $.ajax({
-                    url: `{{ route('public.mekanik-upload.pengajuan', ['id' => '__ID__']) }}`.replace('__ID__', selectedId),
+                    url: `{{ route('mekanik.pengajuan', ['id' => '__ID__']) }}`.replace('__ID__',
+                        selectedId),
                     method: 'GET',
                     success: function(response) {
                         let complete = response.complete;
                         let serviceUnits = response.service_units;
                         let completeHtml = '';
                         let html = '';
-
-                        if (complete) {
-                            completeHtml = `
-                                <div class="border border-gray-300 rounded-lg p-4 mb-3 bg-slate-50">
-                                    <input type="hidden" name="complete[id]" value="${complete.id}">
-                                    ${renderExistingFiles('Foto nota', complete.foto_nota, 'foto_nota')}
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Upload / Ganti Foto Nota</label>
-                                    <div class="file-dropzone">
-                                        <span class="dropzone-title">Klik atau seret file ke sini</span>
-                                        <span class="dropzone-subtitle">Format: JPG, PNG. Maksimal 5MB.</span>
-                                        <input type="file" name="complete[foto_nota][]" multiple accept=".jpg,.jpeg,.png" data-max-files="3">
-                                        <span class="dropzone-filename">Belum ada file dipilih</span>
-                                        <div class="preview-selected"></div>
-                                    </div>
-                                </div>
-                            `;
-                        } else {
-                            completeHtml = `
-                                <div class="border border-gray-300 rounded-lg p-4 mb-3 bg-slate-50">
-                                    <p class="text-sm text-slate-500 mb-3">Data complete belum tersedia untuk SPK ini.</p>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Upload Foto Nota</label>
-                                    <div class="file-dropzone">
-                                        <span class="dropzone-title">Klik atau seret file ke sini</span>
-                                        <span class="dropzone-subtitle">Format: JPG, PNG. Maksimal 5MB.</span>
-                                        <input type="file" name="complete[foto_nota][]" multiple accept=".jpg,.jpeg,.png" data-max-files="3">
-                                        <span class="dropzone-filename">Belum ada file dipilih</span>
-                                        <div class="preview-selected"></div>
-                                    </div>
-                                </div>
-                            `;
-                        }
 
                         $('#complete-wrapper').html(completeHtml);
 
@@ -600,6 +676,7 @@
                                 html += `
                                 <div class="service-unit-item border border-gray-300 p-4 rounded-sm mb-3">
                                     <input type="hidden" name="service_units[${idx}][id]" value="${unit.id}">
+                                    ${renderUnitDetails(unit)}
                                     <div class="grid gap-3 md:grid-cols-2">
                                         <div class="mb-3">
                                             ${renderExistingFiles('Foto unit', unit.foto_unit, 'foto_unit')}
@@ -684,7 +761,8 @@
                         bindDropzoneEvents();
                     },
                     error: function(xhr) {
-                        console.error('Fetch pengajuan error:', xhr);
+                        console.error('Fetch pengajuan error:', xhr.$responseJSON || xhr
+                            .responseText);
                         resetDynamicSections();
                         $('#service-units-wrapper').html(`
                             <div class="border border-red-300 bg-red-50 rounded-lg p-4 mb-3">
@@ -705,8 +783,29 @@
 
             $(document).on('click', '.remove-existing-photo', function(e) {
                 e.preventDefault();
-                $(this).closest('.preview-item').remove();
+
+                openDeletePhotoModal($(this).closest('.preview-item'));
+            });
+
+            $(document).on('click', '#cancel-delete-photo', function() {
+                closeDeletePhotoModal();
+            });
+
+            $(document).on('click', '#delete-photo-modal', function(e) {
+                if (e.target === this) {
+                    closeDeletePhotoModal();
+                }
+            });
+
+            $(document).on('click', '#confirm-delete-photo', function() {
+                if (!deletePhotoTarget || !deletePhotoTarget.length) {
+                    closeDeletePhotoModal();
+                    return;
+                }
+
+                deletePhotoTarget.remove();
                 hydrateExistingInputs();
+                closeDeletePhotoModal();
             });
 
             $(document).on('click', '.remove-selected-photo', function(e) {

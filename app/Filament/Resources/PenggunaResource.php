@@ -62,6 +62,7 @@ class PenggunaResource extends Resource
                         'admin_driver' => 'Admin Driver',
                         'admin_jual' => 'Admin Penjualan',
                         'president' => 'President',
+                        'mekanik' => 'Mekanik',
                     ])
                     ->required(),
             ]);

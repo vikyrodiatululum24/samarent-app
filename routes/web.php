@@ -31,6 +31,8 @@ Route::get('/', function () {
             return redirect('/penjualan');
         } else if ($user->role === 'president') {
             return redirect('/president');
+        } else if ($user->role === 'mekanik') {
+            return redirect('/mekanik/create');
         } else {
             abort(403, 'Unauthorized action.');
         }
@@ -56,11 +58,22 @@ Route::prefix('public')->name('public.')->group(function () {
     Route::post('/mekanik-upload/{id}/update', [MekanikController::class, 'update'])->middleware('throttle:10,1')->name('mekanik-upload.update');
 });
 
+Route::prefix('mekanik')->name('mekanik.')->middleware('auth')->group(function () {
+    Route::get('/create', [MekanikController::class, 'create'])->name('create');
+    Route::get('/{id}/pengajuan', [MekanikController::class, 'fetchPengajuan'])->name('pengajuan');
+    Route::post('/store', [MekanikController::class, 'store'])->middleware('throttle:10,1')->name('store');
+    Route::post('/{id}/update', [MekanikController::class, 'update'])->middleware('throttle:10,1')->name('update');
+});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::prefix('absensi')->name('absensi.')->middleware('auth')->group(function () {
+    Route::get('/sendNotification', [AbsensiController::class, 'sendNotificationByAdmin'])->name('sendNotificationByAdmin');
 });
 
 Route::middleware('auth')->group(function () {

@@ -306,6 +306,38 @@ class KehadiranDriverResource extends Resource
                             }
                         })
                         ->deselectRecordsAfterCompletion(),
+
+                    BulkAction::make('send_notification')
+                        ->label('Kirim Email Notifikasi')
+                        ->icon('heroicon-o-bell')
+                        ->color('primary')
+                        ->requiresConfirmation()
+                        ->modalHeading('Kirim Notifikasi')
+                        ->modalSubheading('Kirim notifikasi ke end user terkait absensi yang dipilih.')
+                        ->modalButton('Ya, Kirim')
+                        ->action(function (Collection $records): void {
+                            $controller = app(\App\Http\Controllers\AbsensiController::class);
+                            $ids = $records->pluck('id')->toArray();
+                            $request = new \Illuminate\Http\Request(['ids' => $ids]);
+
+                            $response = $controller->sendNotificationByAdmin($request);
+                            $payload = $response->getData(true);
+
+                            if ($response->getStatusCode() !== 200) {
+                                Notification::make()
+                                    ->title($payload['message'] ?? 'Gagal mengirim notifikasi.')
+                                    ->danger()
+                                    ->send();
+
+                                return;
+                            }
+
+                            Notification::make()
+                                ->title($payload['message'] ?? 'Notifikasi berhasil dikirim.')
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     DeleteBulkAction::make(),
                 ]),
             ]);

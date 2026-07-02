@@ -29,17 +29,24 @@ class MekanikController extends Controller
 
     public function fetchPengajuan($id)
     {
-        $complete = Complete::where('pengajuan_id', $id)
-        ->select('id', 'pengajuan_id', 'foto_nota')
-        ->first();
-        $serviceUnits = ServiceUnit::where('pengajuan_id', $id)
-        ->select('id', 'pengajuan_id', 'foto_unit', 'foto_odometer', 'foto_kondisi', 'foto_pengerjaan_bengkel', 'foto_tambahan')
-        ->get();
+        try {
+            $complete = Complete::where('pengajuan_id', $id)
+                ->select('id', 'pengajuan_id', 'foto_nota')
+                ->first();
+            $serviceUnits = ServiceUnit::with('unit:id,nopol,merk,type')->where('pengajuan_id', $id)
+                ->select('id', 'pengajuan_id', 'unit_id', 'foto_unit', 'foto_odometer', 'foto_kondisi', 'foto_pengerjaan_bengkel', 'foto_tambahan')
+                ->get();
 
-        return response()->json([
-            'complete' => $complete,
-            'service_units' => $serviceUnits
-        ]);
+            return response()->json([
+                'complete' => $complete,
+                'service_units' => $serviceUnits
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Pengajuan not found',
+                'message' => $e->getMessage()
+            ], 404);
+        }
     }
 
     public function update(Request $request, $id)
@@ -202,7 +209,7 @@ class MekanikController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('public.mekanik-upload.create')
+                ->route('mekanik.create')
                 ->with('success', 'Dokumentasi berhasil diperbarui.');
         } catch (\Throwable $e) {
             DB::rollBack();
