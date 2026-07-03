@@ -323,6 +323,7 @@ class PengajuanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->paginated([10, 25, 50, 100])
             ->columns([
                 Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable()->width('130px')->label('No. Pengajuan'),
                 Tables\Columns\TextColumn::make('created_at')

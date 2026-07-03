@@ -200,6 +200,7 @@ class KehadiranDriverResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->paginated([10, 25, 50, 100])
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')->label('Driver')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('project.name')->label('Project')->searchable()->sortable(),

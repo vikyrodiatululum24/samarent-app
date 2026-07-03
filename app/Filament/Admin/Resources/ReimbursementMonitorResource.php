@@ -52,6 +52,7 @@ class ReimbursementMonitorResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->paginated([10, 25, 50, 100])
             ->modifyQueryUsing(fn (Builder $query) => $query)
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')

@@ -18,7 +18,7 @@ class EndUserResource extends Resource
     protected static ?string $model = EndUser::class;
 
     protected static ?string $pluralModelLabel = 'End User';
-    
+
     protected static string|\UnitEnum|null $navigationGroup = 'Project Management';
 
     public static function form(Schema $schema): Schema
@@ -49,6 +49,7 @@ class EndUserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->paginated([10, 25, 50, 100])
             ->columns([
                 Tables\Columns\TextColumn::make('project.name')
                     ->searchable(),

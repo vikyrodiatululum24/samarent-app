@@ -284,6 +284,7 @@ class ReimbursementResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->paginated([10, 25, 50, 100])
             ->filters([
                 Tables\Filters\Filter::make('created_at')
                     ->form([

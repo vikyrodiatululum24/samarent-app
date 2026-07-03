@@ -196,6 +196,7 @@ class ProsesResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->paginated([10, 25, 50, 100])
             ->columns([
                 Tables\Columns\TextColumn::make('pengajuan.no_pengajuan')
                     ->label('No Pengajuan')

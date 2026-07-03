@@ -27,10 +27,11 @@ class PengajuanResource extends Resource
 
     protected static ?string $label = 'Pengajuan Finance';
     protected static ?string $pluralLabel = 'Pengajuan Finance';
-    
+
     public static function table(Table $table): Table
     {
         return $table
+        ->paginated([10, 25, 50, 100])
             ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('no_pengajuan')->sortable()->searchable(),
