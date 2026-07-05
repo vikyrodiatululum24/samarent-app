@@ -30,7 +30,7 @@ class OvertimeCalculatorService
         $policy = $this->resolver->resolveFromAttendance($attendance, $this->attendanceDate($attendance));
 
         if (! $policy) {
-            throw new \RuntimeException('Overtime policy tidak ditemukan untuk attendance ID ' . $attendance->getKey());
+            throw new \RuntimeException('Overtime policy tidak ditemukan untuk driver ID ' . $attendance->getKey());
         }
 
         $context = $this->buildContext($attendance, $policy);
@@ -109,7 +109,7 @@ class OvertimeCalculatorService
         }
         $overtimeHours = max(0, $isHoliday ? $workedHours : $workedHours - $normalHours);
         $effectiveHours = $this->applyBreakRule($overtimeHours, $isHoliday, (array) ($policy->rules['break'] ?? []));
-        
+
         if ($policy->policy_type === OvertimePolicyType::Government->value) {
             $salary = (float) (data_get($policy->rules['overtime'], 'hourly_salary') ?? 0);
         } else if ($policy->policy_type === OvertimePolicyType::Flat->value) {

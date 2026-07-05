@@ -197,7 +197,7 @@ class AbsenController extends Controller
     public function absenDetail(Request $request, $id)
     {
         $userId = $request->user()->id;
-        $absen = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'endUserOut', 'checks', 'confirmation:confirmable_id,status,end_user_id'])
+        $absen = DriverAttendence::with(['user.driver', 'unit', 'project', 'endUser', 'endUserOut', 'checks', 'confirmation:confirmable_id,status,end_user_id,note'])
             ->where('id', $id)
             ->where('user_id', $userId)
             ->first();
@@ -274,10 +274,11 @@ class AbsenController extends Controller
                     'confirmable_type' => DriverAttendence::class,
                     'confirmable_id' => $a->id,
                     'end_user_id' => $endUser->id,
-                ], [
-                    'token' => $token,
-                    'approval_type' => $a->type,
-                    'expires_at' => now()->addDays(7),
+                    ], [
+                        'token' => $token,
+                        'approval_type' => $a->type,
+                        'expires_at' => now()->addDays(7),
+                        'status' => 'pending',
                 ]);
             }
 
@@ -357,6 +358,7 @@ class AbsenController extends Controller
                     'time_out' => $absen->time_out,
                     'status' => $confirmation->status,
                     'approval_type' => $confirmation->approval_type,
+                    'note' => $confirmation->note,
                 ];
             }
             return null;
@@ -368,10 +370,12 @@ class AbsenController extends Controller
 
     public function confirmAbsen(Request $request)
     {
+        Log::info('Confirm Absen Request: ', $request->all());
         $request->validate([
             'token' => 'required|string',
             'status' => 'required|in:approved,rejected',
             'absenId' => 'sometimes|exists:driver_attendences,id',
+            'note' => 'nullable|string|max:255',
         ]);
 
         $confirmation = \App\Models\Confirmation::where('token', $request->token)->where('confirmable_id', $request->absenId)->first();
@@ -386,22 +390,32 @@ class AbsenController extends Controller
         }
 
         if ($request->status === 'approved') {
-            $confirmation->update([
-                'is_confirmed' => true,
-                'status' => 'approved',
-            ]);
+            try {
+                DB::beginTransaction();
+                $confirmation->update([
+                    'is_confirmed' => true,
+                    'status' => 'approved',
+                    'note' => $request->note ?? null,
+                ]);
 
-            $driverAttendence->update([
-                'is_approved_in' => 'approved',
-                'is_approved_out' => 'approved',
-                'is_complete' => true,
-            ]);
+                $driverAttendence->update([
+                    'is_approved_in' => 'approved',
+                    'is_approved_out' => 'approved',
+                    'is_complete' => true,
+                ]);
 
-            PayrollHelpers::calculateOvertimePay($driverAttendence);
+                PayrollHelpers::calculateOvertimePay($driverAttendence);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['message' => 'Failed to approve absen', 'error' => $e->getMessage()], 500);
+            }
         } else {
+
             $confirmation->update([
                 'is_confirmed' => false,
                 'status' => 'rejected',
+                'note' => $request->note ?? null,
             ]);
 
             $driverAttendence->update([

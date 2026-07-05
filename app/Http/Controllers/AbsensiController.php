@@ -72,6 +72,7 @@ class AbsensiController extends Controller
                     'token' => $token,
                     'approval_type' => $a->type,
                     'expires_at' => now()->addDays(7),
+                    'status' => 'pending',
                 ]);
             }
 
