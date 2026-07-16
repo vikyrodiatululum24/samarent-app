@@ -292,7 +292,8 @@ class FormTugasResource extends Resource
                             ->columnSpanFull()
                     ])
                     ->collapsible(),
-            ]);
+            ])
+            ->columns(1);
     }
 
     protected static function updateTotal(Set $set, Get $get): void

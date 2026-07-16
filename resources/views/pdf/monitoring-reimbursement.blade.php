@@ -193,7 +193,7 @@
                         @endphp
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
-                            <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d-M-Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($item->date)->translatedFormat('d-M-Y') }}</td>
                             <td>{{ $item->keterangan ?? '-' }}</td>
                             <td>{{ $item->metode_pembayaran ? ($item->metode_pembayaran === 'cash' ? 'Cash' : 'Fleet Card') : '-' }}
                             </td>

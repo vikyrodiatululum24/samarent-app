@@ -202,7 +202,7 @@
                         @endphp
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
-                            <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d-M-Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($item->date)->translatedFormat('d-M-Y') }}</td>
                             <td>{{ $item->keterangan ?? '-' }}</td>
                             <td>{{ $item->metode_pembayaran ? ($item->metode_pembayaran === 'cash' ? 'Cash' : 'Fleet Card') : '-' }}
                             </td>
@@ -260,7 +260,7 @@
                 <div class="signature">
                     <table style="width: 70%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; margin-left: auto; margin-right: auto;">
                         {{-- Paksa lebar kolom sama rata --}}
-                        
+
                         <tr>
                             <td colspan="3"
                                 style="border: 1px solid #ddd; padding: 0.5rem; text-align: center; font-size: 12px;">

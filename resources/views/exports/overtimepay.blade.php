@@ -4,11 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        table {
+        table.header, table.content {
             width: 100%;
             border-collapse: collapse;
             font-family: Arial, sans-serif;
-            font-size: 12px;
+            font-size: 10px;
+        }
+
+        table.footer {
+            width:80%;
+            font-family: Arial, sans-serif;
+            font-size: 10px;
         }
 
         th,
@@ -50,44 +56,45 @@
             }
         }
     @endphp
-    <table>
+    <table class="header">
         <tr>
             <td colspan="2"><strong>OVERTIME PAY REPORT</strong></td>
-            <td colspan="9"><strong>: LAPORAN UPAH LEMBUR PENGEMUDI (OVERTIME PAY REPORT FOR DRIVER)</strong></td>
+            <td colspan="14"><strong>: LAPORAN UPAH LEMBUR PENGEMUDI (OVERTIME PAY REPORT FOR DRIVER)</strong></td>
         </tr>
         <tr>
             <td colspan="2">
                 <strong>Nama Driver</strong>
                 <p style="font-style: italic; margin: 2px 0;">Driver Name</p>
             </td>
-            <td colspan="9">
+            <td colspan="14">
                 <p style="margin: 0;">: {{ $driverName ?? 'N/A' }}</p>
             </td>
         </tr>
         <tr>
             <td colspan="2"><strong>Bulan/Month</strong>
             </td>
-            <td colspan="9">: {{ $monthLabel }}</td>
+            <td colspan="14">: {{ $monthLabel }}</td>
         </tr>
     </table>
 
-    <table>
+    <table class="content" style="margin-top: 10px;">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Day</th>
-                <th>Shift</th>
+                <th style="width: 7%;">Date</th>
+                <th style="width: 5%;">Day</th>
+                <th style="width: 6%;">Shift</th>
                 <th>From Time</th>
                 <th>To Time</th>
                 <th>Work Hours</th>
                 <th>Normal Hours</th>
-                <th>Calculated OT</th>
-                <th>Amount/H</th>
+                <th>Calc OT</th>
+                <th>Amount/ H</th>
                 <th>OT Amount</th>
                 <th>Out of Town</th>
                 <th>Overnight</th>
-                <th>Transport</th>
-                <th>Monthly Allowance</th>
+                <th>Own Risk</th>
+                <th>Deskripsi Potongan Lainnya</th>
+                <th>Potongan Lainnya</th>
                 <th>Remarks</th>
             </tr>
         </thead>
@@ -106,47 +113,79 @@
                     <td>{{ number_format($pay->ot_amount, 2) }}</td>
                     <td>{{ number_format($pay->out_of_town, 2) }}</td>
                     <td>{{ number_format($pay->overnight, 2) }}</td>
-                    <td>{{ number_format($pay->transport, 2) }}</td>
-                    <td>{{ number_format($pay->monthly_allowance, 2) }}</td>
+                    <td>{{ number_format($pay->own_risk, 2) }}</td>
+                    <td>{{ $pay->deduction_desc }}</td>
+                    <td>{{ number_format($pay->deduction_value, 2) }}</td>
                     <td>{{ $pay->remarks }}</td>
                 </tr>
             @endforeach
-            <tr>
-                <td style="text-align: left;"><strong>Total Overtime Hours:</strong></td>
-                <td><strong>{{ number_format($overtimePays->sum('calculated_ot_hours'), 2) }}</strong>
-                </td>
-            </tr>
-            <tr>
-                <td style="text-align: left;"><strong>Total Overtime Pay:</strong></td>
-                <td>
-                    <strong>{{ number_format($overtimePays->sum('ot_amount') + $overtimePays->sum('out_of_town') + $overtimePays->sum('overnight') + $overtimePays->sum('transport') + $overtimePays->sum('monthly_allowance'), 2) }}</strong>
-                </td>
-            </tr>
-            <tr>
-                <td style="text-align: left;"><strong>Out of Town:</strong></td>
-                <td><strong>{{ number_format($overtimePays->sum('out_of_town'), 2) }}</strong></td>
-            </tr>
-            <tr>
-                <td style="text-align: left;"><strong>Overnight:</strong></td>
-                <td><strong>{{ number_format($overtimePays->sum('overnight'), 2) }}</strong></td>
-            </tr>
-            <tr>
-                <td style="text-align: left;"><strong>Transport Allowance:</strong></td>
-                <td><strong>{{ number_format($overtimePays->sum('transport'), 2) }}</strong></td>
-            </tr>
-            <tr>
-                <td style="text-align: left;"><strong>Monthly/Other Allowance:</strong></td>
-                <td><strong>{{ number_format($overtimePays->sum('monthly_allowance'), 2) }}</strong>
-                </td>
-            </tr>
-            <tr>
-                <td style="text-align: left;"><strong>Grand Total:</strong></td>
-                <td>
-                    <strong>{{ number_format($overtimePays->sum('ot_amount') + $overtimePays->sum('overnight') + $overtimePays->sum('out_of_town') + $overtimePays->sum('transport') + $overtimePays->sum('monthly_allowance'), 2) }}</strong>
-                </td>
-            </tr>
+
         </tbody>
     </table>
+
+    <div style="margin-top: 20px;">
+        <table class="no-border footer" style="width: 100%;" >
+            <tr>
+                <td style="width: 15%;">
+                    <strong>Total Overtime Hours</strong>
+                </td>
+                <td style="width: 10%;">
+                    <p>: {{ number_format($overtimePays->sum('calculated_ot_hours'), 2) }}</p>
+                </td>
+                <td style="width: 15%;">
+                    &nbsp;
+                </td>
+                <td style="width: 15%;">
+                    <strong>Own Risk</strong>
+                </td>
+                <td style="width: 10%;">
+                    <p>: {{ number_format($overtimePays->sum('own_risk'), 2) }}</p>
+                </td>
+                <td style="width: 15%;">
+                    &nbsp;
+                </td>
+                <td style="width: 15%;">
+                    <strong>Grand Total</strong>
+                </td>
+                <td style="width: 10%;">
+                    <p>: {{ number_format($overtimePays->sum('ot_amount') + $overtimePays->sum('out_of_town') + $overtimePays->sum('overnight') - $overtimePays->sum('own_risk') - $overtimePays->sum('deduction_value'), 2) }}</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 15%;">
+                    <strong>Total Overtime Pay</strong>
+                </td>
+                <td style="width: 10%;">
+                    <p>: {{ number_format($overtimePays->sum('ot_amount'), 2) }}</p>
+                </td>
+                <td style="width: 15%;">
+                    &nbsp;
+                </td>
+                <td style="width: 15%;">
+                    <strong>Potongan Lainnya</strong>
+                </td>
+                <td style="width: 10%;">
+                    <p>: {{ number_format($overtimePays->sum('deduction_value'), 2) }}</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 15%;">
+                    <strong>Out of Town</strong>
+                </td>
+                <td style="width: 10%;">
+                    <p>: {{ number_format($overtimePays->sum('out_of_town'), 2) }}</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 15%;">
+                    <strong>Overnight</strong>
+                </td>
+                <td style="width: 10%;">
+                    <p>: {{ number_format($overtimePays->sum('overnight'), 2) }}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
 </body>
 
 </html>

@@ -32,9 +32,9 @@ class ViewReimbursement extends ViewRecord
                             ->badge()
                             ->color('info'),
 
-                        Components\TextEntry::make('created_at')
-                            ->label('Tanggal Dibuat')
-                            ->date('d F Y, H:i:s'),
+                        Components\TextEntry::make('date')
+                            ->label('Tanggal Reimbursement')
+                            ->date('d F Y'),
                     ])
                     ->columns(2),
 

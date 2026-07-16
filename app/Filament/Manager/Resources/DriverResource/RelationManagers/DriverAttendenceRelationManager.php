@@ -30,6 +30,7 @@ class DriverAttendenceRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('id')
+            ->paginated([10, 25, 50, 100])
             ->columns([
                 Tables\Columns\TextColumn::make('date')
                 ->toggleable(isToggledHiddenByDefault: false)

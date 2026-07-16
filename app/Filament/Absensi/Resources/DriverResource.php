@@ -2,27 +2,28 @@
 
 namespace App\Filament\Absensi\Resources;
 
+use App\Filament\Absensi\Resources\DriverResource\Pages;
+use App\Filament\Absensi\Resources\DriverResource\RelationManagers;
+use App\Filament\Manager\Resources\DriverResource\RelationManagers\ReimbursementsRelationManager;
 use App\Models\Branch;
 use App\Models\Division;
 use App\Models\Driver;
-use App\Models\User;
 use App\Models\SetSalary;
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Schemas\Schema;
+use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\Image;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use App\Filament\Absensi\Resources\DriverResource\Pages;
-use App\Filament\Absensi\Resources\DriverResource\RelationManagers;
 
 class DriverResource extends Resource
 {
@@ -379,6 +380,7 @@ class DriverResource extends Resource
         return [
             RelationManagers\DriverAttendenceRelationManager::class,
             RelationManagers\OvertimePaysRelationManager::class,
+            ReimbursementsRelationManager::class,
         ];
     }
 

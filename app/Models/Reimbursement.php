@@ -9,6 +9,7 @@ class Reimbursement extends Model
 {
     protected $fillable = [
         'user_id',
+        'date',
         'km_awal',
         'foto_odometer_awal',
         'km_akhir',
@@ -35,7 +36,7 @@ class Reimbursement extends Model
         });
     }
 
-    
+
     public function getFotoOdometerAwalUrlAttribute()
     {
         return $this->foto_odometer_awal ? asset('storage/' . $this->foto_odometer_awal) : null;

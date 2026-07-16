@@ -23,6 +23,9 @@ class OvertimePay extends Model
         'overnight',
         'transport',
         'monthly_allowance',
+        'own_risk',
+        'deduction_value',
+        'deduction_desc',
         'remarks',
         'calculation_detail',
     ];
@@ -38,6 +41,8 @@ class OvertimePay extends Model
         'overnight' => 'decimal:2',
         'transport' => 'decimal:2',
         'monthly_allowance' => 'decimal:2',
+        'own_risk' => 'decimal:2',
+        'deduction_value' => 'decimal:2',
     ];
 
     public function driverAttendance()

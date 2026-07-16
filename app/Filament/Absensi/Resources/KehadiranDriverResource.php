@@ -200,7 +200,7 @@ class KehadiranDriverResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->paginated([10, 25, 50, 100])
+            ->paginated([10, 25, 50, 100])
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')->label('Driver')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('project.name')->label('Project')->searchable()->sortable(),
@@ -350,7 +350,14 @@ class KehadiranDriverResource extends Resource
             ->schema([
                 Section::make('Detail Kehadiran Driver')
                     ->columns(2)
-                    ->schema([Group::make()->schema([TextEntry::make('user.name')->label('Driver'), TextEntry::make('unit.type')->label('Unit'), TextEntry::make('unit.nopol')->label('Nopol'), TextEntry::make('date')->label('Tanggal'), TextEntry::make('note')->label('Catatan')]), Group::make()->schema([TextEntry::make('project.name')->label('Project'), TextEntry::make('endUser.name')->label('End User 1'), TextEntry::make('endUserOut.name')->label('End User 2'), TextEntry::make('is_complete')->label('Approval')->badge(fn($state) => $state ? 'success' : 'warning')->formatStateUsing(fn($state) => $state ? 'Selesai' : 'Belum Selesai')])]),
+                    ->schema([
+                        Group::make()->schema([
+                            TextEntry::make('user.name')->label('Driver'),
+                            TextEntry::make('unit.type')->label('Unit'),
+                            TextEntry::make('unit.nopol')->label('Nopol'),
+                            TextEntry::make('date')->label('Tanggal'),
+                            TextEntry::make('note')->label('Catatan')]),
+                        Group::make()->schema([TextEntry::make('project.name')->label('Project'), TextEntry::make('endUser.name')->label('End User 1'), TextEntry::make('endUserOut.name')->label('End User 2'), TextEntry::make('is_complete')->label('Approval')->badge(fn($state) => $state ? 'success' : 'warning')->formatStateUsing(fn($state) => $state ? 'Selesai' : 'Belum Selesai')])]),
                 Section::make('Absensi Masuk')
                     ->schema([
                         TextEntry::make('time_in')->label('Waktu Masuk'),

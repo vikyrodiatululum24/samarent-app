@@ -47,7 +47,7 @@
             @foreach ($reimbursements as $reimbursement)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $reimbursement->created_at }}</td>
+                    <td>{{ $reimbursement->date }}</td>
                     <td>{{ $reimbursement->type }}</td>
                     <td>{{ $reimbursement->km_awal ?? '0' }}</td>
                     <td>{{ $reimbursement->km_akhir ?? '0' }}</td>

@@ -29,8 +29,9 @@ class ReimbursementsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('keterangan')
+            ->paginated([10, 25, 50, 100])
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')->label('Tanggal')->date('d/m/Y')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('date')->label('Tanggal')->date('d/m/Y')->sortable()->searchable()->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('keterangan')->label('Keterangan')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: false),
 
                 Tables\Columns\TextColumn::make('type')->label('Tipe')->formatStateUsing(fn(string $state): string => strtoupper($state))->sortable()->toggleable(isToggledHiddenByDefault: false),
@@ -78,10 +79,10 @@ class ReimbursementsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('updated_at')->label('Terakhir Diupdate')->dateTime('d/m/Y H:i')->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\Filter::make('created_at')
+                Tables\Filters\Filter::make('date')
                     ->form([Forms\Components\DatePicker::make('dari')->label('Dari Tanggal')->native(false), Forms\Components\DatePicker::make('sampai')->label('Sampai Tanggal')->native(false)])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query->when($data['dari'], fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))->when($data['sampai'], fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
+                        return $query->when($data['dari'], fn(Builder $query, $date): Builder => $query->whereDate('date', '>=', $date))->when($data['sampai'], fn(Builder $query, $date): Builder => $query->whereDate('date', '<=', $date));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
@@ -101,13 +102,13 @@ class ReimbursementsRelationManager extends RelationManager
                     ->color('success')
                     ->action(function () {
                         $filters = $this->tableFilters;
-                        if (empty($filters['created_at']['dari']) || empty($filters['created_at']['sampai'])) {
+                        if (empty($filters['date']['dari']) || empty($filters['date']['sampai'])) {
                             // Jika filter tanggal belum lengkap, tampilkan notifikasi error
                             Notification::make()->title('Filter Diperlukan')->body('Harap isi filter tanggal terlebih dahulu sebelum melakukan export.')->danger()->send();
                             return;
                         }
-                        $dari = $filters['created_at']['dari'] ?? null;
-                        $sampai = $filters['created_at']['sampai'] ?? null;
+                        $dari = $filters['date']['dari'] ?? null;
+                        $sampai = $filters['date']['sampai'] ?? null;
                         $userId = $this->ownerRecord->user_id;
 
                         $params = ['user_id' => $userId];
@@ -135,6 +136,7 @@ class ReimbursementsRelationManager extends RelationManager
                         };
 
                         return [
+                            'date' => $record->date,
                             'type' => $record->type,
                             'km_awal' => $record->km_awal,
                             'km_akhir' => $record->km_akhir,
@@ -149,6 +151,11 @@ class ReimbursementsRelationManager extends RelationManager
                         ];
                     })
                     ->form([
+                        Forms\Components\DatePicker::make('date')
+                            ->label('Tanggal')
+                            ->required()
+                            ->columnSpanFull(),
+
                         Forms\Components\Select::make('type')
                             ->label('Tipe Reimbursement')
                             ->options([
@@ -294,10 +301,11 @@ class ReimbursementsRelationManager extends RelationManager
                             'nota' => $normalizePath($data['nota']),
                             'dana_masuk' => $data['dana_masuk'],
                             'dana_keluar' => $data['dana_keluar'],
+                            'date' => $data['date'],
                         ]);
                     }),
             ])
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('date', 'desc')
             ->bulkActions([
                 BulkAction::make('export')
                     ->label('Export Selected')

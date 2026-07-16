@@ -23,6 +23,7 @@ class ReimbursementController extends Controller
     {
         return [
             'user_id' => 'required|exists:users,id',
+            'date' => 'required|date',
             'type' => 'required|in:bbm,tol,parkir,lainnya',
             'km_awal' => 'nullable|numeric|min:0',
             'foto_odometer_awal' => 'nullable|image|max:10240',
@@ -92,6 +93,7 @@ class ReimbursementController extends Controller
             }
             $reimbursement = Reimbursement::create(array_merge([
                 'user_id' => $request->user_id,
+                'date' => $request->date,
                 'type' => $request->type,
                 'km_awal' => $request->km_awal,
                 'km_akhir' => $request->km_akhir,
@@ -178,6 +180,7 @@ class ReimbursementController extends Controller
             'km_awal',
             'km_akhir',
             'tujuan_perjalanan',
+            'date',
             'keterangan',
             'dana_masuk',
             'dana_keluar',

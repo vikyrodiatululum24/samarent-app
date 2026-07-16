@@ -17,6 +17,7 @@ class ReimbursementResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'date' => $this->date,
             'km_awal' => $this->km_awal,
             'foto_odometer_awal' => $this->foto_odometer_awal,
             'foto_odometer_awal_url' => $this->foto_odometer_awal_url,

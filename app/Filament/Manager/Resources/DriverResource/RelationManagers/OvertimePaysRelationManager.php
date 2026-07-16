@@ -29,6 +29,7 @@ class OvertimePaysRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('driver')
+            ->paginated([10, 25, 50, 100])
             ->columns([
                 Tables\Columns\TextColumn::make('tanggal')->date()->label('Tanggal')->sortable(),
                 Tables\Columns\TextColumn::make('hari')->label('Hari')->sortable(),
@@ -46,8 +47,9 @@ class OvertimePaysRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('ot_amount')->label('Jumlah OT')->money('idr', true)->sortable(),
                 // Tables\Columns\TextColumn::make('transport')->label('Transport')->money('idr', true)->sortable(),
                 // Tables\Columns\TextColumn::make('monthly_allowance')->label('Tunjangan Bulanan')->money('idr', true)->sortable(),
-                // Tables\Columns\TextColumn::make('out_of_town')->label('Dinas Luar')->money('idr', true)->sortable(),
-                // Tables\Columns\TextColumn::make('overnight')->label('Menginap')->money('idr', true)->sortable(),
+                Tables\Columns\TextColumn::make('out_of_town')->label('Dinas Luar')->money('idr', true)->sortable(), //keluar kota
+                Tables\Columns\TextColumn::make('overnight')->label('Menginap')->money('idr', true)->sortable(), //menginap
+                Tables\Columns\TextColumn::make('or')->label('OR')->money('idr', true)->sortable(), //menginap
                 // Tables\Columns\TextColumn::make('remarks')->label('Keterangan')->sortable(),
             ])
             ->filters([

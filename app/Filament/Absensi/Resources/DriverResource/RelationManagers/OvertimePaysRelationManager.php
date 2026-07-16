@@ -48,24 +48,27 @@ class OvertimePaysRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('driver')
             ->columns([
-                Tables\Columns\TextColumn::make('tanggal')->date()->label('Tanggal')->sortable(),
-                Tables\Columns\TextColumn::make('hari')->label('Hari')->sortable(),
+                Tables\Columns\TextColumn::make('tanggal')->date()->label('Tanggal')->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('hari')->label('Hari')->sortable()->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('shift')
                     ->label('Shift')
                     ->color(function ($state) {
                         return $state === 'Holiday' ? 'danger' : 'success';
                     }),
-                Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable(),
-                Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable(),
-                Tables\Columns\TextColumn::make('worked_hours')->label('Jam Kerja')->sortable(),
-                Tables\Columns\TextColumn::make('normal_hours')->label('Jam Normal')->sortable(),
-                Tables\Columns\TextColumn::make('calculated_ot_hours')->label('Total Jam OT')->sortable(),
-                Tables\Columns\TextColumn::make('amount_per_hour')->label('Amount/Hour')->money('idr', true)->sortable(),
-                Tables\Columns\TextColumn::make('ot_amount')->label('Jumlah OT')->money('idr', true)->sortable(),
+                Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('worked_hours')->label('Jam Kerja')->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('normal_hours')->label('Jam Normal')->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('calculated_ot_hours')->label('Total Jam OT')->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('amount_per_hour')->label('Amount/Hour')->money('idr', true)->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('ot_amount')->label('Jumlah OT')->money('idr', true)->sortable()->toggleable(isToggledHiddenByDefault: false),
                 // Tables\Columns\TextColumn::make('transport')->label('Transport')->money('idr', true)->sortable(),
-                // Tables\Columns\TextColumn::make('monthly_allowance')->label('Tunjangan Bulanan')->money('idr', true)->sortable(),
-                // Tables\Columns\TextColumn::make('out_of_town')->label('Dinas Luar')->money('idr', true)->sortable(),
-                // Tables\Columns\TextColumn::make('overnight')->label('Menginap')->money('idr', true)->sortable(),
+                Tables\Columns\TextColumn::make('monthly_allowance')->label('Tunjangan Bulanan')->money('idr', true)->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('out_of_town')->label('Dinas Luar')->money('idr', true)->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('overnight')->label('Menginap')->money('idr', true)->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('own_risk')->label('Own Risk')->money('idr', true)->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('deduction_desc')->label('Deskripsi Deduction')->sortable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('deduction_value')->label('Deduction')->money('idr', true)->sortable()->toggleable(isToggledHiddenByDefault: false),
                 // Tables\Columns\TextColumn::make('remarks')->label('Keterangan')->sortable(),
             ])
             ->defaultSort('tanggal', 'asc')
@@ -143,7 +146,30 @@ class OvertimePaysRelationManager extends RelationManager
                     ->label('Laporan')
                     ->icon('heroicon-o-arrow-down-tray'),
             ])
-            ->actions([Actions\EditAction::make(), Actions\DeleteAction::make()])
+            ->actions([
+                Actions\Action::make('edit')
+                    ->label('Edit')
+                    ->icon('heroicon-o-pencil')
+                    ->form([
+                        Forms\Components\TextInput::make('out_of_town')->label('Dinas Luar')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
+                        Forms\Components\TextInput::make('overnight')->label('Menginap')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
+                        Forms\Components\TextInput::make('own_risk')->label('Own Risk')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
+                        Forms\Components\TextInput::make('deduction_value')->label('Potongan Lainnya')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->live(onBlur: true)->afterStateUpdated(function ($set, $get) {
+                            if ($get('deduction_value') <= 0) {
+                                $set('deduction_desc', null);
+                            }
+                        }),
+                        Forms\Components\Textarea::make('deduction_desc')->label('Deskripsi Potongan')->columnSpanFull()->required(fn ($get) => $get('deduction_value') > 0)->maxLength(65535)->visible(fn ($get) => $get('deduction_value') > 0),
+                        Forms\Components\Textarea::make('remarks')->label('Keterangan')->columnSpanFull()->maxLength(65535),
+                    ])
+                    ->action(function ($record, $data) {
+                        $record->update($data);
+                        Notification::make()
+                            ->title('Data berhasil diperbarui')
+                            ->success()
+                            ->send();
+                    })
+                ])
             ->bulkActions([Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()])]);
     }
 }

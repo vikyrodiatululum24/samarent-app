@@ -55,6 +55,12 @@ class ReimbursementResource extends Resource
                     ->default(Auth::id())
                     ->required(),
 
+                DatePicker::make('date')
+                    ->label('Tanggal Reimbursement')
+                    ->required()
+                    ->default(now())
+                    ->placeholder('Pilih tanggal reimbursement'),
+
                 Select::make('type')
                     ->label('Tipe Reimbursement')
                     ->options([
@@ -65,7 +71,6 @@ class ReimbursementResource extends Resource
                     ])
                     ->required()
                     ->live()
-                    ->columnSpanFull()
                     ->placeholder('Pilih tipe reimbursement'),
 
                 Section::make('Data Odometer Awal')
@@ -201,7 +206,7 @@ class ReimbursementResource extends Resource
                 return $query->where('user_id', Auth::id());
             })
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('date')
                     ->label('Tanggal')
                     ->date('d/m/Y')
                     ->sortable()
@@ -299,11 +304,11 @@ class ReimbursementResource extends Resource
                         return $query
                             ->when(
                                 $data['dari'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
                             )
                             ->when(
                                 $data['sampai'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
                     })
                     ->indicateUsing(function (array $data): array {
@@ -343,7 +348,7 @@ class ReimbursementResource extends Resource
                     ->openUrlInNewTab(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('date', 'desc');
     }
 
     public static function getEloquentQuery(): Builder

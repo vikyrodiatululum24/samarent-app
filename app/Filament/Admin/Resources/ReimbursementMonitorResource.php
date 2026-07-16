@@ -55,7 +55,7 @@ class ReimbursementMonitorResource extends Resource
         ->paginated([10, 25, 50, 100])
             ->modifyQueryUsing(fn (Builder $query) => $query)
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('date')
                     ->label('Tanggal')
                     ->date('d/m/Y')
                     ->sortable()
@@ -125,11 +125,11 @@ class ReimbursementMonitorResource extends Resource
                         return $query
                             ->when(
                                 $data['dari'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
                             )
                             ->when(
                                 $data['sampai'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
                     })
                     ->indicateUsing(function (array $data): array {
@@ -169,7 +169,7 @@ class ReimbursementMonitorResource extends Resource
                     ->openUrlInNewTab(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('date', 'desc');
     }
 
     public static function getEloquentQuery(): Builder
