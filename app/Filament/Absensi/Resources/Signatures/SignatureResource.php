@@ -22,7 +22,7 @@ class SignatureResource extends Resource
 
     protected static ?string $label = 'Signature';
 
-     protected static string | \UnitEnum | null $navigationGroup = 'Master Data';
+    protected static string | \UnitEnum | null $navigationGroup = 'Master Data';
 
     protected static ?string $pluralModelLabel = 'Signature';
 

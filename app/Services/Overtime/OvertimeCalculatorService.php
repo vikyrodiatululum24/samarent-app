@@ -3,6 +3,7 @@
 namespace App\Services\Overtime;
 
 use App\Enums\OvertimePolicyType;
+use App\Helpers\HolidayDates;
 use App\Models\DriverAttendence;
 use App\Models\OvertimePay;
 use App\Models\SetSalary;
@@ -174,15 +175,8 @@ class OvertimeCalculatorService
 
     private function isHoliday(Carbon $date): bool
     {
-        $holidays = Cache::remember('holiday_api_' . $date->year, now()->addDays(30), function () use ($date) {
-            $response = Http::timeout(5)->get('https://libur.deno.dev/api?tahun=' . $date->year);
-
-            if (! $response->successful()) {
-                return collect();
-            }
-
-            return collect($response->json() ?? []);
-        });
+        $holidays = HolidayDates::getHolidayDates($date->year)
+            ->where('is_national_holiday', true);
 
         return (bool) $holidays->firstWhere('date', $date->toDateString());
     }

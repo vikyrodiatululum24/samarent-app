@@ -68,13 +68,6 @@ class EventHolidayListWidget extends Widget
                 'description' => null,
             ]);
 
-        Log::info('List items fetched', [
-            'start' => $start->toDateString(),
-            'end'   => $end->toDateString(),
-            'events_count' => $events->count(),
-            'holidays_count' => $holidays->count(),
-        ]);
-
         return $events
             ->concat($holidays)
             ->sortBy('date')

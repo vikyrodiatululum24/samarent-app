@@ -11,7 +11,6 @@ class HolidayDates
     public static function getHolidayDates($year)
     {
         $cacheKey = 'holidays_' . $year;
-        Log::info('Fetching from helper: ' . $year);
 
         $data = Cache::remember(
             $cacheKey,
@@ -30,10 +29,7 @@ class HolidayDates
                 return collect();
             }
         );
-        Log::info('Fetched data: ', [
-            'count' => $data->count(),
-            'year' => $year,
-        ]);
+
         return $data;
     }
 }

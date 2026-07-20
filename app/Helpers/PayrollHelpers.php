@@ -37,35 +37,12 @@ class PayrollHelpers
 
         try {
 
-            $cacheKey = 'holidays_' . $tanggal->year;
-
-            $holidays = Cache::remember(
-                $cacheKey,
-                now()->addDays(30),
-                function () use ($tanggal) {
-
-                    $response = Http::timeout(5)->get(
-                        "https://libur.deno.dev/api?tahun={$tanggal->year}"
-                    );
-
-                    if ($response->successful()) {
-                        return collect(
-                            json_decode($response->body(), true)
-                        );
-                    }
-
-                    return collect();
-                }
-            );
-
-            Log::info('data holidays', $holidays->toArray());
+            $holidays = HolidayDates::getHolidayDates($tanggal->year);
 
             $isHoliday = $holidays->firstWhere(
                 'date',
                 $tanggal->toDateString()
             );
-
-            Log::info('Is holiday for ' . $tanggal->toDateString(), ['is_holiday' => !!$isHoliday]);
 
             if ($isHoliday) {
                 return 'Holiday';

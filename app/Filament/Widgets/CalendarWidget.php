@@ -58,10 +58,6 @@ class CalendarWidget extends FullCalendarWidget
 
     public function fetchEvents(array $fetchInfo): array
     {
-        Log::info('Fetch range', [
-            'start' => $fetchInfo['start'],
-            'end'   => $fetchInfo['end'],
-        ]);
         $events = Event::query()
             ->where('start_at', '>=', $fetchInfo['start'])
             ->where('end_at', '<=', $fetchInfo['end'])
@@ -90,7 +86,6 @@ class CalendarWidget extends FullCalendarWidget
                 \Carbon\Carbon::parse($fetchInfo['end'])->year
             ) as $year
         ) {
-            Log::info('Fetching From widget: ' . $year);
             $holidayEvents = $holidayEvents->merge(
                 HolidayDates::getHolidayDates($year)->where('is_national_holiday', true)
             );
