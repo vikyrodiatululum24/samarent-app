@@ -202,13 +202,13 @@ class KehadiranDriverResource extends Resource
         return $table
             ->paginated([10, 25, 50, 100])
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')->label('Driver')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('project.name')->label('Project')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('endUser.name')->label('User In')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('endUserOut.name')->label('User Out')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('unit.nopol')->label('Unit')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('date')->date()->label('Tanggal')->sortable(),
-                Tables\Columns\TextColumn::make('time_in')->label('Waktu Masuk'),
+                Tables\Columns\TextColumn::make('user.name')->label('Driver')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('project.name')->label('Project')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('endUser.name')->label('User In')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('endUserOut.name')->label('User Out')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('unit.nopol')->label('Unit')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('date')->date()->label('Tanggal')->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('time_in')->label('Waktu Masuk')->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('waktu_check')
                     ->label('Waktu Check')
                     ->getStateUsing(function ($record) {
@@ -217,9 +217,15 @@ class KehadiranDriverResource extends Resource
                         }
 
                         return $record->checks->sortBy('created_at')->map(fn($check) => $check->created_at->format('H:i:s'))->implode(', ');
-                    }),
-                Tables\Columns\TextColumn::make('time_out')->label('Waktu Keluar'),
-                Tables\Columns\BooleanColumn::make('is_complete')->label('Selesai')->sortable(),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('time_out')->label('Waktu Keluar')->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\BooleanColumn::make('is_complete')->label('Selesai')->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
             ])
             ->defaultSort('id', 'desc')
             ->filters([

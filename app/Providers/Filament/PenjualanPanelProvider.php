@@ -79,6 +79,9 @@ class PenjualanPanelProvider extends PanelProvider
                 EnsurePenjualanRole::class,
             ])
             ->navigationItems([
+                NavigationItem::make('Dashboard')
+                    ->url('/penjualan', shouldOpenInNewTab: false)
+                    ->sort(0),
                 NavigationItem::make('Admin Panel')
                     ->url('/admin', shouldOpenInNewTab: false)
                     ->group('Panels')

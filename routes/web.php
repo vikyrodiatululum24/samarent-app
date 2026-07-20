@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\MekanikController;
 use App\Http\Controllers\PraPengajuanController;
 use App\Http\Controllers\PrintController;
@@ -39,6 +40,8 @@ Route::get('/', function () {
     }
     return redirect('/login');
 })->name('dashboard');
+
+Route::get('/holiday-dates', [HolidayController::class, 'index'])->name('holiday-dates');
 
 // Public Reimbursement Routes (No Authentication Required)
 Route::prefix('public')->name('reimbursement.')->group(function () {

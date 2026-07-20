@@ -55,7 +55,7 @@ class FinancePanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Finance/Widgets'), for: 'App\\Filament\\Finance\\Widgets')
             ->widgets([
-                
+
             ])
             ->plugin(
                 FilamentFullCalendarPlugin::make()
@@ -77,6 +77,9 @@ class FinancePanelProvider extends PanelProvider
                 \App\Http\Middleware\EnsureFinanceRole::class,
             ])
             ->navigationItems([
+                NavigationItem::make('Dashboard')
+                    ->url('/finance', shouldOpenInNewTab: false)
+                    ->sort(0),
                 NavigationItem::make('Admin Panel')
                     ->url('/admin', shouldOpenInNewTab: false)
                     ->group('Panels')

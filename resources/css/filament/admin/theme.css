@@ -7,3 +7,12 @@
 
 @import '../../../../vendor/saade/filament-fullcalendar/resources/css/filament-fullcalendar.css';
 @source '../../../../vendor/saade/filament-fullcalendar/resources/views/**/*.blade.php';
+
+.fc-daygrid-day:has(.libur-nasional) {
+    background-color: transparent !important;
+}
+
+.fc-daygrid-day:has(.libur-nasional) .fc-daygrid-day-number {
+    color: #dc2626;
+    font-weight: 700;
+}

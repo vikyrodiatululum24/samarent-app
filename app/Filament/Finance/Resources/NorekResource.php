@@ -21,6 +21,7 @@ class NorekResource extends Resource
     protected static ?string $navigationLabel = 'Data Rekening';
     protected static ?string $label = 'Data Rekening';
     protected static ?string $pluralLabel = 'Data Rekening';
+    protected static ?int $navigationSort = 3;
     public static function form(Schema $schema): Schema
     {
         return $schema->components([

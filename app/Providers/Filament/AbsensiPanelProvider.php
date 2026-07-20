@@ -9,6 +9,7 @@ use Filament\Facades\Filament;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -72,7 +73,24 @@ class AbsensiPanelProvider extends PanelProvider
                     ->selectable()
                     ->editable()
             )
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Project Management'),
+                    NavigationGroup::make()
+                        ->label('Master Data Overtime'),
+                NavigationGroup::make()
+                    ->label('Panels'),
+                NavigationGroup::make()
+                    ->label('Unit'),
+                NavigationGroup::make()
+                    ->label('Master Data'),
+                NavigationGroup::make()
+                    ->label('Keuangan'),
+            ])
             ->navigationItems([
+                NavigationItem::make('Dashboard')
+                    ->url('/absensi', shouldOpenInNewTab: false)
+                    ->sort(0),
                 NavigationItem::make('Admin Panel')
                     ->url('/admin', shouldOpenInNewTab: false)
                     ->group('Panels')

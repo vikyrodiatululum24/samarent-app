@@ -76,6 +76,10 @@ class AsuransiPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->navigationItems([
+                NavigationItem::make('Dashboard')
+                    ->url('/asuransi', shouldOpenInNewTab: false)
+                    ->sort(0),
+
                 NavigationItem::make('Admin Panel')
                     ->url('/admin', shouldOpenInNewTab: false)
                     ->group('Panels')

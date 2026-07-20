@@ -66,6 +66,9 @@ class ManagerPanelProvider extends PanelProvider
                 \App\Http\Middleware\EnsureManagerRole::class,
             ])
             ->navigationItems([
+                NavigationItem::make('Dashboard')
+                    ->url('/manager', shouldOpenInNewTab: false)
+                    ->sort(0),
                 NavigationItem::make('Admin Panel')
                     ->url('/admin', shouldOpenInNewTab: false)
                     ->group('Panels')

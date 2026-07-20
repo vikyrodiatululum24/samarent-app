@@ -24,9 +24,9 @@ class PengajuanResource extends Resource
     protected static ?string $model = Pengajuan::class;
 
     protected static ?string $navigationLabel = 'Pengajuan Finance';
-
     protected static ?string $label = 'Pengajuan Finance';
     protected static ?string $pluralLabel = 'Pengajuan Finance';
+    protected static ?int $navigationSort = 1;
 
     public static function table(Table $table): Table
     {

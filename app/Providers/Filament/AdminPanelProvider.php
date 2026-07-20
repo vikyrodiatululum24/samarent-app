@@ -9,8 +9,8 @@ use Filament\Facades\Filament;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
-use Filament\Pages;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -57,6 +57,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\CalendarWidget::class,
+                Widgets\EventHolidayListWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -77,102 +78,135 @@ class AdminPanelProvider extends PanelProvider
                     ->selectable()
                     ->editable()
             )
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Pengajuan'),
+                NavigationGroup::make()
+                    ->label('Panels'),
+                NavigationGroup::make()
+                    ->label('Pengaturan'),
+                NavigationGroup::make()
+                    ->label('Unit'),
+                NavigationGroup::make()
+                    ->label('Master Data'),
+                NavigationGroup::make()
+                    ->label('Keuangan'),
+            ])
             ->navigationItems([
+                NavigationItem::make('Dashboard')
+                    ->url('/admin', shouldOpenInNewTab: false)
+                    ->sort(1),
+
+                // NavigationItem::make('Pra-Pengajuan')
+                //     ->url('/admin/pra-pengajuans', shouldOpenInNewTab: false)
+                //     ->group('Pengajuan')
+                //     ->sort(2),
+
+                // NavigationItem::make('Pengajuan')
+                //     ->url('/admin/pengajuan', shouldOpenInNewTab: false)
+                //     ->group('Pengajuan')
+                //     ->sort(2),
+
+                // NavigationItem::make('Histori Pengajuan')
+                //     ->url('/admin/histori-pengajuan', shouldOpenInNewTab: false)
+                //     ->group('Units')
+                //     ->sort(4),
+
                 NavigationItem::make('Admin Panel')
                     ->url('/admin', shouldOpenInNewTab: false)
                     ->group('Panels')
-                    ->sort(1)
-                    ->visible(fn () => Auth::check()
+                    ->sort(3)
+                    ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'admin'
                         && in_array(Auth::user()?->email, [
-                        'centralakun@samarent.com',
-                        // tambahkan email lain yang diizinkan
-                    ])),
+                            'centralakun@samarent.com',
+                            // tambahkan email lain yang diizinkan
+                        ])),
 
                 NavigationItem::make('User Panel')
                     ->url('/user', shouldOpenInNewTab: false)
                     ->icon('heroicon-o-users')
                     ->group('Panels')
-                    ->sort(1)
-                    ->visible(fn () => Auth::check()
+                    ->sort(3)
+                    ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'user'
                         && in_array(Auth::user()?->email, [
-                        'centralakun@samarent.com',
-                        // tambahkan email lain yang diizinkan
-                    ])),
+                            'centralakun@samarent.com',
+                            // tambahkan email lain yang diizinkan
+                        ])),
 
                 NavigationItem::make('User Panel')
                     ->url('/user', shouldOpenInNewTab: false)
                     ->group('Panels')
-                    ->sort(2)
-                    ->visible(fn () => Auth::check()
+                    ->sort(3)
+                    ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'user'
                         && in_array(Auth::user()?->email, [
-                        'centralakun@samarent.com',
-                    ])),
+                            'centralakun@samarent.com',
+                        ])),
 
                 NavigationItem::make('Manager Panel')
                     ->url('/manager', shouldOpenInNewTab: false)
                     ->group('Panels')
-                    ->sort(2)
-                    ->visible(fn () => Auth::check()
+                    ->sort(3)
+                    ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'manager'
                         && in_array(Auth::user()?->email, [
-                        'centralakun@samarent.com',
-                    ])),
+                            'centralakun@samarent.com',
+                        ])),
 
                 NavigationItem::make('Finance Panel')
                     ->url('/finance', shouldOpenInNewTab: false)
                     ->group('Panels')
-                    ->sort(2)
-                    ->visible(fn () => Auth::check()
+                    ->sort(3)
+                    ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'finance'
                         && in_array(Auth::user()?->email, [
-                        'centralakun@samarent.com',
-                    ])),
-
-                    NavigationItem::make('Asuransi Panel')
-                    ->url('/asuransi', shouldOpenInNewTab: false)
-                    ->group('Panels')
-                    ->sort(2)
-                    ->visible(fn () => Auth::check()
-                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'asuransi'
-                        && in_array(Auth::user()?->email, [
-                        'centralakun@samarent.com',
+                            'centralakun@samarent.com',
                         ])),
 
-                    NavigationItem::make('Admin Driver Panel')
-                            ->url('/absensi', shouldOpenInNewTab: false)
-                            ->group('Panels')
-                            ->sort(2)
-                            ->visible(fn () => Auth::check()
-                                && Filament::getCurrentOrDefaultPanel()?->getId() !== 'absensi'
-                                && in_array(Auth::user()?->email, [
-                                'centralakun@samarent.com',
-                            ])),
+                NavigationItem::make('Asuransi Panel')
+                    ->url('/asuransi', shouldOpenInNewTab: false)
+                    ->group('Panels')
+                    ->sort(3)
+                    ->visible(fn() => Auth::check()
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'asuransi'
+                        && in_array(Auth::user()?->email, [
+                            'centralakun@samarent.com',
+                        ])),
 
-                    NavigationItem::make('Admin Jual Panel')
-                            ->url('/penjualan', shouldOpenInNewTab: false)
-                            ->group('Panels')
-                            ->sort(2)
-                            ->visible(fn () => Auth::check()
-                                && Filament::getCurrentOrDefaultPanel()?->getId() !== 'penjualan'
-                                && in_array(Auth::user()?->email, [
-                                'centralakun@samarent.com',
-                            ])),
+                NavigationItem::make('Admin Driver Panel')
+                    ->url('/absensi', shouldOpenInNewTab: false)
+                    ->group('Panels')
+                    ->sort(3)
+                    ->visible(fn() => Auth::check()
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'absensi'
+                        && in_array(Auth::user()?->email, [
+                            'centralakun@samarent.com',
+                        ])),
+
+                NavigationItem::make('Admin Jual Panel')
+                    ->url('/penjualan', shouldOpenInNewTab: false)
+                    ->group('Panels')
+                    ->sort(3)
+                    ->visible(fn() => Auth::check()
+                        && Filament::getCurrentOrDefaultPanel()?->getId() !== 'penjualan'
+                        && in_array(Auth::user()?->email, [
+                            'centralakun@samarent.com',
+                        ])),
 
                 NavigationItem::make('Absensi Driver')
                     ->url('https://driver.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
                     ->sort(3)
-                    ->visible(fn () => Auth::check() && in_array(Auth::user()?->email, [
+                    ->visible(fn() => Auth::check() && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
                 NavigationItem::make('President Panel')
                     ->url('/president', shouldOpenInNewTab: false)
                     ->group('Panels')
-                    ->sort(4)
-                    ->visible(fn () => Auth::check()
+                    ->sort(3)
+                    ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'president'
                         && in_array(Auth::user()?->email, [
                             'centralakun@samarent.com',
@@ -180,8 +214,8 @@ class AdminPanelProvider extends PanelProvider
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
-                    ->sort(5)
-                    ->visible(fn () => Auth::check() && in_array(Auth::user()?->email, [
+                    ->sort(3)
+                    ->visible(fn() => Auth::check() && in_array(Auth::user()?->email, [
                         'centralakun@samarent.com',
                     ])),
             ])

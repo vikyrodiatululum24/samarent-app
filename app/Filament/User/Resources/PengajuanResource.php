@@ -37,6 +37,8 @@ class PengajuanResource extends Resource
 
     protected static ?string $navigationLabel = 'Pengajuan';
 
+    protected static ?int $navigationSort = 1;
+
     protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Schema $schema): Schema

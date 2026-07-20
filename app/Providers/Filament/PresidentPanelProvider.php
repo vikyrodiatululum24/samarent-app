@@ -100,6 +100,9 @@ class PresidentPanelProvider extends PanelProvider
                 EnsurePresidentRole::class,
             ])
             ->navigationItems([
+                NavigationItem::make('Dashboard')
+                    ->url('/president', shouldOpenInNewTab: false)
+                    ->sort(0),
                 NavigationItem::make('Admin Panel')
                     ->url('/admin', shouldOpenInNewTab: false)
                     ->group('Panels')
