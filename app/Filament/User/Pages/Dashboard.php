@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Asuransi\Pages;
+namespace App\Filament\User\Pages;
 
 use App\Filament\Widgets\CalendarWidget;
 use App\Filament\Widgets\EventHolidayListWidget;
@@ -9,8 +9,6 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
-
     public function getWidgets(): array
     {
         return [

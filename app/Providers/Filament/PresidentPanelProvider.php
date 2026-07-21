@@ -22,6 +22,7 @@ use Filament\Facades\Filament;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
@@ -98,6 +99,20 @@ class PresidentPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 EnsurePresidentRole::class,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Pengajuan'),
+                NavigationGroup::make()
+                    ->label('Panels'),
+                NavigationGroup::make()
+                    ->label('Pengaturan'),
+                NavigationGroup::make()
+                    ->label('Unit'),
+                NavigationGroup::make()
+                    ->label('Master Data'),
+                NavigationGroup::make()
+                    ->label('Keuangan'),
             ])
             ->navigationItems([
                 NavigationItem::make('Dashboard')

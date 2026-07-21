@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Asuransi\Resources\AsuransiResource;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Widgets\CalendarWidget;
+use App\Filament\Widgets\EventHolidayListWidget;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -57,7 +58,8 @@ class AsuransiPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Asuransi/Widgets'), for: 'App\\Filament\\Asuransi\\Widgets')
             ->widgets([
-                CalendarWidget::class,
+                // CalendarWidget::class,
+                // EventHolidayListWidget::class,
             ])
             ->plugin(
                 FilamentFullCalendarPlugin::make()

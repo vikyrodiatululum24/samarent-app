@@ -3,6 +3,7 @@
 namespace App\Filament\Penjualan\Pages;
 
 use App\Filament\Widgets\CalendarWidget;
+use App\Filament\Widgets\EventHolidayListWidget;
 use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 
@@ -14,6 +15,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             CalendarWidget::class,
+            EventHolidayListWidget::class,
         ];
     }
 

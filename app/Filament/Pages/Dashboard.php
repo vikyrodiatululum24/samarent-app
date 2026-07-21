@@ -3,7 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\CalendarWidget;
-
+use App\Filament\Widgets\EventHolidayListWidget;
 use BackedEnum;
 
 class Dashboard extends \Filament\Pages\Dashboard
@@ -13,6 +13,7 @@ class Dashboard extends \Filament\Pages\Dashboard
     {
         return [
             CalendarWidget::class,
+            EventHolidayListWidget::class,
         ];
     }
 }
