@@ -202,6 +202,22 @@
                         @enderror
                     </div>
 
+                    <div class="mb-6">
+                        <label for="date" class="block text-sm font-medium text-gray-700 mb-2">
+                            Tanggal <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="date"
+                            name="date"
+                            id="date"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            value="{{ old('date', now()->toDateString()) }}"
+                            required>
+                        @error('date')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Data Odometer Awal Section -->
                     <div class="mb-8" id="section_odometer_awal" style="display: none;">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">

@@ -51,6 +51,7 @@ class PublicReimbursementController extends Controller
 
         // Validate the request
         $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
             'user_id' => 'required|exists:users,id',
             'type' => 'required|in:bbm,tol,parkir,lainnya',
             'km_awal' => 'nullable|numeric|min:0',
@@ -100,7 +101,8 @@ class PublicReimbursementController extends Controller
             }
 
             // Create reimbursement
-            $reimbursement = Reimbursement::create([
+            Reimbursement::create([
+                'date' => $request->date ?? now()->toDateString(),
                 'user_id' => $request->user_id,
                 'type' => $request->type,
                 'km_awal' => $request->km_awal,

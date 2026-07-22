@@ -44,7 +44,7 @@ class ProsesCompletePengajuan extends EditRecord
                         Forms\Components\TextInput::make('complete.nominal_estimasi')
                             ->label('Nominal Estimasi')
                             ->inputMode('numeric')
-                            ->rules(['regex:/^[0-9]+$/'])
+                            ->rules(['regex:/^-?[0-9]+$/'])
                             ->validationMessages([
                                 'regex' => 'Nominal Estimasi harus berupa angka.',
                             ])
@@ -88,7 +88,7 @@ class ProsesCompletePengajuan extends EditRecord
                         Forms\Components\TextInput::make('complete.nominal_tf_finance')
                             ->label('Nominal Transfer Finance')
                             ->inputMode('numeric')
-                            ->rules(['regex:/^[0-9]+$/'])
+                            ->rules(['regex:/^-?[0-9]+$/'])
                             ->validationMessages([
                                 'regex' => 'Nominal Transfer Finance harus berupa angka.',
                             ])
@@ -194,7 +194,7 @@ class ProsesCompletePengajuan extends EditRecord
                         Forms\Components\TextInput::make('complete.nominal_tf_bengkel')
                             ->label('Nominal Transfer Bengkel')
                             ->inputMode('numeric')
-                            ->rules(['regex:/^[0-9]+$/'])
+                            ->rules(['regex:/^-?[0-9]+$/'])
                             ->validationMessages([
                                 'regex' => 'Nominal Transfer Bengkel harus berupa angka.',
                             ])
@@ -212,14 +212,13 @@ class ProsesCompletePengajuan extends EditRecord
                         Forms\Components\TextInput::make('complete.selisih_tf')
                             ->label('Selisih Transfer')
                             ->inputMode('numeric')
-                            ->rules(['regex:/^[0-9]+$/'])
+                            ->rules(['regex:/^-?[0-9]+$/'])
                             ->validationMessages([
                                 'regex' => 'Selisih Transfer harus berupa angka.',
                             ])
                             ->prefix('Rp ')
                             ->mask(RawJs::make('$money($input)'))
                             ->stripCharacters(',')
-                            ->readOnly()
                             ->required(fn($record) => $record->complete?->status_finance === 'paid')
                             ->readOnly(),
                         Forms\Components\DatePicker::make('complete.tanggal_tf_bengkel')

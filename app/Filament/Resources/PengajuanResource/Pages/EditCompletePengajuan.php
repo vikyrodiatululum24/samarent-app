@@ -140,7 +140,7 @@ class EditCompletePengajuan extends EditRecord
                                     ->label('No. Rekening')
                                     ->required()
                                     ->inputMode('numeric')
-                                    ->rules(['regex:/^-?\d+(,\d+)*$/'])
+                                    ->rules(['regex:/^\d+(,\d+)*$/'])
                                     ->validationMessages([
                                         'regex' => 'No. Rekening harus berupa angka.',
                                     ])
@@ -186,7 +186,7 @@ class EditCompletePengajuan extends EditRecord
                             ->readOnly()
                             ->maxLength(255)
                             ->inputMode('numeric')
-                            ->rules(['regex:/^-?\d+(,\d+)*$/'])
+                            ->rules(['regex:/^\d+(,\d+)*$/'])
                             ->validationMessages([
                                 'regex' => 'No. Rekening Bengkel harus berupa angka.',
                             ]),
@@ -206,10 +206,11 @@ class EditCompletePengajuan extends EditRecord
                             ->mask(RawJs::make('$money($input)'))
                             ->stripCharacters(',')
                             ->live(debounce: 500)
-                            ->afterStateUpdated(fn(Set $set, $state, Get $get) => $set(
-                                'complete.selisih_tf',
-                                str_replace(',', '', $get('complete.nominal_tf_finance')) - $state
-                            ))
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $nominalFinance = (float) ($get('complete.nominal_tf_finance') ?? 0);
+                                $nominalBengkel = (float) ($get('complete.nominal_tf_bengkel') ?? 0);
+                                $set('complete.selisih_tf', $nominalFinance - $nominalBengkel);
+                            })
                             ->required(fn($record) => $record->complete?->status_finance === 'paid')
                             ->nullable(),
                         Forms\Components\TextInput::make('complete.selisih_tf')
@@ -222,13 +223,8 @@ class EditCompletePengajuan extends EditRecord
                             ->prefix('Rp ')
                             ->mask(RawJs::make('$money($input)'))
                             ->stripCharacters(',')
-                            ->readOnly()
                             ->required(fn($record) => $record->complete?->status_finance === 'paid')
-                            ->reactive()
-                            ->afterStateUpdated(fn(Set $set, $state, Get $get) => $set(
-                                'complete.selisih_tf',
-                                $get('complete.nominal_tf_finance') - $get('complete.nominal_tf_bengkel')
-                            )),
+                            ->readOnly(),
                         Forms\Components\DatePicker::make('complete.tanggal_tf_bengkel')
                             ->label('Tanggal Transfer Bengkel')
                             ->nullable()
