@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
+use App\Models\BastkDokumentasi;
 use App\Models\Complete;
 use App\Models\DriverAttendence;
 use App\Models\DriverCheck;
 use App\Models\Finance;
 use App\Models\Reimbursement;
 use App\Models\ServiceUnit;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Storage;
 
 class CleanUnusedImages extends Command
 {
@@ -54,7 +55,27 @@ class CleanUnusedImages extends Command
             'photo_out' => ['type' => 'string', 'folder' => 'absen/photo_out'],
         ],
 
-        
+        BastkDokumentasi::class => [
+            'unit_depan' => ['type' => 'string', 'folder' => 'bastk/dokumentasi/unit_depan'],
+            'unit_belakang' => ['type' => 'string', 'folder' => 'bastk/dokumentasi/unit_belakang'],
+            'unit_samping_kanan' => ['type' => 'string', 'folder' => 'bastk/dokumentasi/unit_samping_kanan'],
+            'unit_samping_kiri' => ['type' => 'string', 'folder' => 'bastk/dokumentasi/unit_samping_kiri'],
+            'kabin_depan' => ['type' => 'string', 'folder' => 'bastk/dokumentasi/kabin_depan'],
+            'kabin_tengah' => ['type' => 'string', 'folder' => 'bastk/dokumentasi/kabin_tengah'],
+            'kabin_belakang' => ['type' => 'string', 'folder' => 'bastk/dokumentasi/kabin_belakang'],
+            'dashboard' => ['type' => 'string', 'folder' => 'bastk/dokumentasi/dashboard'],
+            'odometer' => ['type' => 'string', 'folder' => 'bastk/dokumentasi/odometer'],
+            // Field array
+            'kerusakan' => ['type' => 'array',  'folder' => 'bastk/dokumentasi/kerusakan'],
+            // Field array
+            'tools'     => ['type' => 'array',  'folder' => 'bastk/dokumentasi/tools'],
+            'buku_service'=> ['type'=>'string','folder'=>'bastk/dokumentasi/buku_service'],
+            'manual_book'=> ['type'=>'string','folder'=>'bastk/dokumentasi/manual_book'],
+            'ban_serep'=> ['type'=>'string','folder'=>'bastk/dokumentasi/ban_serep'],
+            'stnk_depan'=> ['type'=>'string','folder'=>'bastk/dokumentasi/stnk_depan'],
+            'stnk_belakang'=> ['type'=>'string','folder'=>'bastk/dokumentasi/stnk_belakang'],
+            'bastk'=> ['type'=>'string','folder'=>'bastk/dokumentasi/bastk']
+        ],
     ];
 
     public function handle()

@@ -100,7 +100,8 @@ Route::middleware('auth')->group(function () {
     Route::get('print-form-driver', [PrintController::class, 'printFormDriver'])->name('filament.driver.print-form-driver');
     Route::get('/reimbursement/monitoring-reimbursement-print-pdf', [ReimbursementPdfController::class, 'MonitoringReimbursementPrint'])->name('reimbursement.monitoring-print-pdf');
     Route::get('/reimbursement/monitoring-reimbursement-export-excel', [ReimbursementPdfController::class, 'MonitoringReimbursementExportExcel'])->name('reimbursement.monitoring-export-excel');
-
+    Route::get('/print-bastk/{id}', [PrintController::class, 'printBastk'])->name('print.bastk');
+    
     // Route for printing Pra Pengajuan from Filament View Page
     Route::get('ajukan-pra-pengajuan/{id}', [PraPengajuanController::class, 'ajukanPraPengajuan'])->name('ajukan-pra-pengajuan');
     Route::get('ajukan-multiple-pra-pengajuan', [PraPengajuanController::class, 'ajukanMultiplePraPengajuan'])->name('ajukan-multiple-pra-pengajuan');

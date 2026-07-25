@@ -6,9 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Print SPK</title>
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
+    <style>
+        .watermark {
+            position: fixed;
+            top: 25%;
+            right: -15%;
+            z-index: -1000;
+            opacity: .08;
+        }
+
+        .watermark img {
+            width: 420px;
+        }
+    </style>
 </head>
 
 <body>
+
+    <div class="watermark">
+        <img src="{{ public_path('images/icon.png') }}">
+    </div>
+
     <div>
         <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%"
             style="margin-bottom: 20px;">

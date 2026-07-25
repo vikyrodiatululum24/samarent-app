@@ -45,4 +45,8 @@ class Unit extends Model
     {
         return $this->hasMany(PraPengajuan::class, 'unit_id', 'id');
     }
+    public function bastk()
+    {
+        return $this->hasMany(Bastk::class, 'unit_id', 'id');
+    }
 }

@@ -75,10 +75,10 @@ class PengajuanResource extends Resource
                                                 ->rules([
                                                     'nullable',
                                                     'string',
-                                                    'regex:/^\d{10,15}$/',
+                                                    'regex:/^(\d{10,15}|-)$/',
                                                 ])
                                                 ->validationMessages([
-                                                    'regex' => 'No. WhatsApp harus berupa angka dan memiliki panjang antara 10 hingga 15 digit.',
+                                                    'regex' => 'No. WhatsApp harus berupa angka dan memiliki panjang antara 10 hingga 15 digit atau gunakan tanda "-" jika ingin di kosongkan.',
                                                 ])
                                                 ->maxLength(255),
                                         ]),

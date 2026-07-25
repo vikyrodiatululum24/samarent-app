@@ -15,6 +15,8 @@ use App\Models\KeuanganService;
 use App\Exports\OvertimePayExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DriverAttendenceExport;
+use App\Models\Bastk;
+use Barryvdh\DomPDF\PDF as DomPDFPDF;
 
 class PrintController extends Controller
 {
@@ -284,5 +286,15 @@ class PrintController extends Controller
     {
         $pdf = PDF::loadView('prints.form-driver');
         return $pdf->stream('form-driver.pdf');
+    }
+
+    public function printBastk($id)
+    {
+        ini_set('max_execution_time', 300);
+        $bastk = Bastk::with(['unit', 'items', 'dokumentasi'])->findOrFail($id);
+        $namaFile = 'BASTK-' . $bastk->no_bastk;
+        $namaFile = str_replace(['/', '\\'], '-', $namaFile);
+        $pdf = PDF::loadView('prints.bastk', ['bastk' => $bastk])->setPaper('legal', 'portrait');
+        return $pdf->stream("$namaFile.pdf");
     }
 }
