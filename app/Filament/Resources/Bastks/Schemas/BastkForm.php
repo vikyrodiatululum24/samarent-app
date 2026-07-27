@@ -23,7 +23,17 @@ class BastkForm
                     ->description('Data Utama Berita Acara Serah Terima Kendaraan')
                     ->schema([
                         Grid::make(2)->schema([
-                            Forms\Components\TextInput::make('kode')->label('Kode BASTK')->placeholder('Otomatis / Masukkan Kode')->maxLength(255)->unique(ignoreRecord: true),
+                            Forms\Components\Select::make('kode')->label('Kode BASTK')->placeholder('Pilih Kode BASTK')->unique(ignoreRecord: true)->options([
+                                'nl' => 'NL - New Lease',
+                                'nc' => 'NC - New Car',
+                                'uc' => 'UC - Used Car',
+                                'ec' => 'EC - End Contract',
+                                'rp' => 'RP - Replace',
+                                'tm' => 'TM - Temporary',
+                                'br' => 'BR - Body Repair',
+                                'sv' => 'SV - Service',
+                                'pm' => 'PM - Permar',
+                            ]),
                             Forms\Components\Select::make('unit_id')->label('Pilih Unit')->relationship('unit', 'nopol')->searchable()->preload()->required()->getOptionLabelFromRecordUsing(fn(Unit $record) => "{$record->type} - {$record->nopol}"),
                             Forms\Components\TextInput::make('kepada')->label('Kepada')->required()->maxLength(255),
                             Forms\Components\TextInput::make('no_hp')->label('No HP')->tel()->maxLength(255),

@@ -21,6 +21,8 @@ class GsResource extends Resource
 {
     protected static ?string $model = Gs::class;
 
+    protected static ?string $pluralModelLabel = 'GS';
+
     protected static ?string $recordTitleAttribute = 'record-title';
 
     public static function getRecordTitle(?Model $record): string

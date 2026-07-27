@@ -29,6 +29,18 @@
         .watermark img {
             width: 420px;
         }
+
+        .noBastk {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #000;
+            padding: 5px 10px;
+            z-index: 1000;
+        }
     </style>
 </head>
 
@@ -41,6 +53,9 @@
     <!-- seluruh isi pdf -->
 
     <div>
+        <div class="noBastk">
+            <p style="text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 5px;">{{ $bastk->no_bastk }}</p>
+        </div>
         <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%"
             style="margin-bottom: 5px;">
         <div style="padding: 5px 20px;">
@@ -61,7 +76,7 @@
                     <td style="width: 1%; padding:0.2rem;">
                         :
                     </td>
-                    <td style="width: 35%; padding:0.2rem;">
+                    <td style="width: 40%; padding:0.2rem;">
                         {{ $bastk->unit->nopol ?? ' - ' }} / {{ $bastk->unit->no_rks }}
                     </td>
                 </tr>
@@ -81,7 +96,7 @@
                     <td style="width: 1%; padding:0.2rem;">
                         :
                     </td>
-                    <td style="width: 35%; padding:0.2rem;">
+                    <td style="width: 40%; padding:0.2rem;">
                         {{ strtoupper($bastk->unit->type) }}
                     </td>
                 </tr>
@@ -98,7 +113,7 @@
                     <td style="width: 1%;">
                         :
                     </td>
-                    <td style="width: 35%;">
+                    <td style="width: 40%;">
                         {{ strtoupper($bastk->unit->warna ?? ' - ') }} / {{ strtoupper($bastk->unit->no_rangka) }}
                     </td>
                 </tr>
@@ -118,7 +133,7 @@
                     <td style="width: 1%;">
                         :
                     </td>
-                    <td style="width: 35%;">
+                    <td style="width: 40%;">
                         {{ strtoupper($bastk->unit->no_mesin) }} / {{ strtoupper($bastk->unit->no_rangka) }}
                     </td>
                 </tr>
@@ -144,14 +159,16 @@
                     <td style="width: 1%;">
                         :
                     </td>
-                    <td style="width: 70%;" colspan="4">
+                    <td style="width: 75%;" colspan="4">
                         <table width="100%">
                             @foreach (collect($pilihan)->chunk(9) as $row)
                                 <tr>
                                     <td>
                                         @foreach ($pilihan as $item)
+                                        <span style="{{ in_array(strtolower($item), $kondisi) ? 'font-weight: bold;' : 'font-weight: normal;' }}">
                                             {!! in_array(strtolower($item), $kondisi) ? '&#10004;' : '' !!}
                                             {{ $item }}
+                                        </span>
                                             @unless ($loop->last)
                                                 /
                                             @endunless
@@ -161,6 +178,7 @@
                             @endforeach
                         </table>
                     </td>
+                </tr>
                 <tr>
                     <td style="font-weight: bold; width: 15%;">
                         &nbsp;
@@ -236,12 +254,14 @@
             </table>
             @php
                 $velg = $bastk->items->firstWhere('kelengkapan', 'Velg Ban');
+                $tutup_dop = $bastk->items->firstWhere('kelengkapan', 'Tutup Dop');
+                $apar = $bastk->items->firstWhere('kelengkapan', 'Apar');
             @endphp
             <table width="95%" style="padding-left: 20px; border-collapse:collapse; margin-top:10px;">
                 <tr>
                     <td width="10%" style="font-weight: bold;">Velg Ban</td>
-                    <td width="10%" style="font-weight: bold;">
-                        {{ $velg?->baik ? ': Original' : ': Racing' }}
+                    <td width="20%">
+                        : <span style="{{ $velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Ada</span> / <span style="{{ !$velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Tidak Ada</span>
                     </td>
                     <td width="50%" rowspan="9" style="vertical-align: top; text-align:center;">
                         <img src="{{ public_path('images/car.jpeg') }}" alt="car" width="100%"
@@ -302,15 +322,15 @@
                 </tr>
                 <tr>
                     <td width="10%" style="font-weight: bold;">Tutup Dop</td>
-                    <td width="20%" style="font-weight: bold;">
-                        {{ $velg?->baik ? ': Ada' : ': Tidak Ada' }}
+                    <td width="20%" >
+                        : <span style="{{ $tutup_dop?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Ada</span> / <span style="{{ !$tutup_dop?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Tidak Ada</span>
                     </td>
 
                 </tr>
                 <tr>
                     <td width="10%" style="font-weight: bold;">Apar</td>
-                    <td width="20%" style="font-weight: bold;">
-                        {{ $bastk->items->firstWhere('kelengkapan', 'Apar')?->baik ? ': Ada' : ': Tidak Ada' }}
+                    <td width="20%">
+                        : <span style="{{ $apar?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Ada</span> / <span style="{{ !$apar?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Tidak Ada</span>
                     </td>
                 </tr>
                 <tr>

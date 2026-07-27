@@ -21,6 +21,9 @@ class BastkInfolist
                                 Infolists\Components\TextEntry::make('kode')
                                     ->label('Kode BASTK')
                                     ->weight('bold')
+                                    ->formatStateUsing(fn ($state) => strtoupper($state))
+                                    ->badge()
+                                    ->color('primary')
                                     ->copyable(),
                                 Infolists\Components\TextEntry::make('unit.nopol')
                                     ->label('No. Polisi Unit')

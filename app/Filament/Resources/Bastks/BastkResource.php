@@ -13,14 +13,15 @@ use App\Models\Bastk;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class BastkResource extends Resource
 {
     protected static ?string $model = Bastk::class;
 
-    protected static ?string $recordTitleAttribute = 'kode';
+    protected static ?string $recordTitleAttribute = 'no_bastk';
+
+    protected static ?string $pluralModelLabel = 'BASTK';
 
     public static function form(Schema $schema): Schema
     {

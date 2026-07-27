@@ -16,35 +16,48 @@ class BastksTable
     {
         return $table
             ->columns([
-                TextColumn::make('kode')
-                    ->label('Kode BASTK')
+                TextColumn::make('no_bastk')
+                    ->label('No BASTK')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('unit.nopol')
                     ->label('Unit')
                     ->searchable()
                     ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false)
                     ->formatStateUsing(fn ($record) => $record->unit ? "{$record->unit->type} - {$record->unit->nopol}" : '-'),
                 TextColumn::make('kepada')
                     ->label('Kepada')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('tgl_serah')
                     ->label('Tgl Serah')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('tgl_kembali')
                     ->label('Tgl Kembali')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('nama_penyerah')
                     ->label('Penyerah')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('nama_penerima')
                     ->label('Penerima')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('kondisi_unit')
+                    ->label('Kondisi Unit')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Dibuat Pada')
                     ->dateTime()

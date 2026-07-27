@@ -9,6 +9,7 @@ class Bastk extends Model
     protected $table = 'bastk';
 
     protected $fillable = [
+        'no_bastk',
         'kode',
         'kepada',
         'alamat',
@@ -42,5 +43,28 @@ class Bastk extends Model
     public function dokumentasi()
     {
         return $this->hasOne(BastkDokumentasi::class, 'bastk_id', 'id');
+    }
+
+    static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($bastk) {
+                    // Melihat seluruh data
+        // dd($bastk->toArray());
+            $bastk->no_bastk = $bastk->generateNoBastk($bastk->kode);
+        });
+    }
+
+    public function generateNoBastk($kode)
+    {
+        $kode = strtoupper($kode); // Convert kode to uppercase
+        $latestBastk = self::latest('id')->first();
+        $latestId = $latestBastk ? $latestBastk->id : 0;
+        $newId = $latestId + 1;
+        $month = now()->format('m/Y'); // results in something like: 07/2026
+
+        return 'BASTK/' . str_pad($newId, 4, '0', STR_PAD_LEFT)  . '/' . $month . '/' . $kode;
+        //results in something like: BASTK/0001/07/2026/BASTK
     }
 }
