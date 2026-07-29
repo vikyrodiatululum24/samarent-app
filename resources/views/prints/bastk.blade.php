@@ -41,6 +41,18 @@
             padding: 5px 10px;
             z-index: 1000;
         }
+
+        .type-bastk {
+            position: fixed;
+            top: 100px;
+            right: 50%;
+            transform: translateX(50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1px 5px;
+            z-index: 1000;
+        }
     </style>
 </head>
 
@@ -55,6 +67,9 @@
     <div>
         <div class="noBastk">
             <p style="text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 5px;">{{ $bastk->no_bastk }}</p>
+        </div>
+        <div class="type-bastk">
+            <p style="text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 5px; text-decoration: underline;">{{ $bastk->type_bastk == 'serah' ? 'PENYERAHAN' : 'PENGAMBILAN' }}</p>
         </div>
         <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%"
             style="margin-bottom: 5px;">
@@ -261,7 +276,7 @@
                 <tr>
                     <td width="10%" style="font-weight: bold;">Velg Ban</td>
                     <td width="20%">
-                        : <span style="{{ $velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Ada</span> / <span style="{{ !$velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Tidak Ada</span>
+                        : <span style="{{ $velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Orignal</span> / <span style="{{ !$velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Racing</span>
                     </td>
                     <td width="50%" rowspan="9" style="vertical-align: top; text-align:center;">
                         <img src="{{ public_path('images/car.jpeg') }}" alt="car" width="100%"

@@ -9,7 +9,9 @@ class Bastk extends Model
     protected $table = 'bastk';
 
     protected $fillable = [
+        'created_by',
         'no_bastk',
+        'type_bastk',
         'kode',
         'kepada',
         'alamat',
@@ -45,13 +47,17 @@ class Bastk extends Model
         return $this->hasOne(BastkDokumentasi::class, 'bastk_id', 'id');
     }
 
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
     static function boot()
     {
         parent::boot();
 
         static::creating(function ($bastk) {
-                    // Melihat seluruh data
-        // dd($bastk->toArray());
+            $bastk->created_by = auth()->id();
             $bastk->no_bastk = $bastk->generateNoBastk($bastk->kode);
         });
     }

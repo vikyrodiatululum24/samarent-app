@@ -94,4 +94,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(BosJoulmer::class);
     }
+    public function bastks()
+    {
+        return $this->hasMany(Bastk::class, 'created_by', 'id');
+    }
 }

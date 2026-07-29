@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\MekanikController;
 use App\Http\Controllers\PraPengajuanController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicBastkController;
 use App\Http\Controllers\PublicPraPengajuanController;
 use App\Http\Controllers\PublicReimbursementController;
 use App\Http\Controllers\ReimbursementPdfController;
@@ -48,6 +50,9 @@ Route::prefix('public')->name('reimbursement.')->group(function () {
     Route::get('/reimbursement/create', [PublicReimbursementController::class, 'create'])->name('create');
     Route::post('/reimbursement/store', [PublicReimbursementController::class, 'store'])->middleware('throttle:10,1')->name('store');
     Route::get('/reimbursement/success', [PublicReimbursementController::class, 'success'])->name('success');
+
+    Route::get('/bastk/create', [PublicBastkController::class, 'createBastk'])->name('bastk.create');
+    Route::post('/bastk/store', [PublicBastkController::class, 'storeBastk'])->middleware('throttle:10,1')->name('bastk.store');
 });
 
 Route::prefix('public')->name('public.')->group(function () {
@@ -101,7 +106,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reimbursement/monitoring-reimbursement-print-pdf', [ReimbursementPdfController::class, 'MonitoringReimbursementPrint'])->name('reimbursement.monitoring-print-pdf');
     Route::get('/reimbursement/monitoring-reimbursement-export-excel', [ReimbursementPdfController::class, 'MonitoringReimbursementExportExcel'])->name('reimbursement.monitoring-export-excel');
     Route::get('/print-bastk/{id}', [PrintController::class, 'printBastk'])->name('print.bastk');
-    
+
     // Route for printing Pra Pengajuan from Filament View Page
     Route::get('ajukan-pra-pengajuan/{id}', [PraPengajuanController::class, 'ajukanPraPengajuan'])->name('ajukan-pra-pengajuan');
     Route::get('ajukan-multiple-pra-pengajuan', [PraPengajuanController::class, 'ajukanMultiplePraPengajuan'])->name('ajukan-multiple-pra-pengajuan');

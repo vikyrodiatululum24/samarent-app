@@ -23,22 +23,31 @@ class BastkForm
                     ->description('Data Utama Berita Acara Serah Terima Kendaraan')
                     ->schema([
                         Grid::make(2)->schema([
-                            Forms\Components\Select::make('kode')->label('Kode BASTK')->placeholder('Pilih Kode BASTK')->unique(ignoreRecord: true)->options([
-                                'nl' => 'NL - New Lease',
-                                'nc' => 'NC - New Car',
-                                'uc' => 'UC - Used Car',
-                                'ec' => 'EC - End Contract',
-                                'rp' => 'RP - Replace',
-                                'tm' => 'TM - Temporary',
-                                'br' => 'BR - Body Repair',
-                                'sv' => 'SV - Service',
-                                'pm' => 'PM - Permar',
-                            ]),
-                            Forms\Components\Select::make('unit_id')->label('Pilih Unit')->relationship('unit', 'nopol')->searchable()->preload()->required()->getOptionLabelFromRecordUsing(fn(Unit $record) => "{$record->type} - {$record->nopol}"),
+                            Group::make()
+                                ->columnSpanFull()
+                                ->columns(3)
+                                ->schema([
+                                    Forms\Components\Select::make('type_bastk')->label('Jenis BASTK')->options([
+                                        'serah' => 'Diserahkan',
+                                        'terima' => 'Diterima',
+                                    ])->required(),
+                                    Forms\Components\Select::make('kode')->label('Kode BASTK')->placeholder('Pilih Kode BASTK')->unique(ignoreRecord: true)->options([
+                                        'nl' => 'NL - New Lease',
+                                        'nc' => 'NC - New Car',
+                                        'uc' => 'UC - Used Car',
+                                        'ec' => 'EC - End Contract',
+                                        'rp' => 'RP - Replace',
+                                        'tm' => 'TM - Temporary',
+                                        'br' => 'BR - Body Repair',
+                                        'sv' => 'SV - Service',
+                                        'pm' => 'PM - Permar',
+                                    ]),
+                                    Forms\Components\Select::make('unit_id')->label('Pilih Unit')->relationship('unit', 'nopol')->searchable()->preload()->required()->getOptionLabelFromRecordUsing(fn(Unit $record) => "{$record->type} - {$record->nopol}"),
+                                ]),
                             Forms\Components\TextInput::make('kepada')->label('Kepada')->required()->maxLength(255),
                             Forms\Components\TextInput::make('no_hp')->label('No HP')->tel()->maxLength(255),
                             Forms\Components\Textarea::make('alamat')->label('Alamat')->columnSpanFull()->rows(2),
-                            Forms\Components\DatePicker::make('tgl_serah')->label('Tanggal Serah')->required(),
+                            Forms\Components\DatePicker::make('tgl_serah')->label('Tanggal Serah'),
                             Forms\Components\DatePicker::make('tgl_kembali')->label('Tanggal Kembali'),
                             Forms\Components\TextInput::make('nama_penyerah')->label('Nama Penyerah')->maxLength(255),
                             Forms\Components\TextInput::make('nama_penerima')->label('Nama Penerima')->maxLength(255),
@@ -54,9 +63,8 @@ class BastkForm
                                 'permar' => 'Permar',
                                 'exchange' => 'Exchange',
                             ])->required()
-                            ->reactive(),
+                                ->reactive(),
                             Forms\Components\Textarea::make('exchange')->label('Exchange')->columnSpanFull()->rows(3)->visible(fn($get) => in_array('exchange', $get('kondisi_unit') ?? []))->required(fn($get) => in_array('exchange', $get('kondisi_unit') ?? [])),
-                            Forms\Components\Textarea::make('keterangan')->label('Keterangan')->columnSpanFull()->rows(3),
                         ]),
                     ]),
 
@@ -202,6 +210,8 @@ class BastkForm
                                 $component->state($items->values()->toArray());
                             })
                             ->columnSpanFull(),
+
+                        Forms\Components\Textarea::make('keterangan')->label('Keterangan')->columnSpanFull()->rows(3),
                     ]),
                 // Step 3: Dokumentasi Foto (Child: bastk_dokumentasis)
                 Step::make('Dokumentasi Foto')
