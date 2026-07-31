@@ -50,9 +50,11 @@ Route::prefix('public')->name('reimbursement.')->group(function () {
     Route::get('/reimbursement/create', [PublicReimbursementController::class, 'create'])->name('create');
     Route::post('/reimbursement/store', [PublicReimbursementController::class, 'store'])->middleware('throttle:10,1')->name('store');
     Route::get('/reimbursement/success', [PublicReimbursementController::class, 'success'])->name('success');
+    });
 
-    Route::get('/bastk/create', [PublicBastkController::class, 'createBastk'])->name('bastk.create');
-    Route::post('/bastk/store', [PublicBastkController::class, 'storeBastk'])->middleware('throttle:10,1')->name('bastk.store');
+Route::prefix('public/bastk')->name('bastk.')->group(function () {
+    Route::get('/create', [PublicBastkController::class, 'create'])->name('create');
+    Route::post('/store', [PublicBastkController::class, 'store'])->middleware('throttle:10,1')->name('store');
 });
 
 Route::prefix('public')->name('public.')->group(function () {

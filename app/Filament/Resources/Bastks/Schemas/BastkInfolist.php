@@ -107,7 +107,7 @@ class BastkInfolist
 
                                                 // Fuel bar indicator
                                                 $html .= '<div style="display: flex; align-items: flex-end; gap: 3px;">';
-                                                $html .= '<span style="font-size: 11px; color: #6b7280; margin-right: 4px; font-weight: 600;">E</span>';
+                                                $html .= '<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 mr-1">E</span>';
                                                 for ($i = 1; $i <= 8; $i++) {
                                                     $active = $i <= $bars;
                                                     $color = $active ? '#22c55e' : '#e5e7eb';
@@ -116,13 +116,13 @@ class BastkInfolist
                                                     $height = 14 + ($i * 2);
                                                     $html .= "<div style='width: 14px; height: {$height}px; background-color: {$color}; border: 1px solid {$border}; border-radius: 2px;' title='Bar {$i}'></div>";
                                                 }
-                                                $html .= '<span style="font-size: 11px; color: #6b7280; margin-left: 4px; font-weight: 600;">F</span>';
+                                                $html .= '<span class="text-xs font-semibold text-gray-500 dark:text-gray-400 mr-1">F</span>';
                                                 $html .= '</div>';
 
                                                 // BBM count + Jenis BBM
                                                 $html .= "<div style='display: flex; flex-direction: column; gap: 2px;'>";
-                                                $html .= "<span style='font-size: 13px; font-weight: bold; color: #111827;'>{$bars} / 8 Bar</span>";
-                                                $html .= "<span style='font-size: 11px; color: #6b7280;'>{$jenisBbm}</span>";
+                                                $html .= "<span class='text-xs font-bold text-gray-900 dark:text-white'>{$bars} / 8 Bar</span>";
+                                                $html .= "<span class='text-xs text-gray-900 dark:text-white'>{$jenisBbm}</span>";
                                                 $html .= "</div>";
 
                                                 $html .= "</div>";

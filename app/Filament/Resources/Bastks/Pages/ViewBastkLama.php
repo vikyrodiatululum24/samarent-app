@@ -2,14 +2,14 @@
 
 namespace App\Filament\Resources\Bastks\Pages;
 
-use App\Filament\Resources\Bastks\BastkResource;
+use App\Filament\Resources\Bastks\BastkLamaResource;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewBastk extends ViewRecord
+class ViewBastkLama extends ViewRecord
 {
-    protected static string $resource = BastkResource::class;
+    protected static string $resource = BastkLamaResource::class;
 
     protected function getHeaderActions(): array
     {

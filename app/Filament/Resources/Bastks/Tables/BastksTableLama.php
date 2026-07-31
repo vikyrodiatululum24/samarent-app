@@ -10,7 +10,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class BastksTable
+class BastksTableLama
 {
     public static function configure(Table $table): Table
     {
@@ -78,4 +78,6 @@ class BastksTable
                 ]),
             ]);
     }
+
+    
 }

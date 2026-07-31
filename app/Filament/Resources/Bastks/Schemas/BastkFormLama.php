@@ -13,7 +13,7 @@ use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
 use Livewire\Form;
 
-class BastkForm
+class BastkFormLama
 {
     public static function configure(Schema $schema): Schema
     {

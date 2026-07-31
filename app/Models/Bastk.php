@@ -12,6 +12,7 @@ class Bastk extends Model
         'created_by',
         'no_bastk',
         'type_bastk',
+        'jenis_bastk',
         'kode',
         'kepada',
         'alamat',
@@ -57,20 +58,34 @@ class Bastk extends Model
         parent::boot();
 
         static::creating(function ($bastk) {
-            $bastk->created_by = auth()->id();
-            $bastk->no_bastk = $bastk->generateNoBastk($bastk->kode);
+            if (!$bastk->created_by) {
+                $bastk->created_by = auth()->id();
+            }
+            if (!$bastk->no_bastk) {
+                $bastk->no_bastk = $bastk->generateNoBastk($bastk->kode, $bastk->jenis_bastk);
+            }
         });
     }
 
-    public function generateNoBastk($kode)
+    public function generateNoBastk($kode, $jenisBastk)
     {
         $kode = strtoupper($kode); // Convert kode to uppercase
-        $latestBastk = self::latest('id')->first();
-        $latestId = $latestBastk ? $latestBastk->id : 0;
-        $newId = $latestId + 1;
+        $latestBastk = self::latest('id')->where('jenis_bastk', $jenisBastk)->first();
+        
+        $newNumber = 1;
+        if ($latestBastk && $latestBastk->no_bastk) {
+            // Contoh format: BASTK/0009/07/2026/NL
+            // Kita pecah string berdasarkan "/"
+            $parts = explode('/', $latestBastk->no_bastk);
+            // Angka 4 digit ada di indeks ke-1 (setelah BASTK)
+            if (isset($parts[1]) && is_numeric($parts[1])) {
+                $newNumber = (int)$parts[1] + 1;
+            }
+        }
+
         $month = now()->format('m/Y'); // results in something like: 07/2026
 
-        return 'BASTK/' . str_pad($newId, 4, '0', STR_PAD_LEFT)  . '/' . $month . '/' . $kode;
-        //results in something like: BASTK/0001/07/2026/BASTK
+        return 'BASTK/' . str_pad($newNumber, 4, '0', STR_PAD_LEFT)  . '/' . $month . '/' . $kode;
+        //results in something like: BASTK/0010/07/2026/NL
     }
 }

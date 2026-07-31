@@ -45,6 +45,7 @@ class ProsesPengajuan extends EditRecord
         $data['finance'] = [
             'user_id' => Auth::user()->id,
             'bukti_transaksi' => $this->record->finance?->bukti_transaksi,
+            'bukti_transaksi_2' => $this->record->finance?->bukti_transaksi_2,
         ];
 
         return $data;
@@ -53,128 +54,141 @@ class ProsesPengajuan extends EditRecord
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-                Section::make('Informasi Finance')
-                    ->schema([
-                        Hidden::make('finance.user_id')
-                            ->default(Auth::user()->id),
-                        Grid::make(3)
-                            ->schema([
-                                Forms\Components\Select::make('complete.payment_2')
-                                    ->label('Nama Rekening')
-                                    ->options(
-                                        \App\Models\Norek::pluck('name', 'name')->toArray()
-                                    )
-                                    ->searchable()
-                                    ->nullable()
-                                    ->live()
-                                    ->afterStateUpdated(function ($component, $state, Set $set) {
-                                        $component->state(strtoupper($state));
-                                        $norek = \App\Models\Norek::where('name', $state)->first();
-                                        $set('complete.norek_2', $norek?->norek);
-                                        $set('complete.bank_2', $norek?->bank);
-                                        $set('complete.payment_2', $norek?->name);
-                                    })
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')
-                                            ->label('Nama Rekening')
-                                            ->required()
-                                            ->maxLength(255),
-                                        Forms\Components\TextInput::make('norek')
-                                            ->label('No. Rekening')
-                                            ->required()
-                                            ->inputMode('numeric')
-                                            ->rules(['regex:/^[0-9]+$/'])
-                                            ->validationMessages([
-                                                'regex' => 'No. Rekening harus berupa angka.',
-                                            ])
-                                            ->maxLength(255),
-                                        Forms\Components\Select::make('bank')
-                                            ->label('Bank')
-                                            ->required()
-                                            ->options([
-                                                'BCA' => 'BCA',
-                                                'MANDIRI' => 'MANDIRI',
-                                                'BRI' => 'BRI',
-                                                'BNI' => 'BNI',
-                                                'PERMATA' => 'PERMATA',
-                                                'BTN' => 'BTN',
-                                            ]),
-                                    ])
-                                    ->createOptionUsing(function (array $data) {
-                                        $exists = \App\Models\Norek::where('name', $data['name'])
-                                            ->orWhere('norek', $data['norek'])
-                                            ->exists();
-                                        if ($exists) {
-                                            Notification::make()
-                                                ->title('Gagal Menambah Rekening')
-                                                ->body('Nama rekening atau nomor rekening sudah terdaftar.')
-                                                ->danger()
-                                                ->send();
-                                            return $data['name'];
-                                        }
-                                        \App\Models\Norek::create(['name' => $data['name'], 'norek' => $data['norek'], 'bank' => $data['bank']]);
+            Section::make('Informasi Finance')
+                ->schema([
+                    Hidden::make('finance.user_id')
+                        ->default(Auth::user()->id),
+                    Grid::make(3)
+                        ->schema([
+                            Forms\Components\Select::make('complete.payment_2')
+                                ->label('Nama Rekening')
+                                ->options(
+                                    \App\Models\Norek::pluck('name', 'name')->toArray()
+                                )
+                                ->searchable()
+                                ->nullable()
+                                ->live()
+                                ->afterStateUpdated(function ($component, $state, Set $set) {
+                                    $component->state(strtoupper($state));
+                                    $norek = \App\Models\Norek::where('name', $state)->first();
+                                    $set('complete.norek_2', $norek?->norek);
+                                    $set('complete.bank_2', $norek?->bank);
+                                    $set('complete.payment_2', $norek?->name);
+                                })
+                                ->createOptionForm([
+                                    Forms\Components\TextInput::make('name')
+                                        ->label('Nama Rekening')
+                                        ->required()
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('norek')
+                                        ->label('No. Rekening')
+                                        ->required()
+                                        ->inputMode('numeric')
+                                        ->rules(['regex:/^[0-9]+$/'])
+                                        ->validationMessages([
+                                            'regex' => 'No. Rekening harus berupa angka.',
+                                        ])
+                                        ->maxLength(255),
+                                    Forms\Components\Select::make('bank')
+                                        ->label('Bank')
+                                        ->required()
+                                        ->options([
+                                            'BCA' => 'BCA',
+                                            'MANDIRI' => 'MANDIRI',
+                                            'BRI' => 'BRI',
+                                            'BNI' => 'BNI',
+                                            'PERMATA' => 'PERMATA',
+                                            'BTN' => 'BTN',
+                                        ]),
+                                ])
+                                ->createOptionUsing(function (array $data) {
+                                    $exists = \App\Models\Norek::where('name', $data['name'])
+                                        ->orWhere('norek', $data['norek'])
+                                        ->exists();
+                                    if ($exists) {
                                         Notification::make()
-                                            ->title('Berhasil Menambah Rekening')
-                                            ->body('Nama rekening dan nomor rekening berhasil ditambahkan.')
-                                            ->success()
+                                            ->title('Gagal Menambah Rekening')
+                                            ->body('Nama rekening atau nomor rekening sudah terdaftar.')
+                                            ->danger()
                                             ->send();
                                         return $data['name'];
-                                    })
-                                    ->createOptionAction(function ($action) {
-                                        $action->modalHeading('Tambah Nama Rekening Baru');
-                                    }),
-                                Forms\Components\TextInput::make('complete.bank_2')
-                                    ->nullable()
-                                    ->label('Bank')
-                                    ->readOnly(),
-                                Forms\Components\TextInput::make('complete.norek_2')
-                                    ->nullable()
-                                    ->label('No. Rekening')
-                                    ->inputMode('numeric')
-                                    ->rules(['regex:/^[0-9]+$/'])
-                                    ->validationMessages([
-                                        'regex' => 'No. Rekening harus berupa angka.',
-                                    ])
-                                    ->maxLength(255)
-                                    ->readOnly(),
-                            ]),
-                            Grid::make(2)
-                            ->schema([
-                                Forms\Components\DatePicker::make('complete.tanggal_input_bank')
-                                    ->label('Tanggal Input Bank')
-                                    ->nullable(),
-                                Forms\Components\DatePicker::make('complete.tanggal_tf_finance')
-                                    ->label('Tanggal Transfer')
-                                    ->required(fn($get) => $get('complete.status_finance') === 'paid'),
+                                    }
+                                    \App\Models\Norek::create(['name' => $data['name'], 'norek' => $data['norek'], 'bank' => $data['bank']]);
+                                    Notification::make()
+                                        ->title('Berhasil Menambah Rekening')
+                                        ->body('Nama rekening dan nomor rekening berhasil ditambahkan.')
+                                        ->success()
+                                        ->send();
+                                    return $data['name'];
+                                })
+                                ->createOptionAction(function ($action) {
+                                    $action->modalHeading('Tambah Nama Rekening Baru');
+                                }),
+                            Forms\Components\TextInput::make('complete.bank_2')
+                                ->nullable()
+                                ->label('Bank')
+                                ->readOnly(),
+                            Forms\Components\TextInput::make('complete.norek_2')
+                                ->nullable()
+                                ->label('No. Rekening')
+                                ->inputMode('numeric')
+                                ->rules(['regex:/^[0-9]+$/'])
+                                ->validationMessages([
+                                    'regex' => 'No. Rekening harus berupa angka.',
+                                ])
+                                ->maxLength(255)
+                                ->readOnly(),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
+                            Forms\Components\DatePicker::make('complete.tanggal_input_bank')
+                                ->label('Tanggal Input Bank')
+                                ->nullable(),
+                            Forms\Components\DatePicker::make('complete.tanggal_tf_finance')
+                                ->label('Tanggal Transfer')
+                                ->required(fn($get) => $get('complete.status_finance') === 'paid'),
 
-                                Forms\Components\TextInput::make('complete.nominal_tf_finance')
-                                    ->label('Nominal Transfer')
-                                    ->inputMode('numeric')
-                                    ->rules(['regex:/^[0-9]+$/'])
-                                    ->validationMessages([
-                                        'regex' => 'Nominal harus berupa angka.',
-                                    ])
-                                    ->required(fn($get) => $get('complete.status_finance') === 'paid'),
+                            Forms\Components\TextInput::make('complete.nominal_tf_finance')
+                                ->label('Nominal Transfer')
+                                ->inputMode('numeric')
+                                ->rules(['regex:/^[0-9]+$/'])
+                                ->validationMessages([
+                                    'regex' => 'Nominal harus berupa angka.',
+                                ])
+                                ->required(fn($get) => $get('complete.status_finance') === 'paid'),
 
-                                Forms\Components\Select::make('complete.status_finance')
-                                    ->label('Status')
-                                    ->options([
-                                        'paid' => 'Paid',
-                                        'unpaid' => 'Unpaid',
-                                    ])
-                                    ->live(),
-                            ]),
-                        Forms\Components\FileUpload::make('finance.bukti_transaksi')
-                            ->label('Bukti Transaksi')
-                            ->resize(50)
-                            ->maxSize(2048)
-                            ->helperText('Hanya dapat mengunggah file dengan tipe PDF atau gambar (image).')
-                            ->required(fn($get) => $get('complete.status_finance') === 'paid')
-                            ->acceptedFileTypes(['application/pdf', 'image/*'])
-                            ->disk('public')
-                            ->directory('bukti_transaksi'),
-                    ]),
-            ])
+                            Forms\Components\Select::make('complete.status_finance')
+                                ->label('Status')
+                                ->options([
+                                    'paid' => 'Paid',
+                                    'unpaid' => 'Unpaid',
+                                ])
+                                ->live(),
+                        ]),
+                    Grid::make(2)
+                        ->schema([
+                            Forms\Components\FileUpload::make('finance.bukti_transaksi')
+                                ->label('Bukti Transaksi')
+                                ->resize(50)
+                                ->maxSize(2048)
+                                ->helperText('Hanya dapat mengunggah file dengan tipe PDF atau gambar (image).')
+                                ->required(fn($get) => $get('complete.status_finance') === 'paid')
+                                ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->disk('public')
+                                ->directory('bukti_transaksi'),
+
+                            Forms\Components\FileUpload::make('finance.bukti_transaksi_2')
+                                ->label('Bukti Transaksi 2')
+                                ->resize(50)
+                                ->maxSize(2048)
+                                ->helperText('Hanya dapat mengunggah file dengan tipe PDF atau gambar (image).')
+                                ->required(fn($get) => $get('complete.status_finance') === 'paid')
+                                ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->disk('public')
+                                ->directory('bukti_transaksi'),
+                        ])
+                ]),
+        ])
             ->columns(1);
     }
 

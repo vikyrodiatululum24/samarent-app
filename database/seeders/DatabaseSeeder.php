@@ -18,8 +18,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // UserSeeder::class,
             // UnitJualSeeder::class,
-            EndUserSeeder::class,
-            DriverAttendenceSeeder::class,
+            // EndUserSeeder::class,
+            // DriverAttendenceSeeder::class,
+            driverSeeder::class,
         ]);
     }
 }

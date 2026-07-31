@@ -418,6 +418,10 @@ class PengajuanResource extends Resource
                         ViewEntry::make('finance.bukti_transaksi')
                             ->label('Bukti Transaksi')
                             ->view('filament.components.bukti_transaksi'),
+
+                        ViewEntry::make('finance.bukti_transaksi_2')
+                            ->label('Bukti Transaksi')
+                            ->view('filament.components.bukti_transaksi'),
                     ])
                     ->columns([
                         'default' => 4,

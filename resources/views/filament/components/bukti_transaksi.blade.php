@@ -6,8 +6,8 @@
     @endphp
 
     @if ($extension === 'pdf')
-        <embed src="{{ asset('storage/' . $file) }}" type="application/pdf" width="300px" height="200px" class="rounded-sm shadow-sm" />
-
+        <embed src="{{ asset('storage/' . $file) }}" type="application/pdf" width="300px" height="200px"
+            class="rounded-sm shadow-sm" />
     @else
         <img src="{{ asset('storage/' . $file) }}" class="object-cover rounded-sm shadow-sm"
             style="max-width: 300px; max-height: 200px;" alt="Foto Bukti Transaksi">
@@ -15,6 +15,11 @@
     <a href="{{ asset('storage/' . $getState()) }}" download
         class="px-3 py-1 bg-blue-600 text-white text-sm rounded-sm hover:bg-blue-700 transition">
         Download
+    </a>
+    {{-- preview --}}
+    <a href="{{ asset('storage/' . $getState()) }}" target="_blank"
+        class="px-3 py-1 bg-gray-600 text-white text-sm rounded-sm hover:bg-gray-700 transition">
+        Preview
     </a>
 @else
     <p class="text-gray-500">Tidak ada bukti transaksi.</p>
