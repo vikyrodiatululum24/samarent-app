@@ -45,12 +45,53 @@ class NorekResource extends Resource
                     ->label('Bank')
                     ->required()
                     ->options([
-                        'BCA' => 'BCA',
-                        'MANDIRI' => 'MANDIRI',
-                        'BRI' => 'BRI',
-                        'BNI' => 'BNI',
-                        'PERMATA' => 'PERMATA',
-                        'BTN' => 'BTN',
+                        // Bank BUMN / Himbara
+                        'MANDIRI' => 'Bank Mandiri',
+                        'BRI' => 'Bank Rakyat Indonesia (BRI)',
+                        'BNI' => 'Bank Negara Indonesia (BNI)',
+                        'BTN' => 'Bank Tabungan Negara (BTN)',
+                        'BSI' => 'Bank Syariah Indonesia (BSI)',
+                        
+                        // Bank Swasta Nasional Terbesar
+                        'BCA' => 'Bank Central Asia (BCA)',
+                        'DANAMON' => 'Bank Danamon',
+                        'PERMATA' => 'Bank Permata',
+                        'CIMB' => 'Bank CIMB Niaga',
+                        'PANIN' => 'Bank Panin',
+                        'MAYBANK' => 'Maybank Indonesia',
+                        'OCBC' => 'OCBC NISP',
+                        'MEGA' => 'Bank Mega',
+                        'SINARMAS' => 'Bank Sinarmas',
+                        'BUKOPIN' => 'KB Bank (Bukopin)',
+                        
+                        // Bank Digital / Populer
+                        'JAGO' => 'Bank Jago',
+                        'ALLO' => 'Allo Bank',
+                        'SEABANK' => 'SeaBank',
+                        'NEO' => 'Bank Neo Commerce',
+                        'BLU' => 'blu by BCA Digital',
+                        'JENIUS' => 'Jenius (BTPN)',
+                        
+                        // Bank Pembangunan Daerah (BPD)
+                        'BJB' => 'Bank BJB',
+                        'DKI' => 'Bank DKI',
+                        'JATENG' => 'Bank Jateng',
+                        'JATIM' => 'Bank Jatim',
+                        'BALI' => 'Bank BPD Bali',
+                        'DIY' => 'Bank BPD DIY',
+                        'SUMUT' => 'Bank Sumut',
+                        'NAGARI' => 'Bank Nagari',
+                        'RIAU_KEPRI' => 'Bank Riau Kepri Syariah',
+                        'SUMSEL_BABEL' => 'Bank Sumsel Babel',
+                        'LAMPUNG' => 'Bank Lampung',
+                        'KALSEL' => 'Bank Kalsel',
+                        'KALBAR' => 'Bank Kalbar',
+                        'KALTIMTARA' => 'Bank Kaltimtara',
+                        'SULSELBAR' => 'Bank Sulselbar',
+                        'SUTRA' => 'Bank Sultra',
+                        'NTB' => 'Bank NTB Syariah',
+                        'NTT' => 'Bank NTT',
+                        'PAPUA' => 'Bank Papua',
                     ]),
             ]);
     }
