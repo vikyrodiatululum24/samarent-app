@@ -26,8 +26,12 @@ class DriversImport implements ToCollection, WithHeadingRow
                 if($user){
                     $user->delete();
                 }
-                
+
                 $email = strtolower(str_replace(' ', '',$row['name'])).'@'.$row['domain'];
+
+                if (User::where('email', $email)->first()) {
+                    continue;
+                }
 
                 $project = Project::where('name', $row['project'])->first();
                 $projectId = $project ? $project->id : null;
