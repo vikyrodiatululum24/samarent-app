@@ -21,6 +21,13 @@ class DriversImport implements ToCollection, WithHeadingRow
             foreach ($rows as $row) {
 
                 $email = strtolower(str_replace(' ', '',$row['name'])).$row['domain'];
+                
+                $user = User::where('email', $email)->first();
+                if($user){
+                    $user->delete();
+                }
+                
+                $email = strtolower(str_replace(' ', '',$row['name'])).'@'.$row['domain'];
 
                 $project = Project::where('name', $row['project'])->first();
                 $projectId = $project ? $project->id : null;
