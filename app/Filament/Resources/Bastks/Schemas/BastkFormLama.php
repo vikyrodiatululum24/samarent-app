@@ -35,8 +35,14 @@ class BastkFormLama
                                     Forms\Components\Select::make('kode')->label('Kode BASTK')->placeholder('Pilih Kode BASTK')->options(BastkHelper::kode())->required(),
                                     Forms\Components\Select::make('unit_id')->label('Pilih Unit')->relationship('unit', 'nopol')->searchable()->preload()->required()->getOptionLabelFromRecordUsing(fn(Unit $record) => "{$record->type} - {$record->nopol}"),
                                 ]),
-                            Forms\Components\TextInput::make('kepada')->label('Kepada')->required()->maxLength(255),
-                            Forms\Components\TextInput::make('no_hp')->label('No HP')->tel()->maxLength(255),
+                            Group::make()
+                                ->columnSpanFull()
+                                ->columns(3)
+                                ->schema([
+                                    Forms\Components\TextInput::make('jenis_bastk')->label('Jenis BASTK')->required()->placeholder('BASTK/0001/07/2026/NL')->maxLength(255)->helperText('contoh : BASTK/nomorUrut/bulan/tahun/kode'),
+                                    Forms\Components\TextInput::make('kepada')->label('Kepada')->required()->maxLength(255),
+                                    Forms\Components\TextInput::make('no_hp')->label('No HP')->tel()->maxLength(255),
+                                ]),
                             Forms\Components\Textarea::make('alamat')->label('Alamat')->columnSpanFull()->rows(2),
                             Forms\Components\DatePicker::make('tgl_serah')->label('Tanggal Serah'),
                             Forms\Components\DatePicker::make('tgl_kembali')->label('Tanggal Kembali'),
