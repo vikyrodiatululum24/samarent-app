@@ -17,7 +17,7 @@ class HolidayDates
             now()->addDays(30),
             function () use ($year) {
                 $response = Http::timeout(5)->get(
-                    "https://libur.deno.dev/api?tahun={$year}"
+                    "https://cal.weruka.dev/api/holidays?year={$year}"
                 );
 
                 if ($response->successful()) {
