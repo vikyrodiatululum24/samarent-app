@@ -84,6 +84,8 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Panels'),
                 NavigationGroup::make()
+                    ->label('BASTK'),
+                NavigationGroup::make()
                     ->label('Pengaturan'),
                 NavigationGroup::make()
                     ->label('Unit'),

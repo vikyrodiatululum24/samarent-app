@@ -25,6 +25,11 @@ class ListDrivers extends ListRecords
                 ->icon('heroicon-o-document-arrow-up')
                 ->color('info')
                 ->form([
+                    \Filament\Forms\Components\Placeholder::make('download_template')
+                        ->label('')
+                        ->content(new \Illuminate\Support\HtmlString('
+                                <span>Silahkan unduh <a href="' . route('filament.driver.download-sample') . '" class="font-semibold text-primary-600 dark:text-primary-400 hover:underline">Template Sample Driver (Excel)</a>.</span>
+                        ')),
                     \Filament\Forms\Components\FileUpload::make('file')
                         ->label('File Excel')
                         ->required()

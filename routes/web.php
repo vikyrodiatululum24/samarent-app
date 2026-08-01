@@ -105,6 +105,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/reimbursement/print-pdf', [ReimbursementPdfController::class, 'print'])->name('reimbursement.print-pdf');
     Route::get('/reimbursement/export-excel', [ReimbursementPdfController::class, 'exportExcel'])->name('reimbursement.export-excel');
     Route::get('print-form-driver', [PrintController::class, 'printFormDriver'])->name('filament.driver.print-form-driver');
+    Route::get('download-driver-sample', function () {
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\DriversTemplateExport, 'sample_driver_import.xlsx');
+    })->name('filament.driver.download-sample');
     Route::get('/reimbursement/monitoring-reimbursement-print-pdf', [ReimbursementPdfController::class, 'MonitoringReimbursementPrint'])->name('reimbursement.monitoring-print-pdf');
     Route::get('/reimbursement/monitoring-reimbursement-export-excel', [ReimbursementPdfController::class, 'MonitoringReimbursementExportExcel'])->name('reimbursement.monitoring-export-excel');
     Route::get('/print-bastk/{id}', [PrintController::class, 'printBastk'])->name('print.bastk');

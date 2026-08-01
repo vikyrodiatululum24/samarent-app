@@ -8,6 +8,7 @@ use App\Models\Project;
 use Faker\Factory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
@@ -20,16 +21,15 @@ class DriversImport implements ToCollection, WithHeadingRow
 
             foreach ($rows as $row) {
 
-                $email = strtolower(str_replace(' ', '',$row['name'])).$row['domain'];
-                
-                $user = User::where('email', $email)->first();
-                if($user){
-                    $user->delete();
-                }
+                $email = $row['email'];
 
-                $email = strtolower(str_replace(' ', '',$row['name'])).'@'.$row['domain'];
+                $validateEmail = Validator::make([
+                    'email' => $email,
+                ], [
+                    'email' => 'required|email|unique:users,email',
+                ]);
 
-                if (User::where('email', $email)->first()) {
+                if ($validateEmail->fails()) {
                     continue;
                 }
 
@@ -51,11 +51,10 @@ class DriversImport implements ToCollection, WithHeadingRow
                     'alamat' => $row['alamat'],
                     'no_wa' => $row['no_wa'],
                     'project_id' => $projectId,
-                    'jenis_kelamin' => $row['jenis_kelamin'],
-                    'salary' => $row['salary'],
+                    'jenis_kelamin' => strtolower($row['jenis_kelamin']),
+                    'salary' => 0,
                 ]);
             }
-
         });
     }
 }
