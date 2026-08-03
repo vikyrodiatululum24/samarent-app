@@ -151,14 +151,15 @@ class OvertimePaysRelationManager extends RelationManager
                     ->label('Edit')
                     ->icon('heroicon-o-pencil')
                     ->form([
-                        Forms\Components\TextInput::make('out_of_town')->label('Dinas Luar')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
-                        Forms\Components\TextInput::make('overnight')->label('Menginap')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
-                        Forms\Components\TextInput::make('own_risk')->label('Own Risk')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(','),
+                        Forms\Components\TextInput::make('out_of_town')->label('Dinas Luar')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->default(0)->required(),
+                        Forms\Components\TextInput::make('overnight')->label('Menginap')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->default(0)->required(),
+                        Forms\Components\TextInput::make('own_risk')->label('Own Risk')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->default(0)->required(),
                         Forms\Components\TextInput::make('deduction_value')->label('Potongan Lainnya')->numeric()->prefix('Rp ')->mask(RawJs::make('$money($input)'))->stripCharacters(',')->live(onBlur: true)->afterStateUpdated(function ($set, $get) {
                             if ($get('deduction_value') <= 0) {
                                 $set('deduction_desc', null);
                             }
-                        }),
+                        })
+                        ->default(0)->required(),
                         Forms\Components\Textarea::make('deduction_desc')->label('Deskripsi Potongan')->columnSpanFull()->required(fn ($get) => $get('deduction_value') > 0)->maxLength(65535)->visible(fn ($get) => $get('deduction_value') > 0),
                         Forms\Components\Textarea::make('remarks')->label('Keterangan')->columnSpanFull()->maxLength(65535),
                     ])

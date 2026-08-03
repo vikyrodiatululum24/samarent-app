@@ -50,7 +50,9 @@ class OvertimePaysRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('out_of_town')->label('Dinas Luar')->money('idr', true)->sortable(), //keluar kota
                 Tables\Columns\TextColumn::make('overnight')->label('Menginap')->money('idr', true)->sortable(), //menginap
                 Tables\Columns\TextColumn::make('or')->label('OR')->money('idr', true)->sortable(), //menginap
-                // Tables\Columns\TextColumn::make('remarks')->label('Keterangan')->sortable(),
+                Tables\Columns\TextColumn::make('deduction_value')->label('Potongan Lainnya')->money('idr', true)->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('deduction_desc')->label('Deskripsi Potongan')->sortable()->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('month')
