@@ -182,7 +182,6 @@ class ProsesPengajuan extends EditRecord
                                 ->resize(50)
                                 ->maxSize(2048)
                                 ->helperText('Hanya dapat mengunggah file dengan tipe PDF atau gambar (image).')
-                                ->required(fn($get) => $get('complete.status_finance') === 'paid')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
                                 ->disk('public')
                                 ->directory('bukti_transaksi'),
