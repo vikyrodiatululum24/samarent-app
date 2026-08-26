@@ -23,13 +23,6 @@ class GsResource extends Resource
 
     protected static ?string $pluralModelLabel = 'GS';
 
-    protected static ?string $recordTitleAttribute = 'record-title';
-
-    public static function getRecordTitle(?Model $record): string
-    {
-        return $record?->driver?->user->name ?? 'Tidak ada driver';
-    }
-
     public static function form(Schema $schema): Schema
     {
         return GsForm::configure($schema);
@@ -60,5 +53,10 @@ class GsResource extends Resource
             'view' => ViewGs::route('/{record}'),
             'edit' => EditGs::route('/{record}/edit'),
         ];
+    }
+
+    public static function getCreateButtonLabel(): string
+    {
+        return 'Input GS';
     }
 }

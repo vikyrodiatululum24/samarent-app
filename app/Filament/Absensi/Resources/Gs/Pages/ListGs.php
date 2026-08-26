@@ -3,7 +3,9 @@
 namespace App\Filament\Absensi\Resources\Gs\Pages;
 
 use App\Filament\Absensi\Resources\Gs\GsResource;
+use App\Filament\Exports\GsExporter;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ExportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListGs extends ListRecords
@@ -13,7 +15,10 @@ class ListGs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            ExportAction::make()
+                ->label('Export Excel')
+                ->exporter(GsExporter::class),
+            CreateAction::make()->label('Input GS'),
         ];
     }
 }

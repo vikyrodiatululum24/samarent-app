@@ -2,12 +2,18 @@
 
 namespace App\Filament\Absensi\Resources\Gs\Tables;
 
+use App\Models\Gs;
+use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use App\Filament\Exports\GsExporter;
+use Filament\Actions\ExportBulkAction;
+use Illuminate\Database\Eloquent\Builder;
 
 class GsTable
 {
@@ -49,7 +55,30 @@ class GsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('month')
+                    ->label('Filter Bulan & Tahun')
+                    ->options(function () {
+                        $months = [];
+                        $gss = Gs::selectRaw('DISTINCT YEAR(tanggal_mulai) as year, MONTH(tanggal_mulai) as month')
+                            ->whereNotNull('tanggal_mulai')
+                            ->orderBy('year', 'desc')
+                            ->orderBy('month', 'desc')
+                            ->get();
+
+                        foreach ($gss as $gs) {
+                            $key = $gs->year . '-' . str_pad($gs->month, 2, '0', STR_PAD_LEFT);
+                            $label = Carbon::createFromDate($gs->year, $gs->month, 1)->format('F Y');
+                            $months[$key] = $label;
+                        }
+
+                        return $months;
+                    })
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['value'])) {
+                            [$year, $month] = explode('-', $data['value']);
+                            $query->whereYear('tanggal_mulai', $year)->whereMonth('tanggal_mulai', $month);
+                        }
+                    }),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -57,6 +86,7 @@ class GsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()->exporter(GsExporter::class),
                     DeleteBulkAction::make(),
                 ]),
             ]);

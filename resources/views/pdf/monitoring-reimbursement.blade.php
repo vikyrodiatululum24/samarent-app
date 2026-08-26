@@ -151,6 +151,10 @@
                     <td>: {{ $dari ? \Carbon\Carbon::parse($dari)->translatedFormat('d F Y') : '-' }} s/d
                         {{ $sampai ? \Carbon\Carbon::parse($sampai)->translatedFormat('d F Y') : '-' }}</td>
                 </tr>
+                <tr>
+                    <td>Nama Pegawai</td>
+                    <td>: {{ $nameUsers ? implode(', ', $nameUsers) : '-' }}</td>
+                </tr>
             </table>
         </div>
 

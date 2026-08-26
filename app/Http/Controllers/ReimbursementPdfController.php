@@ -273,6 +273,10 @@ class ReimbursementPdfController extends Controller
             if ($request->query('ids')) {
                 $ids = explode(',', $request->query('ids'));
                 $reimbursements = Reimbursement::whereIn('id', $ids)->orderBy('date', 'asc')->get();
+                $users = Reimbursement::whereIn('id', $ids)->pluck('user_id')->unique();
+                foreach ($users as $user) {
+                    $nameUsers[] = User::find($user)->name;
+                }
 
                 $dari = $reimbursements->min('date');
                 $sampai = $reimbursements->max('date');
@@ -281,9 +285,13 @@ class ReimbursementPdfController extends Controller
                     ->whereDate('date', '<=', $sampai)
                     ->orderBy('date', 'asc')
                     ->get();
+                $users = Reimbursement::whereDate('date', '>=', $dari)->whereDate('date', '<=', $sampai)->pluck('user_id')->unique();
+                foreach ($users as $user) {
+                    $nameUsers[] = User::find($user)->name;
+                }
             }
 
-            $pdf = PDF::loadView('pdf.monitoring-reimbursement', compact('reimbursements', 'dari', 'sampai'))->setPaper('a4', 'portrait');
+            $pdf = PDF::loadView('pdf.monitoring-reimbursement', compact('reimbursements', 'dari', 'sampai', 'nameUsers'))->setPaper('a4', 'portrait');
 
             $filename = 'Laporan_Monitoring_Reimbursement_' . now()->format('YmdHis') . '.pdf';
 

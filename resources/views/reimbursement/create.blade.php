@@ -195,6 +195,9 @@
                             <option value="bbm" {{ old('type') == 'bbm' ? 'selected' : '' }}>BBM</option>
                             <option value="tol" {{ old('type') == 'tol' ? 'selected' : '' }}>Tol</option>
                             <option value="parkir" {{ old('type') == 'parkir' ? 'selected' : '' }}>Parkir</option>
+                            <option value="transportasi umum" {{ old('type') == 'transportasi umum' ? 'selected' : '' }}>Transportasi Umum</option>
+                            <option value="konsumsi" {{ old('type') == 'konsumsi' ? 'selected' : '' }}>Konsumsi</option>
+                            <option value="biaya luar kota" {{ old('type') == 'biaya luar kota' ? 'selected' : '' }}>Biaya Luar Kota</option>
                             <option value="lainnya" {{ old('type') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
                         </select>
                         @error('type')

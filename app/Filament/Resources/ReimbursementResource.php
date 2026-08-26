@@ -67,6 +67,9 @@ class ReimbursementResource extends Resource
                         'bbm' => 'BBM',
                         'tol' => 'Tol',
                         'parkir' => 'Parkir',
+                        'transportasi umum' => 'Transportasi Umum',
+                        'konsumsi' => 'Konsumsi',
+                        'biaya luar kota' => 'Biaya Luar Kota',
                         'lainnya' => 'Lainnya',
                     ])
                     ->required()

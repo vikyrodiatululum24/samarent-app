@@ -18,8 +18,6 @@ class SignatureResource extends Resource
 {
     protected static ?string $model = GroupSignature::class;
 
-    protected static ?string $recordTitleAttribute = 'signature';
-
     protected static ?string $label = 'Signature';
 
     protected static string | \UnitEnum | null $navigationGroup = 'Master Data';
