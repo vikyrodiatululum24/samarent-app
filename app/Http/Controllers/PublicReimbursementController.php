@@ -53,7 +53,7 @@ class PublicReimbursementController extends Controller
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'user_id' => 'required|exists:users,id',
-            'type' => 'required|in:bbm,tol,parkir,lainnya',
+            'type' => 'required|in:bbm,tol,parkir,transportasi umum,konsumsi,biaya luar kotalainnya',
             'km_awal' => 'nullable|numeric|min:0',
             'foto_odometer_awal' => 'nullable|image|max:10240',
             'km_akhir' => 'nullable|numeric|min:0|gt:km_awal',
