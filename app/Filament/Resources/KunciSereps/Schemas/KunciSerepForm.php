@@ -14,8 +14,8 @@ class KunciSerepForm
     {
         $options = [];
         for ($i = 1; $i <= 6; $i++) {
-            foreach (['A', 'B', 'C', 'D'] as $char) {
-                $options["Box $i-$char"] = "Box $i-$char";
+            foreach (['a', 'b', 'c', 'd'] as $char) {
+                $options["box $i-$char"] = strtoupper("box $i-$char");
             }
         }
         return $options;
@@ -56,6 +56,7 @@ class KunciSerepForm
                             ->label('Lokasi')
                             ->options(self::getLokasiOptions())
                             ->searchable()
+                            ->afterStateHydrated(fn (Set $set, ?string $state) => $state ? $set('lokasi', strtolower($state)) : null)
                             ->disabled(fn (Get $get) => $get('status_kunci') === 'diambil')
                             ->dehydrated()
                             ->required(fn (Get $get) => $get('status_kunci') === 'tersedia'),
