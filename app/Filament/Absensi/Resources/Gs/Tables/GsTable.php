@@ -48,11 +48,14 @@ class GsTable
                 TextColumn::make('driver_pengganti')
                     ->label('Driver Pengganti')
                     ->searchable(),
-                TextColumn::make('created_at')
-                    ->label('Dibuat Pada')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('status_progres')
+                    ->label('Status Progres')
+                    ->badge()
+                    ->color(fn($state) => $state === 'progres' ? 'warning' : ($state === 'selesai' ? 'success' : 'gray')),
+                TextColumn::make('status_pembayaran')
+                    ->label('Status Pembayaran')
+                    ->badge()
+                    ->color(fn($state) => $state === 'belum bayar' ? 'warning' : ($state === 'terbayar' ? 'success' : 'gray')),
             ])
             ->filters([
                 SelectFilter::make('month')

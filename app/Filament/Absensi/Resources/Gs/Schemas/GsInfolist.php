@@ -13,6 +13,7 @@ class GsInfolist
     public static function configure(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
                 Section::make('Data Driver Original')
                     ->schema([
@@ -110,6 +111,25 @@ class GsInfolist
                             ->placeholder('-'),
                     ])
                     ->columns(2),
+
+                Section::make('Status')
+                    ->schema([
+                        TextEntry::make('status_progres')
+                            ->label('Status Progres')
+                            ->badge()
+                            ->color(fn($state) => $state === 'progres' ? 'warning' : ($state === 'selesai' ? 'success' : 'gray')),
+                        TextEntry::make('status_pembayaran')
+                            ->label('Status Pembayaran')
+                            ->badge()
+                            ->color(fn($state) => $state === 'belum bayar' ? 'warning' : ($state === 'terbayar' ? 'success' : 'gray')),
+                    ])
+                    ->columns(2)
+                    ->visible(function($record) {
+                        if ($record->status_progres === null && $record->status_pembayaran === null) {
+                            return false;
+                        }
+                        return true;
+                    }),
             ]);
     }
 }

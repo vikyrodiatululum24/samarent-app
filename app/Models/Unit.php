@@ -49,4 +49,8 @@ class Unit extends Model
     {
         return $this->hasMany(Bastk::class, 'unit_id', 'id');
     }
+    public function kunciSerep()
+    {
+        return $this->hasMany(KunciSerep::class, 'unit_id', 'id');
+    }
 }

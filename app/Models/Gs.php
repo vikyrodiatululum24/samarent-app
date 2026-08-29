@@ -21,6 +21,8 @@ class Gs extends Model
         'tanggal_selesai',
         'kunci_unit',
         'keterangan',
+        'status_progres',
+        'status_pembayaran',
         'driver_pengganti',
         'no_hp_pengganti',
     ];

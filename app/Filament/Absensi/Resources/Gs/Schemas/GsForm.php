@@ -99,6 +99,31 @@ class GsForm
                             ->required(),
                     ])
                     ->columns(2),
+
+                Section::make('Status Proses')
+                    ->schema([
+                        Select::make('status_progres')
+                            ->label('Status Progres')
+                            ->options([
+                                'progres' => 'Progres',
+                                'selesai' => 'Selesai',
+                            ])
+                            ->default('progres')
+                            ->formatStateUsing(fn ($state) => $state ?? 'progres')
+                            ->selectablePlaceholder(false)
+                            ->required(),
+                        Select::make('status_pembayaran')
+                            ->label('Status Pembayaran')
+                            ->options([
+                                'belum bayar' => 'Belum Dibayar',
+                                'terbayar' => 'Terbayar',
+                            ])
+                            ->default('belum bayar')
+                            ->formatStateUsing(fn ($state) => $state ?? 'belum bayar')
+                            ->selectablePlaceholder(false)
+                            ->required(),
+                    ])
+                    ->columns(2),
             ])
             ->columns(1);
     }

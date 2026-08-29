@@ -18,4 +18,10 @@ class EditGs extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    //direct ke index setelah save
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
