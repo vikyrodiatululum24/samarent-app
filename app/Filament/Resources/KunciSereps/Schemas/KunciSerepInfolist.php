@@ -16,13 +16,16 @@ class KunciSerepInfolist
                     ->schema([
                         TextEntry::make('unit.nopol')
                             ->label('Unit')
-                            ->placeholder('-'),
+                            ->placeholder('-')
+                            ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? '')),
                         TextEntry::make('no_kunci')
                             ->label('No. Kunci')
-                            ->placeholder('-'),
+                            ->placeholder('-')
+                            ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? '')),
                         TextEntry::make('lokasi')
                             ->label('Lokasi')
-                            ->placeholder('-'),
+                            ->placeholder('-')
+                            ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? '')),
                         TextEntry::make('status_kunci')
                             ->label('Status Kunci')
                             ->badge()
@@ -46,7 +49,8 @@ class KunciSerepInfolist
                             ->placeholder('-'),
                         TextEntry::make('diambil_oleh')
                             ->label('Diambil Oleh')
-                            ->placeholder('-'),
+                            ->placeholder('-')
+                            ->formatStateUsing(fn (?string $state): string => ucwords(strtolower($state ?? ''))),
                         TextEntry::make('keterangan')
                             ->label('Keterangan')
                             ->columnSpanFull()

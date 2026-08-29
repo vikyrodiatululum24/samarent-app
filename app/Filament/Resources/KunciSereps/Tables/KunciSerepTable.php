@@ -21,13 +21,16 @@ class KunciSerepTable
                 Tables\Columns\TextColumn::make('unit.nopol')
                     ->label('Unit')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? '')),
                 Tables\Columns\TextColumn::make('no_kunci')
                     ->label('No. Kunci')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? '')),
                 Tables\Columns\TextColumn::make('lokasi')
                     ->label('Lokasi')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? '')),
                 Tables\Columns\TextColumn::make('status_kunci')
                     ->label('Status Kunci')
                     ->badge()
@@ -47,7 +50,8 @@ class KunciSerepTable
                     ->sortable(),
                 Tables\Columns\TextColumn::make('diambil_oleh')
                     ->label('Diambil Oleh')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(fn (?string $state): string => ucwords(strtolower($state ?? ''))),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('lokasi')
@@ -66,6 +70,56 @@ class KunciSerepTable
                 ]),
             ])
             ->headerActions([
+                Action::make('import_excel_custom')
+                    ->label('Import Excel')
+                    ->icon('heroicon-o-document-arrow-up')
+                    ->color('primary')
+                    ->form([
+                        \Filament\Forms\Components\FileUpload::make('file')
+                            ->label('Pilih File Excel/CSV')
+                            ->disk('local')
+                            ->directory('imports')
+                            ->acceptedFileTypes(['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'])
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        $filePath = \Illuminate\Support\Facades\Storage::disk('local')->path($data['file']);
+                        $import = new \App\Imports\KunciSerepImport();
+                        
+                        \Maatwebsite\Excel\Facades\Excel::import($import, $filePath);
+
+                        $successCount = $import->successCount;
+                        $failuresCount = count($import->failures());
+
+                        $body = "Import selesai. {$successCount} data berhasil diimpor.";
+                        if ($failuresCount > 0) {
+                            $body .= " ⚠️ Terdapat {$failuresCount} baris gagal diimpor (Nopol tidak ditemukan/format salah).";
+                            \Filament\Notifications\Notification::make()
+                                ->warning()
+                                ->title('Import Selesai dengan Peringatan')
+                                ->body($body)
+                                ->persistent()
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('Import Berhasil')
+                                ->body($body)
+                                ->send();
+                        }
+                    })
+                    ->extraModalFooterActions([
+                        \Filament\Actions\Action::make('download_sample')
+                            ->label('Download Sampel Format')
+                            ->color('success')
+                            ->icon('heroicon-o-arrow-down-tray')
+                            ->action(function () {
+                                return \Maatwebsite\Excel\Facades\Excel::download(
+                                    new \App\Exports\KunciSerepSampleExport(),
+                                    'format_import_kunci_serep.xlsx'
+                                );
+                            }),
+                    ]),
                 Action::make('export_excel')
                     ->label('Export Excel')
                     ->icon('heroicon-o-document-arrow-down')

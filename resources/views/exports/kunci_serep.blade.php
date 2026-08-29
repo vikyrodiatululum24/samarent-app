@@ -16,13 +16,13 @@
     @foreach($data as $index => $row)
         <tr>
             <td>{{ $index + 1 }}</td>
-            <td>{{ $row->unit->nopol ?? '-' }}</td>
-            <td>{{ $row->no_kunci }}</td>
-            <td>{{ $row->lokasi }}</td>
-            <td>{{ $row->status_kunci }}</td>
+            <td>{{ strtoupper($row->unit->nopol ?? '-') }}</td>
+            <td>{{ strtoupper($row->no_kunci ?? '') }}</td>
+            <td>{{ strtoupper($row->lokasi ?? '') }}</td>
+            <td>{{ strtoupper($row->status_kunci ?? '') }}</td>
             <td>{{ $row->tanggal_masuk }}</td>
             <td>{{ $row->tanggal_keluar }}</td>
-            <td>{{ $row->diambil_oleh }}</td>
+            <td>{{ ucwords(strtolower($row->diambil_oleh ?? '')) }}</td>
             <td>{{ $row->keterangan }}</td>
         </tr>
     @endforeach

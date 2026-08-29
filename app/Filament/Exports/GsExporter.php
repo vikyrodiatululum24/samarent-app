@@ -34,7 +34,9 @@ class GsExporter extends Exporter
             ExportColumn::make('kunci_unit')->label('Kunci Unit'),
             ExportColumn::make('keterangan')->label('Keterangan'),
             ExportColumn::make('driver_pengganti')->label('Driver Pengganti'),
-            ExportColumn::make('no_hp_pengganti')->label('No. HP Pengganti')
+            ExportColumn::make('no_hp_pengganti')->label('No. HP Pengganti'),
+            ExportColumn::make('status_progres')->label('Status Progres'),
+            ExportColumn::make('status_pembayaran')->label('Status Pembayaran')
         ];
     }
 
