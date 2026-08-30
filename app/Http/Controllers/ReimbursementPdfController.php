@@ -47,7 +47,7 @@ class ReimbursementPdfController extends Controller
             }
         }
 
-        $reimbursements = $query->orderBy('created_at', 'asc')->get();
+        $reimbursements = $query->orderBy('date', 'asc')->get();
         $user = Auth::user();
         $pdf = PDF::loadView('pdf.reimbursement', compact('reimbursements', 'user', 'dari', 'sampai'))->setPaper('a4', 'portrait');
 
