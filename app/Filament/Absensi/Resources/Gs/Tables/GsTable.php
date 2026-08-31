@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use App\Filament\Exports\GsExporter;
 use Filament\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Notifications\Notification;
 
 class GsTable
 {
@@ -48,48 +49,32 @@ class GsTable
                 TextColumn::make('driver_pengganti')
                     ->label('Driver Pengganti')
                     ->searchable(),
-                TextColumn::make('status_progres')
+                \Filament\Tables\Columns\SelectColumn::make('status_progres')
                     ->label('Status Progres')
-                    ->badge()
-                    ->color(fn($state) => $state === 'progres' ? 'warning' : ($state === 'selesai' ? 'success' : 'gray'))
-                    ->action(
-                        \Filament\Actions\Action::make('updateStatusProgres')
-                            ->modalHeading('Update Status Progres')
-                            ->modalWidth('sm')
-                            ->form([
-                                \Filament\Forms\Components\Select::make('status_progres')
-                                    ->label('Status Progres')
-                                    ->options([
-                                        'progres' => 'Progres',
-                                        'selesai' => 'Selesai',
-                                    ])
-                                    ->required(),
-                            ])
-                            ->action(function (Gs $record, array $data): void {
-                                $record->update(['status_progres' => $data['status_progres']]);
-                            })
-                    ),
-                TextColumn::make('status_pembayaran')
+                    ->options([
+                        'progres' => 'Progres',
+                        'selesai' => 'Selesai',
+                    ])
+                    ->selectablePlaceholder(false)
+                    ->afterStateUpdated(function () {
+                        Notification::make()
+                            ->title('Status berhasil diubah')
+                            ->success()
+                            ->send();
+                    }),
+                \Filament\Tables\Columns\SelectColumn::make('status_pembayaran')
                     ->label('Status Pembayaran')
-                    ->badge()
-                    ->color(fn($state) => $state === 'belum bayar' ? 'warning' : ($state === 'terbayar' ? 'success' : 'gray'))
-                    ->action(
-                        \Filament\Actions\Action::make('updateStatusPembayaran')
-                            ->modalHeading('Update Status Pembayaran')
-                            ->modalWidth('sm')
-                            ->form([
-                                \Filament\Forms\Components\Select::make('status_pembayaran')
-                                    ->label('Status Pembayaran')
-                                    ->options([
-                                        'belum bayar' => 'Belum Dibayar',
-                                        'terbayar' => 'Terbayar',
-                                    ])
-                                    ->required(),
-                            ])
-                            ->action(function (Gs $record, array $data): void {
-                                $record->update(['status_pembayaran' => $data['status_pembayaran']]);
-                            })
-                    ),
+                    ->options([
+                        'belum bayar' => 'Belum Dibayar',
+                        'terbayar' => 'Terbayar',
+                    ])
+                    ->selectablePlaceholder(false)
+                    ->afterStateUpdated(function () {
+                        Notification::make()
+                            ->title('Status berhasil diubah')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->filters([
                 SelectFilter::make('month')

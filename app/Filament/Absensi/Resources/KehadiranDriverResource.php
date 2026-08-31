@@ -14,6 +14,8 @@ use Filament\Actions\EditAction;
 use Filament\Actions\BulkAction;
 use Filament\Notifications\Notification;
 use Filament\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -270,7 +272,51 @@ class KehadiranDriverResource extends Resource
                         }
                     }),
             ])
-            ->actions([EditAction::make(), ViewAction::make()])
+            ->actions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    ViewAction::make(),
+
+                    Action::make('approve_samarent')
+                        ->icon('heroicon-o-check-circle')
+                        ->label('Approve')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Approve Kehadiran')
+                        ->modalSubheading('Apakah anda yakin ingin menyetujui kehadiran ini?')
+                        ->modalButton('Ya, Approve')
+                        ->visible(fn($record): bool => str_contains(strtolower($record->project?->name ?? ''), 'samarent') && !$record->is_complete)
+                        ->action(function ($record): void {
+                            app(\App\Services\ConfirmationService::class)->approve($record);
+                            Notification::make()
+                                ->title('Kehadiran berhasil disetujui')
+                                ->success()
+                                ->send();
+                        }),
+                    Action::make('reject_samarent')
+                        ->icon('heroicon-o-x-circle')
+                        ->label('Reject')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Reject Kehadiran')
+                        ->modalSubheading('Apakah anda yakin ingin menolak kehadiran ini?')
+                        ->modalButton('Ya, Tolak')
+                        ->form([
+                            \Filament\Forms\Components\Textarea::make('note')
+                                ->label('Alasan Penolakan')
+                                ->required()
+                                ->maxLength(500),
+                        ])
+                        ->visible(fn($record): bool => str_contains(strtolower($record->project?->name ?? ''), 'samarent'))
+                        ->action(function ($record, array $data): void {
+                            app(\App\Services\ConfirmationService::class)->reject($record, $data['note']);
+                            Notification::make()
+                                ->title('Kehadiran berhasil ditolak')
+                                ->success()
+                                ->send();
+                        }),
+                ]),
+            ])
             ->bulkActions([
                 BulkActionGroup::make([
                     BulkAction::make('complete_and_recalculate_overtime')
@@ -362,8 +408,30 @@ class KehadiranDriverResource extends Resource
                             TextEntry::make('unit.type')->label('Unit'),
                             TextEntry::make('unit.nopol')->label('Nopol'),
                             TextEntry::make('date')->label('Tanggal'),
-                            TextEntry::make('note')->label('Catatan')]),
-                        Group::make()->schema([TextEntry::make('project.name')->label('Project'), TextEntry::make('endUser.name')->label('End User 1'), TextEntry::make('endUserOut.name')->label('End User 2'), TextEntry::make('is_complete')->label('Approval')->badge(fn($state) => $state ? 'success' : 'warning')->formatStateUsing(fn($state) => $state ? 'Selesai' : 'Belum Selesai')])]),
+                            TextEntry::make('note')->label('Catatan')
+                        ]),
+                        Group::make()->schema([
+                            TextEntry::make('project.name')->label('Project'),
+                            TextEntry::make('endUser.name')->label('End User 1'),
+                            TextEntry::make('endUserOut.name')->label('End User 2'),
+                            TextEntry::make('is_complete')
+                                ->label('Approval')
+                                ->badge(fn($state) => $state ? 'success' : 'warning')
+                                ->formatStateUsing(fn($state) => $state ? 'Selesai' : 'Belum Selesai')
+                        ])
+                    ]),
+
+                Section::make('Confirmation Status')
+                    ->schema([
+                        TextEntry::make('confirmation.status')
+                            ->label('Status Konfirmasi')
+                            ->badge(fn($state) => $state === 'approved' ? 'success' : ($state === 'rejected' ? 'danger' : 'warning'))
+                            ->formatStateUsing(fn($state) => $state === 'approved' ? 'Selesai' : ($state === 'rejected' ? 'Ditolak' : 'Menunggu Konfirmasi')),
+                        TextEntry::make('confirmation.note')
+                            ->label('Catatan Konfirmasi'),
+                    ])
+                    ->visible(fn($record) => $record->confirmation)
+                    ->columns(1),
                 Section::make('Absensi Masuk')
                     ->schema([
                         TextEntry::make('time_in')->label('Waktu Masuk'),
