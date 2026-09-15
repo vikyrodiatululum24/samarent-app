@@ -477,4 +477,9 @@ class PengajuanResource extends Resource
     {
         return false; // Menghilangkan tombol create (newPengajuan)
     }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->whereNull('hidden_at');
+    }
 }

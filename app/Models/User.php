@@ -98,4 +98,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Bastk::class, 'created_by', 'id');
     }
+
+    /**
+     * Check if the user is a super admin based on email
+     */
+    public function isSuperAdmin(): bool
+    {
+        $allowedEmails = [
+            'centralakun@samarent.com',
+            'indra@samarent.com',
+        ];
+
+        return in_array($this->email, $allowedEmails);
+    }
 }

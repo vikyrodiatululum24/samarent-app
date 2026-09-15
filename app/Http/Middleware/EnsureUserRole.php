@@ -11,7 +11,7 @@ class EnsureUserRole
     {
         if (auth()->check()) {
             $user = auth()->user();
-            if ($user->role === 'user' || $user->email === 'centralakun@samarent.com') {
+            if ($user->role === 'user' || $user->isSuperAdmin()) {
             return $next($request);
             }
         }

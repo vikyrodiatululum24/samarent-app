@@ -153,8 +153,7 @@ class DriverResource extends Resource
 
         // Ambil data manager terkait user
         $manager = $user->manager;
-        // Jika user adalah centralakun@samarent.com, tampilkan semua data
-        if ($user->email === 'centralakun@samarent.com') {
+        if ($user->isSuperAdmin()) {
             return parent::getEloquentQuery();
         }
 

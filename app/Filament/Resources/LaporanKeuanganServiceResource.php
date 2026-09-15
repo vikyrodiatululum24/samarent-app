@@ -215,7 +215,7 @@ class LaporanKeuanganServiceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com';
+        return Auth::user()?->isSuperAdmin();
     }
 
     private static function getFilteredData($livewire): \Illuminate\Database\Eloquent\Collection

@@ -412,27 +412,27 @@ class UnitJualResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
+        return Auth::user()?->isSuperAdmin() || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function canView($record): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
+        return Auth::user()?->isSuperAdmin() || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
+        return Auth::user()?->isSuperAdmin() || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
+        return Auth::user()?->isSuperAdmin() || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com' || Auth::user()?->email === 'president@samarent.com';
+        return Auth::user()?->isSuperAdmin() || Auth::user()?->email === 'president@samarent.com';
     }
 
     public static function getPages(): array

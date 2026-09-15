@@ -22,7 +22,8 @@ class Pengajuan extends Model
         'payment_1',
         'bank_1',
         'norek_1',
-        'keterangan_proses'
+        'keterangan_proses',
+        'hidden_at'
     ];
 
     protected static function booted()

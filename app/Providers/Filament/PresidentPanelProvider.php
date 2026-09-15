@@ -124,10 +124,7 @@ class PresidentPanelProvider extends PanelProvider
                     ->sort(1)
                     ->visible(fn() => auth()->check()
                         && Filament::getCurrentPanel()?->getId() !== 'admin'
-                        && in_array(auth()->user()->email, [
-                            'centralakun@samarent.com',
-                            // tambahkan email lain yang diizinkan
-                        ])),
+                        && auth()->user()?->isSuperAdmin()),
 
                 NavigationItem::make('User Panel')
                     ->url('/user', shouldOpenInNewTab: false)
@@ -135,9 +132,7 @@ class PresidentPanelProvider extends PanelProvider
                     ->sort(2)
                     ->visible(fn() => auth()->check()
                         && Filament::getCurrentPanel()?->getId() !== 'user'
-                        && in_array(auth()->user()->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && auth()->user()?->isSuperAdmin()),
 
                 NavigationItem::make('Manager Panel')
                     ->url('/manager', shouldOpenInNewTab: false)
@@ -145,9 +140,7 @@ class PresidentPanelProvider extends PanelProvider
                     ->sort(3)
                     ->visible(fn() => auth()->check()
                         && Filament::getCurrentPanel()?->getId() !== 'manager'
-                        && in_array(auth()->user()->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && auth()->user()?->isSuperAdmin()),
 
                 NavigationItem::make('Finance Panel')
                     ->url('/finance', shouldOpenInNewTab: false)
@@ -155,9 +148,7 @@ class PresidentPanelProvider extends PanelProvider
                     ->sort(4)
                     ->visible(fn() => auth()->check()
                         && Filament::getCurrentPanel()?->getId() !== 'finance'
-                        && in_array(auth()->user()->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && auth()->user()?->isSuperAdmin()),
 
                 NavigationItem::make('Asuransi Panel')
                     ->url('/asuransi', shouldOpenInNewTab: false)
@@ -165,9 +156,7 @@ class PresidentPanelProvider extends PanelProvider
                     ->sort(5)
                     ->visible(fn() => auth()->check()
                         && Filament::getCurrentPanel()?->getId() !== 'asuransi'
-                        && in_array(auth()->user()->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && auth()->user()?->isSuperAdmin()),
 
                 NavigationItem::make('Admin Driver Panel')
                     ->url('/absensi', shouldOpenInNewTab: false)
@@ -175,33 +164,25 @@ class PresidentPanelProvider extends PanelProvider
                     ->sort(6)
                     ->visible(fn() => auth()->check()
                         && Filament::getCurrentPanel()?->getId() !== 'absensi'
-                        && in_array(auth()->user()->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && auth()->user()?->isSuperAdmin()),
                 NavigationItem::make('Admin Jual Panel')
                     ->url('/penjualan', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(6)
                     ->visible(fn() => auth()->check()
                         && Filament::getCurrentPanel()?->getId() !== 'penjualan'
-                        && in_array(auth()->user()->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && auth()->user()?->isSuperAdmin()),
 
                 NavigationItem::make('Absensi Driver')
                     ->url('https://driver.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
                     ->sort(7)
-                    ->visible(fn() => auth()->check() && in_array(auth()->user()->email, [
-                        'centralakun@samarent.com',
-                    ])),
+                    ->visible(fn() => auth()->check() && auth()->user()?->isSuperAdmin()),
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
                     ->sort(8)
-                    ->visible(fn() => auth()->check() && in_array(auth()->user()->email, [
-                        'centralakun@samarent.com',
-                    ])),
+                    ->visible(fn() => auth()->check() && auth()->user()?->isSuperAdmin()),
             ])
             ->maxContentWidth(Width::Full)
             ->topNavigation()

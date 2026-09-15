@@ -120,10 +120,7 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(3)
                     ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'admin'
-                        && in_array(Auth::user()?->email, [
-                            'centralakun@samarent.com',
-                            // tambahkan email lain yang diizinkan
-                        ])),
+                        && Auth::user()?->isSuperAdmin()),
 
                 NavigationItem::make('User Panel')
                     ->url('/user', shouldOpenInNewTab: false)
@@ -132,10 +129,7 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(3)
                     ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'user'
-                        && in_array(Auth::user()?->email, [
-                            'centralakun@samarent.com',
-                            // tambahkan email lain yang diizinkan
-                        ])),
+                        && Auth::user()?->isSuperAdmin()),
 
                 NavigationItem::make('User Panel')
                     ->url('/user', shouldOpenInNewTab: false)
@@ -143,9 +137,7 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(3)
                     ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'user'
-                        && in_array(Auth::user()?->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && Auth::user()?->isSuperAdmin()),
 
                 NavigationItem::make('Manager Panel')
                     ->url('/manager', shouldOpenInNewTab: false)
@@ -153,9 +145,7 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(3)
                     ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'manager'
-                        && in_array(Auth::user()?->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && Auth::user()?->isSuperAdmin()),
 
                 NavigationItem::make('Finance Panel')
                     ->url('/finance', shouldOpenInNewTab: false)
@@ -163,9 +153,7 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(3)
                     ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'finance'
-                        && in_array(Auth::user()?->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && Auth::user()?->isSuperAdmin()),
 
                 NavigationItem::make('Asuransi Panel')
                     ->url('/asuransi', shouldOpenInNewTab: false)
@@ -173,9 +161,7 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(3)
                     ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'asuransi'
-                        && in_array(Auth::user()?->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && Auth::user()?->isSuperAdmin()),
 
                 NavigationItem::make('Admin Driver Panel')
                     ->url('/absensi', shouldOpenInNewTab: false)
@@ -183,9 +169,7 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(3)
                     ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'absensi'
-                        && in_array(Auth::user()?->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && Auth::user()?->isSuperAdmin()),
 
                 NavigationItem::make('Admin Jual Panel')
                     ->url('/penjualan', shouldOpenInNewTab: false)
@@ -193,33 +177,25 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(3)
                     ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'penjualan'
-                        && in_array(Auth::user()?->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && Auth::user()?->isSuperAdmin()),
 
                 NavigationItem::make('Absensi Driver')
                     ->url('https://driver.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
                     ->sort(3)
-                    ->visible(fn() => Auth::check() && in_array(Auth::user()?->email, [
-                        'centralakun@samarent.com',
-                    ])),
+                    ->visible(fn() => Auth::check() && Auth::user()?->isSuperAdmin()),
                 NavigationItem::make('President Panel')
                     ->url('/president', shouldOpenInNewTab: false)
                     ->group('Panels')
                     ->sort(3)
                     ->visible(fn() => Auth::check()
                         && Filament::getCurrentOrDefaultPanel()?->getId() !== 'president'
-                        && in_array(Auth::user()?->email, [
-                            'centralakun@samarent.com',
-                        ])),
+                        && Auth::user()?->isSuperAdmin()),
                 NavigationItem::make('Jual Unit Servicesamarent')
                     ->url('https://jualmobil.servicesamarent.com', shouldOpenInNewTab: true)
                     ->group('Panels')
                     ->sort(3)
-                    ->visible(fn() => Auth::check() && in_array(Auth::user()?->email, [
-                        'centralakun@samarent.com',
-                    ])),
+                    ->visible(fn() => Auth::check() && Auth::user()?->isSuperAdmin()),
             ])
             ->databaseNotifications()
             ->maxContentWidth(Width::Full)

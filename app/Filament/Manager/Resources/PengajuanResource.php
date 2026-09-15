@@ -153,8 +153,8 @@ class PengajuanResource extends Resource
         // Ambil data manager terkait user
         $manager = $user->manager;
         // Jika user adalah centralakun@samarent.com, tampilkan semua data
-        if ($user->email === 'centralakun@samarent.com') {
-            return parent::getEloquentQuery();
+        if ($user->isSuperAdmin()) {
+            return parent::getEloquentQuery()->whereNull('hidden_at');
         }
 
         // Jika tidak ada manager, kembalikan query kosong
@@ -185,6 +185,6 @@ class PengajuanResource extends Resource
             $query->where('created_at', '>', '2026-06-01');
         }
 
-        return $query;
+        return $query->whereNull('hidden_at');
     }
 }

@@ -943,4 +943,9 @@ class PengajuanResource extends Resource
     {
         return 'Tambah Pengajuan Baru';
     }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->whereNull('hidden_at');
+    }
 }

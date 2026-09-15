@@ -17,7 +17,7 @@ class EnsurePresidentRole
     {
         if (auth()->check()) {
             $user = auth()->user();
-            if ($user->role === 'president' || $user->email === 'centralakun@samarent.com') {
+            if ($user->role === 'president' || $user->isSuperAdmin()) {
                 return $next($request);
             }
             abort(403);

@@ -57,7 +57,7 @@ class SetSalaryResource extends Resource
                                             $query = Project::query()->orderBy('name');
 
                                             $user = Auth::user();
-                                            $isSuperUser = $user?->email === 'centralakun@samarent.com';
+                                            $isSuperUser = $user?->isSuperAdmin();
                                             $ownedProjectName = $user?->manager?->perusahaan;
 
                                             if (! $isSuperUser && filled($ownedProjectName)) {

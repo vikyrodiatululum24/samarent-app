@@ -17,7 +17,7 @@ class EnsureAsuransiRole
     {
         if (auth()->check()) {
             $user = auth()->user();
-            if ($user->role === 'asuransi' || $user->email === 'centralakun@samarent.com') {
+            if ($user->role === 'asuransi' || $user->isSuperAdmin()) {
                 return $next($request);
             }
         }

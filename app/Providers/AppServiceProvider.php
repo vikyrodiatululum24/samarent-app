@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use Filament\Http\Responses\Auth\Contracts\LogoutResponse;
+use Filament\Auth\Http\Responses\Contracts\LogoutResponse;
 use Illuminate\Support\ServiceProvider;
 use App\Filament\Responses\CustomLogoutResponse;
 

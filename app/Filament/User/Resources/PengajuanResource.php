@@ -651,6 +651,7 @@ class PengajuanResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('user_id', Filament::auth()->id());
+            ->where('user_id', Filament::auth()->id())
+            ->whereNull('hidden_at');
     }
 }

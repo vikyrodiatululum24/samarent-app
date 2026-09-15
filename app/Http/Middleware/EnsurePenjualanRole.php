@@ -17,7 +17,7 @@ class EnsurePenjualanRole
     {
         if (auth()->check()) {
             $user = auth()->user();
-            if ($user->role === 'admin_jual' || $user->email === 'centralakun@samarent.com') {
+            if ($user->role === 'admin_jual' || $user->isSuperAdmin()) {
                 return $next($request);
             }
             abort(403);

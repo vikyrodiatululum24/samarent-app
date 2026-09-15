@@ -190,22 +190,22 @@ class PenggunaResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com';
+        return Auth::user()?->isSuperAdmin();
     }
 
     public static function canView($record): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com';
+        return Auth::user()?->isSuperAdmin();
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com';
+        return Auth::user()?->isSuperAdmin();
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->email === 'centralakun@samarent.com';
+        return Auth::user()?->isSuperAdmin();
     }
 
     public static function getPages(): array

@@ -2,7 +2,7 @@
  
 namespace App\Filament\Responses;
  
-use Filament\Http\Responses\Auth\Contracts\LogoutResponse;
+use Filament\Auth\Http\Responses\Contracts\LogoutResponse;
 use Illuminate\Http\RedirectResponse;
  
 class CustomLogoutResponse implements LogoutResponse
