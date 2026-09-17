@@ -34,7 +34,7 @@ class MekanikController extends Controller
                 ->select('id', 'pengajuan_id', 'foto_nota')
                 ->first();
             $serviceUnits = ServiceUnit::with('unit:id,nopol,merk,type')->where('pengajuan_id', $id)
-                ->select('id', 'pengajuan_id', 'unit_id', 'foto_unit', 'foto_odometer', 'foto_kondisi', 'foto_pengerjaan_bengkel', 'foto_tambahan')
+                ->select('id', 'pengajuan_id', 'unit_id', 'foto_unit', 'foto_odometer', 'foto_kondisi', 'foto_pengerjaan_bengkel', 'foto_tambahan', 'service', 'odometer')
                 ->get();
 
             return response()->json([
@@ -61,6 +61,8 @@ class MekanikController extends Controller
             'complete.foto_nota.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'service_units' => 'nullable|array',
             'service_units.*.id' => 'required|exists:service_units,id',
+            'service_units.*.service' => 'required|string',
+            'service_units.*.odometer' => 'required|string',
             'service_units.*.foto_unit' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'service_units.*.foto_odometer' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'service_units.*.foto_pengerjaan_bengkel' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
@@ -125,6 +127,14 @@ class MekanikController extends Controller
                 }
 
                 $updates = [];
+
+                if (isset($unitPayload['service'])) {
+                    $updates['service'] = $unitPayload['service'];
+                }
+
+                if (isset($unitPayload['odometer'])) {
+                    $updates['odometer'] = $unitPayload['odometer'];
+                }
 
                 if ($request->hasFile("service_units.{$index}.foto_unit")) {
                     $newPath = $this->compressImage->compressAndStore(

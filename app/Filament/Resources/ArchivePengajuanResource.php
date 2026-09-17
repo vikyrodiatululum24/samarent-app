@@ -20,7 +20,7 @@ class ArchivePengajuanResource extends PengajuanResource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->isSuperAdmin();
+        return auth()->user()->email == 'centralakun@samarent.com';
     }
 
     public static function getEloquentQuery(): Builder

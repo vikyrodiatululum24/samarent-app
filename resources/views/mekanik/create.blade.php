@@ -165,6 +165,16 @@
             font-size: 0.75rem;
             color: #64748b;
         }
+        
+        /* Remove spinner for number inputs */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 
@@ -242,6 +252,8 @@
                             @endforeach
                         </select>
                     </div>
+
+
 
                     <h3 class="font-bold text-lg mb-2">Foto Unit Service</h3>
 
@@ -655,6 +667,8 @@
                 }
 
                 if (!selectedId) {
+                    $('#service').val('');
+                    $('#odometer').val('');
                     resetDynamicSections();
                     return;
                 }
@@ -673,10 +687,29 @@
 
                         if (serviceUnits.length > 0) {
                             serviceUnits.forEach((unit, idx) => {
+                                let unitService = unit.service || '';
+                                try {
+                                    let parsed = JSON.parse(unitService);
+                                    if (Array.isArray(parsed)) {
+                                        unitService = parsed.join(', ');
+                                    }
+                                } catch (e) {}
+                                let unitOdometer = unit.odometer || '';
+
                                 html += `
                                 <div class="service-unit-item border border-gray-300 p-4 rounded-sm mb-3">
                                     <input type="hidden" name="service_units[${idx}][id]" value="${unit.id}">
                                     ${renderUnitDetails(unit)}
+                                    <div class="mb-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-1">Jenis Permintaan Service</label>
+                                            <input type="text" name="service_units[${idx}][service]" value="${escapeHtml(unitService)}" required class="w-full p-2 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-blue-500 focus:outline-none" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-1">Odometer</label>
+                                            <input type="number" name="service_units[${idx}][odometer]" value="${escapeHtml(String(unitOdometer))}" required class="w-full p-2 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-blue-500 focus:outline-none" />
+                                        </div>
+                                    </div>
                                     <div class="grid gap-3 md:grid-cols-2">
                                         <div class="mb-3">
                                             ${renderExistingFiles('Foto unit', unit.foto_unit, 'foto_unit')}
