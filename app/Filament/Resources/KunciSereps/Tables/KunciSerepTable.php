@@ -17,20 +17,24 @@ class KunciSerepTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->paginated([10,25,50,100])
             ->columns([
                 Tables\Columns\TextColumn::make('unit.nopol')
                     ->label('Unit')
                     ->searchable()
                     ->sortable()
-                    ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? '')),
+                    ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? ''))
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('no_kunci')
                     ->label('No. Kunci')
                     ->searchable()
-                    ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? '')),
+                    ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? ''))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('lokasi')
                     ->label('Lokasi')
                     ->searchable()
-                    ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? '')),
+                    ->formatStateUsing(fn (?string $state): string => strtoupper($state ?? ''))
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('status_kunci')
                     ->label('Status Kunci')
                     ->badge()
@@ -39,24 +43,31 @@ class KunciSerepTable
                         'tersedia' => 'success',
                         'diambil' => 'warning',
                         default => 'gray',
-                    }),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('tanggal_masuk')
                     ->label('Tgl Masuk')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('tanggal_keluar')
                     ->label('Tgl Keluar')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('diambil_oleh')
                     ->label('Diambil Oleh')
                     ->searchable()
-                    ->formatStateUsing(fn (?string $state): string => ucwords(strtolower($state ?? ''))),
+                    ->formatStateUsing(fn (?string $state): string => ucwords(strtolower($state ?? '')))
+                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('lokasi')
                     ->label('Filter Lokasi')
                     ->options(KunciSerepForm::getLokasiOptions()),
+                Tables\Filters\SelectFilter::make('status_kunci')
+                    ->label('Status Kunci')
+                    ->options(KunciSerepForm::getStatusKunciOptions()),
             ])
             ->defaultSort('created_at', 'desc')
             ->actions([

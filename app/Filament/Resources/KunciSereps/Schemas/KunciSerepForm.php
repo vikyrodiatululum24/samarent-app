@@ -10,6 +10,14 @@ use Filament\Schemas\Components\Utilities\Set;
 
 class KunciSerepForm
 {
+    public static function getStatusKunciOptions(): array
+    {
+        return [
+            'tersedia' => 'Tersedia',
+            'diambil' => 'Diambil',
+        ];
+    }
+
     public static function getLokasiOptions(): array
     {
         $options = [];
@@ -39,10 +47,7 @@ class KunciSerepForm
                             ->maxLength(255),
                         Forms\Components\Select::make('status_kunci')
                             ->label('Status Kunci')
-                            ->options([
-                                'tersedia' => 'Tersedia',
-                                'diambil' => 'Diambil',
-                            ])
+                            ->options(self::getStatusKunciOptions())
                             ->default('tersedia')
                             ->required()
                             ->live()
