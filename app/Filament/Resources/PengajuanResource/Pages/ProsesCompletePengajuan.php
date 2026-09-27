@@ -53,7 +53,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->stripCharacters(',')
                             ->required(),
                     ])
-                    ->columns(2),
+                    ->columns(3),
                 Fieldset::make('Informasi Pengajuan')
                     ->schema([
                         Forms\Components\Select::make('complete.kode')
@@ -79,7 +79,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->required()
                             ->default('pengambilan_ba'),
                     ])
-                    ->columns(2),
+                    ->columns(3),
                 Fieldset::make('Informasi Finance')
                     ->schema([
                         Forms\Components\DatePicker::make('complete.tanggal_tf_finance')
@@ -110,7 +110,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->default('unpaid')
                             ->readOnly(),
                     ])
-                    ->columns(2),
+                    ->columns(3),
                 Fieldset::make('Transfer Bengkel')
                     ->schema([
                         Forms\Components\Select::make('complete.nama_rek_bengkel')
@@ -230,7 +230,7 @@ class ProsesCompletePengajuan extends EditRecord
                             ->nullable()
                             ->required(fn(Get $get) => !empty($get('complete.nominal_tf_bengkel'))),
                     ])
-                    ->columns(2),
+                    ->columns(3),
                 Fieldset::make('Dokumentasi')
                     ->schema([
                         Forms\Components\TextInput::make('complete.bengkel_invoice')
@@ -258,9 +258,10 @@ class ProsesCompletePengajuan extends EditRecord
                                         Storage::disk('public')->delete($path);
                                     }
                                 }
-                            }),
+                            })
+                            ->columnSpan(2),
                     ])
-                    ->columns(2),
+                    ->columns(3),
             ])
             ->columns(1);
     }

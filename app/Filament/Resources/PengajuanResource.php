@@ -375,8 +375,8 @@ class PengajuanResource extends Resource
                         // Format: [nama_service (nopol)], dipisah baris baru
                         return $services->map(function ($service) {
                             $jenis = $service->unit?->jenis ?? '-';
-                            return "{$jenis}";
-                        })->implode('<br>');
+                            return "<div class='h-[3.5rem] py-1 flex items-center overflow-hidden'><span class='w-full line-clamp-2'>{$jenis}</span></div>";
+                        })->implode('');
                     })
                     ->html()
                     ->searchable(query: function (Builder $query, string $search) {
@@ -395,8 +395,8 @@ class PengajuanResource extends Resource
                         $services = $record->service_unit()->with('unit')->get();
                         // Format: [nama_service (nopol)], dipisah baris baru
                         return $services->map(function ($service) {
-                            return "{$service->service}";
-                        })->implode('<br>');
+                            return "<div class='h-[3.5rem] py-1 flex items-center overflow-hidden'><span class='w-full line-clamp-2'>{$service->service}</span></div>";
+                        })->implode('');
                     })
                     ->html()
                     ->searchable(query: function (Builder $query, string $search) {
@@ -416,8 +416,8 @@ class PengajuanResource extends Resource
                         // Format: [nama_service (nopol)], dipisah baris baru
                         return $services->map(function ($service) {
                             $nopol = $service->unit?->nopol ?? '-';
-                            return "{$nopol}";
-                        })->implode('<br>');
+                            return "<div class='h-[3.5rem] py-1 flex items-center overflow-hidden'><span class='w-full line-clamp-2'>{$nopol}</span></div>";
+                        })->implode('');
                     })
                     ->html()
                     ->searchable(query: function (Builder $query, string $search) {
