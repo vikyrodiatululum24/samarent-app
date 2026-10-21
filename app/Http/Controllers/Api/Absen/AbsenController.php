@@ -62,7 +62,7 @@ class AbsenController extends Controller
                 'end_user_id' => $request->end_user_id,
                 'unit_id' => $request->unit_id,
                 'date' => now()->format('Y-m-d'),
-                'time_in' => now(),
+                'time_in' => now()->format('Y-m-d H:i:00'),
                 'start_km' => $request->start_km,
                 'location_in' => $request->location_in,
                 'photo_in' => $request->photo_in ?? null,
@@ -154,7 +154,7 @@ class AbsenController extends Controller
 
         $absen->update([
             'end_km' => $request->end_km,
-            'time_out' => now(),
+            'time_out' => now()->format('Y-m-d H:i:00'),
             'location_out' => $request->location_out,
             'photo_out' => $request->photo_out,
             'note' => $request->note ?? null,
@@ -408,6 +408,7 @@ class AbsenController extends Controller
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
+                \Illuminate\Support\Facades\Log::error('Approve failed: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
                 return response()->json(['message' => 'Failed to approve absen', 'error' => $e->getMessage()], 500);
             }
         } else {

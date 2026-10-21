@@ -28,8 +28,8 @@ class OvertimePaysRelationManager extends RelationManager
                     'Weekday' => 'Weekday',
                     'Holiday' => 'Holiday',
                 ]),
-            Forms\Components\TimePicker::make('from_time')->label('Dari Jam')->required(),
-            Forms\Components\TimePicker::make('to_time')->label('Sampai Jam')->required(),
+            Forms\Components\TimePicker::make('from_time')->label('Dari Jam')->required()->seconds(false),
+            Forms\Components\TimePicker::make('to_time')->label('Sampai Jam')->required()->seconds(false),
             Forms\Components\TextInput::make('worked_hours')->label('Jam Kerja')->numeric()->minValue(0),
             Forms\Components\TextInput::make('normal_hours')->label('Jam Normal')->numeric()->minValue(0),
             Forms\Components\TextInput::make('calculated_ot_hours')->label('Total Jam OT')->numeric()->minValue(0),
@@ -55,8 +55,8 @@ class OvertimePaysRelationManager extends RelationManager
                     ->color(function ($state) {
                         return $state === 'Holiday' ? 'danger' : 'success';
                     }),
-                Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable()->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable()->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable()->toggleable(isToggledHiddenByDefault: false)->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i')),
+                Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable()->toggleable(isToggledHiddenByDefault: false)->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i')),
                 Tables\Columns\TextColumn::make('worked_hours')->label('Jam Kerja')->sortable()->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('normal_hours')->label('Jam Normal')->sortable()->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('calculated_ot_hours')->label('Total Jam OT')->sortable()->toggleable(isToggledHiddenByDefault: false),

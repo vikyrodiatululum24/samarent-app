@@ -5,6 +5,7 @@ namespace App\Filament\Manager\Resources;
 use App\Filament\Manager\Resources\DriverAttendenceResource\Pages;
 use App\Models\DriverAttendence;
 use App\Services\GeocodingService;
+use Carbon\Carbon;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -58,9 +59,11 @@ class DriverAttendenceResource extends Resource
                 Tables\Columns\TextColumn::make('project.name')
                     ->label('Project'),
                 Tables\Columns\TextColumn::make('time_in')
-                    ->label('Waktu Masuk'),
+                    ->label('Waktu Masuk')
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i')),
                 Tables\Columns\TextColumn::make('time_out')
-                    ->label('Waktu Keluar'),
+                    ->label('Waktu Keluar')
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i')),
                 Tables\Columns\BooleanColumn::make('is_complete')
                     ->label('Approved'),
             ])
@@ -133,7 +136,7 @@ class DriverAttendenceResource extends Resource
 
                 Section::make('Absensi Masuk')
                     ->schema([
-                        TextEntry::make('time_in')->label('Waktu Masuk'),
+                        TextEntry::make('time_in')->label('Waktu Masuk')->formatStateUsing(fn($state) => Carbon::parse($state)->format('d F Y - H:i')),
                         TextEntry::make('start_km')->label('KM Awal'),
                         TextEntry::make('location_in')
                             ->label('Lokasi Masuk')
@@ -166,7 +169,7 @@ class DriverAttendenceResource extends Resource
 
                 Section::make('Absensi Keluar')
                     ->schema([
-                        TextEntry::make('time_out')->label('Waktu Keluar'),
+                        TextEntry::make('time_out')->label('Waktu Keluar')->formatStateUsing(fn($state) => Carbon::parse($state)->format('d F Y - H:i')),
                         TextEntry::make('end_km')->label('KM Akhir'),
                         TextEntry::make('location_out')
                             ->label('Lokasi Keluar')

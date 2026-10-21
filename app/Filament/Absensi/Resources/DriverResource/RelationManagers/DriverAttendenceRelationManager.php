@@ -51,7 +51,8 @@ class DriverAttendenceRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('location_in')->label('Lokasi Masuk')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('time_in')
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i')),
                 Tables\Columns\ImageColumn::make('photo_in')
                     ->disk('public')
                     ->square()
@@ -62,7 +63,7 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->label('Jam Cek')
                     ->getStateUsing(function ($record) {
                         $check = $record->checks()->latest()->first();
-                        return $check ? $check->created_at->format('H:i:s') : '-';
+                        return $check ? $check->created_at->format('H:i') : '-';
                     })
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('location_chek')
@@ -82,7 +83,8 @@ class DriverAttendenceRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('end_km')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('time_out')
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i')),
                 Tables\Columns\TextColumn::make('location_out')->label('Lokasi Keluar')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\ImageColumn::make('photo_out')
@@ -229,8 +231,8 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->form([
                         Section::make('Informasi Absensi')
                             ->schema([
-                                DateTimePicker::make('time_in')->label('Waktu Masuk'),
-                                DateTimePicker::make('time_out')->label('Waktu Keluar'),
+                                DateTimePicker::make('time_in')->label('Waktu Masuk')->seconds(false),
+                                DateTimePicker::make('time_out')->label('Waktu Keluar')->seconds(false),
                                 Select::make('project_id')
                                     ->relationship('project', 'name')
                                     ->searchable()

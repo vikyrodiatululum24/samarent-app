@@ -55,6 +55,7 @@ class DriverAttendenceRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('location_in')->label('Lokasi Masuk')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('time_in')
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i'))
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\ImageColumn::make('photo_in')
                     ->disk('public')
@@ -66,7 +67,7 @@ class DriverAttendenceRelationManager extends RelationManager
                     ->label('Jam Cek')
                     ->getStateUsing(function ($record) {
                         $check = $record->checks()->latest()->first();
-                        return $check ? $check->created_at->format('H:i:s') : '-';
+                        return $check ? $check->created_at->format('H:i') : '-';
                     })
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('location_chek')
@@ -86,6 +87,7 @@ class DriverAttendenceRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('end_km')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('time_out')
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i'))
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('location_out')->label('Lokasi Keluar')
                     ->toggleable(isToggledHiddenByDefault: false),

@@ -77,6 +77,8 @@ class KehadiranDriverResource extends Resource
                                 name: 'user',
                                 titleAttribute: 'name',
                                 modifyQueryUsing: function (Builder $query, Get $get) {
+                                    $query->where('role', 'driver');
+                                    
                                     if ($get('project_id')) {
                                         $query->whereHas('driver.project', function (Builder $query) use ($get) {
                                             $query->where('id', $get('project_id'));
@@ -98,7 +100,7 @@ class KehadiranDriverResource extends Resource
                     ->columns(2),
                 Section::make('Absensi Masuk')
                     ->schema([
-                        Forms\Components\DateTimePicker::make('time_in')->label('Waktu Masuk')->required(),
+                        Forms\Components\DateTimePicker::make('time_in')->label('Waktu Masuk')->seconds(false)->required(),
                         Forms\Components\Select::make('end_user_id')->label('Start User')->options(fn(Get $get) => EndUser::query()->when($get('project_id'), fn($query, $projectId) => $query->where('project_id', $projectId))->orderBy('name')->pluck('name', 'id'))->required()->searchable()->disabled(fn(Get $get) => blank($get('project_id')))->live(),
                         Forms\Components\TextInput::make('start_km')
                             ->label('KM Awal')
@@ -175,7 +177,7 @@ class KehadiranDriverResource extends Resource
                 Section::make('Absensi Keluar')
                     ->schema([
                         Forms\Components\Select::make('end_user_out')->label('End User')->options(fn(Get $get) => EndUser::query()->when($get('project_id'), fn($query, $projectId) => $query->where('project_id', $projectId))->orderBy('name')->pluck('name', 'id'))->required()->searchable()->disabled(fn(Get $get) => blank($get('project_id'))),
-                        Forms\Components\DateTimePicker::make('time_out')->label('Waktu Keluar')->required(),
+                        Forms\Components\DateTimePicker::make('time_out')->label('Waktu Keluar')->seconds(false)->required(),
                         Forms\Components\TextInput::make('end_km')->label('KM Akhir')->numeric()->minValue(0),
                         Forms\Components\TextInput::make('location_out')->label('Lokasi Keluar')->maxLength(255),
                         Forms\Components\FileUpload::make('photo_out')
@@ -210,7 +212,7 @@ class KehadiranDriverResource extends Resource
                 Tables\Columns\TextColumn::make('endUserOut.name')->label('User Out')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('unit.nopol')->label('Unit')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('date')->date()->label('Tanggal')->sortable()->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('time_in')->label('Waktu Masuk')->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('time_in')->label('Waktu Masuk')->dateTime('Y-m-d H:i')->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('waktu_check')
                     ->label('Waktu Check')
                     ->getStateUsing(function ($record) {
@@ -218,10 +220,10 @@ class KehadiranDriverResource extends Resource
                             return '-';
                         }
 
-                        return $record->checks->sortBy('created_at')->map(fn($check) => $check->created_at->format('H:i:s'))->implode(', ');
+                        return $record->checks->sortBy('created_at')->map(fn($check) => $check->created_at->format('H:i'))->implode(', ');
                     })
                     ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('time_out')->label('Waktu Keluar')->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('time_out')->label('Waktu Keluar')->dateTime('Y-m-d H:i')->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\BooleanColumn::make('is_complete')->label('Selesai')->sortable()
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->trueIcon('heroicon-o-check-circle')
@@ -234,7 +236,7 @@ class KehadiranDriverResource extends Resource
                 Tables\Filters\SelectFilter::make('project_id')->label('Filter Project')->relationship('project', 'name'),
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label('Filter Driver')
-                    ->relationship('user', 'name')
+                    ->relationship('user', 'name', modifyQueryUsing: fn (Builder $query) => $query->where('role', 'driver'))
                     ->query(function (Builder $query, array $data, \Filament\Tables\Contracts\HasTable $livewire): Builder {
                         $userId = $data['value'] ?? null;
                         $projectId = $livewire->getTableFilterState('project_id')['value'] ?? null;
@@ -407,7 +409,7 @@ class KehadiranDriverResource extends Resource
                             TextEntry::make('user.name')->label('Driver'),
                             TextEntry::make('unit.type')->label('Unit'),
                             TextEntry::make('unit.nopol')->label('Nopol'),
-                            TextEntry::make('date')->label('Tanggal'),
+                            TextEntry::make('date')->label('Tanggal')->formatStateUsing(fn($state) => \Carbon\Carbon::parse($state)->format('d F Y')),
                             TextEntry::make('note')->label('Catatan')
                         ]),
                         Group::make()->schema([
@@ -434,7 +436,7 @@ class KehadiranDriverResource extends Resource
                     ->columns(1),
                 Section::make('Absensi Masuk')
                     ->schema([
-                        TextEntry::make('time_in')->label('Waktu Masuk'),
+                        TextEntry::make('time_in')->label('Waktu Masuk')->dateTime('Y-m-d H:i'),
                         TextEntry::make('start_km')->label('KM Awal'),
                         TextEntry::make('location_in')
                             ->label('Lokasi Masuk')
@@ -457,7 +459,7 @@ class KehadiranDriverResource extends Resource
 
                 Section::make('Absensi Keluar')
                     ->schema([
-                        TextEntry::make('time_out')->label('Waktu Keluar'),
+                        TextEntry::make('time_out')->label('Waktu Keluar')->dateTime('Y-m-d H:i'),
                         TextEntry::make('end_km')->label('KM Akhir'),
                         TextEntry::make('location_out')
                             ->label('Lokasi Keluar')

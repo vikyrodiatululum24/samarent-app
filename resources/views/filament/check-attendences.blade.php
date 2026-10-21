@@ -21,7 +21,7 @@
                 }
             @endphp
             <div class="p-3 border rounded-lg">
-                <div>🕒 {{ $item->created_at ? $item->created_at->format('H:i:s') : '-' }}</div>
+                <div>🕒 {{ $item->created_at ? $item->created_at->format('H:i') : '-' }}</div>
                 <div>📍 {{ $address }}</div>
                 <div class="text-sm text-gray-500">
                     ({{ $item->location }})

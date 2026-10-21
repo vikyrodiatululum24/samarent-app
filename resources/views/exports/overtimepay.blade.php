@@ -104,8 +104,8 @@
                     <td>{{ \Carbon\Carbon::parse($pay->tanggal)->format('d-m-Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($pay->tanggal)->locale('id')->translatedFormat('l') }}</td>
                     <td>{{ $pay->shift }}</td>
-                    <td>{{ $pay->from_time }}</td>
-                    <td>{{ $pay->to_time }}</td>
+                    <td>{{ \Carbon\Carbon::parse($pay->from_time)->format('H:i') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($pay->to_time)->format('H:i') }}</td>
                     <td>{{ number_format($pay->worked_hours, 2) }}</td>
                     <td>{{ number_format($pay->normal_hours, 2) }}</td>
                     <td>{{ $pay->calculated_ot_hours }}</td>

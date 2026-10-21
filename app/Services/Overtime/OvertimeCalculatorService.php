@@ -8,13 +8,10 @@ use App\Models\DriverAttendence;
 use App\Models\OvertimePay;
 use App\Models\SetSalary;
 use App\Services\Overtime\OvertimePolicyResolver;
-use App\Services\Overtime\Strategies\CustomStrategy;
 use App\Services\Overtime\Strategies\FlatStrategy;
 use App\Services\Overtime\Strategies\GovernmentStrategy;
 use App\Services\Overtime\Strategies\OvertimeStrategyInterface;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 
 class OvertimeCalculatorService
 {
@@ -22,7 +19,6 @@ class OvertimeCalculatorService
         private readonly OvertimePolicyResolver $resolver,
         private readonly FlatStrategy $flatStrategy,
         private readonly GovernmentStrategy $governmentStrategy,
-        private readonly CustomStrategy $customStrategy,
     ) {}
 
     public function calculateAndPersist(DriverAttendence $attendance): OvertimePay
@@ -97,8 +93,8 @@ class OvertimeCalculatorService
     private function buildContext(DriverAttendence $attendance, SetSalary $policy): array
     {
         $date = $this->attendanceDate($attendance);
-        $clockIn = $this->resolveDateTime($attendance, 'time_in');
-        $clockOut = $this->resolveDateTime($attendance, 'time_out');
+        $clockIn = $this->resolveDateTime($attendance, 'time_in')->second(0);
+        $clockOut = $this->resolveDateTime($attendance, 'time_out')->second(0);
         $workedHours = max(0, $clockIn->diffInMinutes($clockOut) / 60);
         $workdays = $this->normalizeWorkdays((array) ($policy->workdays ?? data_get($policy->rules, 'workdays', [])));
         $day = strtolower($date->format('l'));
@@ -109,16 +105,17 @@ class OvertimeCalculatorService
             $isHoliday = $this->isHoliday($date) || ! array_key_exists($day, $workdays);
         }
         $overtimeHours = max(0, $isHoliday ? $workedHours : $workedHours - $normalHours);
-        $effectiveHours = $this->applyBreakRule($overtimeHours, $isHoliday, (array) ($policy->rules['break'] ?? []));
+        $effectiveHours = $this->applyBreakRule($overtimeHours, $isHoliday, (array) (data_get($policy->rules, 'break', [])));
 
+        $rules = $policy->rules ?? [];
         if ($policy->policy_type === OvertimePolicyType::Government->value) {
-            $salary = (float) (data_get($policy->rules['overtime'], 'hourly_salary') ?? 0);
+            $salary = (float) data_get($rules, 'overtime.hourly_salary', 0);
         } else if ($policy->policy_type === OvertimePolicyType::Flat->value) {
-            $salary = (float) $isHoliday
-                ? (data_get($policy->rules['overtime'], 'holiday_rate') ?? 0)
-                : (data_get($policy->rules['overtime'], 'weekday_rate') ?? 0);
+            $salary = (float) ($isHoliday
+                ? data_get($rules, 'overtime.holiday_rate', 0)
+                : data_get($rules, 'overtime.weekday_rate', 0));
         } else {
-            $salary = (float) ($policy->rules['overtime']['hourly_salary'] ?? 0);
+            $salary = (float) data_get($rules, 'overtime.hourly_salary', 0);
         }
 
         return [

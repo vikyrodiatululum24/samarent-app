@@ -38,8 +38,8 @@ class OvertimePaysRelationManager extends RelationManager
                     ->color(function ($state) {
                         return $state === 'Holiday' ? 'danger' : 'success';
                     }),
-                Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable(),
-                Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable(),
+                Tables\Columns\TextColumn::make('from_time')->label('Dari Jam')->sortable()->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i')),
+                Tables\Columns\TextColumn::make('to_time')->label('Sampai Jam')->sortable()->formatStateUsing(fn($state) => Carbon::parse($state)->format('H:i')),
                 Tables\Columns\TextColumn::make('worked_hours')->label('Jam Kerja')->sortable(),
                 Tables\Columns\TextColumn::make('normal_hours')->label('Jam Normal')->sortable(),
                 Tables\Columns\TextColumn::make('calculated_ot_hours')->label('Total Jam OT')->sortable(),
