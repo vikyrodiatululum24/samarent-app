@@ -24,8 +24,8 @@ class ViewMonitorReimbursement extends ViewRecord
                             ->badge()
                             ->color('info'),
 
-                        Components\TextEntry::make('created_at')
-                            ->label('Tanggal Dibuat')
+                        Components\TextEntry::make('date')
+                            ->label('Tanggal Transaksi')
                             ->date('d F Y, H:i:s'),
                     ])
                     ->columns(2),
