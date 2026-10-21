@@ -422,7 +422,7 @@
                             @foreach ($row as $item)
                                 <td width="50%" style="border:1px solid #ddd; vertical-align:top;">
                                     <div style="font-weight:bold; text-align:center; margin-bottom:10px; margin-top: 10px">
-                                        {{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d M Y') }}
+                                        {{ \Carbon\Carbon::parse($item->date)->translatedFormat('d M Y') }}
                                     </div>
 
                                     @if ($item->nota)
