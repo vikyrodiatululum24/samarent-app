@@ -53,4 +53,8 @@ class Unit extends Model
     {
         return $this->hasMany(KunciSerep::class, 'unit_id', 'id');
     }
+    public function angsuranKendaraans()
+    {
+        return $this->hasMany(AngsuranKendaraan::class, 'unit_id', 'id');
+    }
 }

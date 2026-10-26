@@ -17,8 +17,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 
 class ProsesResource extends Resource
@@ -158,12 +156,14 @@ class ProsesResource extends Resource
                             ->disk('public')
                             ->directory('foto_nota')
                             ->nullable()
+                            ->resize(50)
                             ->default(fn($record) => $record->complete?->foto_nota),
                         Forms\Components\FileUpload::make('foto_pengerjaan_bengkel')
                             ->label('Foto Pengerjaan Bengkel')
                             ->disk('public')
                             ->directory('foto_pengerjaan_bengkel')
                             ->nullable()
+                            ->resize(50)
                             ->default(fn($record) => $record->complete?->foto_pengerjaan_bengkel),
                         Forms\Components\FileUpload::make('foto_tambahan')
                             ->label('Foto Tambahan')
@@ -172,6 +172,7 @@ class ProsesResource extends Resource
                             ->multiple()
                             ->maxFiles(3)
                             ->nullable()
+                            ->resize(50)
                             ->default(fn($record) => $record->complete?->foto_tambahan)
                             ->reactive()
                             ->afterStateUpdated(function ($state, Set $set, Get $get, $livewire) {

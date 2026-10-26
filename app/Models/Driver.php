@@ -119,4 +119,9 @@ class Driver extends Model
     {
         return $this->hasMany(Reimbursement::class, 'user_id', 'user_id');
     }
+
+    public function angsuranKendaraans()
+    {
+        return $this->hasMany(AngsuranKendaraan::class, 'driver_id');
+    }
 }

@@ -25,12 +25,14 @@ class Bastk extends Model
         'kondisi_unit',
         'exchange',
         'keterangan',
+        'is_submitted_customer',
     ];
 
     protected $casts = [
         'tgl_serah' => 'date',
         'tgl_kembali' => 'date',
         'kondisi_unit' => 'json',
+        'is_submitted_customer' => 'boolean',
     ];
 
     public function unit()

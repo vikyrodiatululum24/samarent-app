@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Bastks\Schemas;
 use App\Helpers\BastkHelper;
 use App\Models\Unit;
 use Filament\Forms;
+use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Utilities\Set;
@@ -50,6 +51,9 @@ class BastkFormLama
                             Forms\Components\TextInput::make('nama_penerima')->label('Nama Penerima')->maxLength(255),
                             Forms\Components\CheckboxList::make('kondisi_unit')->label('Kondisi Unit')->options(BastkHelper::kondisi())->required()
                                 ->reactive(),
+                            Forms\Components\Toggle::make('is_submitted_customer')
+                                ->label('Sudah Disubmit ke Customer')
+                                ->default(false),
                             Forms\Components\Textarea::make('exchange')->label('Exchange')->columnSpanFull()->rows(3)->visible(fn($get) => in_array('exchange', $get('kondisi_unit') ?? []))->required(fn($get) => in_array('exchange', $get('kondisi_unit') ?? [])),
                         ]),
                     ]),
@@ -197,7 +201,7 @@ class BastkFormLama
                             })
                             ->columnSpanFull(),
 
-                        Forms\Components\Textarea::make('keterangan')->label('Keterangan')->columnSpanFull()->rows(3),
+                        RichEditor::make('keterangan')->label('Keterangan')->columnSpanFull(),
                     ]),
                 // Step 3: Dokumentasi Foto (Child: bastk_dokumentasis)
                 Step::make('Dokumentasi Foto')

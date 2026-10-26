@@ -43,6 +43,9 @@ class BastkInfolist
                                     ->label('Nama Penyerah'),
                                 Infolists\Components\TextEntry::make('nama_penerima')
                                     ->label('Nama Penerima'),
+                                Infolists\Components\IconEntry::make('is_submitted_customer')
+                                    ->label('Disubmit ke Customer')
+                                    ->boolean(),
                                 Infolists\Components\TextEntry::make('alamat')
                                     ->label('Alamat')
                                     ->columnSpanFull(),
@@ -55,6 +58,8 @@ class BastkInfolist
                                     ->visible(fn($record) => in_array('exchange', $record->kondisi_unit ?? [])),
                                 Infolists\Components\TextEntry::make('keterangan')
                                     ->label('Keterangan')
+                                    ->html()
+                                    ->prose()
                                     ->columnSpanFull(),
                             ]),
                     ])

@@ -8,4 +8,12 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        host: '127.0.0.1', // Memaksa IPv4 agar tidak menggunakan [::1]
+        port: 5173,
+        cors: true,
+        hmr: {
+            host: '127.0.0.1',
+        },
+    },
 });

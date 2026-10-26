@@ -66,52 +66,55 @@
 
     <div>
         <div class="noBastk">
-            <p style="text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 5px;">{{ $bastk->no_bastk }}</p>
+            <p style="text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 5px;">
+                {{ $bastk->no_bastk }}</p>
         </div>
         <div class="type-bastk">
-            <p style="text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 5px; text-decoration: underline;">{{ $bastk->type_bastk == 'serah' ? 'PENYERAHAN' : 'PENGAMBILAN' }}</p>
+            <p
+                style="text-align: center; font-size: 15px; font-weight: bold; margin-bottom: 5px; text-decoration: underline;">
+                {{ $bastk->type_bastk == 'serah' ? 'PENYERAHAN' : 'PENGAMBILAN' }}</p>
         </div>
         <img src="{{ public_path('images/header_samarent.jpg') }}" alt="header samarent" width="100%"
             style="margin-bottom: 5px;">
         <div style="padding: 5px 20px;">
             <table class="header" style="width: 90%;">
                 <tr>
-                    <td style="font-weight: bold; width: 15%; padding:0.2rem;">
+                    <td style="font-weight: bold; width: 20%;">
                         Kepada
                     </td>
-                    <td style="width: 1%; padding:0.2rem;">
+                    <td style="width: 1%; vertical-align: top;">
                         :
                     </td>
-                    <td style="width: 35%; padding:0.2rem;">
+                    <td style="width: 29%;">
                         {{ strtoupper($bastk->kepada) }}
                     </td>
-                    <td style="font-weight: bold; width: 20%; padding:0.2rem;">
+                    <td style="font-weight: bold; width: 20%;">
                         No. Polisi / No. PO
                     </td>
-                    <td style="width: 1%; padding:0.2rem;">
+                    <td style="width: 1%; vertical-align: top;">
                         :
                     </td>
-                    <td style="width: 40%; padding:0.2rem;">
+                    <td style="width: 40%; vertical-align: top;">
                         {{ $bastk->unit->nopol ?? ' - ' }} / {{ $bastk->unit->no_rks }}
                     </td>
                 </tr>
                 <tr>
-                    <td style="font-weight: bold; width: 15%; padding:0.2rem;">
+                    <td style="font-weight: bold; width: 20%;">
                         Alamat
                     </td>
-                    <td style="width: 1%; padding:0.2rem;">
+                    <td style="width: 1%; vertical-align: top;">
                         :
                     </td>
-                    <td style="width: 35%;" rowspan="2" valign="top" style="vertical-align: top;">
+                    <td style="width: 29%;" rowspan="2" valign="top" style="vertical-align: top;">
                         {{ strtoupper($bastk->alamat) }}
                     </td>
-                    <td style="font-weight: bold; width: 20%; padding:0.2rem;">
+                    <td style="font-weight: bold; width: 20%;">
                         Type Kendaraan
                     </td>
-                    <td style="width: 1%; padding:0.2rem;">
+                    <td style="width: 1%; vertical-align: top;">
                         :
                     </td>
-                    <td style="width: 40%; padding:0.2rem;">
+                    <td style="width: 40%; vertical-align: top;">
                         {{ strtoupper($bastk->unit->type) }}
                     </td>
                 </tr>
@@ -133,13 +136,13 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="font-weight: bold; width: 15%;">
+                    <td style="font-weight: bold; width: 20%;">
                         No. Telepon / HP
                     </td>
-                    <td style="width: 1%;">
+                    <td style="width: 1%; vertical-align: top;">
                         :
                     </td>
-                    <td style="width: 35%;">
+                    <td style="width: 29%; vertical-align: top;">
                         {{ $bastk->no_hp }}
                     </td>
                     <td style="font-weight: bold; width: 20%;">
@@ -171,7 +174,7 @@
                     <td>
                         &nbsp;
                     </td>
-                    <td style="width: 1%;">
+                    <td style="width: 1%; vertical-align: top;">
                         :
                     </td>
                     <td style="width: 75%;" colspan="4">
@@ -180,10 +183,11 @@
                                 <tr>
                                     <td>
                                         @foreach ($pilihan as $item)
-                                        <span style="{{ in_array(strtolower($item), $kondisi) ? 'font-weight: bold;' : 'font-weight: normal;' }}">
-                                            {!! in_array(strtolower($item), $kondisi) ? '&#10004;' : '' !!}
-                                            {{ $item }}
-                                        </span>
+                                            <span
+                                                style="{{ in_array(strtolower($item), $kondisi) ? 'font-weight: bold;' : 'font-weight: normal;' }}">
+                                                {!! in_array(strtolower($item), $kondisi) ? '&#10004;' : '' !!}
+                                                {{ $item }}
+                                            </span>
                                             @unless ($loop->last)
                                                 /
                                             @endunless
@@ -231,7 +235,7 @@
                         style="font-weight: bold; width: 4%; border: 1px solid; border-collapse: collapse; text-align:center">
                         T
                     </td>
-                    <td style="font-weight: bold; width: 50%; border: 1px solid; border-collapse: collapse;">
+                    <td style="font-weight: bold; width: 49%; border: 1px solid; border-collapse: collapse;">
                         Keterangan
                     </td>
                 </tr>
@@ -259,11 +263,12 @@
                         <td style="width: 4%; border: 1px solid; border-collapse: collapse; text-align: center;">
                             {!! $item->tidak_ada ? '&#10004;' : '' !!}
                         </td>
-                        <td>
-                            @if ($loop->first)
-                                {{ $bastk->keterangan }}
-                            @endif
-                        </td>
+                        @if ($loop->first)
+                            <td rowspan="{{ $items->count() }}"
+                                style="width: 49%; vertical-align: top; text-align: start; border: 1px solid; border-collapse: collapse; padding-left: 17px;">
+                                {!! $bastk->keterangan !!}
+                            </td>
+                        @endif
                     </tr>
                 @endforeach
             </table>
@@ -276,7 +281,9 @@
                 <tr>
                     <td width="10%" style="font-weight: bold;">Velg Ban</td>
                     <td width="20%">
-                        : <span style="{{ $velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Orignal</span> / <span style="{{ !$velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Racing</span>
+                        : <span
+                            style="{{ $velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Orignal</span> /
+                        <span style="{{ !$velg?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Racing</span>
                     </td>
                     <td width="50%" rowspan="9" style="vertical-align: top; text-align:center;">
                         <img src="{{ public_path('images/car.jpeg') }}" alt="car" width="100%"
@@ -337,15 +344,20 @@
                 </tr>
                 <tr>
                     <td width="10%" style="font-weight: bold;">Tutup Dop</td>
-                    <td width="20%" >
-                        : <span style="{{ $tutup_dop?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Ada</span> / <span style="{{ !$tutup_dop?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Tidak Ada</span>
+                    <td width="20%">
+                        : <span
+                            style="{{ $tutup_dop?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Ada</span>
+                        / <span style="{{ !$tutup_dop?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Tidak
+                            Ada</span>
                     </td>
 
                 </tr>
                 <tr>
                     <td width="10%" style="font-weight: bold;">Apar</td>
                     <td width="20%">
-                        : <span style="{{ $apar?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Ada</span> / <span style="{{ !$apar?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Tidak Ada</span>
+                        : <span style="{{ $apar?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Ada</span>
+                        / <span style="{{ !$apar?->baik ? 'font-weight: bold;' : 'font-weight: normal;' }}">Tidak
+                            Ada</span>
                     </td>
                 </tr>
                 <tr>
@@ -363,36 +375,29 @@
                     <td colspan="2" style="text-align: center;">Yang Menerima</td>
                 </tr>
                 <tr>
-                    <td colspan="2" style="text-align: center height: 100px;">&nbsp;</td>
-                    <td colspan="2" style="text-align: center height: 100px;">&nbsp;</td>
+                    <td colspan="2" style="text-align: center; height: 60px;">&nbsp;</td>
+                    <td colspan="2" style="text-align: center; height: 60px;">&nbsp;</td>
                 </tr>
                 <tr>
-                    <td colspan="2" style="text-align: center; padding-top: 50px;">
+                    <td colspan="2" style="text-align: center;">
                         <u>({{ $bastk->nama_penyerah }})</u>
                     </td>
-                    <td colspan="2" style="text-align: center; padding-top: 50px;">
+                    <td colspan="2" style="text-align: center;">
                         <u>({{ $bastk->nama_penerima }})</u>
                     </td>
                 </tr>
-                {{-- <tr>
-                    <td colspan="2" style="text-align: center; text-size: 6px;">Nama Leng, Tanda Tangan & Stempel</td>
-                    <td colspan="2" style="text-align: center; text-size: 6px;">Nama, Tanda Tangan & Stempel</td>
-                </tr> --}}
             </table>
         </div>
     </div>
 
-    <div style="page-break-before: always; padding: 10px 20px;">
-        @php
+    @php
+        $dokumentasi = collect();
+        $doc = $bastk->dokumentasi;
 
-            $dokumentasi = collect();
-
-            $doc = $bastk->dokumentasi;
-
+        if ($doc) {
             // =========================
             // Dokumentasi utama
             // =========================
-
             $data = [
                 'Unit Depan' => $doc->unit_depan,
                 'Unit Belakang' => $doc->unit_belakang,
@@ -428,7 +433,6 @@
             // =========================
             // Kerusakan
             // =========================
-
             foreach ($doc->kerusakan ?? [] as $index => $image) {
                 if (!empty($image)) {
                     $dokumentasi->push([
@@ -441,7 +445,6 @@
             // =========================
             // Tools
             // =========================
-
             foreach ($doc->tools ?? [] as $index => $image) {
                 if (!empty($image)) {
                     $dokumentasi->push([
@@ -450,68 +453,60 @@
                     ]);
                 }
             }
+        }
+    @endphp
 
-        @endphp
-        @foreach ($dokumentasi->chunk(4) as $row)
-            <table width="100%" style="border-collapse: collapse; margin-bottom:12px;">
-
-                <tr>
-
-                    @foreach ($row as $item)
-                        <td width="25%"
-                            style="
-                    border:1px solid #000;
-                    padding:5px;
-                    vertical-align:top;
-                    text-align:center;
-                ">
-
-                            <div style="font-size:10px;font-weight:bold;margin-bottom:4px;">
-                                {{ $item['label'] }}
-                            </div>
-
-                            @php
-                                $path = public_path('storage/' . $item['image']);
-                            @endphp
-
-                            @if (file_exists($path))
-                                <img src="{{ $path }}"
-                                    style="
-                            width:100%;
-                            object-fit:cover;
-                        ">
-                            @else
-                                <div
-                                    style="
-                            height:140px;
-                            line-height:140px;
-                            border:1px dashed #999;
-                            color:#999;
-                            font-size:9px;
-                        ">
-
-                                    Tidak Ada Gambar
-
+    @if ($dokumentasi->isNotEmpty())
+        <div style="page-break-before: always; padding: 10px 20px;">
+            @foreach ($dokumentasi->chunk(4) as $row)
+                <table width="100%" style="border-collapse: collapse; margin-bottom:12px;">
+                    <tr>
+                        @foreach ($row as $item)
+                            <td width="25%"
+                                style="
+                        border:1px solid #000;
+                        padding:5px;
+                        vertical-align:top;
+                        text-align:center;
+                    ">
+                                <div style="font-size:10px;font-weight:bold;margin-bottom:4px;">
+                                    {{ $item['label'] }}
                                 </div>
-                            @endif
 
-                        </td>
-                    @endforeach
+                                @php
+                                    $path = public_path('storage/' . $item['image']);
+                                @endphp
 
-                    {{-- Jika kurang dari 4 kolom --}}
-                    @for ($i = $row->count(); $i < 4; $i++)
-                        <td width="25%" style="
-                    border:1px solid #000;
-                ">
-                        </td>
-                    @endfor
+                                @if (file_exists($path))
+                                    <img src="{{ $path }}"
+                                        style="
+                                width:100%;
+                                object-fit:cover;
+                            ">
+                                @else
+                                    <div
+                                        style="
+                                height:140px;
+                                line-height:140px;
+                                border:1px dashed #999;
+                                color:#999;
+                                font-size:9px;
+                            ">
+                                        Tidak Ada Gambar
+                                    </div>
+                                @endif
+                            </td>
+                        @endforeach
 
-                </tr>
-
-            </table>
-        @endforeach
-
-    </div>
+                        {{-- Kolom sisa tanpa border agar posisi kolom foto tetap 25% tanpa kotak kosong --}}
+                        @for ($i = $row->count(); $i < 4; $i++)
+                            <td width="25%" style="border: none;"></td>
+                        @endfor
+                    </tr>
+                </table>
+            @endforeach
+        </div>
+    @endif
 </body>
 
 </html>

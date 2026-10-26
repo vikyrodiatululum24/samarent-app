@@ -6,7 +6,6 @@ use App\Helpers\HolidayDates;
 use App\Models\Event;
 use Carbon\Carbon;
 use Filament\Widgets\Widget;
-use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 
 
