@@ -42,9 +42,4 @@ class Project extends Model
     {
         return $this->hasMany(GroupSignature::class);
     }
-
-    public function angsuranKendaraans()
-    {
-        return $this->hasMany(AngsuranKendaraan::class, 'project_id');
-    }
 }

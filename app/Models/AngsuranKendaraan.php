@@ -66,11 +66,6 @@ class AngsuranKendaraan extends Model
         return $this->hasMany(AngsuranPengeluaran::class, 'angsuran_kendaraan_id');
     }
 
-    public function project(): BelongsTo
-    {
-        return $this->belongsTo(Project::class, 'project_id');
-    }
-
     /**
      * Hitung total setoran yang sudah masuk pada bulan dan tahun tertentu.
      */
