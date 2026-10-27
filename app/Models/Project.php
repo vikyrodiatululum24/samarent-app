@@ -40,6 +40,11 @@ class Project extends Model
 
     public function groupSignatures()
     {
-        return $this->hasMany(GroupSignatures::class);
+        return $this->hasMany(GroupSignature::class);
+    }
+
+    public function angsuranKendaraans()
+    {
+        return $this->hasMany(AngsuranKendaraan::class, 'project_id');
     }
 }

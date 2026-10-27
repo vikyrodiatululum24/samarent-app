@@ -29,6 +29,7 @@ class AngsuranKendaraan extends Model
         'tgl_deposit',
         'status',
         'catatan',
+        'project_id',
     ];
 
     protected $casts = [
@@ -63,6 +64,11 @@ class AngsuranKendaraan extends Model
     public function pengeluarans(): HasMany
     {
         return $this->hasMany(AngsuranPengeluaran::class, 'angsuran_kendaraan_id');
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class, 'project_id');
     }
 
     /**

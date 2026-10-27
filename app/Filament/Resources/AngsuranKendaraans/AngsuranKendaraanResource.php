@@ -11,6 +11,7 @@ use App\Filament\Resources\AngsuranKendaraans\RelationManagers\PengeluaransRelat
 use App\Filament\Resources\AngsuranKendaraans\RelationManagers\SetoransRelationManager;
 use App\Models\AngsuranKendaraan;
 use App\Models\Driver;
+use App\Models\Project;
 use App\Models\Unit;
 use BackedEnum;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -56,87 +57,110 @@ class AngsuranKendaraanResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Ringkasan Realisasi Proses Angsuran')
-                    ->description('Akumulasi pembayaran riil, status sisa kontrak, dan performa bulan berjalan')
-                    ->icon('heroicon-o-chart-bar')
-                    ->schema([
-                        Grid::make(3)
-                            ->schema([
-                                TextInput::make('summary_setoran')
-                                    ->label('Total Setoran Terkumpul')
-                                    ->prefix('Rp')
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->afterStateHydrated(fn ($component, $record) => $component->state($record ? number_format($record->total_setoran_keseluruhan, 0, ',', '.') : '-')),
+                // Section::make('Ringkasan Realisasi Proses Angsuran')
+                //     ->description('Akumulasi pembayaran riil, status sisa kontrak, dan performa bulan berjalan')
+                //     ->icon('heroicon-o-chart-bar')
+                //     ->schema([
+                //         Grid::make(3)
+                //             ->schema([
+                //                 TextInput::make('summary_setoran')
+                //                     ->label('Total Setoran Terkumpul')
+                //                     ->prefix('Rp')
+                //                     ->disabled()
+                //                     ->dehydrated(false)
+                //                     ->afterStateHydrated(fn ($component, $record) => $component->state($record ? number_format($record->total_setoran_keseluruhan, 0, ',', '.') : '-')),
 
-                                TextInput::make('summary_persen')
-                                    ->label('Progres Pelunasan Kontrak')
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->afterStateHydrated(function ($component, $record) {
-                                        if (! $record || $record->nilai_kontrak <= 0) return $component->state('0%');
-                                        $persen = round(($record->total_setoran_keseluruhan / $record->nilai_kontrak) * 100, 1);
-                                        return $component->state($persen . '%');
-                                    }),
+                //                 TextInput::make('summary_persen')
+                //                     ->label('Progres Pelunasan Kontrak')
+                //                     ->disabled()
+                //                     ->dehydrated(false)
+                //                     ->afterStateHydrated(function ($component, $record) {
+                //                         if (! $record || $record->nilai_kontrak <= 0) return $component->state('0%');
+                //                         $persen = round(($record->total_setoran_keseluruhan / $record->nilai_kontrak) * 100, 1);
+                //                         return $component->state($persen . '%');
+                //                     }),
 
-                                TextInput::make('summary_sisa')
-                                    ->label('Sisa Nilai Kontrak')
-                                    ->prefix('Rp')
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->afterStateHydrated(fn ($component, $record) => $component->state($record ? number_format($record->sisa_kontrak, 0, ',', '.') : '-')),
+                //                 TextInput::make('summary_sisa')
+                //                     ->label('Sisa Nilai Kontrak')
+                //                     ->prefix('Rp')
+                //                     ->disabled()
+                //                     ->dehydrated(false)
+                //                     ->afterStateHydrated(fn ($component, $record) => $component->state($record ? number_format($record->sisa_kontrak, 0, ',', '.') : '-')),
 
-                                TextInput::make('summary_bulan_ini')
-                                    ->label('Setoran Bulan Ini (' . Carbon::now()->locale('id')->translatedFormat('F Y') . ')')
-                                    ->prefix('Rp')
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->afterStateHydrated(fn ($component, $record) => $component->state($record ? number_format($record->getTotalSetoranBulan(now()->month, now()->year), 0, ',', '.') : '-')),
+                //                 TextInput::make('summary_bulan_ini')
+                //                     ->label('Setoran Bulan Ini (' . Carbon::now()->locale('id')->translatedFormat('F Y') . ')')
+                //                     ->prefix('Rp')
+                //                     ->disabled()
+                //                     ->dehydrated(false)
+                //                     ->afterStateHydrated(fn ($component, $record) => $component->state($record ? number_format($record->getTotalSetoranBulan(now()->month, now()->year), 0, ',', '.') : '-')),
 
-                                TextInput::make('summary_status_bulan_ini')
-                                    ->label('Status Setoran Bulan Ini')
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->afterStateHydrated(function ($component, $record) {
-                                        if (! $record) return $component->state('-');
-                                        $setor = (float) $record->getTotalSetoranBulan(now()->month, now()->year);
-                                        $target = (float) $record->normal_angsuran;
-                                        $selisih = $setor - $target;
-                                        if ($setor >= $target && $target > 0) {
-                                            return $component->state('Lunas Bulan Ini (+Rp ' . number_format($selisih, 0, ',', '.') . ')');
-                                        } elseif ($setor > 0) {
-                                            return $component->state('Kurang Bayar (Kurang Rp ' . number_format(abs($selisih), 0, ',', '.') . ')');
-                                        } else {
-                                            return $component->state('Belum Ada Setoran (Target: Rp ' . number_format($target, 0, ',', '.') . ')');
-                                        }
-                                    }),
+                //                 TextInput::make('summary_status_bulan_ini')
+                //                     ->label('Status Setoran Bulan Ini')
+                //                     ->disabled()
+                //                     ->dehydrated(false)
+                //                     ->afterStateHydrated(function ($component, $record) {
+                //                         if (! $record) return $component->state('-');
+                //                         $setor = (float) $record->getTotalSetoranBulan(now()->month, now()->year);
+                //                         $target = (float) $record->normal_angsuran;
+                //                         $selisih = $setor - $target;
+                //                         if ($setor >= $target && $target > 0) {
+                //                             return $component->state('Lunas Bulan Ini (+Rp ' . number_format($selisih, 0, ',', '.') . ')');
+                //                         } elseif ($setor > 0) {
+                //                             return $component->state('Kurang Bayar (Kurang Rp ' . number_format(abs($selisih), 0, ',', '.') . ')');
+                //                         } else {
+                //                             return $component->state('Belum Ada Setoran (Target: Rp ' . number_format($target, 0, ',', '.') . ')');
+                //                         }
+                //                     }),
 
-                                TextInput::make('summary_service')
-                                    ->label('Klaim Service Kendaraan (Penyewa)')
-                                    ->disabled()
-                                    ->dehydrated(false)
-                                    ->afterStateHydrated(function ($component, $record) {
-                                        if (! $record) return $component->state('-');
-                                        $totalKlaim = (float) $record->pengeluarans()->sum('nominal');
-                                        $sisaKlaim = (float) $record->pengeluarans->sum(fn ($p) => $p->sisa_kompensasi);
-                                        return $component->state('Total: Rp ' . number_format($totalKlaim, 0, ',', '.') . ' (Sisa: Rp ' . number_format($sisaKlaim, 0, ',', '.') . ')');
-                                    }),
-                            ]),
-                    ])
-                    ->visible(fn ($record) => $record !== null),
+                //                 TextInput::make('summary_service')
+                //                     ->label('Klaim Service Kendaraan (Penyewa)')
+                //                     ->disabled()
+                //                     ->dehydrated(false)
+                //                     ->afterStateHydrated(function ($component, $record) {
+                //                         if (! $record) return $component->state('-');
+                //                         $totalKlaim = (float) $record->pengeluarans()->sum('nominal');
+                //                         $sisaKlaim = (float) $record->pengeluarans->sum(fn ($p) => $p->sisa_kompensasi);
+                //                         return $component->state('Total: Rp ' . number_format($totalKlaim, 0, ',', '.') . ' (Sisa: Rp ' . number_format($sisaKlaim, 0, ',', '.') . ')');
+                //                     }),
+                //             ]),
+                //     ])
+                //     ->visible(fn ($record) => $record !== null),
 
                 Section::make('Identitas Penyewa & Kendaraan')
                     ->description('Data driver penyewa dan unit kendaraan yang disewa')
                     ->schema([
-                        Select::make('driver_id')
-                            ->label('Nama Penyewa (Driver)')
-                            ->options(fn () => Driver::query()
-                                ->join('users', 'drivers.user_id', '=', 'users.id')
-                                ->orderBy('users.name')
-                                ->pluck('users.name', 'drivers.id')
+                        Select::make('project_id')
+                            ->label('Project')
+                            ->options(fn () => Project::query()
+                                ->orderBy('name')
+                                ->pluck('name', 'id')
                             )
                             ->searchable()
                             ->preload()
+                            ->live()
+                            ->afterStateUpdated(fn (callable $set) => $set('driver_id', null))
+                            ->formatStateUsing(fn ($state, ?AngsuranKendaraan $record) => $state ?? $record?->driver?->project_id)
+                            ->dehydrated(false)
+                            ->required(),
+
+                        Select::make('driver_id')
+                            ->label('Nama Penyewa (Driver)')
+                            ->options(function (callable $get, ?AngsuranKendaraan $record) {
+                                $projectId = $get('project_id') ?? $record?->driver?->project_id;
+                                if (! $projectId) {
+                                    return [];
+                                }
+
+                                return Driver::query()
+                                    ->where('drivers.project_id', $projectId)
+                                    ->join('users', 'drivers.user_id', '=', 'users.id')
+                                    ->orderBy('users.name')
+                                    ->pluck('users.name', 'drivers.id');
+                            })
+                            ->searchable()
+                            ->preload()
+                            ->disabled(fn (callable $get) => blank($get('project_id')))
+                            ->placeholder(fn (callable $get) => blank($get('project_id')) ? 'Pilih project terlebih dahulu' : 'Pilih Driver')
                             ->required(),
 
                         Select::make('unit_id')
