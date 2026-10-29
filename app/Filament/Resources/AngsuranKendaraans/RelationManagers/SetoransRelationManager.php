@@ -25,6 +25,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
@@ -50,6 +51,7 @@ class SetoransRelationManager extends RelationManager
                     ->label('Tanggal Setor')
                     ->default(now())
                     ->required()
+                    ->native(false)
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set) {
                         if ($state) {
@@ -61,7 +63,15 @@ class SetoransRelationManager extends RelationManager
 
                 TextInput::make('nominal')
                     ->label(fn(callable $get) => $get('metode_setor') === 'kombinasi' ? 'Total Setoran Hari Ini' : 'Nominal Setoran')
-                    ->numeric()
+                    ->inputMode('numeric')
+                    ->rules(
+                        'regex:/^[1-9]\d*$/'
+                    )
+                    ->validationMessages([
+                        'regex' => 'Masukkan jumlah setoran yang valid.',
+                    ])
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
                     ->formatStateUsing(fn ($state) => $state !== null ? (int) round((float) $state) : null)
                     ->dehydrateStateUsing(fn ($state) => $state !== null ? (float) $state : null)
                     ->prefix('Rp')
@@ -109,6 +119,7 @@ class SetoransRelationManager extends RelationManager
                             }
                         } else {
                             $set('nominal', (int) $angsHarian);
+                            $set('angsuran_pengeluaran_id', null);
                         }
                     }),
 
@@ -178,7 +189,15 @@ class SetoransRelationManager extends RelationManager
                     ->schema([
                         TextInput::make('nominal_kompensasi')
                             ->label('1. Potong Nota (Kompensasi)')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(
+                                'regex:/^[1-9]\d*$/'
+                            )
+                            ->validationMessages([
+                                'regex' => 'Masukkan jumlah setoran yang valid.',
+                            ])
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->formatStateUsing(fn ($state) => $state !== null ? (int) round((float) $state) : null)
                             ->prefix('Rp')
                             ->live()
@@ -202,7 +221,13 @@ class SetoransRelationManager extends RelationManager
 
                         TextInput::make('nominal_sisa')
                             ->label('3. Nominal Sisa Bayar')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^-?[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Estimasi harus berupa angka.',
+                            ])
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->formatStateUsing(fn ($state) => $state !== null ? (int) round((float) $state) : null)
                             ->prefix('Rp')
                             ->live()
@@ -238,7 +263,8 @@ class SetoransRelationManager extends RelationManager
 
                         TextInput::make('periode_tahun')
                             ->label('Periode Tahun')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^[0-9]{4}$/'])
                             ->default(now()->year)
                             ->required(),
                     ]),
@@ -498,6 +524,12 @@ class SetoransRelationManager extends RelationManager
             ->actions([
                 ViewAction::make(),
                 EditAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        if (!in_array($data['metode_setor'] ?? '', ['kompensasi_biaya', 'kombinasi'])) {
+                            $data['angsuran_pengeluaran_id'] = null;
+                        }
+                        return $data;
+                    })
                     ->before(function ($record) {
                         session(['old_pengeluaran_id_' . $record->id => $record->angsuran_pengeluaran_id]);
                     })

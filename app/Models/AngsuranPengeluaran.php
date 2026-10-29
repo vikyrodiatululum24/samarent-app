@@ -43,7 +43,9 @@ class AngsuranPengeluaran extends Model
      */
     public function getTotalTerkompensasiAttribute(): float
     {
-        return (float) $this->setorans()->sum('nominal');
+        return (float) $this->setorans()
+            ->whereIn('metode_setor', ['kompensasi_biaya', 'kombinasi'])
+            ->sum('nominal');
     }
 
     /**
@@ -71,5 +73,14 @@ class AngsuranPengeluaran extends Model
         } else {
             $this->update(['status' => 'dikompensasi_sebagian']);
         }
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function ($pengeluaran) {
+            if ($pengeluaran->setorans()->exists()) {
+                throw new \Exception('Data biaya service tidak dapat dihapus karena sudah terkompensasi ke setoran harian.');
+            }
+        });
     }
 }

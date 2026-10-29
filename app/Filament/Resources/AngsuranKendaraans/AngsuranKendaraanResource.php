@@ -32,6 +32,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Support\RawJs;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -180,6 +181,7 @@ class AngsuranKendaraanResource extends Resource
                             ->label('Tgl Serah Terima')
                             ->required()
                             ->live()
+                            ->native(false)
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 if ($state && $get('jangka_waktu_tahun')) {
                                     $tahun = (int) $get('jangka_waktu_tahun');
@@ -189,7 +191,13 @@ class AngsuranKendaraanResource extends Resource
 
                         TextInput::make('jangka_waktu_tahun')
                             ->label('Jangka Waktu (Tahun)')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(
+                                'regex:/^[1-9]\d*$/'
+                            )
+                            ->validationMessages([
+                                'regex' => 'Masukkan angka yang valid',
+                            ])
                             ->default(5)
                             ->required()
                             ->live()
@@ -206,6 +214,7 @@ class AngsuranKendaraanResource extends Resource
 
                         DatePicker::make('tgl_jatuh_tempo_akhir')
                             ->label('Masa Akhir Kontrak Sewa')
+                            ->native(false)
                             ->required(),
 
                         Select::make('status')
@@ -226,7 +235,13 @@ class AngsuranKendaraanResource extends Resource
                     ->schema([
                         TextInput::make('frekuensi_per_bulan')
                             ->label('Frekuensi Per Bulan (Hari)')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(
+                                'regex:/^[1-9]\d*$/'
+                            )
+                            ->validationMessages([
+                                'regex' => 'Masukkan angka yang valid',
+                            ])
                             ->default(28)
                             ->suffix('Hari')
                             ->required()
@@ -243,10 +258,16 @@ class AngsuranKendaraanResource extends Resource
 
                         TextInput::make('angsuran_per_hari')
                             ->label('Angsuran Per Hari')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^-?[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Estimasi harus berupa angka.',
+                            ])
                             ->formatStateUsing(fn ($state) => $state !== null ? (int) round((float) $state) : null)
                             ->dehydrateStateUsing(fn ($state) => $state !== null ? (float) $state : null)
                             ->prefix('Rp')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->required()
                             ->live(onBlur: true)
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -266,10 +287,16 @@ class AngsuranKendaraanResource extends Resource
 
                         TextInput::make('normal_angsuran')
                             ->label('Normal Angsuran (Per Bulan)')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^-?[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Estimasi harus berupa angka.',
+                            ])
                             ->formatStateUsing(fn ($state) => $state !== null ? (int) round((float) $state) : null)
                             ->dehydrateStateUsing(fn ($state) => $state !== null ? (float) $state : null)
                             ->prefix('Rp')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->helperText('Otomatis: Frekuensi × Angsuran Per Hari')
                             ->required()
                             ->live(onBlur: true)
@@ -281,10 +308,16 @@ class AngsuranKendaraanResource extends Resource
 
                         TextInput::make('nilai_kontrak')
                             ->label('Nilai Kontrak')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^-?[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Estimasi harus berupa angka.',
+                            ])
                             ->formatStateUsing(fn ($state) => $state !== null ? (int) round((float) $state) : null)
                             ->dehydrateStateUsing(fn ($state) => $state !== null ? (float) $state : null)
                             ->prefix('Rp')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->helperText('Otomatis: Normal Angsuran × 12 Bulan × Jangka Waktu')
                             ->required(),
                     ])
@@ -295,27 +328,41 @@ class AngsuranKendaraanResource extends Resource
                     ->schema([
                         TextInput::make('dp')
                             ->label('DP (Uang Muka)')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^-?[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Estimasi harus berupa angka.',
+                            ])
                             ->formatStateUsing(fn ($state) => $state !== null ? (int) round((float) $state) : null)
                             ->dehydrateStateUsing(fn ($state) => $state !== null ? (float) $state : null)
                             ->prefix('Rp')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->nullable(),
 
                         DatePicker::make('tgl_dp')
                             ->label('Tanggal Pembayaran DP')
+                            ->native(false)
                             ->nullable(),
 
                         TextInput::make('deposit')
                             ->label('Deposit (3x Angsuran)')
-                            ->numeric()
+                            ->inputMode('numeric')
+                            ->rules(['regex:/^-?[0-9]+$/'])
+                            ->validationMessages([
+                                'regex' => 'Nominal Estimasi harus berupa angka.',
+                            ])
                             ->formatStateUsing(fn ($state) => $state !== null ? (int) round((float) $state) : null)
                             ->dehydrateStateUsing(fn ($state) => $state !== null ? (float) $state : null)
                             ->prefix('Rp')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
                             ->helperText('Dapat dikosongkan atau disesuaikan')
                             ->nullable(),
 
                         DatePicker::make('tgl_deposit')
                             ->label('Tanggal Pembayaran Deposit')
+                            ->native(false)
                             ->nullable(),
 
                         Textarea::make('catatan')

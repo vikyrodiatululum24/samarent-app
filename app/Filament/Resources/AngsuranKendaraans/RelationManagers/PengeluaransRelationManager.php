@@ -23,6 +23,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
@@ -46,6 +47,7 @@ class PengeluaransRelationManager extends RelationManager
             ->components([
                 DatePicker::make('tgl_pengeluaran')
                     ->label('Tanggal Pengeluaran')
+                    ->native(false)
                     ->default(now())
                     ->required(),
 
@@ -56,7 +58,13 @@ class PengeluaransRelationManager extends RelationManager
 
                 TextInput::make('nominal')
                     ->label('Nominal Biaya Dikeluarkan')
-                    ->numeric()
+                    ->inputMode('numeric')
+                    ->rules(['regex:/^-?[0-9]+$/'])
+                    ->validationMessages([
+                        'regex' => 'Nominal Estimasi harus berupa angka.',
+                    ])
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
                     ->formatStateUsing(fn ($state) => $state !== null ? (int) round((float) $state) : null)
                     ->dehydrateStateUsing(fn ($state) => $state !== null ? (float) $state : null)
                     ->prefix('Rp')
@@ -319,13 +327,55 @@ class PengeluaransRelationManager extends RelationManager
                     }),
                 ViewAction::make(),
                 EditAction::make()
+                    // Nonaktifkan jika sudah terhubung ke setoran
+                    ->disabled(fn (AngsuranPengeluaran $record) => $record->setorans()->exists())
+                    ->tooltip(fn (AngsuranPengeluaran $record) => $record->setorans()->exists() 
+                        ? 'Tidak dapat diedit karena sudah terkompensasi ke setoran.' 
+                        : null)
                     ->after(fn ($record) => $record->sinkronkanStatus()),
                 DeleteAction::make()
+                    // Sembunyikan atau nonaktifkan tombol hapus jika sudah terpakai
+                    ->disabled(fn (AngsuranPengeluaran $record) => $record->setorans()->exists())
+                    ->tooltip(fn (AngsuranPengeluaran $record) => $record->setorans()->exists() 
+                        ? 'Tidak dapat dihapus karena sudah terkompensasi ke setoran.' 
+                        : null)
                     ->after(fn ($record) => $record->sinkronkanStatus()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->successNotification(null)
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function (\Illuminate\Support\Collection $records) {
+                            $terkompensasi = $records->filter(fn ($r) => $r->setorans()->exists());
+                            $bisaDihapus = $records->reject(fn ($r) => $r->setorans()->exists());
+
+                            // Hapus data yang belum pernah digunakan di setoran
+                            if ($bisaDihapus->isNotEmpty()) {
+                                $bisaDihapus->each->delete();
+                            }
+
+                            // Tampilkan notifikasi yang jelas & akurat
+                            if ($terkompensasi->isEmpty()) {
+                                Notification::make()
+                                    ->title('Data berhasil dihapus')
+                                    ->body("{$bisaDihapus->count()} data biaya service berhasil dihapus.")
+                                    ->success()
+                                    ->send();
+                            } elseif ($bisaDihapus->isNotEmpty()) {
+                                Notification::make()
+                                    ->title('Sebagian data berhasil dihapus')
+                                    ->body("{$bisaDihapus->count()} data berhasil dihapus. {$terkompensasi->count()} data dilewati karena sudah terkompensasi ke setoran.")
+                                    ->warning()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Penghapusan Dibatalkan')
+                                    ->body('Semua data yang dipilih sudah terkompensasi ke setoran dan tidak dapat dihapus.')
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
                     BulkAction::make('export_pengeluaran_terpilih')
                         ->label('Ekspor Biaya Terpilih')
                         ->icon('heroicon-o-arrow-down-tray')
