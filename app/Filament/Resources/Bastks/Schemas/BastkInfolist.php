@@ -255,6 +255,20 @@ class BastkInfolist
                                     ->extraImgAttributes(['style' => 'cursor: zoom-in; border-radius: 6px;'])
                                     ->url(fn ($record) => $record->dokumentasi?->stnk_belakang ? asset('storage/' . $record->dokumentasi->stnk_belakang) : null)
                                     ->openUrlInNewTab(),
+                                Infolists\Components\ImageEntry::make('dokumentasi.no_rangka')
+                                    ->label('No. Rangka')
+                                    ->disk('public')
+                                    ->height(120)
+                                    ->extraImgAttributes(['style' => 'cursor: zoom-in; border-radius: 6px;'])
+                                    ->url(fn ($record) => $record->dokumentasi?->no_rangka ? asset('storage/' . $record->dokumentasi->no_rangka) : null)
+                                    ->openUrlInNewTab(),
+                                Infolists\Components\ImageEntry::make('dokumentasi.no_mesin')
+                                    ->label('No. Mesin')
+                                    ->disk('public')
+                                    ->height(120)
+                                    ->extraImgAttributes(['style' => 'cursor: zoom-in; border-radius: 6px;'])
+                                    ->url(fn ($record) => $record->dokumentasi?->no_mesin ? asset('storage/' . $record->dokumentasi->no_mesin) : null)
+                                    ->openUrlInNewTab(),
                                 Infolists\Components\ImageEntry::make('dokumentasi.bastk')
                                     ->label('File Scan BASTK')
                                     ->disk('public')

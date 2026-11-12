@@ -276,7 +276,13 @@ class PengajuanResource extends Resource
                                                 ->preload()
                                                 ->required(),
                                             Forms\Components\TextInput::make('odometer')
-                                                ->required(),
+                                                ->required()
+                                                ->inputMode('numeric')
+                                                ->rules(['regex:/^[0-9]+$/'])
+                                                ->validationMessages([
+                                                    'regex' => 'Odometer harus berupa angka.',
+                                                ])
+                                                ->maxLength(10),
                                         ]),
                                     Forms\Components\TextInput::make('service')
                                         ->label('Jenis Permintaan Service')

@@ -22,6 +22,8 @@
                 'ban_serep' => 'Foto Ban Serep',
                 'stnk_depan' => 'Foto STNK Depan',
                 'stnk_belakang' => 'Foto STNK Belakang',
+                'no_rangka' => 'Foto No. Rangka',
+                'no_mesin' => 'Foto No. Mesin',
                 'bastk' => 'File Scan BASTK',
             ];
         @endphp

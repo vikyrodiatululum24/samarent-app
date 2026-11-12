@@ -27,6 +27,8 @@ class BastkDokumentasi extends Model
         'stnk_depan',
         'stnk_belakang',
         'bastk',
+        'no_rangka',
+        'no_mesin',
         'kerusakan',
         'tools',
     ];
@@ -61,6 +63,8 @@ class BastkDokumentasi extends Model
             'stnk_depan',
             'stnk_belakang',
             'bastk',
+            'no_rangka',
+            'no_mesin',
         ];
 
         static::updating(function ($model) use ($fileFields) {

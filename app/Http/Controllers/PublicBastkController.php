@@ -92,7 +92,7 @@ class PublicBastkController extends Controller
                     'unit_depan', 'unit_belakang', 'unit_samping_kanan', 'unit_samping_kiri',
                     'kabin_depan', 'kabin_tengah', 'kabin_belakang', 'dashboard',
                     'odometer', 'buku_service', 'manual_book', 'ban_serep',
-                    'stnk_depan', 'stnk_belakang', 'bastk',
+                    'stnk_depan', 'stnk_belakang', 'bastk', 'no_rangka', 'no_mesin',
                 ];
 
                 foreach ($singleFields as $field) {

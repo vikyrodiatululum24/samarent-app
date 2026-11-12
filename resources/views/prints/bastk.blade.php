@@ -418,6 +418,9 @@
                 'STNK Depan' => $doc->stnk_depan,
                 'STNK Belakang' => $doc->stnk_belakang,
 
+                'No. Rangka' => $doc->no_rangka,
+                'No. Mesin' => $doc->no_mesin,
+
                 'BASTK' => $doc->bastk,
             ];
 
